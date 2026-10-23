@@ -86,7 +86,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-05 — Mosse legali, giocata e ridistribuzioni
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** spec §3.4, §4, §5; `docs/architecture.md` (forma dell'API)
 - **Obiettivo:** `ScopaMove(card, capture: Set<Card>)`, `legalMoves(state)`, `play(state, move): PlayResult`, ridistribuzione automatica (§3.4).
 - **Nomi da usare:**
