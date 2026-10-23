@@ -78,7 +78,7 @@ public class SeededRng(seed: Long) {
         private const val GOLDEN_GAMMA: Long = -0x61c8864680b583ebL // 0x9E3779B97F4A7C15
         private const val MIX_1: Long = -0x40a7b892e31b1a47L // 0xBF58476D1CE4E5B9
         private const val MIX_2: Long = -0x6b2fb644ecceee15L // 0x94D049BB133111EB
-        private const val TWO_POW_63: ULong = 1uL shl 63
+        private const val TWO_POW_63: ULong = 0x8000000000000000uL
 
         /**
          * Ricostruisce un [SeededRng] a partire da uno [state] precedentemente esportato.
