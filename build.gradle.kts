@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 /*
@@ -15,12 +18,31 @@ val allowedProjectDeps: Map<String, Set<String>> = mapOf(
     ":core:ai" to setOf(":core:game"),
     ":core:protocol" to setOf(":core:game"),
     ":sim" to setOf(":core:game", ":core:ai"),
+    ":app:android" to setOf(":core:game", ":core:ai", ":core:protocol"),
 )
 val allowedExternalDeps: Map<String, Set<String>> = mapOf(
     ":core:game" to emptySet(),
     ":core:ai" to emptySet(),
     ":core:protocol" to setOf("org.jetbrains.kotlinx:kotlinx-serialization-json"),
     ":sim" to emptySet(),
+    ":app:android" to setOf(
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+        "androidx.compose:compose-bom",
+        "androidx.compose.ui:ui",
+        "androidx.compose.ui:ui-graphics",
+        "androidx.compose.ui:ui-tooling",
+        "androidx.compose.ui:ui-tooling-preview",
+        "androidx.compose.ui:ui-test-junit4",
+        "androidx.compose.ui:ui-test-manifest",
+        "androidx.compose.material3:material3",
+        "androidx.activity:activity-compose",
+        "androidx.navigation:navigation-compose",
+        "androidx.lifecycle:lifecycle-runtime-compose",
+        "androidx.lifecycle:lifecycle-viewmodel-compose",
+        "io.insert-koin:koin-android",
+        "io.insert-koin:koin-androidx-compose",
+    ),
 )
 
 // Unica eccezione sempre ammessa: la stdlib Kotlin. Nei test è ammesso solo kotlin-test.

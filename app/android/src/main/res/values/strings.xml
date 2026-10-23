@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Maestro – Scopa e Briscola</string>
+    <string name="home_welcome_title">Maestro</string>
+    <string name="home_subtitle">Scopa e Briscola con coach AI</string>
+    <string name="home_start_game">Nuova Partita</string>
+</resources>

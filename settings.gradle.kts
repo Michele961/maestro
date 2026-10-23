@@ -21,6 +21,6 @@ include(":core:game")
 include(":core:ai")
 include(":core:protocol")
 include(":sim")
+include(":app:android")
 
-// Fase 1: include(":app:android") — non creare prima del task F1 dedicato.
 // Fase 2: include(":server") — non creare prima del task F2 dedicato.
