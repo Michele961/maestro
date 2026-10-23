@@ -10,6 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class MainTest {
 
@@ -88,6 +89,10 @@ class MainTest {
             arrayOf("--games", "10", "--seed", "xyz"),
             arrayOf("--games", "10", "--seed", "42", "--p1", "unknownBot"),
             arrayOf("--games", "10", "--seed", "42", "--p2", "unknownBot"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "0"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "-10"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "abc"),
+            arrayOf("--games", "10", "--seed", "42", "--samples"),
             arrayOf("--games", "10", "--seed", "42", "--out"),
             arrayOf("--games", "10", "--seed", "42", "--save-logs", "   "),
         )
@@ -215,5 +220,40 @@ class MainTest {
     @Test
     fun mainRunsWithDefaultBotsWhenOnlyGamesAndSeedAreProvided() {
         main(arrayOf("--games", "2", "--seed", "1"))
+    }
+
+    @Test
+    fun pimcBotCliAcceptsSamplesOptionAndProducesDeterministicReport() {
+        val out1 = StringBuilder()
+        val out2 = StringBuilder()
+        val code1 = runCli(
+            args = arrayOf("--games", "4", "--seed", "42", "--p1", "pimc", "--p2", "greedy", "--samples", "10"),
+            out = out1,
+            err = StringBuilder(),
+        )
+        val code2 = runCli(
+            args = arrayOf("--games", "4", "--seed", "42", "--p1", "pimc", "--p2", "greedy", "--samples", "10"),
+            out = out2,
+            err = StringBuilder(),
+        )
+        assertEquals(0, code1)
+        assertEquals(0, code2)
+        val lines1 = out1.toString().trim().lines().filterNot { it.startsWith("msPerMove:") }
+        val lines2 = out2.toString().trim().lines().filterNot { it.startsWith("msPerMove:") }
+        assertEquals(lines1, lines2)
+    }
+
+    @Test
+    fun pimcBotBeatsGreedyBotIn1000GamesForSamples20And50And100() {
+        val r20 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 20))
+        val r50 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 50))
+        val r100 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 100))
+
+        fail(
+            "BENCHMARK_F0_10_RESULTS:\n" +
+                "--- SAMPLES=20 ---\n${r20.toStdoutText()}\n${r20.toJson()}\n" +
+                "--- SAMPLES=50 ---\n${r50.toStdoutText()}\n${r50.toJson()}\n" +
+                "--- SAMPLES=100 ---\n${r100.toStdoutText()}\n${r100.toJson()}",
+        )
     }
 }

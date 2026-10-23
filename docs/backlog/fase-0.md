@@ -171,7 +171,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-10 — Bot PIMC e risolutore dell'ultima distribuzione
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/ai/maestro.md` (PIMC)
 - **Obiettivo:** `MoveEvaluator` PIMC con `determinize()`, `PimcBot`, ricerca esatta a mazzo vuoto, `SearchBudget(samples, maxNodes)`, valutazione provvisoria come da documento. Il simulatore accetta `--p1 pimc` / `--p2 pimc` con `--samples K`.
 - **Perimetro autorizzato:** aggiungere `pimc` e `--samples` al simulatore.

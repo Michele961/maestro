@@ -2,7 +2,9 @@ package it.maestro.sim
 
 import it.maestro.ai.bot.Bot
 import it.maestro.ai.bot.GreedyBot
+import it.maestro.ai.bot.PimcBot
 import it.maestro.ai.bot.RandomBot
+import it.maestro.ai.bot.SearchBudget
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
@@ -30,12 +32,13 @@ private const val PERCENT_MULTIPLIER: Double = 100.0
 private const val P95_QUANTILE: Double = 0.95
 
 /**
- * Configurazione degli argomenti da riga di comando del simulatore (task F0-09).
+ * Configurazione degli argomenti da riga di comando del simulatore (task F0-09, F0-10).
  *
  * @property games Numero di partite da simulare (`> 0`).
  * @property seed Seme del generatore principale (`master = SeededRng(seed)`).
- * @property p1Name Nome del bot associato a `--p1` (`random` o `greedy`).
- * @property p2Name Nome del bot associato a `--p2` (`random` o `greedy`).
+ * @property p1Name Nome del bot associato a `--p1` (`random`, `greedy` o `pimc`).
+ * @property p2Name Nome del bot associato a `--p2` (`random`, `greedy` o `pimc`).
+ * @property samples Numero di campioni per `PimcBot` (`--samples K`, default [SearchBudget.DEFAULT_SAMPLES]).
  * @property outFile Percorso opzionale del file JSON di output (`--out`).
  * @property saveLogsDir Percorso opzionale della cartella in cui salvare i log di partita (`--save-logs`).
  */
@@ -44,6 +47,7 @@ data class SimCliOptions(
     val seed: Long,
     val p1Name: String = DEFAULT_P1_BOT,
     val p2Name: String = DEFAULT_P2_BOT,
+    val samples: Int = SearchBudget.DEFAULT_SAMPLES,
     val outFile: Path? = null,
     val saveLogsDir: Path? = null,
 )
@@ -163,9 +167,9 @@ fun runCli(
  * Esegue la simulazione deterministica delle partite secondo le regole di F0-09.
  */
 fun runSimulation(options: SimCliOptions): SimulationReport {
-    val p1Bot = resolveBot(options.p1Name)
+    val p1Bot = resolveBot(options.p1Name, options.samples)
         ?: error("Bot p1 non valido: ${options.p1Name}")
-    val p2Bot = resolveBot(options.p2Name)
+    val p2Bot = resolveBot(options.p2Name, options.samples)
         ?: error("Bot p2 non valido: ${options.p2Name}")
 
     val saveLogsDir = options.saveLogsDir
@@ -273,6 +277,7 @@ internal fun parseCliArgs(args: Array<String>): SimCliOptions? {
     var seed: Long? = null
     var p1Name: String = DEFAULT_P1_BOT
     var p2Name: String = DEFAULT_P2_BOT
+    var samples: Int = SearchBudget.DEFAULT_SAMPLES
     var outFile: Path? = null
     var saveLogsDir: Path? = null
 
@@ -293,13 +298,18 @@ internal fun parseCliArgs(args: Array<String>): SimCliOptions? {
             }
             "--p1" -> {
                 val normalized = value.lowercase(Locale.ROOT)
-                if (resolveBot(normalized) == null) return null
+                if (!isSupportedBotName(normalized)) return null
                 p1Name = normalized
             }
             "--p2" -> {
                 val normalized = value.lowercase(Locale.ROOT)
-                if (resolveBot(normalized) == null) return null
+                if (!isSupportedBotName(normalized)) return null
                 p2Name = normalized
+            }
+            "--samples" -> {
+                val parsed = value.toIntOrNull() ?: return null
+                if (parsed <= 0) return null
+                samples = parsed
             }
             "--out" -> {
                 outFile = Path.of(value)
@@ -320,18 +330,23 @@ internal fun parseCliArgs(args: Array<String>): SimCliOptions? {
         seed = finalSeed,
         p1Name = p1Name,
         p2Name = p2Name,
+        samples = samples,
         outFile = outFile,
         saveLogsDir = saveLogsDir,
     )
 }
 
 internal fun usageMessage(): String =
-    "Usage: sim --games <N> --seed <S> [--p1 <random|greedy>] [--p2 <random|greedy>] " +
-        "[--out <file.json>] [--save-logs <dir>]"
+    "Usage: sim --games <N> --seed <S> [--p1 <random|greedy|pimc>] [--p2 <random|greedy|pimc>] " +
+        "[--samples <K>] [--out <file.json>] [--save-logs <dir>]"
 
-private fun resolveBot(name: String): Bot? = when (name) {
+private fun isSupportedBotName(name: String): Boolean =
+    name == "random" || name == "greedy" || name == "pimc"
+
+private fun resolveBot(name: String, samples: Int = SearchBudget.DEFAULT_SAMPLES): Bot? = when (name) {
     "random" -> RandomBot
     "greedy" -> GreedyBot
+    "pimc" -> PimcBot(SearchBudget(samples = samples))
     else -> null
 }
 
