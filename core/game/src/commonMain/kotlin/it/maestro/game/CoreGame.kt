@@ -8,5 +8,5 @@ package it.maestro.game
  */
 public object CoreGame {
     /** Versione delle regole serializzata nei log; va incrementata a ogni cambio di regole (ADR-0003). */
-    public const val RULES_VERSION: Int = 0
+    public const val RULES_VERSION: Int = 1
 }
