@@ -25,6 +25,6 @@ public data class SearchBudget(
         public const val DEFAULT_SAMPLES: Int = 20
 
         /** Limite predefinito di nodi esplorati per campione nella ricerca a informazione perfetta. */
-        public const val DEFAULT_MAX_NODES: Int = 2_000
+        public const val DEFAULT_MAX_NODES: Int = 200
     }
 }
