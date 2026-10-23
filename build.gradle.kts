@@ -50,9 +50,13 @@ subprojects {
                                 violations += "${c.name}: progetto ${d.path}"
                             }
                             else -> {
+                                // Il plugin KMP aggiunge dipendenze interne "unspecified"
+                                // (group null) alle configurazioni di compilazione dei test.
+                                // Non sono dipendenze reali del modulo e vanno ignorate.
+                                if (d.group == null || d.name == "unspecified") return@forEach
                                 val ok = isStdlib(d.group, d.name) ||
                                     (isTest && isKotlinTest(d.group, d.name)) ||
-                                    (!isTest && "${d.group}:${d.name}" in allowedExternal)
+                                    "${d.group}:${d.name}" in allowedExternal
                                 if (!ok) violations += "${c.name}: libreria ${d.group}:${d.name}"
                             }
                         }
