@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "ask": [
+      "gradle/libs.versions.toml",
+      "**/build.gradle.kts",
+      "settings.gradle.kts",
+      "docs/decisions/**",
+      "docs/rules/**",
+      "docs/vision.md",
+      "docs/architecture.md",
+      "docs/ai/**",
+      "docs/conventions.md",
+      "docs/workflow.md",
+      ".github/**",
+      ".claude/**",
+      "CLAUDE.md",
+      "AGENTS.md"
+    ]
+  }
+}

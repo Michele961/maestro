@@ -35,7 +35,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-00 — Guardrail mancanti per gli agenti
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Modalità:** sessione interattiva con Michele (tutti i file sono protetti).
 - **Obiettivo:** creare i file che `CLAUDE.md` cita ma che non esistono: template della PR (con sezioni "Fuori dal perimetro" e "Domande aperte"), `.claude/commands/start-task.md`, `.claude/commands/review-task.md`, `.claude/settings.json` con conferma sui file protetti. Aggiornare `README.md` (stato: Fase 1) e la tabella "Stack per fase" di `docs/architecture.md` con le librerie approvate in D5.
 - **Perimetro autorizzato:** `.github/`, `.claude/`, `README.md`, tabella "Stack per fase" di `docs/architecture.md`.
