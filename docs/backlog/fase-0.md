@@ -59,7 +59,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-03 — Modello delle carte e notazione di test
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** spec §1, `docs/rules/glossary.md`, `docs/conventions.md` (ordine canonico)
 - **Obiettivo:** in `it.maestro.game.model`: `Suit`, `Rank` (con `value` 1–10), `Card`, `Seat` (`P1`, `P2`, `other()`), `fullDeck()` in ordine canonico, `CardOrder` (comparator canonico). Helper **solo di test** `card("7D")` / `cards("AD", "3C")`.
 - **Notazione:** simbolo del valore `A`, `2`…`7`, `F`, `C`, `R` + seme `D`, `C`, `S`, `B`. Ogni altro simbolo (es. `8D`, `10D`, `KD`) è invalido.
