@@ -104,7 +104,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-06 — Fine smazzata, punteggio e fine partita
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** spec §6, §7
 - **Obiettivo:** carte residue all'ultima presa, punti per categoria (primiera e `reBello` inclusi), totali, nuova smazzata con cambio mazziere, fine partita, tutto dentro `play()` come da §7.5. `DealPhase.DEAL_OVER` diventa uno stato di passaggio non osservabile dall'esterno, a meno che la partita sia finita.
 - **Nomi da usare:** `DealScore` (punti per `ScoreCategory` e per `Seat`, più le somme di primiera di entrambi), eventi `DealEnded(score: DealScore)` e `MatchEnded(winner: Seat, totals)`, `DealPhase.MATCH_OVER`.

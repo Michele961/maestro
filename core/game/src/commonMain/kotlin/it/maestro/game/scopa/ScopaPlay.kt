@@ -3,16 +3,19 @@ package it.maestro.game.scopa
 import it.maestro.game.model.Card
 import it.maestro.game.model.CardOrder
 import it.maestro.game.model.Seat
+import it.maestro.game.model.fullDeck
+import it.maestro.game.rng.SeededRng
 
 private const val REDEAL_CARDS_TOTAL: Int = 6
 private const val MIN_SUM_CAPTURE_SIZE: Int = 2
 
 /**
  * Restituisce tutte le mosse legali per il giocatore di turno ([ScopaState.toMove]) nello stato [state],
- * in ordine deterministico e canonico (`docs/architecture.md`, spec §4.2–4.6, §4.9).
+ * in ordine deterministico e canonico (`docs/architecture.md`, spec §4.2–4.6, §4.9, §7.6).
  *
  * Regole applicate:
- * - Se [ScopaState.phase] non è [DealPhase.PLAYING], restituisce una lista vuota (comportamento di confine F0-05).
+ * - Se [ScopaState.phase] non è [DealPhase.PLAYING] (ad esempio a partita finita, [DealPhase.MATCH_OVER],
+ *   spec §7.6), restituisce una lista vuota.
  * - Le carte nella mano del giocatore di turno sono considerate in ordine canonico ([CardOrder], spec §4.9).
  * - **Precedenza della carta uguale (spec §4.2):** se sul tavolo c'è almeno una carta dello stesso valore
  *   ([Card.rank]) della carta giocata, le uniche prese ammesse per quella carta sono i singoletti
@@ -58,17 +61,22 @@ public fun legalMoves(state: ScopaState): List<ScopaMove> {
 
 /**
  * Applica la mossa [move] allo stato [state], restituendo un [PlayResult] tipizzato senza mai
- * lanciare eccezioni per mosse non valide (`docs/architecture.md`, spec §3.4, §4, §5).
+ * lanciare eccezioni per mosse non valide (`docs/architecture.md`, spec §3.4, §4, §5, §6, §7).
  *
- * - Se [ScopaState.phase] è [DealPhase.DEAL_OVER], restituisce [PlayResult.Rejected] con [RejectReason.DEAL_OVER].
+ * - Se [ScopaState.phase] è [DealPhase.MATCH_OVER], restituisce [PlayResult.Rejected] con
+ *   [RejectReason.MATCH_OVER] (spec §7.6).
+ * - Se [ScopaState.phase] è [DealPhase.DEAL_OVER], restituisce [PlayResult.Rejected] con
+ *   [RejectReason.DEAL_OVER].
  * - Se [move] non appartiene a [legalMoves]`(state)`, restituisce [PlayResult.Rejected] con
  *   [RejectReason.NOT_IN_LEGAL_MOVES] lasciando [state] invariato.
  * - Altrimenti applica la giocata, aggiorna tavolo, mazzetto delle prese, conteggio scope, eventuale
- *   ridistribuzione automatica (spec §3.4) o passaggio a [DealPhase.DEAL_OVER] quando mani e mazzo sono vuoti,
- *   e restituisce [PlayResult.Applied] con la lista ordinata di [GameEvent].
+ *   ridistribuzione automatica (spec §3.4) oppure fine smazzata (spec §6, §7.5: assegnazione delle
+ *   carte residue all'ultima presa, calcolo del punteggio con evento [GameEvent.DealEnded], nuova
+ *   smazzata con mazziere alternato o fine partita con evento [GameEvent.MatchEnded]).
  */
 public fun play(state: ScopaState, move: ScopaMove): PlayResult {
     return when (state.phase) {
+        DealPhase.MATCH_OVER -> PlayResult.Rejected(RejectReason.MATCH_OVER)
         DealPhase.DEAL_OVER -> PlayResult.Rejected(RejectReason.DEAL_OVER)
         DealPhase.PLAYING -> applyMoveIfLegal(state, move)
     }
@@ -130,41 +138,43 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
         }
     }
 
+    if (bothHandsEmpty && state.deck.isEmpty()) {
+        return finishDealAndContinueOrEndMatch(
+            state = state,
+            mover = seat,
+            handsAfterPlay = handsAfterPlay,
+            tableAfterPlay = newTable,
+            capturedAfterPlay = newCapturedBy,
+            sweepsAfterPlay = newSweeps,
+            lastCapturer = newLastCapturer,
+            events = events,
+        )
+    }
+
     val finalHands: Map<Seat, List<Card>>
     val finalDeck: List<Card>
     val finalDistribution: Int
-    val finalPhase: DealPhase
 
     if (bothHandsEmpty) {
-        if (state.deck.isNotEmpty()) {
-            // spec §3.4: ridistribuzione automatica di 3 carte a testa, una alla volta,
-            // iniziando dall'avversario del mazziere, senza carte nuove sul tavolo.
-            check(state.deck.size >= REDEAL_CARDS_TOTAL) {
-                "Il mazzo deve contenere almeno $REDEAL_CARDS_TOTAL carte per ridistribuire, trovate ${state.deck.size}"
-            }
-            val firstReceiver = state.dealer.other()
-            val firstReceiverHand = listOf(state.deck[0], state.deck[2], state.deck[4])
-            val dealerHand = listOf(state.deck[1], state.deck[3], state.deck[5])
-            finalHands = mapOf(
-                Seat.P1 to if (firstReceiver == Seat.P1) firstReceiverHand else dealerHand,
-                Seat.P2 to if (firstReceiver == Seat.P2) firstReceiverHand else dealerHand,
-            )
-            finalDeck = state.deck.subList(REDEAL_CARDS_TOTAL, state.deck.size).toList()
-            finalDistribution = state.distribution + 1
-            finalPhase = DealPhase.PLAYING
-            events.add(GameEvent.CardsDealt(distribution = finalDistribution))
-        } else {
-            // F0-05 comportamento di confine: fine della smazzata -> DEAL_OVER.
-            finalHands = handsAfterPlay
-            finalDeck = state.deck
-            finalDistribution = state.distribution
-            finalPhase = DealPhase.DEAL_OVER
+        // spec §3.4: ridistribuzione automatica di 3 carte a testa, una alla volta,
+        // iniziando dall'avversario del mazziere, senza carte nuove sul tavolo.
+        check(state.deck.size >= REDEAL_CARDS_TOTAL) {
+            "Il mazzo deve contenere almeno $REDEAL_CARDS_TOTAL carte per ridistribuire, trovate ${state.deck.size}"
         }
+        val firstReceiver = state.dealer.other()
+        val firstReceiverHand = listOf(state.deck[0], state.deck[2], state.deck[4])
+        val dealerHand = listOf(state.deck[1], state.deck[3], state.deck[5])
+        finalHands = mapOf(
+            Seat.P1 to if (firstReceiver == Seat.P1) firstReceiverHand else dealerHand,
+            Seat.P2 to if (firstReceiver == Seat.P2) firstReceiverHand else dealerHand,
+        )
+        finalDeck = state.deck.subList(REDEAL_CARDS_TOTAL, state.deck.size).toList()
+        finalDistribution = state.distribution + 1
+        events.add(GameEvent.CardsDealt(distribution = finalDistribution))
     } else {
         finalHands = handsAfterPlay
         finalDeck = state.deck
         finalDistribution = state.distribution
-        finalPhase = DealPhase.PLAYING
     }
 
     val newState = state.copy(
@@ -172,7 +182,7 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
         hands = finalHands,
         table = newTable,
         deck = finalDeck,
-        phase = finalPhase,
+        phase = DealPhase.PLAYING,
         distribution = finalDistribution,
         capturedBy = newCapturedBy,
         sweeps = newSweeps,
@@ -180,6 +190,94 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
     )
 
     return PlayResult.Applied(state = newState, events = events.toList())
+}
+
+/**
+ * Esegue la chiusura automatica della smazzata secondo spec §6.1–6.3 e §7.2–7.5:
+ * 1. Assegna le carte rimaste sul tavolo a [lastCapturer] (senza scopa); se `lastCapturer == null`,
+ *    le carte restano non assegnate a nessuno.
+ * 2. Calcola il [DealScore], emette [GameEvent.DealEnded] e aggiorna i totali di partita.
+ * 3. Se almeno un giocatore ha raggiunto o superato [ScopaConfig.targetScore] e i totali non sono in parità,
+ *    emette [GameEvent.MatchEnded] e porta lo stato in [DealPhase.MATCH_OVER].
+ * 4. Altrimenti avvia automaticamente una nuova smazzata con il mazziere alternato (`dealer.other()`).
+ */
+private fun finishDealAndContinueOrEndMatch(
+    state: ScopaState,
+    mover: Seat,
+    handsAfterPlay: Map<Seat, List<Card>>,
+    tableAfterPlay: List<Card>,
+    capturedAfterPlay: Map<Seat, List<Card>>,
+    sweepsAfterPlay: Map<Seat, Int>,
+    lastCapturer: Seat?,
+    events: MutableList<GameEvent>,
+): PlayResult {
+    // spec §6.1: le carte rimaste sul tavolo vanno a chi ha fatto l'ultima presa (non è una scopa).
+    // Se nessuno ha preso nulla nell'intera smazzata, restano assegnate a nessuno.
+    val finalCapturedBy: Map<Seat, List<Card>>
+    val tableAtDealEnd: List<Card>
+    if (tableAfterPlay.isNotEmpty() && lastCapturer != null) {
+        val updatedLastCapturerPile = capturedAfterPlay.getValue(lastCapturer) + tableAfterPlay
+        finalCapturedBy = mapOf(
+            Seat.P1 to if (lastCapturer == Seat.P1) updatedLastCapturerPile else capturedAfterPlay.getValue(Seat.P1),
+            Seat.P2 to if (lastCapturer == Seat.P2) updatedLastCapturerPile else capturedAfterPlay.getValue(Seat.P2),
+        )
+        tableAtDealEnd = emptyList()
+    } else {
+        finalCapturedBy = capturedAfterPlay
+        tableAtDealEnd = tableAfterPlay
+    }
+
+    // spec §6.2, §6.3: calcolo punteggio della smazzata.
+    val dealScore = calculateDealScore(
+        config = state.config,
+        capturedBy = finalCapturedBy,
+        sweeps = sweepsAfterPlay,
+    )
+    events.add(GameEvent.DealEnded(score = dealScore))
+
+    val p1Total = state.totals.getValue(Seat.P1) + dealScore.totalPoints(Seat.P1)
+    val p2Total = state.totals.getValue(Seat.P2) + dealScore.totalPoints(Seat.P2)
+    val updatedTotals = mapOf(
+        Seat.P1 to p1Total,
+        Seat.P2 to p2Total,
+    )
+
+    // spec §7.2, §7.3: se almeno un giocatore ha raggiunto o superato targetScore e i totali non sono pari,
+    // vince chi ha il punteggio totale più alto; se i totali sono pari, si gioca un'altra smazzata.
+    val target = state.config.targetScore
+    val someoneReachedTarget = p1Total >= target || p2Total >= target
+    if (someoneReachedTarget && p1Total != p2Total) {
+        val winner = if (p1Total > p2Total) Seat.P1 else Seat.P2
+        events.add(GameEvent.MatchEnded(winner = winner, totals = updatedTotals))
+        val matchOverState = state.copy(
+            toMove = mover.other(),
+            hands = handsAfterPlay,
+            table = tableAtDealEnd,
+            deck = emptyList(),
+            phase = DealPhase.MATCH_OVER,
+            capturedBy = finalCapturedBy,
+            sweeps = sweepsAfterPlay,
+            lastCapturer = lastCapturer,
+            totals = updatedTotals,
+            winner = winner,
+        )
+        return PlayResult.Applied(state = matchOverState, events = events.toList())
+    }
+
+    // spec §2.3, §7.3, §7.5: nuova smazzata con il mazziere passato all'altro giocatore,
+    // proseguendo sulla stessa sequenza di SeededRng (ADR-0009 punto 4).
+    val nextDealer = state.dealer.other()
+    val rng = SeededRng.fromState(state.rngState)
+    val nextDealState = dealOpeningHand(
+        config = state.config,
+        dealer = nextDealer,
+        nextShuffledDeck = { rng.shuffle(fullDeck()) },
+        currentRngState = { rng.state },
+    ).copy(
+        totals = updatedTotals,
+    )
+
+    return PlayResult.Applied(state = nextDealState, events = events.toList())
 }
 
 /**
