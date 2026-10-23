@@ -58,7 +58,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-02 — Modulo `app:android` e CI con APK
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** ADR-0012, ADR-0007, `docs/architecture.md` (Moduli)
 - **Obiettivo:** creare `app:android` (una sola Activity, Compose, Koin, `minSdk 26`, `applicationId = "it.maestro.app"`), tema base, risorse stringhe `it` ed `en`, schermata iniziale vuota con il nome dell'app ("Maestro – Scopa e Briscola", D8). La CI produce l'APK di debug.
 - **Perimetro autorizzato:** nuovo modulo `app:android` in `settings.gradle.kts` e nella tabella dei confini del `build.gradle.kts` root; Compose, Koin, Navigation Compose, kotlinx-coroutines, AndroidX Lifecycle/ViewModel per Compose, Compose UI test (D5) nel version catalog.
