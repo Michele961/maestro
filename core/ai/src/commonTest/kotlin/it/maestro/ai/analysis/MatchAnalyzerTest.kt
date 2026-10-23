@@ -210,20 +210,23 @@ class MatchAnalyzerTest {
             }
         }
 
-        // P2 ha giocato ai turni 0, 2 -> perdite 0.00, 0.20 -> media = 0.10 -> accuracy = 74
-        // P1 ha giocato ai turni 1, 3 -> perdite 0.10, 0.50 -> media = 0.30 -> accuracy = 41
-        assertTrue(abs(0.30 - analysis.meanLoss(Seat.P1)) < 1e-9)
-        assertTrue(abs(0.10 - analysis.meanLoss(Seat.P2)) < 1e-9)
-        assertEquals(41, analysis.accuracy(Seat.P1))
-        assertEquals(74, analysis.accuracy(Seat.P2))
+        val firstMover = analysis.moves[0].seat
+        val secondMover = firstMover.other()
 
-        assertEquals(0, analysis.count(Seat.P1, MoveGrade.BEST))
-        assertEquals(1, analysis.count(Seat.P1, MoveGrade.INACCURACY))
-        assertEquals(1, analysis.count(Seat.P1, MoveGrade.BLUNDER))
+        // firstMover ha giocato ai turni 0, 2 -> perdite 0.00, 0.20 -> media = 0.10 -> accuracy = 74
+        // secondMover ha giocato ai turni 1, 3 -> perdite 0.10, 0.50 -> media = 0.30 -> accuracy = 41
+        assertTrue(abs(0.10 - analysis.meanLoss(firstMover)) < 1e-9)
+        assertTrue(abs(0.30 - analysis.meanLoss(secondMover)) < 1e-9)
+        assertEquals(74, analysis.accuracy(firstMover))
+        assertEquals(41, analysis.accuracy(secondMover))
 
-        assertEquals(1, analysis.count(Seat.P2, MoveGrade.BEST))
-        assertEquals(1, analysis.count(Seat.P2, MoveGrade.INACCURACY))
-        assertEquals(0, analysis.count(Seat.P2, MoveGrade.BLUNDER))
+        assertEquals(1, analysis.count(firstMover, MoveGrade.BEST))
+        assertEquals(1, analysis.count(firstMover, MoveGrade.INACCURACY))
+        assertEquals(0, analysis.count(firstMover, MoveGrade.BLUNDER))
+
+        assertEquals(0, analysis.count(secondMover, MoveGrade.BEST))
+        assertEquals(1, analysis.count(secondMover, MoveGrade.INACCURACY))
+        assertEquals(1, analysis.count(secondMover, MoveGrade.BLUNDER))
     }
 
     @Test
