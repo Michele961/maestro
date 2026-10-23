@@ -3,6 +3,7 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
     // Target attivi: JVM (test, simulatore, server). Android e iOS si aggiungono nei task F1/F4.
     jvm()
     jvmToolchain(21)
