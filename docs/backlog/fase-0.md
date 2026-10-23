@@ -72,7 +72,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-04 — Configurazione, nuova partita e distribuzione iniziale
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** spec §2, §3.1–3.3, §8; ADR-0009 (ordine di consumo), ADR-0011
 - **Obiettivo:** in `it.maestro.game.scopa`: `ScopaConfig` (solo i campi di §8, validati), `ScopaState` immutabile (contiene lo stato di `SeededRng`), `newMatch(config, seed)` con primo mazziere, mescolamento, distribuzione iniziale e regola dei tre Re. Porta `CoreGame.RULES_VERSION` a `1` e aggiorna il relativo test (autorizzato).
 - **Perimetro autorizzato:** helper di test che costruisce uno stato da un ordine di mazzo dato, per forzare i casi di §3.3.
