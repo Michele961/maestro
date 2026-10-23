@@ -26,7 +26,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-01 — Build verde in CI
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Modalità:** sessione interattiva con Michele (le modifiche ai file di build chiedono conferma).
 - **Riferimenti:** `docs/architecture.md`, `build.gradle.kts`, `.github/workflows/ci.yml`
 - **Obiettivo:** lo scaffold esistente compila e `./gradlew check` passa su GitHub Actions e in locale (JDK 21 obbligatorio, nessun toolchain resolver).
