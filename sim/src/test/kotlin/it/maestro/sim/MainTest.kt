@@ -88,6 +88,10 @@ class MainTest {
             arrayOf("--games", "10", "--seed", "xyz"),
             arrayOf("--games", "10", "--seed", "42", "--p1", "unknownBot"),
             arrayOf("--games", "10", "--seed", "42", "--p2", "unknownBot"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "0"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "-10"),
+            arrayOf("--games", "10", "--seed", "42", "--samples", "abc"),
+            arrayOf("--games", "10", "--seed", "42", "--samples"),
             arrayOf("--games", "10", "--seed", "42", "--out"),
             arrayOf("--games", "10", "--seed", "42", "--save-logs", "   "),
         )
@@ -109,6 +113,10 @@ class MainTest {
         // Risultato deterministico esatto su 1000 partite con seed 42 (GreedyBot vs RandomBot):
         // wins: p1=928 (92.8000%), p2=72 (7.2000%)
         private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 928
+
+        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot):
+        // wins: p1=631 (63.1000%), p2=369 (36.9000%)
+        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 631
     }
 
     @Test
@@ -215,5 +223,50 @@ class MainTest {
     @Test
     fun mainRunsWithDefaultBotsWhenOnlyGamesAndSeedAreProvided() {
         main(arrayOf("--games", "2", "--seed", "1"))
+    }
+
+    @Test
+    fun pimcBotCliAcceptsSamplesOptionAndProducesDeterministicReport() {
+        val out1 = StringBuilder()
+        val out2 = StringBuilder()
+        val code1 = runCli(
+            args = arrayOf("--games", "4", "--seed", "42", "--p1", "pimc", "--p2", "greedy", "--samples", "10"),
+            out = out1,
+            err = StringBuilder(),
+        )
+        val code2 = runCli(
+            args = arrayOf("--games", "4", "--seed", "42", "--p1", "pimc", "--p2", "greedy", "--samples", "10"),
+            out = out2,
+            err = StringBuilder(),
+        )
+        assertEquals(0, code1)
+        assertEquals(0, code2)
+        val lines1 = out1.toString().trim().lines().filterNot { it.startsWith("msPerMove:") }
+        val lines2 = out2.toString().trim().lines().filterNot { it.startsWith("msPerMove:") }
+        assertEquals(lines1, lines2)
+    }
+
+    @Test
+    fun pimcBotBeatsGreedyBotInMoreThan60PercentOf1000Games() {
+        val report = runSimulation(
+            SimCliOptions(
+                games = 1000,
+                seed = 42L,
+                p1Name = "pimc",
+                p2Name = "greedy",
+                samples = 20,
+            ),
+        )
+
+        assertEquals(1000, report.winsP1 + report.winsP2)
+        assertTrue(
+            report.winsP1 > 600,
+            "PimcBot deve vincere più del 60% delle partite su 1000 contro GreedyBot, vinte: ${report.winsP1}",
+        )
+        assertEquals(
+            EXPECTED_PIMC_S20_WINS_SEED_42,
+            report.winsP1,
+            "Valore deterministico atteso per seed=42, samples=20 (1000 partite): report=${report.toStdoutText()}",
+        )
     }
 }
