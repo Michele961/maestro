@@ -1,8 +1,10 @@
 package it.maestro.sim
 
+import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.bot.Bot
 import it.maestro.ai.bot.GreedyBot
 import it.maestro.ai.bot.PimcBot
+import it.maestro.ai.bot.PimcEvaluator
 import it.maestro.ai.bot.RandomBot
 import it.maestro.ai.bot.SearchBudget
 import it.maestro.game.CoreGame
@@ -19,6 +21,7 @@ import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.newMatch
 import it.maestro.game.scopa.play
 import it.maestro.game.scopa.viewFor
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
@@ -32,7 +35,7 @@ private const val PERCENT_MULTIPLIER: Double = 100.0
 private const val P95_QUANTILE: Double = 0.95
 
 /**
- * Configurazione degli argomenti da riga di comando del simulatore (task F0-09, F0-10).
+ * Configurazione degli argomenti da riga di comando per la modalità simulazione (task F0-09, F0-10).
  *
  * @property games Numero di partite da simulare (`> 0`).
  * @property seed Seme del generatore principale (`master = SeededRng(seed)`).
@@ -51,6 +54,22 @@ data class SimCliOptions(
     val outFile: Path? = null,
     val saveLogsDir: Path? = null,
 )
+
+/**
+ * Configurazione degli argomenti da riga di comando per la modalità analisi (`--analyze`, task F0-11).
+ *
+ * @property logFile Percorso del file di log da analizzare.
+ * @property samples Numero di campioni PIMC per mossa (`--samples K`, default [SearchBudget.DEFAULT_SAMPLES]).
+ */
+data class AnalyzeCliOptions(
+    val logFile: Path,
+    val samples: Int = SearchBudget.DEFAULT_SAMPLES,
+)
+
+internal sealed interface CliCommand {
+    data class Simulate(val options: SimCliOptions) : CliCommand
+    data class Analyze(val options: AnalyzeCliOptions) : CliCommand
+}
 
 /**
  * Risultato aggregato di una sessione di simulazione (task F0-09).
@@ -145,21 +164,67 @@ fun runCli(
     out: Appendable = System.out,
     err: Appendable = System.err,
 ): Int {
-    val options = parseCliArgs(args)
-    if (options == null) {
+    val command = parseCliCommand(args)
+    if (command == null) {
         err.appendLine(usageMessage())
         return 1
     }
 
-    val report = runSimulation(options)
-    out.appendLine(report.toStdoutText())
+    return when (command) {
+        is CliCommand.Simulate -> {
+            val options = command.options
+            val report = runSimulation(options)
+            out.appendLine(report.toStdoutText())
 
-    val outFile = options.outFile
-    if (outFile != null) {
-        outFile.parent?.let { Files.createDirectories(it) }
-        Files.writeString(outFile, report.toJson())
+            val outFile = options.outFile
+            if (outFile != null) {
+                outFile.parent?.let { Files.createDirectories(it) }
+                Files.writeString(outFile, report.toJson())
+            }
+            0
+        }
+        is CliCommand.Analyze -> {
+            runAnalyzeCli(command.options, out, err)
+        }
+    }
+}
+
+private fun runAnalyzeCli(
+    options: AnalyzeCliOptions,
+    out: Appendable,
+    err: Appendable,
+): Int {
+    if (!Files.isRegularFile(options.logFile)) {
+        err.appendLine("File di log non trovato o non valido: ${options.logFile}")
+        return 1
     }
 
+    val text = try {
+        Files.readString(options.logFile)
+    } catch (e: IOException) {
+        err.appendLine("Errore di lettura del file di log '${options.logFile}': ${e.message}")
+        return 1
+    }
+
+    val log = try {
+        MatchLog.parse(text)
+    } catch (e: IllegalArgumentException) {
+        err.appendLine("Log non valido '${options.logFile}': ${e.message}")
+        return 1
+    }
+
+    val analysis = try {
+        val analyzer = MatchAnalyzer(
+            evaluator = PimcEvaluator,
+            budget = SearchBudget(samples = options.samples),
+        )
+        analyzer.analyze(log)
+    } catch (e: IllegalArgumentException) {
+        err.appendLine("Impossibile analizzare il log '${options.logFile}': ${e.message}")
+        return 1
+    }
+
+    out.appendLine(analysis.toReadableReport())
     return 0
 }
 
@@ -270,16 +335,20 @@ fun runSimulation(options: SimCliOptions): SimulationReport {
     )
 }
 
-internal fun parseCliArgs(args: Array<String>): SimCliOptions? {
+internal fun parseCliArgs(args: Array<String>): SimCliOptions? =
+    (parseCliCommand(args) as? CliCommand.Simulate)?.options
+
+internal fun parseCliCommand(args: Array<String>): CliCommand? {
     if (args.isEmpty()) return null
 
     var games: Int? = null
     var seed: Long? = null
-    var p1Name: String = DEFAULT_P1_BOT
-    var p2Name: String = DEFAULT_P2_BOT
+    var p1Name: String? = null
+    var p2Name: String? = null
     var samples: Int = SearchBudget.DEFAULT_SAMPLES
     var outFile: Path? = null
     var saveLogsDir: Path? = null
+    var analyzeFile: Path? = null
 
     var index = 0
     while (index < args.size) {
@@ -317,28 +386,47 @@ internal fun parseCliArgs(args: Array<String>): SimCliOptions? {
             "--save-logs" -> {
                 saveLogsDir = Path.of(value)
             }
+            "--analyze" -> {
+                analyzeFile = Path.of(value)
+            }
             else -> return null
         }
         index += 2
     }
 
+    if (analyzeFile != null) {
+        if (games != null || seed != null || p1Name != null || p2Name != null || outFile != null || saveLogsDir != null) {
+            return null
+        }
+        return CliCommand.Analyze(
+            AnalyzeCliOptions(
+                logFile = analyzeFile,
+                samples = samples,
+            ),
+        )
+    }
+
     val finalGames = games ?: return null
     val finalSeed = seed ?: return null
 
-    return SimCliOptions(
-        games = finalGames,
-        seed = finalSeed,
-        p1Name = p1Name,
-        p2Name = p2Name,
-        samples = samples,
-        outFile = outFile,
-        saveLogsDir = saveLogsDir,
+    return CliCommand.Simulate(
+        SimCliOptions(
+            games = finalGames,
+            seed = finalSeed,
+            p1Name = p1Name ?: DEFAULT_P1_BOT,
+            p2Name = p2Name ?: DEFAULT_P2_BOT,
+            samples = samples,
+            outFile = outFile,
+            saveLogsDir = saveLogsDir,
+        ),
     )
 }
 
 internal fun usageMessage(): String =
-    "Usage: sim --games <N> --seed <S> [--p1 <random|greedy|pimc>] [--p2 <random|greedy|pimc>] " +
-        "[--samples <K>] [--out <file.json>] [--save-logs <dir>]"
+    "Usage:\n" +
+        "  sim --games <N> --seed <S> [--p1 <random|greedy|pimc>] [--p2 <random|greedy|pimc>] " +
+        "[--samples <K>] [--out <file.json>] [--save-logs <dir>]\n" +
+        "  sim --analyze <log-file> [--samples <K>]"
 
 private fun isSupportedBotName(name: String): Boolean =
     name == "random" || name == "greedy" || name == "pimc"

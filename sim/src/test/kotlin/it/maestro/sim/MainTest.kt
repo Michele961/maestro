@@ -94,6 +94,10 @@ class MainTest {
             arrayOf("--games", "10", "--seed", "42", "--samples"),
             arrayOf("--games", "10", "--seed", "42", "--out"),
             arrayOf("--games", "10", "--seed", "42", "--save-logs", "   "),
+            arrayOf("--analyze"),
+            arrayOf("--analyze", "   "),
+            arrayOf("--analyze", "match.log", "--games", "10", "--seed", "42"),
+            arrayOf("--analyze", "match.log", "--samples", "0"),
         )
 
         for (args in invalidCases) {
@@ -268,5 +272,103 @@ class MainTest {
             report.winsP1,
             "Valore deterministico atteso per seed=42, samples=20 (1000 partite): report=${report.toStdoutText()}",
         )
+    }
+
+    @Test
+    fun analyzeOptionPrintsReadableMoveReportForSavedLog() {
+        val tempDir = Files.createTempDirectory("maestro-sim-analyze-")
+        try {
+            val saveExitCode = runCli(
+                args = arrayOf(
+                    "--games",
+                    "1",
+                    "--seed",
+                    "42",
+                    "--p1",
+                    "greedy",
+                    "--p2",
+                    "random",
+                    "--save-logs",
+                    tempDir.toString(),
+                ),
+                out = StringBuilder(),
+                err = StringBuilder(),
+            )
+            assertEquals(0, saveExitCode)
+
+            val logFile = tempDir.resolve("match-0.log")
+            val parsedLog = MatchLog.parse(Files.readString(logFile))
+
+            val analyzeOut1 = StringBuilder()
+            val analyzeErr1 = StringBuilder()
+            val analyzeCode1 = runCli(
+                args = arrayOf("--analyze", logFile.toString(), "--samples", "4"),
+                out = analyzeOut1,
+                err = analyzeErr1,
+            )
+
+            val analyzeOut2 = StringBuilder()
+            val analyzeErr2 = StringBuilder()
+            val analyzeCode2 = runCli(
+                args = arrayOf("--analyze", logFile.toString(), "--samples", "4"),
+                out = analyzeOut2,
+                err = analyzeErr2,
+            )
+
+            assertEquals(0, analyzeCode1)
+            assertEquals(0, analyzeCode2)
+            assertEquals("", analyzeErr1.toString())
+            assertEquals("", analyzeErr2.toString())
+            assertEquals(analyzeOut1.toString(), analyzeOut2.toString())
+
+            val lines = analyzeOut1.toString().trim().lines()
+            assertEquals("maestro-analysis report", lines[0])
+            assertTrue(lines[1].startsWith("P1: accuracy="))
+            assertTrue(lines[2].startsWith("P2: accuracy="))
+            assertEquals(3 + parsedLog.moves.size, lines.size)
+
+            for (i in parsedLog.moves.indices) {
+                val moveLine = lines[3 + i]
+                assertTrue(moveLine.startsWith("#${i + 1} "))
+                assertTrue(moveLine.contains(" | played: "))
+                assertTrue(moveLine.contains(" | grade: "))
+                assertTrue(moveLine.contains(" | top3: ["))
+            }
+        } finally {
+            tempDir.toFile().deleteRecursively()
+        }
+    }
+
+    @Test
+    fun analyzeOptionReturnsNonZeroExitCodeForMissingOrInvalidLogFile() {
+        val tempDir = Files.createTempDirectory("maestro-sim-analyze-invalid-")
+        try {
+            val missingFile = tempDir.resolve("non-existent.log")
+            val outMissing = StringBuilder()
+            val errMissing = StringBuilder()
+            val codeMissing = runCli(
+                args = arrayOf("--analyze", missingFile.toString()),
+                out = outMissing,
+                err = errMissing,
+            )
+            assertNotEquals(0, codeMissing)
+            assertEquals("", outMissing.toString())
+            assertTrue(errMissing.toString().isNotBlank())
+
+            val badLogFile = tempDir.resolve("malformed.log")
+            Files.writeString(badLogFile, "not a maestro log\n")
+            val outBad = StringBuilder()
+            val errBad = StringBuilder()
+            val codeBad = runCli(
+                args = arrayOf("--analyze", badLogFile.toString()),
+                out = outBad,
+                err = errBad,
+            )
+            assertNotEquals(0, codeBad)
+            assertEquals("", outBad.toString())
+            assertTrue(errBad.toString().isNotBlank())
+        } finally {
+            tempDir.toFile().deleteRecursively()
+        }
     }
 }
