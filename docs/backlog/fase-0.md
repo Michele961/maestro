@@ -153,7 +153,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-09 — Simulatore da riga di comando
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `sim/README.md`, `docs/ai/maestro.md` (Metriche)
 - **Obiettivo:** `./gradlew :sim:run --args="--games N --seed S --p1 <random|greedy> --p2 <random|greedy> [--out file.json] [--save-logs dir]"`.
 - **Regole del simulatore:**
