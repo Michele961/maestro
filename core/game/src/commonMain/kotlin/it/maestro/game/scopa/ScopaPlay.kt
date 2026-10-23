@@ -91,6 +91,7 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
     val seat = state.toMove
     val events = mutableListOf<GameEvent>()
     events.add(GameEvent.CardPlayed(seat = seat, card = move.card))
+    val newPlayedCards = state.playedCards + move.card
 
     val updatedMoverHand = state.hand(seat).filterNot { it == move.card }
     val handsAfterPlay = mapOf(
@@ -147,6 +148,7 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
             capturedAfterPlay = newCapturedBy,
             sweepsAfterPlay = newSweeps,
             lastCapturer = newLastCapturer,
+            playedCardsAfterPlay = newPlayedCards,
             events = events,
         )
     }
@@ -187,6 +189,7 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
         capturedBy = newCapturedBy,
         sweeps = newSweeps,
         lastCapturer = newLastCapturer,
+        playedCards = newPlayedCards,
     )
 
     return PlayResult.Applied(state = newState, events = events.toList())
@@ -209,6 +212,7 @@ private fun finishDealAndContinueOrEndMatch(
     capturedAfterPlay: Map<Seat, List<Card>>,
     sweepsAfterPlay: Map<Seat, Int>,
     lastCapturer: Seat?,
+    playedCardsAfterPlay: List<Card>,
     events: MutableList<GameEvent>,
 ): PlayResult {
     // spec §6.1: le carte rimaste sul tavolo vanno a chi ha fatto l'ultima presa (non è una scopa).
@@ -260,6 +264,7 @@ private fun finishDealAndContinueOrEndMatch(
             lastCapturer = lastCapturer,
             totals = updatedTotals,
             winner = winner,
+            playedCards = playedCardsAfterPlay,
         )
         return PlayResult.Applied(state = matchOverState, events = events.toList())
     }
