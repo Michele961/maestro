@@ -44,7 +44,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-02 — Generatore con seed e mescolamento
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0009 (dettagli vincolanti), spec §3.1
 - **Obiettivo:** `SeededRng` in `it.maestro.game.rng` con `nextLong()`, `nextInt(bound)`, `fork()`, `state` esportabile e ripristinabile, e `shuffle` Fisher–Yates che restituisce una nuova lista. Algoritmi esattamente come in ADR-0009.
 - **Fuori perimetro:** uso di `kotlin.random`.
