@@ -58,7 +58,7 @@ class ScopaScoringAndMatchEndTest {
 
         // P1 aveva 20 carte + 4 residue (7D, 7B, 6B, AB) = 24 carte (> 20) -> 1 punto CARTE.
         // P1 aveva 6 Denari + 7D = 7 Denari -> 1 punto DENARI, 1 punto SETTEBELLO.
-        // P1 ora ha anche Bastoni (7B = 21) -> primiera P1 = 18 (6D) + 21 (7C) + 21 (7S) + 21 (7B) = 81 -> 1 punto PRIMIERA.
+        // P1 ora ha 7D (21) e anche Bastoni (7B = 21) -> primiera P1 = 21 (7D) + 21 (7C) + 21 (7S) + 21 (7B) = 84 -> 1 punto PRIMIERA.
         // P1 aveva 1 scopa -> 1 punto SCOPE (nessuna scopa dalle carte residue).
         assertEquals(1, score.points(Seat.P1, ScoreCategory.CARTE))
         assertEquals(1, score.points(Seat.P1, ScoreCategory.DENARI))
@@ -66,7 +66,7 @@ class ScopaScoringAndMatchEndTest {
         assertEquals(1, score.points(Seat.P1, ScoreCategory.PRIMIERA))
         assertEquals(1, score.points(Seat.P1, ScoreCategory.SCOPE))
         assertEquals(0, score.points(Seat.P1, ScoreCategory.RE_BELLO))
-        assertEquals(81, score.primieraSum(Seat.P1))
+        assertEquals(84, score.primieraSum(Seat.P1))
         assertNull(score.primieraSum(Seat.P2))
         assertEquals(5, score.totalPoints(Seat.P1))
         assertEquals(0, score.totalPoints(Seat.P2))
