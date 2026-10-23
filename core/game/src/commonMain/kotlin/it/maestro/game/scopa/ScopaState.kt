@@ -16,12 +16,15 @@ import it.maestro.game.model.Seat
  * @property table Carte scoperte al centro del tavolo, nell'ordine di uscita (spec §3.2).
  * @property deck Carte rimaste nel tallone coperto; l'indice `0` è la carta in cima (spec §3.1).
  * @property rngState Stato interno a 64 bit di `SeededRng` al termine dell'ultima operazione casuale (ADR-0009).
- * @property phase Fase corrente della smazzata ([DealPhase.PLAYING] o [DealPhase.DEAL_OVER], task F0-05).
+ * @property phase Fase corrente della smazzata o della partita ([DealPhase.PLAYING], [DealPhase.DEAL_OVER]
+ *   o [DealPhase.MATCH_OVER], task F0-05, F0-06).
  * @property distribution Numero progressivo della distribuzione corrente nella smazzata (`1..6`, spec §3.5).
  * @property capturedBy Mazzetto delle prese effettuate da ciascun giocatore nella smazzata corrente (spec §4.7).
  * @property sweeps Conteggio delle scope realizzate da ciascun giocatore nella smazzata corrente (spec §5.1).
  * @property lastCapturer Ultimo giocatore che ha effettuato una presa nella smazzata corrente, o `null` se
  *   nessuno ha ancora preso (`docs/rules/glossary.md`, spec §6.1).
+ * @property totals Punteggi totali di partita accumulati da ciascun giocatore a fine smazzata (spec §2.1, §7).
+ * @property winner Vincitore della partita quando [phase] è [DealPhase.MATCH_OVER], altrimenti `null` (spec §7.2).
  */
 public data class ScopaState(
     public val config: ScopaConfig,
@@ -36,6 +39,8 @@ public data class ScopaState(
     public val capturedBy: Map<Seat, List<Card>> = mapOf(Seat.P1 to emptyList(), Seat.P2 to emptyList()),
     public val sweeps: Map<Seat, Int> = mapOf(Seat.P1 to 0, Seat.P2 to 0),
     public val lastCapturer: Seat? = null,
+    public val totals: Map<Seat, Int> = mapOf(Seat.P1 to 0, Seat.P2 to 0),
+    public val winner: Seat? = null,
 ) {
     /**
      * Restituisce la lista delle carte in mano al giocatore seduto in [seat].
@@ -46,4 +51,9 @@ public data class ScopaState(
      * Restituisce il mazzetto delle carte prese nella smazzata corrente dal giocatore seduto in [seat].
      */
     public fun captured(seat: Seat): List<Card> = capturedBy.getValue(seat)
+
+    /**
+     * Restituisce il punteggio totale di partita accumulato dal giocatore seduto in [seat].
+     */
+    public fun totalScore(seat: Seat): Int = totals.getValue(seat)
 }

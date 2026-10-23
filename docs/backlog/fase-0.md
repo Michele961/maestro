@@ -104,15 +104,15 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-06 — Fine smazzata, punteggio e fine partita
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** spec §6, §7
 - **Obiettivo:** carte residue all'ultima presa, punti per categoria (primiera e `reBello` inclusi), totali, nuova smazzata con cambio mazziere, fine partita, tutto dentro `play()` come da §7.5. `DealPhase.DEAL_OVER` diventa uno stato di passaggio non osservabile dall'esterno, a meno che la partita sia finita.
 - **Nomi da usare:** `DealScore` (punti per `ScoreCategory` e per `Seat`, più le somme di primiera di entrambi), eventi `DealEnded(score: DealScore)` e `MatchEnded(winner: Seat, totals)`, `DealPhase.MATCH_OVER`.
 - **Perimetro autorizzato:** modificare il comportamento di confine di F0-05 (da `DEAL_OVER` a nuova smazzata) e aggiornare i relativi test.
 - **Criteri di accettazione:**
-    - [ ] Tutti i casi di §10 relativi a §6 e §7 hanno un test dedicato.
-    - [ ] §7.6: a partita finita `legalMoves()` è vuota e `play()` dà `Rejected(MATCH_OVER)`.
-    - [ ] Su 500 seed, la partita termina sempre e il vincitore rispetta §7.2–7.3.
+    - [x] Tutti i casi di §10 relativi a §6 e §7 hanno un test dedicato.
+    - [x] §7.6: a partita finita `legalMoves()` è vuota e `play()` dà `Rejected(MATCH_OVER)`.
+    - [x] Su 500 seed, la partita termina sempre e il vincitore rispetta §7.2–7.3.
 - **Domande aperte:** —
 
 ## F0-07 — Vista del giocatore, log, replay e determinizzazione

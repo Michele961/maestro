@@ -298,16 +298,16 @@ class ScopaPlayTest {
         val result = play(finalPlayState, ScopaMove(card("RD"), cards("4C", "6S").toSet()))
         assertTrue(result is PlayResult.Applied)
 
-        assertTrue(result.state.table.isEmpty())
-        assertEquals(DealPhase.DEAL_OVER, result.state.phase)
-        // Il conteggio scope di P1 resta invariato (2) e non viene emesso GameEvent.Sweep.
-        assertEquals(2, result.state.sweeps.getValue(Seat.P1))
-        assertEquals(1, result.state.sweeps.getValue(Seat.P2))
-        assertEquals(Seat.P1, result.state.lastCapturer)
+        // Non viene emesso GameEvent.Sweep e i punti SCOPE in DealEnded restano 2 per P1 e 1 per P2.
+        assertTrue(result.events.none { it is GameEvent.Sweep })
+        val dealEnded = result.events.filterIsInstance<GameEvent.DealEnded>().single()
+        assertEquals(2, dealEnded.score.points(Seat.P1, ScoreCategory.SCOPE))
+        assertEquals(1, dealEnded.score.points(Seat.P2, ScoreCategory.SCOPE))
         assertEquals(
             listOf(
                 GameEvent.CardPlayed(Seat.P1, card("RD")),
                 GameEvent.Captured(Seat.P1, cards("4C", "6S").toSet()),
+                dealEnded,
             ),
             result.events,
         )
@@ -395,17 +395,19 @@ class ScopaPlayTest {
     }
 
     @Test
-    fun spec3_5_spec10_500SeedsPlayingFirstLegalMoveReachesDealOverWith40CardsInvariant() {
+    fun spec3_5_spec10_500SeedsPlayingFirstLegalMoveCompletesFirstDealWith36PlaysAnd40CardsInvariant() {
         val canonicalDeckSet = fullDeck().toSet()
 
         for (seed in 0L until 500L) {
             var state = newMatch(ScopaConfig(), seed)
             assertInitialInvariants(state, canonicalDeckSet, seed)
 
+            val initialDealer = state.dealer
             val cardsDealtEvents = mutableListOf<GameEvent.CardsDealt>()
+            var dealEndedEvent: GameEvent.DealEnded? = null
             var movesPlayed = 0
 
-            while (state.phase == DealPhase.PLAYING) {
+            while (dealEndedEvent == null) {
                 val legal = legalMoves(state)
                 assertTrue(legal.isNotEmpty(), "legalMoves vuota durante PLAYING per seed=$seed, mossa=$movesPlayed")
                 assertLegalMovesCanonicalOrder(legal, seed, movesPlayed)
@@ -416,30 +418,31 @@ class ScopaPlayTest {
                 assertTrue(result is PlayResult.Applied, "play ha rifiutato la prima mossa legale per seed=$seed")
 
                 cardsDealtEvents.addAll(result.events.filterIsInstance<GameEvent.CardsDealt>())
+                dealEndedEvent = result.events.filterIsInstance<GameEvent.DealEnded>().singleOrNull()
                 state = result.state
                 movesPlayed++
 
-                assertEquals(currentMover.other(), state.toMove, "Il turno non si è alternato per seed=$seed")
+                if (dealEndedEvent == null) {
+                    assertEquals(currentMover.other(), state.toMove, "Il turno non si è alternato per seed=$seed")
+                }
                 assert40CardsInvariant(state, canonicalDeckSet, seed, movesPlayed)
             }
 
             // spec §3.5: 6 distribuzioni totali = 36 carte giocate in una smazzata a 2 giocatori.
             assertEquals(36, movesPlayed, "Numero di giocate != 36 per seed=$seed")
-            assertEquals(DealPhase.DEAL_OVER, state.phase, "Fase finale != DEAL_OVER per seed=$seed")
-            assertEquals(6, state.distribution, "Distribuzione finale != 6 per seed=$seed")
             assertEquals(
                 listOf(2, 3, 4, 5, 6),
                 cardsDealtEvents.map { it.distribution },
                 "Eventi CardsDealt non corrispondono alle distribuzioni 2..6 per seed=$seed",
             )
-            assertTrue(state.hand(Seat.P1).isEmpty(), "Mano P1 non vuota a fine smazzata per seed=$seed")
-            assertTrue(state.hand(Seat.P2).isEmpty(), "Mano P2 non vuota a fine smazzata per seed=$seed")
-            assertTrue(state.deck.isEmpty(), "Mazzo non vuoto a fine smazzata per seed=$seed")
-            assertTrue(legalMoves(state).isEmpty(), "legalMoves non vuota a DEAL_OVER per seed=$seed")
-            assertEquals(
-                PlayResult.Rejected(RejectReason.DEAL_OVER),
-                play(state, ScopaMove(card("AD"), emptySet())),
-            )
+            // Dopo la 36ª giocata (spec §7.5): o è iniziata una nuova smazzata con mazziere alternato,
+            // oppure la partita è terminata (MATCH_OVER).
+            if (state.phase == DealPhase.PLAYING) {
+                assertEquals(initialDealer.other(), state.dealer, "Il mazziere non è cambiato per seed=$seed")
+                assertEquals(1, state.distribution, "Nuova smazzata non in distribuzione 1 per seed=$seed")
+            } else {
+                assertEquals(DealPhase.MATCH_OVER, state.phase, "Fase inattesa per seed=$seed")
+            }
         }
     }
 

@@ -4,7 +4,7 @@ import it.maestro.game.model.Card
 import it.maestro.game.model.Seat
 
 /**
- * Evento di dominio prodotto dall'esecuzione di una giocata valida tramite [play] (task F0-05).
+ * Evento di dominio prodotto dall'esecuzione di una giocata valida tramite [play] (task F0-05, F0-06).
  */
 public sealed interface GameEvent {
     /**
@@ -46,5 +46,26 @@ public sealed interface GameEvent {
      */
     public data class CardsDealt(
         public val distribution: Int,
+    ) : GameEvent
+
+    /**
+     * La smazzata si è conclusa ed è stato calcolato il punteggio [score] (spec §6, §7.5, task F0-06).
+     *
+     * @property score Dettaglio dei punti per categoria e per giocatore e delle somme di primiera.
+     */
+    public data class DealEnded(
+        public val score: DealScore,
+    ) : GameEvent
+
+    /**
+     * La partita si è conclusa con la vittoria di [winner] e i punteggi totali [totals]
+     * (spec §7.2, §7.5, task F0-06).
+     *
+     * @property winner Giocatore vincitore della partita.
+     * @property totals Punteggi totali finali di partita per ciascun [Seat].
+     */
+    public data class MatchEnded(
+        public val winner: Seat,
+        public val totals: Map<Seat, Int>,
     ) : GameEvent
 }
