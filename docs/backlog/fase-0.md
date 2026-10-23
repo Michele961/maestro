@@ -195,7 +195,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-12 — Revisione con giocatore esperto
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Esecutore:** Michele (non un agente)
 - **Obiettivo:** analizzare 20 partite con l'output di F0-11 e annotare dove le classi non convincono.
 - **Uscita:** note in `docs/backlog/f0-12-note.md`, usate per tarare soglie, pesi e formula della precisione.
