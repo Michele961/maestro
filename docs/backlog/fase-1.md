@@ -46,7 +46,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-01 — Target Android nei moduli `core:*`
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/architecture.md` (Target), ADR-0001, ADR-0010
 - **Obiettivo:** aggiungere `androidTarget()` a `core:game`, `core:ai`, `core:protocol` senza cambiare codice comune. I test comuni girano anche sul target Android (unit test locali).
 - **Perimetro autorizzato:** Android Gradle Plugin stabile (D5) nel version catalog e nei `build.gradle.kts` dei moduli `core:*`; Android SDK nel workflow di CI.
