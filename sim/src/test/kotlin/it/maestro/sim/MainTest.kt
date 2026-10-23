@@ -105,6 +105,12 @@ class MainTest {
         }
     }
 
+    private companion object {
+        // Risultato deterministico esatto su 1000 partite con seed 42 (GreedyBot vs RandomBot):
+        // wins: p1=945 (94.5000%), p2=55 (5.5000%)
+        private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 945
+    }
+
     @Test
     fun greedyBotBeatsRandomBotInMoreThanHalfOf1000Games() {
         val report = runSimulation(
@@ -116,11 +122,15 @@ class MainTest {
             ),
         )
 
-        println("F0-09 1000-games benchmark (seed=42):${"\n"}${report.toStdoutText()}")
         assertEquals(1000, report.winsP1 + report.winsP2)
         assertTrue(
             report.winsP1 > 500,
             "GreedyBot deve vincere più di 500 partite su 1000 contro RandomBot, vinte: ${report.winsP1}",
+        )
+        assertEquals(
+            EXPECTED_GREEDY_WINS_SEED_42,
+            report.winsP1,
+            "Valore deterministico atteso per seed=42 (1000 partite): report=${report.toStdoutText()}",
         )
     }
 
