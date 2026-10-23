@@ -18,3 +18,5 @@ jobs:
           java-version: '21'
       - name: Gradle check
         run: ./gradlew check
+      - name: Assemble debug APK
+        run: ./gradlew :app:android:assembleDebug
