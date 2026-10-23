@@ -1,10 +1,10 @@
 # Backlog — Fase 1: MVP offline Android
 
-> **BOZZA — non eseguibile.** Proposta del 2026-10-23, in attesa di approvazione di Michele (vedi `docs/roadmap.md` §3, decisioni D1–D9). Finché questa nota c'è, nessun agente avvia task di questo file.
+Approvato da Michele il 2026-10-23. Le decisioni a cui i task rimandano (D1–D9) sono in `docs/roadmap.md` §3.
 
 Obiettivo della fase: un'app Android installabile in cui si gioca a Scopa contro il Maestro, a più livelli, con anteprima post-partita, Game Review e Check di allenamento, tutto offline. Nessun server, nessun pagamento.
 
-**Gate di uscita (proposta):** partita completa giocata da un tester esterno contro ogni livello; precisione di ogni livello nella fascia decisa in D3; p95 del tempo per mossa del livello più forte sotto 500 ms sul dispositivo di riferimento (D4); zero crash su almeno 50 partite di test; etichette della review giudicate sensate nel playtest umano (F1-16).
+**Gate di uscita:** partita completa giocata da un tester esterno contro ogni livello; Elo di ogni livello vicino al suo obiettivo e ogni livello più forte del precedente (D3); p95 del tempo per mossa del livello Maestro sotto 200 ms sul Pixel 10 Pro e sotto 800 ms sul profilo di fascia bassa (D4); zero crash su almeno 50 partite di test; etichette della review giudicate sensate nel playtest umano (F1-16).
 
 Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in corso` · `in revisione` · `fatto` · `bloccato`, vedi `docs/workflow.md`). Gli agenti modificano solo **Stato** e **Domande aperte** del proprio task.
 
@@ -37,8 +37,8 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 - **Stato:** da fare
 - **Modalità:** sessione interattiva con Michele (tutti i file sono protetti).
-- **Obiettivo:** creare i file che `CLAUDE.md` cita ma che non esistono: template della PR (con sezioni "Fuori dal perimetro" e "Domande aperte"), `.claude/commands/start-task.md`, `.claude/commands/review-task.md`, `.claude/settings.json` con conferma sui file protetti. Aggiornare `README.md` (stato: Fase 1).
-- **Perimetro autorizzato:** `.github/`, `.claude/`, `README.md`.
+- **Obiettivo:** creare i file che `CLAUDE.md` cita ma che non esistono: template della PR (con sezioni "Fuori dal perimetro" e "Domande aperte"), `.claude/commands/start-task.md`, `.claude/commands/review-task.md`, `.claude/settings.json` con conferma sui file protetti. Aggiornare `README.md` (stato: Fase 1) e la tabella "Stack per fase" di `docs/architecture.md` con le librerie approvate in D5.
+- **Perimetro autorizzato:** `.github/`, `.claude/`, `README.md`, tabella "Stack per fase" di `docs/architecture.md`.
 - **Criteri di accettazione:**
     - [ ] I quattro file esistono e corrispondono a quanto descritto in `CLAUDE.md` §6–7.
     - [ ] Michele ha approvato il testo dei comandi.
@@ -49,7 +49,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Stato:** da fare
 - **Riferimenti:** `docs/architecture.md` (Target), ADR-0001, ADR-0010
 - **Obiettivo:** aggiungere `androidTarget()` a `core:game`, `core:ai`, `core:protocol` senza cambiare codice comune. I test comuni girano anche sul target Android (unit test locali).
-- **Perimetro autorizzato:** Android Gradle Plugin (versione da D5) nel version catalog e nei `build.gradle.kts` dei moduli `core:*`; Android SDK nel workflow di CI.
+- **Perimetro autorizzato:** Android Gradle Plugin stabile (D5) nel version catalog e nei `build.gradle.kts` dei moduli `core:*`; Android SDK nel workflow di CI.
 - **Criteri di accettazione:**
     - [ ] `./gradlew check` verde in CI con il target Android.
     - [ ] `core:game` continua a dipendere solo dalla stdlib (`checkModuleBoundaries`).
@@ -60,34 +60,37 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 - **Stato:** da fare
 - **Riferimenti:** ADR-0012, ADR-0007, `docs/architecture.md` (Moduli)
-- **Obiettivo:** creare `app:android` (una sola Activity, Compose, Koin, `minSdk 26`), tema base, risorse stringhe `it` ed `en`, schermata iniziale vuota con il nome dell'app. La CI produce l'APK di debug.
-- **Perimetro autorizzato:** nuovo modulo `app:android` in `settings.gradle.kts` e nella tabella dei confini del `build.gradle.kts` root; Compose, Koin e le librerie di D5 nel version catalog.
+- **Obiettivo:** creare `app:android` (una sola Activity, Compose, Koin, `minSdk 26`, `applicationId = "it.maestro.app"`), tema base, risorse stringhe `it` ed `en`, schermata iniziale vuota con il nome dell'app ("Maestro – Scopa e Briscola", D8). La CI produce l'APK di debug.
+- **Perimetro autorizzato:** nuovo modulo `app:android` in `settings.gradle.kts` e nella tabella dei confini del `build.gradle.kts` root; Compose, Koin, Navigation Compose, kotlinx-coroutines, AndroidX Lifecycle/ViewModel per Compose, Compose UI test (D5) nel version catalog.
 - **Criteri di accettazione:**
     - [ ] `./gradlew check` e `./gradlew :app:android:assembleDebug` verdi in CI.
     - [ ] `app:android` dipende solo da `core:*` tra i moduli del progetto.
     - [ ] Nessuna stringa per l'utente scritta nel codice (ADR-0007): un test o un controllo lint lo verifica.
-- **Domande aperte:** package Android e nome dell'app (D8).
+- **Domande aperte:** —
 
 ## F1-03 — Livelli di difficoltà del Maestro
 
 - **Stato:** da fare
 - **Riferimenti:** `docs/ai/maestro.md` (Livelli di difficoltà), `docs/reports/fase-0.md` §5–6, decisioni D2 e D3
-- **Obiettivo:** in `core:ai`, livelli di difficoltà come configurazione di `PimcBot` (campioni, nodi, rumore nella scelta, memoria imperfetta), nella forma decisa in D3. Il simulatore accetta `--p1 level:<nome>`. Se D2 lo approva, confronto `PRIMIERA_DIFF` 0,02 vs 0,025.
-- **Perimetro autorizzato:** aggiungere l'opzione dei livelli al simulatore.
+- **Obiettivo:** in `core:ai`, 5 livelli di difficoltà (Principiante, Dilettante, Intermedio, Avanzato, Maestro) come configurazioni di `PimcBot`: campioni, nodi, rumore nella scelta, memoria imperfetta (D3). Il simulatore accetta `--p1 level:<nome>` e calcola l'Elo dei livelli facendoli giocare tra loro. `PRIMIERA_DIFF` passa a 0,025 (D2). Parametri ed Elo finali si fissano con Michele sui dati del task.
+- **Perimetro autorizzato:** aggiungere livelli ed Elo al simulatore; aggiornare in `docs/ai/maestro.md` il peso della primiera e la sezione "Livelli di difficoltà" con i valori approvati.
 - **Criteri di accettazione:**
     - [ ] Ogni livello è deterministico a parità di seed (test).
     - [ ] La "memoria imperfetta" usa solo la vista: il bot non riceve mai lo stato completo (test).
-    - [ ] Report nella PR: precisione media (con `MatchAnalyzer`) e win-rate di ogni livello contro il successivo su 1000 partite; ogni livello nella sua fascia di D3.
+    - [ ] Report nella PR: Elo misurato di ogni livello (obiettivo di partenza 800 / 1100 / 1400 / 1700 / 2000), win-rate di ogni livello contro il successivo su 1000 partite, precisione media con `MatchAnalyzer`.
+    - [ ] Ogni livello batte il precedente con margine significativo.
+    - [ ] Confronto `PRIMIERA_DIFF` 0,02 vs 0,025 su 1000 partite di `PimcBot` contro sé stesso, allegato alla PR.
 - **Domande aperte:** —
 
 ## F1-04 — Misura delle prestazioni su dispositivo
 
 - **Stato:** da fare
 - **Riferimenti:** decisione D4, `docs/reports/fase-0.md` §4.2
-- **Obiettivo:** misurare su dispositivo reale (o emulatore con profilo del dispositivo di riferimento) il tempo per mossa di ogni livello e il tempo dell'analisi di una partita intera.
+- **Obiettivo:** misurare sul Pixel 10 Pro di Michele e su un emulatore con profilo di fascia bassa (CPU limitata, API 26) il tempo per mossa di ogni livello e il tempo dell'analisi di una partita intera.
 - **Criteri di accettazione:**
     - [ ] Tabella nella PR: tempo medio e p95 per mossa per livello; tempo dell'analisi di una partita a 11.
-    - [ ] Se un valore supera il limite di D4, il task si chiude `bloccato` con una proposta (meno campioni, analisi in background, ISMCTS da `maestro.md`).
+    - [ ] Livello Maestro: p95 < 200 ms sul Pixel 10 Pro e < 800 ms sul profilo di fascia bassa.
+    - [ ] Se un valore supera il limite, il task si chiude `bloccato` con una proposta (meno campioni, analisi in background, ISMCTS da `maestro.md`).
 - **Domande aperte:** —
 
 ## F1-05 — Stato della partita nella UI (MVI)
@@ -184,18 +187,18 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
 
 - **Stato:** da fare
-- **Obiettivo:** suoni con SoundPool, animazioni Rive del Maestro, Crashlytics, build di rilascio firmata.
+- **Obiettivo:** suoni con SoundPool, animazioni Rive del Maestro, Crashlytics, build di rilascio firmata con Play App Signing (D8). La chiave di upload resta a Michele, fuori dal repository; la CI non firma.
 - **Perimetro autorizzato:** Rive, Firebase Crashlytics e relativo plugin nel version catalog.
 - **Criteri di accettazione:**
     - [ ] Suoni disattivabili dalle impostazioni.
     - [ ] Un crash di prova compare in Crashlytics.
-- **Domande aperte:** firma e account (D8).
+- **Domande aperte:** —
 
 ## F1-15 — Test interno su Play Console
 
 - **Stato:** da fare
 - **Esecutore:** Michele (account e console), agenti per la checklist
-- **Obiettivo:** pubblicazione nel canale di test interno, scheda minima, informativa privacy per Crashlytics.
+- **Obiettivo:** pubblicazione nel canale di test interno dell'account personale di Michele (D8), scheda minima ("Maestro – Scopa e Briscola"), informativa privacy per Crashlytics. Verificare se l'account è soggetto all'obbligo di test chiuso (12 tester per 14 giorni) prima della produzione: in quel caso il test chiuso parte qui.
 - **Criteri di accettazione:**
     - [ ] Un tester esterno installa l'app dal link di test.
 
@@ -209,4 +212,4 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 ## F1-17 — Report di fine fase
 
 - **Stato:** da fare
-- **Obiettivo:** `docs/reports/fase-1.md`: esito del gate, metriche di F1-03/F1-04, crash, esito del playtest, proposta definitiva di soglie e formula della precisione, proposta per la Fase 2 (o per la Briscola, secondo D6).
+- **Obiettivo:** `docs/reports/fase-1.md`: esito del gate, metriche di F1-03/F1-04, crash, esito del playtest, proposta definitiva di soglie e formula della precisione, proposta per la Fase 2.
