@@ -10,7 +10,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class MainTest {
 
@@ -114,6 +113,10 @@ class MainTest {
         // Risultato deterministico esatto su 1000 partite con seed 42 (GreedyBot vs RandomBot):
         // wins: p1=928 (92.8000%), p2=72 (7.2000%)
         private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 928
+
+        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot):
+        // wins: p1=631 (63.1000%), p2=369 (36.9000%)
+        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 631
     }
 
     @Test
@@ -244,82 +247,26 @@ class MainTest {
     }
 
     @Test
-    fun pimcBotBeatsGreedyBotIn1000GamesForSamples20And50And100() {
-        val r20 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 20))
-        val r50 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 50))
-        val r100 = runSimulation(SimCliOptions(games = 1000, seed = 42L, p1Name = "pimc", p2Name = "greedy", samples = 100))
+    fun pimcBotBeatsGreedyBotInMoreThan60PercentOf1000Games() {
+        val report = runSimulation(
+            SimCliOptions(
+                games = 1000,
+                seed = 42L,
+                p1Name = "pimc",
+                p2Name = "greedy",
+                samples = 20,
+            ),
+        )
 
-        // TEMP: embed benchmark results in exception class name via custom ClassLoader so Gradle logs print it
-        val encoded = listOf(r20 to 20, r50 to 50, r100 to 100).joinToString("__") { (r, s) ->
-            "S${s}_W${r.winsP1}_${r.winsP2}_M${encodeNum(r.meanMsPerMove)}_P${encodeNum(r.p95MsPerMove)}_" +
-                ScoreCategory.entries.joinToString("_") { c ->
-                    "${c.name}1_${encodeNum(r.avgPointsP1.getValue(c))}2_${encodeNum(r.avgPointsP2.getValue(c))}"
-                }
-        }
-        throwBenchmarkCarrier("it.maestro.sim.Bench_$encoded")
-    }
-
-    private fun encodeNum(d: Double): String =
-        String.format(java.util.Locale.US, "%.4f", d).replace('.', 'd').replace('-', 'm')
-
-    private fun throwBenchmarkCarrier(className: String): Nothing {
-        val internalName = className.replace('.', '/')
-        val superName = "java/lang/RuntimeException"
-        val cw = java.io.ByteArrayOutputStream()
-        val dos = java.io.DataOutputStream(cw)
-        dos.writeInt(0xCAFEBABE.toInt())
-        dos.writeShort(0)
-        dos.writeShort(52) // Java 8
-        dos.writeShort(10) // constant pool count (1..9)
-        // 1: Utf8 internalName
-        dos.writeByte(1); dos.writeUTF(internalName)
-        // 2: Class #1
-        dos.writeByte(7); dos.writeShort(1)
-        // 3: Utf8 superName
-        dos.writeByte(1); dos.writeUTF(superName)
-        // 4: Class #3
-        dos.writeByte(7); dos.writeShort(3)
-        // 5: Utf8 "<init>"
-        dos.writeByte(1); dos.writeUTF("<init>")
-        // 6: Utf8 "()V"
-        dos.writeByte(1); dos.writeUTF("()V")
-        // 7: NameAndType #5:#6
-        dos.writeByte(12); dos.writeShort(5); dos.writeShort(6)
-        // 8: Methodref #4.#7
-        dos.writeByte(10); dos.writeShort(4); dos.writeShort(7)
-        // 9: Utf8 "Code"
-        dos.writeByte(1); dos.writeUTF("Code")
-
-        dos.writeShort(0x0021) // ACC_PUBLIC | ACC_SUPER
-        dos.writeShort(2) // this_class
-        dos.writeShort(4) // super_class
-        dos.writeShort(0) // interfaces_count
-        dos.writeShort(0) // fields_count
-        dos.writeShort(1) // methods_count
-        // method <init>()V
-        dos.writeShort(0x0001) // ACC_PUBLIC
-        dos.writeShort(5) // name_index = <init>
-        dos.writeShort(6) // descriptor_index = ()V
-        dos.writeShort(1) // attributes_count = 1 (Code)
-        dos.writeShort(9) // attribute_name_index = Code
-        dos.writeInt(17) // attribute_length = 2 + 2 + 4 + 5 + 2 + 2 = 17
-        dos.writeShort(1) // max_stack
-        dos.writeShort(1) // max_locals
-        dos.writeInt(5) // code_length
-        dos.writeByte(0x2A) // aload_0
-        dos.writeByte(0xB7) // invokespecial
-        dos.writeShort(8) // #8 super.<init>
-        dos.writeByte(0xB1) // return
-        dos.writeShort(0) // exception_table_length
-        dos.writeShort(0) // code attributes_count
-        dos.writeShort(0) // class attributes_count
-        dos.close()
-
-        val bytes = cw.toByteArray()
-        val loader = object : ClassLoader(this::class.java.classLoader) {
-            fun define(): Class<*> = defineClass(className, bytes, 0, bytes.size)
-        }
-        val ex = loader.define().getDeclaredConstructor().newInstance() as Throwable
-        throw ex
+        assertEquals(1000, report.winsP1 + report.winsP2)
+        assertTrue(
+            report.winsP1 > 600,
+            "PimcBot deve vincere più del 60% delle partite su 1000 contro GreedyBot, vinte: ${report.winsP1}",
+        )
+        assertEquals(
+            EXPECTED_PIMC_S20_WINS_SEED_42,
+            report.winsP1,
+            "Valore deterministico atteso per seed=42, samples=20 (1000 partite): report=${report.toStdoutText()}",
+        )
     }
 }
