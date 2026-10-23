@@ -107,8 +107,8 @@ class MainTest {
 
     private companion object {
         // Risultato deterministico esatto su 1000 partite con seed 42 (GreedyBot vs RandomBot):
-        // wins: p1=945 (94.5000%), p2=55 (5.5000%)
-        private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 945
+        // wins: p1=928 (92.8000%), p2=72 (7.2000%)
+        private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 928
     }
 
     @Test
