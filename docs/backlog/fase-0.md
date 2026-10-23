@@ -117,7 +117,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-07 — Vista del giocatore, log, replay e determinizzazione
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** ADR-0002, ADR-0003, `docs/architecture.md`
 - **Obiettivo:** `viewFor(state, seat)`, `MatchLog`, `replay(log): ReplayResult`, `determinize(view, opponentHand, deckOrder)`, formato testuale del log.
 - **Campi di `ScopaView`:** `seat`, `config`, `dealer`, `toMove`, `phase`, `hand` (propria), `table`, `capturedBy` (prese di entrambi), `playedCards` (carte uscite nella smazzata, in ordine), `opponentHandSize`, `deckSize`, `sweeps` (per giocatore), `totals` (punteggi di partita). **Mai** la mano avversaria, l'ordine del mazzo o lo stato del generatore.

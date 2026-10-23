@@ -25,6 +25,7 @@ import it.maestro.game.model.Seat
  *   nessuno ha ancora preso (`docs/rules/glossary.md`, spec §6.1).
  * @property totals Punteggi totali di partita accumulati da ciascun giocatore a fine smazzata (spec §2.1, §7).
  * @property winner Vincitore della partita quando [phase] è [DealPhase.MATCH_OVER], altrimenti `null` (spec §7.2).
+ * @property playedCards Carte giocate dalla mano nella smazzata corrente, nell'ordine in cui sono state giocate (task F0-07).
  */
 public data class ScopaState(
     public val config: ScopaConfig,
@@ -41,6 +42,7 @@ public data class ScopaState(
     public val lastCapturer: Seat? = null,
     public val totals: Map<Seat, Int> = mapOf(Seat.P1 to 0, Seat.P2 to 0),
     public val winner: Seat? = null,
+    public val playedCards: List<Card> = emptyList(),
 ) {
     /**
      * Restituisce la lista delle carte in mano al giocatore seduto in [seat].
