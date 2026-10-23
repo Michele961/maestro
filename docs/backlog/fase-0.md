@@ -183,7 +183,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-11 — Analizzatore delle mosse
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/ai/maestro.md` (Analizzatore), ADR-0005
 - **Obiettivo:** in `it.maestro.ai.analysis`: analisi di un `MatchLog` con valore delle alternative, perdita, `MoveGrade`, precisione per giocatore. Il simulatore accetta `--analyze <file di log>`.
 - **Perimetro autorizzato:** aggiungere `--analyze` al simulatore.
