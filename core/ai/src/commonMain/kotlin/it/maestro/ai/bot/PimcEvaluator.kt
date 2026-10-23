@@ -21,9 +21,9 @@ private val SETTEBELLO_CARD: Card = Card(rank = Rank.SETTE, suit = Suit.DENARI)
 
 /**
  * Profondità predefinita in semimosse (ply) per la ricerca minimax alfa-beta quando il mazzo non è vuoto
- * (4 semimosse = 2 turni per giocatore).
+ * (2 semimosse = mossa del giocatore + risposta ottima dell'avversario).
  */
-private const val NON_FINAL_DEAL_SEARCH_DEPTH: Int = 4
+private const val NON_FINAL_DEAL_SEARCH_DEPTH: Int = 2
 
 /**
  * Numero massimo di semimosse rimanenti nell'ultima distribuzione (`deckSize == 0`, al più 3 + 3 carte).
