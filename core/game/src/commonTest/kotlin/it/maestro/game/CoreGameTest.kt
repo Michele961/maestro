@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class CoreGameTest {
     @Test
-    fun rulesVersionStartsAtZero() {
-        assertEquals(0, CoreGame.RULES_VERSION)
+    fun rulesVersionIsOne() {
+        assertEquals(1, CoreGame.RULES_VERSION)
     }
 }
