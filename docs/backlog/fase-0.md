@@ -142,7 +142,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-08 — Bot casuale e avido
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/ai/maestro.md` (Bot)
 - **Obiettivo:** `Bot`, `RandomBot`, `GreedyBot` in `it.maestro.ai.bot`, con le regole di scelta esattamente come nella tabella dei bot.
 - **Criteri di accettazione:**
