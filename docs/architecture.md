@@ -92,7 +92,7 @@ Tutte queste funzioni stanno in `it.maestro.game.scopa`. I tipi e i valori non e
 | Fase | Aggiunte |
 | --- | --- |
 | 0 | Kotlin 2.2, Gradle 8.14, JDK 21, kotlin.test |
-| 1 | Jetpack Compose, Koin, Room, DataStore, Rive, SoundPool, Crashlytics, i18n it/en |
+| 1 | Android Gradle Plugin, Jetpack Compose, Koin, Room, DataStore, Rive, SoundPool, Crashlytics, i18n it/en, Navigation Compose, kotlinx-coroutines, AndroidX Lifecycle/ViewModel per Compose, Compose UI test |
 | 2 | Ktor server + client WebSocket, Postgres, Redis, Google Sign-In, Play Integrity |
 | 3 | Play Billing (verifica server, RTDN), AdMob rewarded con SSV, consenso UMP |
 | 4 | Compose Multiplatform iOS |

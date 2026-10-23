@@ -4,14 +4,15 @@ Gioco di carte italiano per Android con un coach AI locale ("il Maestro") che in
 
 - Visione di prodotto: [docs/vision.md](docs/vision.md)
 - Architettura: [docs/architecture.md](docs/architecture.md)
+- Roadmap: [docs/roadmap.md](docs/roadmap.md)
 - Decisioni: [docs/decisions/](docs/decisions/README.md)
 - Regole della Scopa: [docs/rules/scopa.md](docs/rules/scopa.md)
-- Backlog attuale: [docs/backlog/fase-0.md](docs/backlog/fase-0.md)
+- Backlog attuale: [docs/backlog/fase-1.md](docs/backlog/fase-1.md)
 - **Agenti AI: leggete [CLAUDE.md](CLAUDE.md) prima di tutto.**
 
 ## Stato
 
-Fase 0 — motore headless (regole, AI, simulatore). Nessuna UI.
+Fase 1 — MVP offline Android (Jetpack Compose, Koin, Scopa contro il Maestro, Game Review locale). Motore headless completato in Fase 0.
 
 ## Requisiti
 
