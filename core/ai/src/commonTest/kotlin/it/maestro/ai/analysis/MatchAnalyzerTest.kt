@@ -146,17 +146,16 @@ class MatchAnalyzerTest {
 
     @Test
     fun analyze_computesAlternativesLossesGradesAndSeatMetricsAccurately() {
-        val log = buildSampleLog(seed = 7L, maxTurns = 6)
+        val log = buildSampleLog(seed = 7L, maxTurns = 4)
 
-        // Valutatore controllato: assegna alla mossa migliore valore 1.0 e alla mossa giocata
-        // una perdita predefinita per ciascuno dei 6 turni:
+        // Valutatore controllato: nei primi 4 turni di una distribuzione a 3 carte per giocatore
+        // (turni 0 e 1 hanno almeno 3 mosse legali; turni 2 e 3 hanno almeno 2 mosse legali)
+        // assegna alla mossa migliore valore 1.0 e alla mossa giocata una perdita predefinita:
         // Turno 0 (P2): loss = 0.00 -> BEST
         // Turno 1 (P1): loss = 0.10 -> INACCURACY
         // Turno 2 (P2): loss = 0.20 -> INACCURACY
         // Turno 3 (P1): loss = 0.50 -> BLUNDER
-        // Turno 4 (P2): loss = 0.40 -> BLUNDER
-        // Turno 5 (P1): loss = 0.00 -> BEST
-        val targetLosses = listOf(0.00, 0.10, 0.20, 0.50, 0.40, 0.00)
+        val targetLosses = listOf(0.00, 0.10, 0.20, 0.50)
         var callIndex = 0
 
         val controlledEvaluator = object : MoveEvaluator {
@@ -183,7 +182,7 @@ class MatchAnalyzerTest {
 
         val analysis = MatchAnalyzer(evaluator = controlledEvaluator).analyze(log)
 
-        assertEquals(6, analysis.moves.size)
+        assertEquals(4, analysis.moves.size)
 
         // Verifica mossa per mossa
         val expectedGrades = listOf(
@@ -191,10 +190,8 @@ class MatchAnalyzerTest {
             MoveGrade.INACCURACY,
             MoveGrade.INACCURACY,
             MoveGrade.BLUNDER,
-            MoveGrade.BLUNDER,
-            MoveGrade.BEST,
         )
-        for (i in 0 until 6) {
+        for (i in 0 until 4) {
             val moveAnalysis = analysis.moves[i]
             assertEquals(i, moveAnalysis.moveIndex)
             assertEquals(i + 1, moveAnalysis.moveNumber)
@@ -213,20 +210,20 @@ class MatchAnalyzerTest {
             }
         }
 
-        // P2 ha giocato ai turni 0, 2, 4 -> perdite 0.00, 0.20, 0.40 -> media = 0.20 -> accuracy = 55
-        // P1 ha giocato ai turni 1, 3, 5 -> perdite 0.10, 0.50, 0.00 -> media = 0.20 -> accuracy = 55
-        assertTrue(abs(0.20 - analysis.meanLoss(Seat.P1)) < 1e-9)
-        assertTrue(abs(0.20 - analysis.meanLoss(Seat.P2)) < 1e-9)
-        assertEquals(55, analysis.accuracy(Seat.P1))
-        assertEquals(55, analysis.accuracy(Seat.P2))
+        // P2 ha giocato ai turni 0, 2 -> perdite 0.00, 0.20 -> media = 0.10 -> accuracy = 74
+        // P1 ha giocato ai turni 1, 3 -> perdite 0.10, 0.50 -> media = 0.30 -> accuracy = 41
+        assertTrue(abs(0.30 - analysis.meanLoss(Seat.P1)) < 1e-9)
+        assertTrue(abs(0.10 - analysis.meanLoss(Seat.P2)) < 1e-9)
+        assertEquals(41, analysis.accuracy(Seat.P1))
+        assertEquals(74, analysis.accuracy(Seat.P2))
 
-        assertEquals(1, analysis.count(Seat.P1, MoveGrade.BEST))
+        assertEquals(0, analysis.count(Seat.P1, MoveGrade.BEST))
         assertEquals(1, analysis.count(Seat.P1, MoveGrade.INACCURACY))
         assertEquals(1, analysis.count(Seat.P1, MoveGrade.BLUNDER))
 
         assertEquals(1, analysis.count(Seat.P2, MoveGrade.BEST))
         assertEquals(1, analysis.count(Seat.P2, MoveGrade.INACCURACY))
-        assertEquals(1, analysis.count(Seat.P2, MoveGrade.BLUNDER))
+        assertEquals(0, analysis.count(Seat.P2, MoveGrade.BLUNDER))
     }
 
     @Test
