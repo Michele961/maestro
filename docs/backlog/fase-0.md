@@ -202,5 +202,5 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F0-13 — Report di fine fase
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Obiettivo:** `docs/reports/fase-0.md` con le metriche di `docs/ai/maestro.md`, l'esito del gate, proposte di pesi, soglie e parametri per i livelli di difficoltà. Michele decide il passaggio alla Fase 1 e conferma o cambia i valori provvisori.
