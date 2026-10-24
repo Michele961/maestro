@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 
-private val GoldAccentColor = Color(0xFFE9C46A)
+private val SelectedBorderColor = Color(0xFFE9C46A)
 private val SelectedCardColor = Color(0xFF264653)
 private val UnselectedCardColor = Color(0xFF1E293B)
 
@@ -116,7 +116,7 @@ public fun PreGameScreen(
                             .testTag("level_option_${level.name}")
                             .border(
                                 width = if (isSelected) 2.dp else 1.dp,
-                                color = if (isSelected) GoldAccentColor else Color.DarkGray,
+                                color = if (isSelected) SelectedBorderColor else Color.DarkGray,
                                 shape = RoundedCornerShape(8.dp),
                             ),
                         shape = RoundedCornerShape(8.dp),
@@ -133,7 +133,7 @@ public fun PreGameScreen(
                                 text = stringResource(id = stringResId),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) GoldAccentColor else Color.White,
+                                color = if (isSelected) SelectedBorderColor else Color.White,
                             )
                         }
                     }
@@ -167,7 +167,7 @@ public fun PreGameScreen(
                             .testTag("target_score_option_$target")
                             .border(
                                 width = if (isSelected) 2.dp else 1.dp,
-                                color = if (isSelected) GoldAccentColor else Color.DarkGray,
+                                color = if (isSelected) SelectedBorderColor else Color.DarkGray,
                                 shape = RoundedCornerShape(8.dp),
                             ),
                         shape = RoundedCornerShape(8.dp),
@@ -184,7 +184,7 @@ public fun PreGameScreen(
                                 text = stringResource(id = stringResId),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) GoldAccentColor else Color.White,
+                                color = if (isSelected) SelectedBorderColor else Color.White,
                             )
                         }
                     }
