@@ -4,6 +4,7 @@
 **Data:** 2026-10-24  
 **Approvato da:** Michele  
 **Riferimento grafico ufficiale:** [`style_guide_sheet.jpg`](style_guide_sheet.jpg)  
+**Specifiche del Design System UI:** [`design-system.md`](design-system.md)  
 **Target:** Mobile (Android / iOS)  
 **Atmosfera Chiave:** Circolo italiano tradizionale, artigianale, caldo e accogliente, con finiture tattili e contrasto netto per la massima leggibilità.
 
