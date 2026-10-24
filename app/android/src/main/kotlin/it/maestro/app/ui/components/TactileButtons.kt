@@ -163,68 +163,37 @@ public fun ScorePlaque(
     p1Label: String = "Noi",
     p2Label: String = "Voi",
 ) {
-    val plaqueShape = RoundedCornerShape(20.dp)
-    val scoreBadgeShape = RoundedCornerShape(6.dp)
-
-    Surface(
-        modifier = modifier.shadow(4.dp, plaqueShape),
-        shape = plaqueShape,
-        color = WoodSurfaceDark,
-        border = BorderStroke(1.5.dp, ButtonGoldBorder),
+    // Targa d'ottone con rivetti (pelle generata), come "TU 4 – 2 AVV" del mockup del tavolo.
+    NineSliceBox(
+        skin = R.drawable.skin_score_plaque,
+        slice = 0.4f,
+        corner = 26.dp,
+        modifier = modifier,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 30.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = p1Label,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Box(
-                modifier = Modifier
-                    .clip(scoreBadgeShape)
-                    .background(Color(0xFF1E88E5))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-            ) {
-                Text(
-                    text = p1Score.toString(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    fontSize = 16.sp,
-                )
-            }
-
-            Box(modifier = Modifier.padding(horizontal = 10.dp)) {
-                Text(text = "•", color = ButtonGoldBorder, fontSize = 16.sp)
-            }
-
-            Text(
-                text = p2Label,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Box(
-                modifier = Modifier
-                    .clip(scoreBadgeShape)
-                    .background(Color(0xFFD32F2F))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-            ) {
-                Text(
-                    text = p2Score.toString(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    fontSize = 16.sp,
-                )
-            }
+            ScoreText(p1Label.uppercase(), ButtonTextCream, 18.sp)
+            ScoreText(p1Score.toString(), Color(0xFF42A5F5), 30.sp, Modifier.padding(start = 8.dp))
+            ScoreText("–", ButtonTextCream, 24.sp, Modifier.padding(horizontal = 8.dp))
+            ScoreText(p2Score.toString(), Color(0xFFEF5350), 30.sp, Modifier.padding(end = 8.dp))
+            ScoreText(p2Label.uppercase(), ButtonTextCream, 18.sp)
         }
     }
+}
+
+@Composable
+private fun ScoreText(text: String, color: Color, size: TextUnit, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = size,
+        fontWeight = FontWeight.Bold,
+        fontFamily = MaestroDisplayFont,
+        modifier = modifier,
+        style = TextStyle(shadow = Shadow(Color(0x99000000), Offset(0f, 2f), 3f)),
+    )
 }
 
 /**
