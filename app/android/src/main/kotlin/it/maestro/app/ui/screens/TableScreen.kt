@@ -29,12 +29,18 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -261,6 +267,7 @@ public fun TableContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
                     .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
@@ -350,6 +357,7 @@ private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
             .padding(horizontal = 10.dp, vertical = 8.dp)
             .testTag("table_top_bar"),
         verticalAlignment = Alignment.CenterVertically,
@@ -913,28 +921,28 @@ private fun MoveFlightOverlay(
     val pileX = 130f
     val pileY = if (isHuman) 130f else -130f
 
-    val offsetX = remember(anim.moveId) { Animatable(0f) }
-    val offsetY = remember(anim.moveId) { Animatable(startOffsetY) }
-    val scale = remember(anim.moveId) { Animatable(0.9f) }
-    val alpha = remember(anim.moveId) { Animatable(0.85f) }
+    val animOffsetX = remember(anim.moveId) { Animatable(0f) }
+    val animOffsetY = remember(anim.moveId) { Animatable(startOffsetY) }
+    val animScale = remember(anim.moveId) { Animatable(0.9f) }
+    val animAlpha = remember(anim.moveId) { Animatable(0.85f) }
 
     LaunchedEffect(anim.stage) {
         when (anim.stage) {
             MoveAnimStage.PLAYING_TO_TABLE -> {
-                launch { offsetY.animateTo(0f, tween(360, easing = FastOutSlowInEasing)) }
-                launch { scale.animateTo(1.15f, tween(360, easing = FastOutSlowInEasing)) }
-                launch { alpha.animateTo(1f, tween(200)) }
+                launch { animOffsetY.animateTo(0f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { animScale.animateTo(1.15f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { animAlpha.animateTo(1f, tween(200)) }
             }
             MoveAnimStage.SHOWING_CAPTURE -> {
-                offsetY.snapTo(0f)
-                scale.snapTo(1.15f)
-                alpha.snapTo(1f)
+                animOffsetY.snapTo(0f)
+                animScale.snapTo(1.15f)
+                animAlpha.snapTo(1f)
             }
             MoveAnimStage.FLYING_TO_PILE -> {
-                launch { offsetX.animateTo(pileX, tween(360, easing = FastOutSlowInEasing)) }
-                launch { offsetY.animateTo(pileY, tween(360, easing = FastOutSlowInEasing)) }
-                launch { scale.animateTo(0.5f, tween(360, easing = FastOutSlowInEasing)) }
-                launch { alpha.animateTo(0.15f, tween(360)) }
+                launch { animOffsetX.animateTo(pileX, tween(360, easing = FastOutSlowInEasing)) }
+                launch { animOffsetY.animateTo(pileY, tween(360, easing = FastOutSlowInEasing)) }
+                launch { animScale.animateTo(0.5f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { animAlpha.animateTo(0.15f, tween(360)) }
             }
             MoveAnimStage.NONE -> {}
         }
@@ -952,11 +960,11 @@ private fun MoveFlightOverlay(
                     modifier = Modifier
                         .offset(x = staggered, y = staggered)
                         .graphicsLayer {
-                            translationX = offsetX.value.dp.toPx()
-                            translationY = offsetY.value.dp.toPx()
-                            scaleX = scale.value * 0.9f
-                            scaleY = scale.value * 0.9f
-                            this.alpha = alpha.value
+                            translationX = animOffsetX.value.dp.toPx()
+                            translationY = animOffsetY.value.dp.toPx()
+                            scaleX = animScale.value * 0.9f
+                            scaleY = animScale.value * 0.9f
+                            alpha = animAlpha.value
                         }
                         .shadow(6.dp, RoundedCornerShape(8.dp)),
                 ) {
@@ -974,11 +982,11 @@ private fun MoveFlightOverlay(
         Box(
             modifier = Modifier
                 .graphicsLayer {
-                    translationX = offsetX.value.dp.toPx()
-                    translationY = offsetY.value.dp.toPx()
-                    scaleX = scale.value
-                    scaleY = scale.value
-                    this.alpha = alpha.value
+                    translationX = animOffsetX.value.dp.toPx()
+                    translationY = animOffsetY.value.dp.toPx()
+                    scaleX = animScale.value
+                    scaleY = animScale.value
+                    alpha = animAlpha.value
                 }
                 .shadow(12.dp, RoundedCornerShape(8.dp)),
         ) {
@@ -1015,48 +1023,53 @@ private fun FeltLayout(
         if (uiState.lastMoveId == 0L) return@LaunchedEffect
 
         val isSweep = uiState.lastEvent is UiGameEvent.Sweep
-        // 1. Carta parte dalla mano e vola al centro del tavolo
-        activeMoveAnim = ActiveMoveAnimation(
-            moveId = uiState.lastMoveId,
-            mover = mover,
-            card = move.card,
-            capture = move.capture,
-            isSweep = isSweep,
-            stage = MoveAnimStage.PLAYING_TO_TABLE,
-        )
-        delay(360L)
-
-        if (move.capture.isNotEmpty()) {
-            // 2. Le carte catturate sul tavolo si evidenziano e il bot annuncia la presa
-            activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.SHOWING_CAPTURE)
-            delay(480L)
-
-            // 3. Volo congiunto verso la pila delle prese
-            activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.FLYING_TO_PILE)
-            soundManager.play(SoundEffect.CARD_CAPTURE)
+        try {
+            // 1. Carta parte dalla mano e vola al centro del tavolo
+            activeMoveAnim = ActiveMoveAnimation(
+                moveId = uiState.lastMoveId,
+                mover = mover,
+                card = move.card,
+                capture = move.capture,
+                isSweep = isSweep,
+                stage = MoveAnimStage.PLAYING_TO_TABLE,
+            )
             delay(360L)
-        } else {
-            delay(160L)
+
+            if (move.capture.isNotEmpty()) {
+                // 2. Le carte catturate sul tavolo si evidenziano e il bot annuncia la presa
+                activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.SHOWING_CAPTURE)
+                delay(480L)
+
+                // 3. Volo congiunto verso la pila delle prese
+                activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.FLYING_TO_PILE)
+                soundManager.play(SoundEffect.CARD_CAPTURE)
+                delay(360L)
+            } else {
+                delay(160L)
+            }
+        } finally {
+            if (activeMoveAnim?.moveId == uiState.lastMoveId) {
+                activeMoveAnim = null
+            }
         }
-        activeMoveAnim = null
     }
 
+    val currentAnim = activeMoveAnim
     val formatCard = rememberCardFormatter()
-    val botPlaying = activeMoveAnim != null && activeMoveAnim?.mover != uiState.humanSeat
-    val botSpeechMessage: String? = if (botPlaying) {
-        val anim = activeMoveAnim!!
-        val cardStr = formatCard(anim.card)
-        if (anim.capture.isEmpty()) {
+    val botPlaying = currentAnim != null && currentAnim.mover != uiState.humanSeat
+    val botSpeechMessage: String? = if (currentAnim != null && currentAnim.mover != uiState.humanSeat) {
+        val cardStr = formatCard(currentAnim.card)
+        if (currentAnim.capture.isEmpty()) {
             stringResource(id = R.string.game_bot_plays_card, cardStr)
         } else {
-            val takesStr = anim.capture.joinToString(", ") { formatCard(it) }
+            val takesStr = currentAnim.capture.joinToString(", ") { formatCard(it) }
             stringResource(id = R.string.game_bot_takes_cards, cardStr, takesStr)
         }
     } else null
 
     // Le carte catturate restano visibili sul tavolo finché non volano alla pila
-    val visibleTableCards = remember(uiState.tableCards, activeMoveAnim) {
-        val anim = activeMoveAnim
+    val visibleTableCards = remember(uiState.tableCards, currentAnim) {
+        val anim = currentAnim
         if (anim != null && anim.capture.isNotEmpty() && anim.stage != MoveAnimStage.FLYING_TO_PILE) {
             (uiState.tableCards + anim.capture).distinct()
         } else {
@@ -1099,7 +1112,7 @@ private fun FeltLayout(
         }
         val showHint = hint != null && !hintDismissed
         val sweeping = uiState.lastEvent is UiGameEvent.Sweep
-        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && activeMoveAnim == null
+        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && currentAnim == null
         val showLeftBubble = showHint || uiState.isHintLoading || sweeping || botPlaying
 
         // Carte in tavola, al centro in griglia
@@ -1123,7 +1136,7 @@ private fun FeltLayout(
             val suggested = uiState.suggestedMove?.capture
             for (card in visibleTableCards) {
                 val big = visibleTableCards.size <= 4 && !showLeftBubble
-                val isBeingCaptured = activeMoveAnim != null && card in activeMoveAnim!!.capture && activeMoveAnim!!.stage == MoveAnimStage.SHOWING_CAPTURE
+                val isBeingCaptured = currentAnim != null && card in currentAnim.capture && currentAnim.stage == MoveAnimStage.SHOWING_CAPTURE
                 PlaceholderCardView(
                     card = card,
                     isPlayable = false,
@@ -1192,9 +1205,9 @@ private fun FeltLayout(
         }
 
         // Overlay per l'animazione di volo della carta giocata e presa
-        if (activeMoveAnim != null) {
+        if (currentAnim != null) {
             MoveFlightOverlay(
-                anim = activeMoveAnim!!,
+                anim = currentAnim,
                 humanSeat = uiState.humanSeat,
             )
         }
@@ -1206,7 +1219,7 @@ private fun FeltLayout(
         ) {
             HandFan(
                 uiState = uiState,
-                enabled = activeMoveAnim == null,
+                enabled = currentAnim == null,
                 onCardClicked = onCardClicked,
             )
         }

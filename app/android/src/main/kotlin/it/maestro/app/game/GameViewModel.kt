@@ -64,21 +64,25 @@ public class GameViewModel(
         // Persistenza automatica della partita (ADR-0003, task F1-08)
         if (matchRepository != null) {
             scope.launch {
-                val scopaState = internalState.scopaState
-                if (scopaState.phase == DealPhase.PLAYING) {
-                    matchRepository.saveActiveMatch(
-                        log = internalState.matchLog,
-                        level = internalState.botLevel,
-                        targetScore = scopaState.config.targetScore,
-                        p1Score = scopaState.totals[Seat.P1] ?: 0,
-                        p2Score = scopaState.totals[Seat.P2] ?: 0,
-                    )
-                } else if (scopaState.phase == DealPhase.MATCH_OVER) {
-                    matchRepository.markCompleted(
-                        winner = scopaState.winner,
-                        p1Score = scopaState.totals[Seat.P1] ?: 0,
-                        p2Score = scopaState.totals[Seat.P2] ?: 0,
-                    )
+                try {
+                    val scopaState = internalState.scopaState
+                    if (scopaState.phase == DealPhase.PLAYING) {
+                        matchRepository.saveActiveMatch(
+                            log = internalState.matchLog,
+                            level = internalState.botLevel,
+                            targetScore = scopaState.config.targetScore,
+                            p1Score = scopaState.totals[Seat.P1] ?: 0,
+                            p2Score = scopaState.totals[Seat.P2] ?: 0,
+                        )
+                    } else if (scopaState.phase == DealPhase.MATCH_OVER) {
+                        matchRepository.markCompleted(
+                            winner = scopaState.winner,
+                            p1Score = scopaState.totals[Seat.P1] ?: 0,
+                            p2Score = scopaState.totals[Seat.P2] ?: 0,
+                        )
+                    }
+                } catch (_: Throwable) {
+                    // Protezione contro errori di I/O o SQLite durante la partita
                 }
             }
         }
