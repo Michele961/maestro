@@ -142,5 +142,6 @@
     <string name="home_nav_leaderboard">Leaderboard</string>
     <string name="home_nav_training">Training</string>
     <string name="home_nav_shop">Shop</string>
+    <string name="home_maestro_title">The Maestro</string>
     <string name="home_messages">Messages</string>
 </resources>
