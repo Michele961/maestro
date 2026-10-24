@@ -74,6 +74,20 @@ class TableScreenScreenshotTest {
     }
 
     @Test
+    fun table_with_bot_card_play_screenshot() {
+        val botMove = ScopaMove(card = Card(Rank.SETTE, Suit.SPADE), capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
+        val botState = midDeal.copy(
+            lastMove = botMove,
+            lastMover = Seat.P2,
+            lastMoveId = 1L,
+            isHumanTurn = false,
+            isBotThinking = false,
+        )
+        composeRule.setContent { MaestroTheme { TableContent(uiState = botState, onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_bot_play.png")
+    }
+
+    @Test
     fun pause_opens_dialog_and_menu_goes_home() {
         var home = 0
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}, onNavigateHome = { home++ }) } }

@@ -1,8 +1,14 @@
 package it.maestro.app.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.ui.graphics.graphicsLayer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.FramedPortrait
@@ -271,6 +277,7 @@ public fun TableContent(
                 }
                 FeltLayout(
                     uiState = uiState,
+                    soundManager = soundManager,
                     onCardClicked = { card ->
                         soundManager.play(SoundEffect.CARD_PLAY)
                         onIntent(GameIntent.PlayCard(card))
@@ -383,6 +390,37 @@ private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
 
 
 
+
+@Composable
+private fun rememberCardFormatter(): (Card) -> String {
+    val assoStr = stringResource(id = R.string.game_card_rank_asso)
+    val fanteStr = stringResource(id = R.string.game_card_rank_fante)
+    val cavalloStr = stringResource(id = R.string.game_card_rank_cavallo)
+    val reStr = stringResource(id = R.string.game_card_rank_re)
+    val denariStr = stringResource(id = R.string.game_suit_denari)
+    val coppeStr = stringResource(id = R.string.game_suit_coppe)
+    val spadeStr = stringResource(id = R.string.game_suit_spade)
+    val bastoniStr = stringResource(id = R.string.game_suit_bastoni)
+
+    return remember(assoStr, fanteStr, cavalloStr, reStr, denariStr, coppeStr, spadeStr, bastoniStr) {
+        { card: Card ->
+            val rankText = when (card.rank) {
+                Rank.ASSO -> assoStr
+                Rank.FANTE -> fanteStr
+                Rank.CAVALLO -> cavalloStr
+                Rank.RE -> reStr
+                else -> card.rank.value.toString()
+            }
+            val suitText = when (card.suit) {
+                Suit.DENARI -> denariStr
+                Suit.COPPE -> coppeStr
+                Suit.SPADE -> spadeStr
+                Suit.BASTONI -> bastoniStr
+            }
+            "$rankText $suitText"
+        }
+    }
+}
 
 @Composable
 private fun formatHintMove(move: ScopaMove): String {
@@ -848,6 +886,115 @@ private fun DeckStack(cards: Int) {
     }
 }
 
+public enum class MoveAnimStage {
+    NONE,
+    PLAYING_TO_TABLE,
+    SHOWING_CAPTURE,
+    FLYING_TO_PILE,
+}
+
+public data class ActiveMoveAnimation(
+    val moveId: Long,
+    val mover: Seat,
+    val card: Card,
+    val capture: Set<Card>,
+    val isSweep: Boolean,
+    val stage: MoveAnimStage,
+)
+
+@Composable
+private fun MoveFlightOverlay(
+    anim: ActiveMoveAnimation,
+    humanSeat: Seat,
+) {
+    val isHuman = anim.mover == humanSeat
+
+    val startOffsetY = if (isHuman) 220f else -200f
+    val pileX = 130f
+    val pileY = if (isHuman) 130f else -130f
+
+    val offsetX = remember(anim.moveId) { Animatable(0f) }
+    val offsetY = remember(anim.moveId) { Animatable(startOffsetY) }
+    val scale = remember(anim.moveId) { Animatable(0.9f) }
+    val alpha = remember(anim.moveId) { Animatable(0.85f) }
+
+    LaunchedEffect(anim.stage) {
+        when (anim.stage) {
+            MoveAnimStage.PLAYING_TO_TABLE -> {
+                launch { offsetY.animateTo(0f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { scale.animateTo(1.15f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { alpha.animateTo(1f, tween(200)) }
+            }
+            MoveAnimStage.SHOWING_CAPTURE -> {
+                offsetY.snapTo(0f)
+                scale.snapTo(1.15f)
+                alpha.snapTo(1f)
+            }
+            MoveAnimStage.FLYING_TO_PILE -> {
+                launch { offsetX.animateTo(pileX, tween(360, easing = FastOutSlowInEasing)) }
+                launch { offsetY.animateTo(pileY, tween(360, easing = FastOutSlowInEasing)) }
+                launch { scale.animateTo(0.5f, tween(360, easing = FastOutSlowInEasing)) }
+                launch { alpha.animateTo(0.15f, tween(360)) }
+            }
+            MoveAnimStage.NONE -> {}
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        // Se siamo nella fase FLYING_TO_PILE, anche le carte catturate volano verso la pila
+        if (anim.stage == MoveAnimStage.FLYING_TO_PILE) {
+            anim.capture.forEachIndexed { idx, capturedCard ->
+                val staggered = (idx * 8).dp
+                Box(
+                    modifier = Modifier
+                        .offset(x = staggered, y = staggered)
+                        .graphicsLayer {
+                            translationX = offsetX.value.dp.toPx()
+                            translationY = offsetY.value.dp.toPx()
+                            scaleX = scale.value * 0.9f
+                            scaleY = scale.value * 0.9f
+                            this.alpha = alpha.value
+                        }
+                        .shadow(6.dp, RoundedCornerShape(8.dp)),
+                ) {
+                    PlaceholderCardView(
+                        card = capturedCard,
+                        isPlayable = false,
+                        width = 72.dp,
+                        height = 108.dp,
+                    )
+                }
+            }
+        }
+
+        // Carta giocata
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    translationX = offsetX.value.dp.toPx()
+                    translationY = offsetY.value.dp.toPx()
+                    scaleX = scale.value
+                    scaleY = scale.value
+                    this.alpha = alpha.value
+                }
+                .shadow(12.dp, RoundedCornerShape(8.dp)),
+        ) {
+            PlaceholderCardView(
+                card = anim.card,
+                isPlayable = false,
+                width = 82.dp,
+                height = 123.dp,
+                modifier = if (anim.capture.isNotEmpty() && anim.stage == MoveAnimStage.SHOWING_CAPTURE) {
+                    Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(8.dp))
+                } else Modifier,
+            )
+        }
+    }
+}
+
 /**
  * Disposizione del tavolo come `reference_table_screen.jpg` (F1-21): mano dell'avversario in alto,
  * carte in tavola al centro, Maestro con fumetto a sinistra, mazzo e prese a destra, mano a ventaglio in basso.
@@ -856,9 +1003,67 @@ private fun DeckStack(cards: Int) {
 @Composable
 private fun FeltLayout(
     uiState: GameUiState,
+    soundManager: SoundManager,
     onCardClicked: (Card) -> Unit,
     onRequestHint: () -> Unit,
 ) {
+    var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
+
+    LaunchedEffect(uiState.lastMoveId) {
+        val move = uiState.lastMove ?: return@LaunchedEffect
+        val mover = uiState.lastMover ?: return@LaunchedEffect
+        if (uiState.lastMoveId == 0L) return@LaunchedEffect
+
+        val isSweep = uiState.lastEvent is UiGameEvent.Sweep
+        // 1. Carta parte dalla mano e vola al centro del tavolo
+        activeMoveAnim = ActiveMoveAnimation(
+            moveId = uiState.lastMoveId,
+            mover = mover,
+            card = move.card,
+            capture = move.capture,
+            isSweep = isSweep,
+            stage = MoveAnimStage.PLAYING_TO_TABLE,
+        )
+        delay(360L)
+
+        if (move.capture.isNotEmpty()) {
+            // 2. Le carte catturate sul tavolo si evidenziano e il bot annuncia la presa
+            activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.SHOWING_CAPTURE)
+            delay(480L)
+
+            // 3. Volo congiunto verso la pila delle prese
+            activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.FLYING_TO_PILE)
+            soundManager.play(SoundEffect.CARD_CAPTURE)
+            delay(360L)
+        } else {
+            delay(160L)
+        }
+        activeMoveAnim = null
+    }
+
+    val formatCard = rememberCardFormatter()
+    val botPlaying = activeMoveAnim != null && activeMoveAnim?.mover != uiState.humanSeat
+    val botSpeechMessage: String? = if (botPlaying) {
+        val anim = activeMoveAnim!!
+        val cardStr = formatCard(anim.card)
+        if (anim.capture.isEmpty()) {
+            stringResource(id = R.string.game_bot_plays_card, cardStr)
+        } else {
+            val takesStr = anim.capture.joinToString(", ") { formatCard(it) }
+            stringResource(id = R.string.game_bot_takes_cards, cardStr, takesStr)
+        }
+    } else null
+
+    // Le carte catturate restano visibili sul tavolo finché non volano alla pila
+    val visibleTableCards = remember(uiState.tableCards, activeMoveAnim) {
+        val anim = activeMoveAnim
+        if (anim != null && anim.capture.isNotEmpty() && anim.stage != MoveAnimStage.FLYING_TO_PILE) {
+            (uiState.tableCards + anim.capture).distinct()
+        } else {
+            uiState.tableCards
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize().padding(10.dp).testTag("felt_layout")) {
         // Mano dell'avversario, coperta e sovrapposta
         Row(
@@ -894,8 +1099,8 @@ private fun FeltLayout(
         }
         val showHint = hint != null && !hintDismissed
         val sweeping = uiState.lastEvent is UiGameEvent.Sweep
-        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading
-        val showLeftBubble = showHint || uiState.isHintLoading || sweeping
+        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && activeMoveAnim == null
+        val showLeftBubble = showHint || uiState.isHintLoading || sweeping || botPlaying
 
         // Carte in tavola, al centro in griglia
         FlowRow(
@@ -913,33 +1118,40 @@ private fun FeltLayout(
                 .testTag("table_cards_zone"),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = if (uiState.tableCards.size <= 4) 2 else 3,
+            maxItemsInEachRow = if (visibleTableCards.size <= 4) 2 else 3,
         ) {
             val suggested = uiState.suggestedMove?.capture
-            for (card in uiState.tableCards) {
-                val big = uiState.tableCards.size <= 4 && !showLeftBubble
+            for (card in visibleTableCards) {
+                val big = visibleTableCards.size <= 4 && !showLeftBubble
+                val isBeingCaptured = activeMoveAnim != null && card in activeMoveAnim!!.capture && activeMoveAnim!!.stage == MoveAnimStage.SHOWING_CAPTURE
                 PlaceholderCardView(
                     card = card,
                     isPlayable = false,
                     width = if (big) 82.dp else 72.dp,
                     height = if (big) 123.dp else 108.dp,
-                    modifier = if (suggested != null && card in suggested) {
-                        Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
-                    } else {
-                        Modifier
+                    modifier = when {
+                        isBeingCaptured -> Modifier
+                            .graphicsLayer { scaleX = 1.08f; scaleY = 1.08f }
+                            .border(3.dp, GoldAccentColor, RoundedCornerShape(8.dp))
+                        suggested != null && card in suggested -> Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
+                        else -> Modifier
                     },
                 )
             }
         }
 
         Column(
-            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 150.dp).width(120.dp),
+            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 150.dp).width(135.dp),
             horizontalAlignment = Alignment.Start,
         ) {
-            AnimatedVisibility(visible = showHint || uiState.isHintLoading, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = showHint || uiState.isHintLoading || botPlaying, enter = fadeIn(), exit = fadeOut()) {
                 MaestroSpeechBubble(
-                    message = if (hint != null) formatHintMove(hint) else stringResource(id = R.string.game_hint_loading),
-                    fontSize = 12.sp,
+                    message = when {
+                        botSpeechMessage != null -> botSpeechMessage
+                        hint != null -> formatHintMove(hint)
+                        else -> stringResource(id = R.string.game_hint_loading)
+                    },
+                    fontSize = if (botSpeechMessage != null) 11.sp else 12.sp,
                     modifier = Modifier
                         .clickable { hintDismissed = true }
                         .testTag("game_hint_banner"),
@@ -955,17 +1167,19 @@ private fun FeltLayout(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
                 )
             }
-            AnimatedVisibility(visible = uiState.isSparring || showHint || sweeping, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = uiState.isSparring || showHint || sweeping || botPlaying, enter = fadeIn(), exit = fadeOut()) {
                 Box(
                     modifier = Modifier
                         .padding(top = 4.dp)
-                        .alpha(if (canAskHint || showHint || sweeping) 1f else 0.7f)
+                        .alpha(if (canAskHint || showHint || sweeping || botPlaying) 1f else 0.7f)
                         .clickable(enabled = canAskHint, onClick = onRequestHint)
                         .testTag("game_hint_button"),
                 ) {
                     FramedPortrait(
                         portrait = when {
                             sweeping -> R.drawable.maestro_celebrating
+                            uiState.isBotThinking -> R.drawable.maestro_thinking
+                            botPlaying -> R.drawable.maestro_pleased
                             showHint -> R.drawable.maestro_pleased
                             else -> R.drawable.maestro_neutral
                         },
@@ -977,19 +1191,35 @@ private fun FeltLayout(
             }
         }
 
+        // Overlay per l'animazione di volo della carta giocata e presa
+        if (activeMoveAnim != null) {
+            MoveFlightOverlay(
+                anim = activeMoveAnim!!,
+                humanSeat = uiState.humanSeat,
+            )
+        }
+
         // Mano del giocatore a ventaglio
         Column(
             modifier = Modifier.align(Alignment.BottomCenter).testTag("player_zone"),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            HandFan(uiState = uiState, onCardClicked = onCardClicked)
+            HandFan(
+                uiState = uiState,
+                enabled = activeMoveAnim == null,
+                onCardClicked = onCardClicked,
+            )
         }
     }
 }
 
 /** Mano a ventaglio: carte sovrapposte e ruotate; quando tocca a te sono più alte e brillano. */
 @Composable
-private fun HandFan(uiState: GameUiState, onCardClicked: (Card) -> Unit) {
+private fun HandFan(
+    uiState: GameUiState,
+    enabled: Boolean = true,
+    onCardClicked: (Card) -> Unit,
+) {
     val cards = uiState.humanHand
     Row(
         modifier = Modifier.testTag("human_hand_row"),
@@ -1001,12 +1231,13 @@ private fun HandFan(uiState: GameUiState, onCardClicked: (Card) -> Unit) {
             val angle = (i - mid) * 8f
             val drop = kotlin.math.abs(i - mid) * 12f
             val isSuggested = uiState.suggestedMove?.card == card
+            val canPlay = enabled && uiState.isHumanTurn
             Box(
                 modifier = Modifier
                     .offset(y = drop.dp)
                     .rotate(angle)
                     .then(
-                        if (isSuggested || uiState.isHumanTurn) {
+                        if (isSuggested || canPlay) {
                             Modifier.shadow(
                                 elevation = if (isSuggested) 18.dp else 8.dp,
                                 shape = RoundedCornerShape(10.dp),
@@ -1020,10 +1251,14 @@ private fun HandFan(uiState: GameUiState, onCardClicked: (Card) -> Unit) {
             ) {
                 PlaceholderCardView(
                     card = card,
-                    isPlayable = uiState.isHumanTurn,
+                    isPlayable = canPlay,
                     width = 110.dp,
                     height = 165.dp,
-                    onClick = { onCardClicked(card) },
+                    onClick = {
+                        if (canPlay) {
+                            onCardClicked(card)
+                        }
+                    },
                 )
             }
         }

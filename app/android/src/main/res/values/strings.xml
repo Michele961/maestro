@@ -159,6 +159,8 @@
     <string name="game_suit_coppe">di coppe</string>
     <string name="game_suit_spade">di spade</string>
     <string name="game_suit_bastoni">di bastoni</string>
+    <string name="game_bot_plays_card">Il Maestro gioca %1$s</string>
+    <string name="game_bot_takes_cards">Il Maestro gioca %1$s e prende: %2$s</string>
     <string name="post_match_victory">Vittoria!</string>
     <string name="post_match_defeat">Sconfitta</string>
     <string name="post_match_final_score">Tu %1$d - %2$d Avversario</string>

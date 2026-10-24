@@ -199,4 +199,31 @@ class GameReducerTest {
         assertEquals(1, afterBot.state.matchLog.moves.size)
         assertEquals(botLegal, afterBot.state.matchLog.moves.first())
     }
+
+    @Test
+    fun moveApplicationTracksLastMoveMoverAndIdForAnimation() {
+        val initial = GameReducer.initial(
+            GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1),
+        )
+        assertEquals(0L, initial.state.lastMoveId)
+        assertNull(initial.state.lastMove)
+        assertNull(initial.state.lastMover)
+
+        val firstMover = initial.state.scopaState.toMove
+        val firstLegal = legalMoves(initial.state.scopaState).first()
+        val res = if (firstMover == Seat.P1) {
+            GameReducer.reduce(initial.state, GameIntent.PlayCard(firstLegal.card))
+        } else {
+            GameReducer.reduce(initial.state, GameIntent.ApplyBotMove(firstLegal))
+        }
+
+        assertEquals(1L, res.state.lastMoveId)
+        assertEquals(firstMover, res.state.lastMover)
+        assertEquals(firstLegal, res.state.lastMove)
+
+        val uiState = res.state.toUiState()
+        assertEquals(1L, uiState.lastMoveId)
+        assertEquals(firstMover, uiState.lastMover)
+        assertEquals(firstLegal, uiState.lastMove)
+    }
 }

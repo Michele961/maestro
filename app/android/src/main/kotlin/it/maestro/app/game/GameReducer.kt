@@ -259,6 +259,8 @@ public object GameReducer {
     private fun applyMove(state: GameInternalState, move: ScopaMove): GameReducerResult {
         return when (val result = play(state.scopaState, move)) {
             is PlayResult.Applied -> {
+                val mover = state.scopaState.toMove
+                val nextMoveId = state.lastMoveId + 1L
                 val newLog = state.matchLog.copy(moves = state.matchLog.moves + move)
                 var dealScore: DealScore? = null
                 var lastEvent: UiGameEvent? = null
@@ -308,6 +310,9 @@ public object GameReducer {
                     lastError = null,
                     lastEvent = lastEvent ?: state.lastEvent,
                     sweepCards = sweepCards,
+                    lastMove = move,
+                    lastMover = mover,
+                    lastMoveId = nextMoveId,
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {

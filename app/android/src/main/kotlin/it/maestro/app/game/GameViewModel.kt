@@ -32,6 +32,7 @@ public class GameViewModel(
     private val matchRepository: MatchRepository? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
+    private val botThinkDelayMillis: Long = if (ioDispatcher == Dispatchers.Unconfined) 0L else 900L,
 ) : ViewModel() {
 
     private val scope: kotlinx.coroutines.CoroutineScope = coroutineScope ?: viewModelScope
@@ -89,6 +90,9 @@ public class GameViewModel(
         when (effect) {
             is GameEffect.ScheduleBotMove -> {
                 scope.launch {
+                    if (botThinkDelayMillis > 0L) {
+                        kotlinx.coroutines.delay(botThinkDelayMillis)
+                    }
                     val bot = effect.level.toBot()
                     val botSeat = effect.botSeat
                     // Il bot riceve SOLO viewFor e legalMoves, mai lo stato globale (ADR-0012, task F1-05)
