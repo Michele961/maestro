@@ -49,6 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.audio.NoOpSoundManager
+import it.maestro.app.audio.SoundEffect
+import it.maestro.app.audio.SoundManager
 import it.maestro.app.game.GameIntent
 import it.maestro.app.game.GameUiState
 import it.maestro.app.game.GameViewModel
@@ -56,6 +59,8 @@ import it.maestro.app.game.PendingCaptureChoice
 import it.maestro.app.game.TrainingAnswerFeedback
 import it.maestro.app.game.UiGameEvent
 import it.maestro.app.ui.components.CardBackView
+import it.maestro.app.ui.components.MaestroAvatarView
+import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.components.PlaceholderCardView
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
@@ -74,6 +79,7 @@ import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingOption
 import it.maestro.game.training.TrainingQuestion
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 public val TableFeltColor: Color = Color(0xFF1B4332)
 public val TableFeltDarkColor: Color = Color(0xFF081C15)
@@ -92,6 +98,7 @@ public fun TableScreen(
     restoreState: ScopaState? = null,
     restoreLog: MatchLog? = null,
     viewModel: GameViewModel = koinViewModel(),
+    soundManager: SoundManager = koinInject(),
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: (MatchLog) -> Unit = {},
 ) {
@@ -122,6 +129,7 @@ public fun TableScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
         modifier = modifier,
+        soundManager = soundManager,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = { onViewAnalysis(viewModel.currentMatchLog) },
         onRematch = {
@@ -143,11 +151,20 @@ public fun TableContent(
     uiState: GameUiState,
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
+    soundManager: SoundManager = NoOpSoundManager(),
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.lastEvent) {
+        when (uiState.lastEvent) {
+            is UiGameEvent.Sweep -> soundManager.play(SoundEffect.SWEEP)
+            is UiGameEvent.DealEnded -> soundManager.play(SoundEffect.CARD_CAPTURE)
+            else -> {}
+        }
+    }
 
     LaunchedEffect(uiState.errorMessage) {
         val error = uiState.errorMessage
@@ -197,8 +214,14 @@ public fun TableContent(
             // 4. ZONA GIOCATORE UMANO
             PlayerZone(
                 uiState = uiState,
-                onCardClicked = { card -> onIntent(GameIntent.PlayCard(card)) },
-                onRequestHint = { onIntent(GameIntent.RequestHint) },
+                onCardClicked = { card ->
+                    soundManager.play(SoundEffect.CARD_PLAY)
+                    onIntent(GameIntent.PlayCard(card))
+                },
+                onRequestHint = {
+                    soundManager.play(SoundEffect.BUTTON_CLICK)
+                    onIntent(GameIntent.RequestHint)
+                },
             )
         }
 
@@ -214,8 +237,12 @@ public fun TableContent(
             TrainingQuestionDialog(
                 question = question,
                 feedback = uiState.trainingQuestionFeedback,
+                soundManager = soundManager,
                 onAnswer = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
-                onContinue = { onIntent(GameIntent.DismissTrainingQuestion) },
+                onContinue = {
+                    soundManager.play(SoundEffect.BUTTON_CLICK)
+                    onIntent(GameIntent.DismissTrainingQuestion)
+                },
             )
         }
 
@@ -270,12 +297,25 @@ private fun OpponentZone(uiState: GameUiState) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = stringResource(id = R.string.game_player_maestro),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = GoldAccentColor,
-                    fontWeight = FontWeight.Bold,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    val mood = when {
+                        uiState.lastEvent is UiGameEvent.Sweep -> MaestroMood.CELEBRATING
+                        uiState.isBotThinking || uiState.isHintLoading -> MaestroMood.THINKING
+                        uiState.trainingQuestionFeedback?.isCorrect == true -> MaestroMood.PLEASED
+                        uiState.trainingQuestionFeedback?.isCorrect == false -> MaestroMood.WARNING
+                        else -> MaestroMood.NEUTRAL
+                    }
+                    MaestroAvatarView(mood = mood, size = 32.dp)
+                    Text(
+                        text = stringResource(id = R.string.game_player_maestro),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = GoldAccentColor,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = "${stringResource(id = R.string.game_sweeps_label)}: ${uiState.opponentSweeps}",
@@ -961,9 +1001,20 @@ private fun MatchOverDialog(
 private fun TrainingQuestionDialog(
     question: TrainingQuestion,
     feedback: TrainingAnswerFeedback?,
+    soundManager: SoundManager = NoOpSoundManager(),
     onAnswer: (Int) -> Unit,
     onContinue: () -> Unit,
 ) {
+    LaunchedEffect(feedback) {
+        if (feedback != null) {
+            if (feedback.isCorrect) {
+                soundManager.play(SoundEffect.CHECK_CORRECT)
+            } else {
+                soundManager.play(SoundEffect.CHECK_WRONG)
+            }
+        }
+    }
+
     val questionTitleResId = when (question.fundamental) {
         TrainingFundamental.SEVENS_COUNT -> R.string.training_question_sevens
         TrainingFundamental.DENARI_COUNT -> R.string.training_question_denari
@@ -1047,7 +1098,10 @@ private fun TrainingQuestionDialog(
                                 .fillMaxWidth()
                                 .testTag("training_option_$index")
                                 .border(1.dp, borderCol, RoundedCornerShape(8.dp))
-                                .clickable(enabled = feedback == null) { onAnswer(index) },
+                                .clickable(enabled = feedback == null) {
+                                    soundManager.play(SoundEffect.BUTTON_CLICK)
+                                    onAnswer(index)
+                                },
                             shape = RoundedCornerShape(8.dp),
                             color = bgCol,
                         ) {

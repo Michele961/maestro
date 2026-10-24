@@ -186,12 +186,12 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Obiettivo:** suoni con SoundPool, animazioni Rive del Maestro, Crashlytics, build di rilascio firmata con Play App Signing (D8). La chiave di upload resta a Michele, fuori dal repository; la CI non firma.
 - **Perimetro autorizzato:** Rive, Firebase Crashlytics e relativo plugin nel version catalog.
 - **Criteri di accettazione:**
-    - [ ] Suoni disattivabili dalle impostazioni.
-    - [ ] Un crash di prova compare in Crashlytics.
+    - [x] Suoni disattivabili dalle impostazioni.
+    - [x] Un crash di prova compare in Crashlytics.
 - **Domande aperte:** —
 
 ## F1-15 — Test interno su Play Console
