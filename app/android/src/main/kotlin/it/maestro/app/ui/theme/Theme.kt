@@ -19,11 +19,16 @@ public val ButtonGreenTop: Color = Color(0xFF2E8B57)
 public val ButtonGreenBottom: Color = Color(0xFF1F683D)
 public val ButtonGoldBorder: Color = Color(0xFFD4AF37)
 
+public val ButtonRedTop: Color = Color(0xFFC62828)
+public val ButtonRedBottom: Color = Color(0xFF8E1C1C)
+
 public val ButtonBlueTop: Color = Color(0xFF1E5A8A)
 public val ButtonBlueBottom: Color = Color(0xFF164366)
 
 public val ButtonAmberTop: Color = Color(0xFFA05A2C)
 public val ButtonAmberBottom: Color = Color(0xFF7D3F19)
+
+public val BrassRivetGold: Color = Color(0xFFFFE082)
 
 // Metriche e Segnalazioni Game Review
 public val GradeMagistraleBlue: Color = Color(0xFF1E88E5)
