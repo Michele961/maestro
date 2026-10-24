@@ -254,7 +254,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Obiettivo:** `PreGameScreen` come in `reference_pre_match_dialog.png`.
 - **Criteri di accettazione:**
     - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
-- **Domande aperte:** —
+- **Domande aperte:** risolte con Michele: modale come nel mockup, 3 livelli (Principiante, Esperto = intermedio, Maestro) e Classica/Sparring; le altre opzioni si recuperano più avanti.
 
 ## F1-21 — Tavolo da gioco con gli asset definitivi
 

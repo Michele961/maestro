@@ -25,7 +25,7 @@ import org.robolectric.annotation.GraphicsMode
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h1250dp-xxhdpi", application = Application::class)
+@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
 class PreGameScreenScreenshotTest {
 
     @get:Rule
@@ -45,7 +45,7 @@ class PreGameScreenScreenshotTest {
         }
         composeRule.onNodeWithTag("target_score_option_21").performClick()
         composeRule.onNodeWithTag("level_option_MAESTRO").performClick()
-        composeRule.onNodeWithTag("training_fundamental_option_NONE").performScrollTo().performClick()
+        composeRule.onNodeWithTag("mode_option_classic").performScrollTo().performClick()
         composeRule.onNodeWithTag("start_game_button").performScrollTo().performClick()
         assertEquals(Triple(DifficultyLevel.MAESTRO, 21, TrainingFundamental.NONE), chosen)
     }

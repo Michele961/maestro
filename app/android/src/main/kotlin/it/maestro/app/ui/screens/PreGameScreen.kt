@@ -1,22 +1,26 @@
 package it.maestro.app.ui.screens
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.BorderStroke
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import it.maestro.app.ui.components.NineSliceBox
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,24 +39,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
-import it.maestro.app.ui.components.BrassHeaderPlaque
 import it.maestro.app.ui.components.ClubBackground
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.TactileSegmentedPill
-import it.maestro.app.ui.theme.ButtonGoldBorder
-import it.maestro.app.ui.theme.ButtonGreenBottom
-import it.maestro.app.ui.theme.WoodSurfaceDark
 import it.maestro.game.training.TrainingFundamental
 
 /**
- * Configurazione pre-partita "Preparati a giocare" (task F1-07, grafica F1-20 su `reference_pre_match_dialog.png`).
- * Permette di selezionare il livello del bot, il punteggio obiettivo (11, 16, 21) e l'obiettivo di allenamento.
+ * Modale "Preparati a giocare" (task F1-07, grafica F1-20 su `reference_pre_match_dialog.png`).
+ * Semplificata come nel mockup (decisione di Michele): punti obiettivo, 3 livelli e modalità Classica/Sparring.
+ * Classica = partita senza check didattici; Sparring = con i check del Maestro su [initialFundamental].
  * Tutti i testi provengono rigorosamente dalle risorse stringhe (ADR-0007).
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 public fun PreGameScreen(
     modifier: Modifier = Modifier,
@@ -64,159 +64,213 @@ public fun PreGameScreen(
 ) {
     var selectedLevel by remember { mutableStateOf(initialLevel) }
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
-    var selectedFundamental by remember { mutableStateOf(initialFundamental) }
+    var sparring by remember { mutableStateOf(initialFundamental != TrainingFundamental.NONE) }
 
-    // Ritratti provvisori per livello: gli avatar generati in F1-13, dal più giovane al Maestro.
+    // 3 livelli del mockup sui livelli del motore: Principiante, Esperto (intermedio), Maestro.
     val levels = listOf(
-        Triple(DifficultyLevel.PRINCIPIANTE, R.string.level_principiante, R.drawable.avatar_beginner),
-        Triple(DifficultyLevel.DILETTANTE, R.string.level_dilettante, R.drawable.avatar_player_alt),
-        Triple(DifficultyLevel.INTERMEDIO, R.string.level_intermedio, R.drawable.avatar_player_default),
-        Triple(DifficultyLevel.AVANZATO, R.string.level_avanzato, R.drawable.avatar_expert),
-        Triple(DifficultyLevel.MAESTRO, R.string.level_maestro, R.drawable.maestro_neutral),
+        LevelOption(DifficultyLevel.PRINCIPIANTE, R.string.level_principiante, 1, R.drawable.avatar_beginner),
+        LevelOption(DifficultyLevel.INTERMEDIO, R.string.level_esperto, 2, R.drawable.avatar_expert),
+        LevelOption(DifficultyLevel.MAESTRO, R.string.level_maestro, 3, R.drawable.maestro_neutral),
     )
 
-    val targetScores = listOf(
-        11 to R.string.target_score_11,
-        16 to R.string.target_score_16,
-        21 to R.string.target_score_21,
-    )
-
-    val fundamentals = listOf(
-        TrainingFundamental.SEVENS_COUNT to R.string.training_fundamental_sevens,
-        TrainingFundamental.DENARI_COUNT to R.string.training_fundamental_denari,
-        TrainingFundamental.PRIMIERA_LEAD to R.string.training_fundamental_primiera,
-        TrainingFundamental.SETTEBELLO_LOCATION to R.string.training_fundamental_settebello,
-        TrainingFundamental.CARDS_LEAD to R.string.training_fundamental_cards,
-        TrainingFundamental.NONE to R.string.training_fundamental_none,
-    )
-
-    ClubBackground(modifier = modifier.testTag("pre_game_screen")) {
+    ClubBackground(modifier = modifier.testTag("pre_game_screen"), feltFraction = 0.5f) {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0x99000000)))
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 28.dp),
+                .padding(horizontal = 18.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            ParchmentPanel(showTopOrnament = true, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(id = R.string.pre_game_title).uppercase(),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = WoodSurfaceDark,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
-                )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                ParchmentPanel(modifier = Modifier.fillMaxWidth().padding(top = 56.dp)) {
+                    Text(
+                        text = stringResource(id = R.string.pre_game_title).uppercase(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color(0xFF2B1A10),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 36.dp, bottom = 4.dp),
+                    )
 
-                SectionHeader(stringResource(id = R.string.pre_game_target_score_title))
-                Row(
-                    modifier = Modifier.fillMaxWidth().testTag("target_score_selector"),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    for ((target, stringResId) in targetScores) {
-                        TactileSegmentedPill(
-                            text = stringResource(id = stringResId),
-                            selected = selectedTargetScore == target,
-                            onClick = { selectedTargetScore = target },
-                            modifier = Modifier.weight(1f).testTag("target_score_option_$target"),
+                    RibbonHeader(stringResource(id = R.string.pre_game_target_score_title))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().testTag("target_score_selector"),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (target in listOf(11, 16, 21)) {
+                            TactileSegmentedPill(
+                                text = stringResource(id = R.string.pre_game_points, target),
+                                selected = selectedTargetScore == target,
+                                onClick = { selectedTargetScore = target },
+                                modifier = Modifier.weight(1f).height(58.dp).testTag("target_score_option_$target"),
+                            )
+                        }
+                    }
+
+                    RibbonHeader(stringResource(id = R.string.pre_game_difficulty_title))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().testTag("level_selector"),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (option in levels) {
+                            LevelTile(
+                                option = option,
+                                selected = selectedLevel == option.level,
+                                onClick = { selectedLevel = option.level },
+                                modifier = Modifier.weight(1f).testTag("level_option_${option.level.name}"),
+                            )
+                        }
+                    }
+
+                    RibbonHeader(stringResource(id = R.string.pre_game_mode_title))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        MaestroPillButton(
+                            text = stringResource(id = R.string.pre_game_mode_classic).uppercase(),
+                            onClick = { sparring = false },
+                            variant = if (sparring) PillButtonVariant.CREAM else PillButtonVariant.PRIMARY_GREEN,
+                            height = 62.dp,
+                            fontSize = 22.sp,
+                            modifier = Modifier.weight(1f),
+                            testTag = "mode_option_classic",
                         )
+                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            MaestroPillButton(
+                                text = stringResource(id = R.string.pre_game_mode_sparring).uppercase(),
+                                onClick = { sparring = true },
+                                variant = if (sparring) PillButtonVariant.EDUCATIONAL_BLUE else PillButtonVariant.CREAM,
+                                height = 62.dp,
+                                fontSize = 22.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                testTag = "mode_option_sparring",
+                            )
+                            Text(
+                                text = stringResource(id = R.string.pre_game_mode_sparring_hint),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = Color(0xFF2B1A10),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
                     }
                 }
-
-                SectionHeader(stringResource(id = R.string.pre_game_difficulty_title))
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth().testTag("level_selector"),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    maxItemsInEachRow = 3,
+                // Le due carte sulla targa in cima, come nel mockup
+                NineSliceBox(
+                    skin = R.drawable.skin_plaque_wood,
+                    slice = 0.3f,
+                    corner = 18.dp,
+                    modifier = Modifier.align(Alignment.TopCenter).size(width = 170.dp, height = 96.dp),
                 ) {
-                    for ((level, stringResId, portrait) in levels) {
-                        LevelTile(
-                            label = stringResource(id = stringResId),
-                            portrait = portrait,
-                            selected = selectedLevel == level,
-                            onClick = { selectedLevel = level },
-                            modifier = Modifier.width(96.dp).testTag("level_option_${level.name}"),
-                        )
+                    Row(horizontalArrangement = Arrangement.spacedBy((-14).dp)) {
+                        CardImage(R.drawable.card_denari_7, -8f)
+                        CardImage(R.drawable.card_bastoni_asso, 8f)
                     }
                 }
-
-                SectionHeader(stringResource(id = R.string.pre_game_training_title))
-                Column(
-                    modifier = Modifier.fillMaxWidth().testTag("training_fundamental_selector"),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    for ((fundamental, stringResId) in fundamentals) {
-                        TactileSegmentedPill(
-                            text = stringResource(id = stringResId),
-                            selected = selectedFundamental == fundamental,
-                            onClick = { selectedFundamental = fundamental },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag("training_fundamental_option_${fundamental.name}"),
-                        )
-                    }
-                }
-
-                MaestroPillButton(
-                    text = stringResource(id = R.string.pre_game_start_button).uppercase(),
-                    onClick = { onStartGame(selectedLevel, selectedTargetScore, selectedFundamental) },
-                    variant = PillButtonVariant.PRIMARY_GREEN,
-                    height = 56.dp,
-                    fontSize = 22.sp,
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-                    testTag = "start_game_button",
-                )
-                MaestroPillButton(
-                    text = stringResource(id = R.string.pre_game_back_button),
-                    onClick = onNavigateBack,
-                    variant = PillButtonVariant.WOOD,
-                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 8.dp),
-                    testTag = "back_to_home_button",
+                Image(
+                    painter = painterResource(R.drawable.button_close),
+                    contentDescription = stringResource(id = R.string.pre_game_back_button),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 44.dp)
+                        .size(52.dp)
+                        .clickable(onClick = onNavigateBack)
+                        .testTag("back_to_home_button"),
                 )
             }
+
+            MaestroPillButton(
+                text = stringResource(id = R.string.pre_game_start_button).uppercase(),
+                onClick = {
+                    onStartGame(
+                        selectedLevel,
+                        selectedTargetScore,
+                        if (sparring) initialFundamental.takeIf { it != TrainingFundamental.NONE }
+                            ?: TrainingFundamental.SEVENS_COUNT else TrainingFundamental.NONE,
+                    )
+                },
+                variant = PillButtonVariant.PRIMARY_GREEN,
+                height = 76.dp,
+                fontSize = 32.sp,
+                modifier = Modifier.fillMaxWidth(0.82f).padding(top = 18.dp),
+                testTag = "start_game_button",
+            )
         }
     }
 }
 
-/** Fascia di sezione come nel mockup ("Punti obiettivo", "Livello avversario"…). */
+private data class LevelOption(
+    val level: DifficultyLevel,
+    @StringRes val label: Int,
+    val number: Int,
+    @DrawableRes val portrait: Int,
+)
+
 @Composable
-private fun SectionHeader(title: String) {
-    BrassHeaderPlaque(
-        title = title,
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 10.dp),
+private fun CardImage(@DrawableRes card: Int, angle: Float) {
+    Image(
+        painter = painterResource(card),
+        contentDescription = null,
+        modifier = Modifier.height(84.dp).rotate(angle),
     )
 }
 
-/** Riquadro del livello con ritratto in cerchio d'ottone; verde quando selezionato. */
+/** Fascia di sezione su nastro, come nel mockup ("Punti obiettivo", "Livello avversario"…). */
+@Composable
+private fun RibbonHeader(title: String) {
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 10.dp).height(46.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.skin_ribbon),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = Color(0xFFFFF4D6),
+            modifier = Modifier.padding(bottom = 6.dp),
+        )
+    }
+}
+
+/** Riquadro del livello con ritratto sporgente in cerchio d'ottone; verde quando selezionato. */
 @Composable
 private fun LevelTile(
-    label: String,
-    @DrawableRes portrait: Int,
+    option: LevelOption,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(12.dp)
-    Surface(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = shape,
-        color = if (selected) ButtonGreenBottom else Color(0xFFF3EBDD),
-        border = BorderStroke(if (selected) 3.dp else 1.dp, ButtonGoldBorder),
-        shadowElevation = if (selected) 6.dp else 2.dp,
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Box(modifier = modifier.clickable(onClick = onClick), contentAlignment = Alignment.TopCenter) {
+        NineSliceBox(
+            skin = if (selected) R.drawable.skin_button_green else R.drawable.skin_button_cream,
+            slice = 0.42f,
+            corner = 18.dp,
+            modifier = Modifier.fillMaxWidth().padding(top = 30.dp).height(104.dp),
         ) {
-            FramedPortrait(portrait = portrait, size = 56.dp)
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = if (selected) Color.White else WoodSurfaceDark,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 4.dp),
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(top = 30.dp),
+            ) {
+                Text(
+                    text = stringResource(id = option.label),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (selected) Color(0xFFFFF4D6) else Color(0xFF2B1A10),
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = stringResource(id = R.string.pre_game_level_number, option.number),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (selected) Color(0xFFFFF4D6) else Color(0xFF2B1A10),
+                )
+            }
         }
+        FramedPortrait(portrait = option.portrait, size = 60.dp)
     }
 }

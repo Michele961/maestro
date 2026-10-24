@@ -32,9 +32,9 @@
     <string name="game_card_rank_fante">Fante</string>
     <string name="game_card_rank_cavallo">Cavallo</string>
     <string name="game_card_rank_re">Re</string>
-    <string name="pre_game_title">Configura Partita</string>
-    <string name="pre_game_difficulty_title">Livello di difficoltà</string>
-    <string name="pre_game_target_score_title">Punteggio obiettivo</string>
+    <string name="pre_game_title">Preparati a giocare</string>
+    <string name="pre_game_difficulty_title">Livello avversario</string>
+    <string name="pre_game_target_score_title">Punti obiettivo</string>
     <string name="pre_game_start_button">Inizia Partita</string>
     <string name="pre_game_back_button">Indietro</string>
     <string name="level_principiante">Principiante</string>
@@ -144,4 +144,11 @@
     <string name="home_nav_shop">Bottega</string>
     <string name="home_maestro_title">Il Maestro</string>
     <string name="home_messages">Messaggi</string>
+    <string name="pre_game_points">%1$d Punti</string>
+    <string name="pre_game_level_number">(Liv. %1$d)</string>
+    <string name="level_esperto">Esperto</string>
+    <string name="pre_game_mode_title">Modalità di gioco</string>
+    <string name="pre_game_mode_classic">Classica</string>
+    <string name="pre_game_mode_sparring">Sparring</string>
+    <string name="pre_game_mode_sparring_hint">Con consigli del Maestro</string>
 </resources>
