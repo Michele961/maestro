@@ -1,0 +1,133 @@
+package it.maestro.app.game
+
+import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.game.model.Card
+import it.maestro.game.model.Seat
+import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.DealScore
+import it.maestro.game.scopa.MatchLog
+import it.maestro.game.scopa.ScopaConfig
+import it.maestro.game.scopa.ScopaMove
+import it.maestro.game.scopa.ScopaState
+import it.maestro.game.scopa.viewFor
+
+/**
+ * Rappresenta la scelta di presa multipla per il giocatore umano quando una carta giocata
+ * può effettuare più prese distinte dal tavolo (spec §4.2–4.3, ADR-0012, task F1-05).
+ *
+ * @property card Carta giocata dalla mano che ha generato la scelta.
+ * @property options Lista di insiemi alternativi di carte sul tavolo catturabili.
+ */
+public data class PendingCaptureChoice(
+    val card: Card,
+    val options: List<Set<Card>>,
+)
+
+/**
+ * Eventi visivi/notifiche di partita per la UI (ADR-0012, task F1-05).
+ */
+public sealed interface UiGameEvent {
+    public data class Sweep(val seat: Seat) : UiGameEvent
+    public data class DealEnded(val score: DealScore) : UiGameEvent
+    public data class MatchEnded(val winner: Seat, val totals: Map<Seat, Int>) : UiGameEvent
+}
+
+/**
+ * Stato della schermata di gioco esposto alla UI (ADR-0012, task F1-05).
+ *
+ * **Principio di sicurezza e architettura:**
+ * La UI non riceve mai [ScopaState] né alcuna informazione nascosta (mano avversaria, tallone coperto).
+ * Tutti i campi derivano rigorosamente dalla [it.maestro.game.scopa.ScopaView] del giocatore umano.
+ */
+public data class GameUiState(
+    val phase: DealPhase,
+    val humanSeat: Seat,
+    val humanHand: List<Card>,
+    val tableCards: List<Card>,
+    val opponentCardCount: Int,
+    val deckCardCount: Int,
+    val humanCapturedCount: Int,
+    val opponentCapturedCount: Int,
+    val humanSweeps: Int,
+    val opponentSweeps: Int,
+    val humanScore: Int,
+    val opponentScore: Int,
+    val isHumanTurn: Boolean,
+    val isBotThinking: Boolean,
+    val pendingCaptureChoice: PendingCaptureChoice?,
+    val lastEvent: UiGameEvent?,
+    val errorMessage: String?,
+)
+
+/**
+ * Intenti dell'utente o del motore di gioco nel modello MVI (ADR-0012, task F1-05).
+ */
+public sealed interface GameIntent {
+    public data class StartMatch(
+        val config: ScopaConfig = ScopaConfig(),
+        val level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
+        val seed: Long = 42L,
+        val humanSeat: Seat = Seat.P1,
+    ) : GameIntent
+
+    public data class PlayCard(val card: Card) : GameIntent
+    public data class SelectCapture(val card: Card, val capture: Set<Card>) : GameIntent
+    public data object CancelCaptureChoice : GameIntent
+    public data object RequestBotMove : GameIntent
+    public data class ApplyBotMove(val move: ScopaMove) : GameIntent
+    public data object DismissError : GameIntent
+    public data object DismissEvent : GameIntent
+}
+
+/**
+ * Stato autoritativo interno gestito dal Reducer (ADR-0012, task F1-05).
+ */
+public data class GameInternalState(
+    val scopaState: ScopaState,
+    val humanSeat: Seat,
+    val botLevel: DifficultyLevel,
+    val matchLog: MatchLog,
+    val pendingCapture: PendingCaptureChoice? = null,
+    val isBotThinking: Boolean = false,
+    val lastError: String? = null,
+    val lastEvent: UiGameEvent? = null,
+) {
+    public fun toUiState(): GameUiState {
+        val view = viewFor(scopaState, humanSeat)
+        val opponentSeat = humanSeat.other()
+        return GameUiState(
+            phase = view.phase,
+            humanSeat = humanSeat,
+            humanHand = view.hand,
+            tableCards = view.table,
+            opponentCardCount = view.opponentHandSize,
+            deckCardCount = view.deckSize,
+            humanCapturedCount = view.capturedBy[humanSeat]?.size ?: 0,
+            opponentCapturedCount = view.capturedBy[opponentSeat]?.size ?: 0,
+            humanSweeps = view.sweeps[humanSeat] ?: 0,
+            opponentSweeps = view.sweeps[opponentSeat] ?: 0,
+            humanScore = view.totals[humanSeat] ?: 0,
+            opponentScore = view.totals[opponentSeat] ?: 0,
+            isHumanTurn = view.phase == DealPhase.PLAYING && view.toMove == humanSeat,
+            isBotThinking = isBotThinking,
+            pendingCaptureChoice = pendingCapture,
+            lastEvent = lastEvent,
+            errorMessage = lastError,
+        )
+    }
+}
+
+/**
+ * Effetto collaterale generato dal Reducer per il runtime asincrono (ADR-0012, task F1-05).
+ */
+public sealed interface GameEffect {
+    public data class ScheduleBotMove(
+        val level: DifficultyLevel,
+        val botSeat: Seat,
+    ) : GameEffect
+}
+
+public data class GameReducerResult(
+    val state: GameInternalState,
+    val effect: GameEffect? = null,
+)

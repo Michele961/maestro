@@ -4,4 +4,16 @@
     <string name="home_welcome_title">Maestro</string>
     <string name="home_subtitle">Scopa e Briscola con coach AI</string>
     <string name="home_start_game">Nuova Partita</string>
+    <string name="game_error_not_your_turn">Non è il tuo turno</string>
+    <string name="game_error_invalid_move">Mossa non valida</string>
+    <string name="game_event_sweep">Scopa!</string>
+    <string name="game_event_deal_ended">Fine smazzata</string>
+    <string name="game_event_match_ended">Partita conclusa</string>
+    <string name="game_dialog_capture_title">Scegli la presa</string>
+    <string name="game_dialog_cancel">Annulla</string>
+    <string name="game_score_label">Punti</string>
+    <string name="game_sweeps_label">Scope</string>
+    <string name="game_bot_thinking">Il Maestro sta pensando…</string>
+    <string name="game_your_turn">Tocca a te</string>
+    <string name="game_opponent_turn">Tocca all\'avversario</string>
 </resources>
