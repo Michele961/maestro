@@ -56,11 +56,14 @@ import it.maestro.app.game.UiGameEvent
 import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.PlaceholderCardView
 import it.maestro.game.model.Card
+import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
+import it.maestro.game.model.Suit
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaConfig
+import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.ScoreCategory
 import org.koin.androidx.compose.koinViewModel
