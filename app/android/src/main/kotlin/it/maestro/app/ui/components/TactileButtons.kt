@@ -36,6 +36,7 @@ import it.maestro.app.ui.theme.ModalBackgroundWarm
 import it.maestro.app.ui.theme.WoodSurfaceDark
 
 public enum class PillButtonVariant {
+    HERO_RED,
     PRIMARY_GREEN,
     EDUCATIONAL_BLUE,
     SECONDARY_AMBER,
@@ -57,6 +58,9 @@ public fun MaestroPillButton(
     contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
 ) {
     val gradient = when (variant) {
+        PillButtonVariant.HERO_RED -> Brush.verticalGradient(
+            listOf(it.maestro.app.ui.theme.ButtonRedTop, it.maestro.app.ui.theme.ButtonRedBottom),
+        )
         PillButtonVariant.PRIMARY_GREEN -> Brush.verticalGradient(
             listOf(ButtonGreenTop, ButtonGreenBottom),
         )
@@ -72,7 +76,7 @@ public fun MaestroPillButton(
     }
 
     val borderColor = when (variant) {
-        PillButtonVariant.PRIMARY_GREEN, PillButtonVariant.SECONDARY_AMBER -> ButtonGoldBorder
+        PillButtonVariant.HERO_RED, PillButtonVariant.PRIMARY_GREEN, PillButtonVariant.SECONDARY_AMBER -> ButtonGoldBorder
         PillButtonVariant.EDUCATIONAL_BLUE -> Color(0xFF64B5F6)
         PillButtonVariant.WOOD -> ButtonGoldBorder.copy(alpha = 0.6f)
     }
@@ -231,3 +235,103 @@ public fun ScorePlaque(
         }
     }
 }
+
+/**
+ * Selettore a pillola per opzioni multiple (es. 11/16/21 punti, modalità di gioco).
+ */
+@Composable
+public fun TactileSegmentedPill(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    val shape = RoundedCornerShape(20.dp)
+    val backgroundBrush = if (selected) {
+        Brush.verticalGradient(listOf(ButtonGreenTop, ButtonGreenBottom))
+    } else {
+        Brush.verticalGradient(listOf(Color(0xFF4A321E), Color(0xFF2B1B10)))
+    }
+    val borderColor = if (selected) ButtonGoldBorder else ButtonGoldBorder.copy(alpha = 0.5f)
+    val textColor = if (selected) Color.White else Color(0xFFD7CCC8)
+
+    Surface(
+        modifier = modifier
+            .shadow(elevation = if (selected) 4.dp else 1.dp, shape = shape)
+            .clickable(enabled = enabled, onClick = onClick),
+        shape = shape,
+        border = BorderStroke(if (selected) 2.dp else 1.dp, borderColor),
+        color = Color.Transparent,
+    ) {
+        Box(
+            modifier = Modifier
+                .background(backgroundBrush)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = text,
+                color = textColor,
+                fontSize = 13.sp,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+            )
+        }
+    }
+}
+
+/**
+ * Targhetta orizzontale in ottone/legno noce con rivetti dorati per le intestazioni (es. PREPARATI A GIOCARE).
+ */
+@Composable
+public fun BrassHeaderPlaque(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    val shape = RoundedCornerShape(12.dp)
+    Surface(
+        modifier = modifier.shadow(6.dp, shape),
+        shape = shape,
+        color = Color.Transparent,
+        border = BorderStroke(2.dp, ButtonGoldBorder),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF5A3821), Color(0xFF3B2213)),
+                    ),
+                )
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.foundation.layout.Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = title,
+                    color = Color(0xFFFFE082),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.sp,
+                    textAlign = TextAlign.Center,
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        color = Color(0xFFD7CCC8),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
+
