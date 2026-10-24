@@ -175,13 +175,15 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-13 — Guida di stile e asset definitivi
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Esecutore:** Michele, con supporto di agenti per l'integrazione
 - **Riferimenti:** ADR-0008
 - **Obiettivo:** `docs/art/style-guide.md` (palette, tratto, cornici, proporzioni); generazione e revisione manuale di 40 carte napoletane ridisegnate, dorso, tavolo, avatar del Maestro; integrazione nell'app come tema sostituibile.
 - **Criteri di accettazione:**
-    - [ ] Ogni asset ha superato la revisione manuale di Michele.
-    - [ ] Il mazzo è un tema separato dalle regole.
+    - [x] Guida di stile v1.0 approvata da Michele (`docs/art/style-guide.md` e `docs/art/style_guide_sheet.jpg`).
+    - [x] Il mazzo è un tema separato dalle regole (`DeckTheme.kt`).
+    - [x] Primi asset chiave approvati e integrati (`card_back`, `card_denari_7`, `card_bastoni_asso`, `maestro_neutral`).
+    - [ ] Completamento intero mazzo 40 carte con approvazione di Michele.
 - **Domande aperte:** —
 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
