@@ -2,7 +2,10 @@ package it.maestro.app.ui.screenshot
 
 import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.bot.DifficultyLevel
@@ -75,6 +78,8 @@ class ReviewScreensScreenshotTest {
     fun game_review_screenshot() {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
+        // Salta al primo errore, come la mano evidenziata nel mockup
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review.png")
     }
 }
