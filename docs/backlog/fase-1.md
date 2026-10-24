@@ -106,7 +106,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-06 — Schermata del tavolo con carte segnaposto
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** `docs/vision.md` §2 (solo contesto), ADR-0008 (segnaposto fino a Fase 1 avanzata)
 - **Obiettivo:** tavolo in Compose: mano del giocatore, carte coperte dell'avversario, tavolo, mazzetti delle prese, mazzo residuo, punteggio. Quando la carta giocata ha più prese possibili (`scopa.md` §4.2–4.3), il giocatore sceglie quale. Animazioni base di giocata e presa.
 - **Criteri di accettazione:**

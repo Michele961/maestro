@@ -16,4 +16,20 @@
     <string name="game_bot_thinking">The Maestro is thinking…</string>
     <string name="game_your_turn">Your turn</string>
     <string name="game_opponent_turn">Opponent\'s turn</string>
+    <string name="game_player_you">You</string>
+    <string name="game_player_maestro">Maestro</string>
+    <string name="game_deck_label">Deck</string>
+    <string name="game_captured_label">Tricks</string>
+    <string name="game_rematch_button">Play Again</string>
+    <string name="game_winner_you">You won!</string>
+    <string name="game_winner_maestro">Maestro won!</string>
+    <string name="game_tie">It\'s a tie!</string>
+    <string name="game_card_denari">Coins</string>
+    <string name="game_card_coppe">Cups</string>
+    <string name="game_card_spade">Swords</string>
+    <string name="game_card_bastoni">Clubs</string>
+    <string name="game_card_rank_asso">Ace</string>
+    <string name="game_card_rank_fante">Jack</string>
+    <string name="game_card_rank_cavallo">Knight</string>
+    <string name="game_card_rank_re">King</string>
 </resources>

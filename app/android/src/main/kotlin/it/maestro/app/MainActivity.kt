@@ -3,7 +3,12 @@ package it.maestro.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import it.maestro.app.ui.screens.HomeScreen
+import it.maestro.app.ui.screens.TableScreen
 import it.maestro.app.ui.theme.MaestroTheme
 
 /**
@@ -14,7 +19,15 @@ public class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaestroTheme {
-                HomeScreen()
+                var currentScreen by remember { mutableStateOf("home") }
+                when (currentScreen) {
+                    "home" -> HomeScreen(
+                        onStartGameClicked = { currentScreen = "table" },
+                    )
+                    "table" -> TableScreen(
+                        onNavigateHome = { currentScreen = "home" },
+                    )
+                }
             }
         }
     }
