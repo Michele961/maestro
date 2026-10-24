@@ -186,7 +186,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
     - [x] Primi asset chiave approvati e integrati (`card_back`, `card_denari_7`, `card_bastoni_asso`, `maestro_neutral`).
     - [ ] Completamento intero mazzo 40 carte con approvazione di Michele.
 - **Domande aperte:**
-    - Risolte con Michele: gli asset passano in `res/drawable-nodpi/` come WebP; `maestro_neutral` va rigenerato senza cornice come le altre espressioni (in attesa della generazione); i componenti del menu vanno in F1-18.
+    - Risolte con Michele: gli asset passano in `res/drawable-nodpi/` come WebP; `maestro_neutral` rigenerato senza cornice come le altre espressioni; i componenti del menu vanno in F1-18.
 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
 

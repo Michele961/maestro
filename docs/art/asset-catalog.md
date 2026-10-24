@@ -20,7 +20,7 @@ Posizione target nel progetto Android:
 
 | File Name | Stato Emotivo | Risoluzione Minima | Stato |
 |---|---|---|---|
-| `maestro_neutral.webp` | Stato normale / neutro con cornice ottone e targa | `512 × 512 px` | **Approvato v1.0** (integrato in `res/drawable-nodpi/`) |
+| `maestro_neutral.webp` | Stato normale / neutro | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
 | `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
 | `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
 | `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
