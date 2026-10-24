@@ -13,9 +13,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
@@ -41,6 +43,12 @@ public sealed interface Screen {
     ) : Screen
     public data class PostMatchPreview(
         val matchLog: MatchLog,
+        val level: DifficultyLevel,
+        val humanSeat: Seat = Seat.P1,
+    ) : Screen
+    public data class GameReview(
+        val matchLog: MatchLog,
+        val analysis: MatchAnalysis,
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
     ) : Screen
@@ -118,6 +126,14 @@ public class MainActivity : ComponentActivity() {
                         matchLog = screen.matchLog,
                         level = screen.level,
                         humanSeat = screen.humanSeat,
+                        onReviewClicked = { analysis ->
+                            currentScreen = Screen.GameReview(
+                                matchLog = screen.matchLog,
+                                analysis = analysis,
+                                level = screen.level,
+                                humanSeat = screen.humanSeat,
+                            )
+                        },
                         onRematchClicked = {
                             currentScreen = Screen.Table(
                                 level = screen.level,
@@ -125,6 +141,18 @@ public class MainActivity : ComponentActivity() {
                             )
                         },
                         onHomeClicked = { currentScreen = Screen.Home },
+                    )
+                    is Screen.GameReview -> GameReviewScreen(
+                        matchLog = screen.matchLog,
+                        analysis = screen.analysis,
+                        humanSeat = screen.humanSeat,
+                        onNavigateBack = {
+                            currentScreen = Screen.PostMatchPreview(
+                                matchLog = screen.matchLog,
+                                level = screen.level,
+                                humanSeat = screen.humanSeat,
+                            )
+                        },
                     )
                 }
 

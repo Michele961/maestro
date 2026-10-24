@@ -64,7 +64,7 @@ public fun PostMatchPreviewScreen(
     humanSeat: Seat = Seat.P1,
     analyzer: MatchAnalyzer = remember { MatchAnalyzer() },
     ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
-    onReviewClicked: () -> Unit = {},
+    onReviewClicked: (MatchAnalysis) -> Unit = {},
     onRematchClicked: () -> Unit = {},
     onHomeClicked: () -> Unit = {},
 ) {
@@ -289,7 +289,8 @@ public fun PostMatchPreviewScreen(
 
                 // Pulsanti di navigazione
                 Button(
-                    onClick = onReviewClicked,
+                    onClick = { analysisResult?.let { onReviewClicked(it) } },
+                    enabled = analysisResult != null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
