@@ -59,7 +59,9 @@ import it.maestro.game.model.Card
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
+import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaConfig
+import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.ScoreCategory
 import org.koin.androidx.compose.koinViewModel
 
@@ -76,17 +78,29 @@ public fun TableScreen(
     level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     targetScore: Int = 11,
     seed: Long = 42L,
+    restoreState: ScopaState? = null,
+    restoreLog: MatchLog? = null,
     viewModel: GameViewModel = koinViewModel(),
     onNavigateHome: () -> Unit = {},
 ) {
-    LaunchedEffect(level, targetScore, seed) {
-        viewModel.onIntent(
-            GameIntent.StartMatch(
-                config = ScopaConfig(targetScore = targetScore),
-                level = level,
-                seed = seed,
-            ),
-        )
+    LaunchedEffect(level, targetScore, seed, restoreState) {
+        if (restoreState != null && restoreLog != null) {
+            viewModel.onIntent(
+                GameIntent.RestoreMatch(
+                    state = restoreState,
+                    matchLog = restoreLog,
+                    level = level,
+                ),
+            )
+        } else {
+            viewModel.onIntent(
+                GameIntent.StartMatch(
+                    config = ScopaConfig(targetScore = targetScore),
+                    level = level,
+                    seed = seed,
+                ),
+            )
+        }
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

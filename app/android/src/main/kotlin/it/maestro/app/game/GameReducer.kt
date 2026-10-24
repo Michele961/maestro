@@ -55,6 +55,8 @@ public object GameReducer {
         return when (intent) {
             is GameIntent.StartMatch -> initial(intent)
 
+            is GameIntent.RestoreMatch -> handleRestoreMatch(intent)
+
             is GameIntent.PlayCard -> handlePlayCard(state, intent)
 
             is GameIntent.SelectCapture -> handleSelectCapture(state, intent)
@@ -127,6 +129,26 @@ public object GameReducer {
         }
         return GameReducerResult(
             state = cleared.copy(isBotThinking = shouldScheduleBot),
+            effect = effect,
+        )
+    }
+
+    private fun handleRestoreMatch(intent: GameIntent.RestoreMatch): GameReducerResult {
+        val internalState = GameInternalState(
+            scopaState = intent.state,
+            humanSeat = intent.humanSeat,
+            botLevel = intent.level,
+            matchLog = intent.matchLog,
+        )
+        val botSeat = intent.humanSeat.other()
+        val botPlays = intent.state.phase == DealPhase.PLAYING && intent.state.toMove == botSeat
+        val effect = if (botPlays) {
+            GameEffect.ScheduleBotMove(level = intent.level, botSeat = botSeat)
+        } else {
+            null
+        }
+        return GameReducerResult(
+            state = internalState.copy(isBotThinking = botPlays),
             effect = effect,
         )
     }
