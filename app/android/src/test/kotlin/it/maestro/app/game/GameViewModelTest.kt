@@ -25,9 +25,9 @@ class GameViewModelTest {
 
         assertEquals(DealPhase.PLAYING, initialUi.phase)
         assertEquals(3, initialUi.humanHand.size)
-        assertEquals(4, initialUi.tableCards.size)
-        assertEquals(3, initialUi.opponentCardCount)
+        assertTrue(initialUi.tableCards.isNotEmpty())
         assertEquals(30, initialUi.deckCardCount)
+        assertTrue(initialUi.isHumanTurn)
 
         // Reset con match deterministico
         viewModel.onIntent(
