@@ -95,13 +95,13 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-05 — Stato della partita nella UI (MVI)
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** ADR-0012 (MVI), `docs/architecture.md` (Flussi: partita offline)
 - **Obiettivo:** modello MVI della partita: stato della schermata, intenti (gioca carta, scegli presa, …), reducer che chiama solo `legalMoves`/`play` di `core:game`; turno del bot eseguito fuori dal thread UI con la sola `viewFor()`.
 - **Criteri di accettazione:**
-    - [ ] Il reducer è puro e testato senza Android.
-    - [ ] La UI non riceve mai `ScopaState` né carte nascoste: solo dati derivati da `viewFor()` del giocatore umano (test).
-    - [ ] Una mossa rifiutata (`Rejected`) produce un errore mostrabile, mai un crash.
+    - [x] Il reducer è puro e testato senza Android.
+    - [x] La UI non riceve mai `ScopaState` né carte nascoste: solo dati derivati da `viewFor()` del giocatore umano (test).
+    - [x] Una mossa rifiutata (`Rejected`) produce un errore mostrabile, mai un crash.
 - **Domande aperte:** —
 
 ## F1-06 — Schermata del tavolo con carte segnaposto
