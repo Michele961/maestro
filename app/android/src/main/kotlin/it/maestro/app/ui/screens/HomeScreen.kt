@@ -44,6 +44,7 @@ import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.WoodIconButton
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.components.WoodRowTile
+import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.BrassRivetGold
 import it.maestro.app.ui.theme.ButtonAmberBottom
 import it.maestro.app.ui.theme.WoodSurfaceDark
@@ -140,7 +141,8 @@ public fun HomeScreen(
                                 text = stringResource(R.string.home_friends).uppercase(),
                                 color = BrassRivetGold,
                                 fontSize = 15.sp,
-                                fontWeight = FontWeight.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = MaestroDisplayFont,
                                 modifier = Modifier.padding(start = 8.dp),
                             )
                         }
@@ -172,6 +174,7 @@ private fun HomeHeader(onSettingsClicked: () -> Unit) {
                 color = BrassRivetGold,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 CurrencyPill(icon = R.drawable.icon_coin, value = stringResource(R.string.home_coins_placeholder))
@@ -232,7 +235,8 @@ private fun GameTile(
             text = title.uppercase(),
             color = WoodSurfaceDark,
             fontSize = 18.sp,
-            fontWeight = FontWeight.Black,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
         Image(

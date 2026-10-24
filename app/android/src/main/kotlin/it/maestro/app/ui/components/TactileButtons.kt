@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.ButtonAmberBottom
 import it.maestro.app.ui.theme.ButtonAmberTop
 import it.maestro.app.ui.theme.ButtonBlueBottom
@@ -106,6 +107,7 @@ public fun MaestroPillButton(
                 color = Color.White,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
                 textAlign = TextAlign.Center,
                 letterSpacing = 0.5.sp,
             )
@@ -206,6 +208,7 @@ public fun ScorePlaque(
                     text = p1Score.toString(),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
                     fontSize = 16.sp,
                 )
             }
@@ -231,6 +234,7 @@ public fun ScorePlaque(
                     text = p2Score.toString(),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
                     fontSize = 16.sp,
                 )
             }
@@ -315,7 +319,8 @@ public fun BrassHeaderPlaque(
                     text = title,
                     color = Color(0xFFFFE082),
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
                     letterSpacing = 1.sp,
                     textAlign = TextAlign.Center,
                 )

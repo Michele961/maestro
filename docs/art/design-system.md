@@ -66,8 +66,28 @@ GradeMistakeRed     = Color(0xFFD32F2F) // Errore grave
 
 ## 3. Libreria dei Componenti Riusabili (`ui/components`)
 
+Catalogo visivo: test `ComponentCatalogScreenshotTest` (screenshot `component_catalog.png` allegato a ogni run della CI).
+
+**Tipografia:** titoli, pulsanti e targhette in **Oswald** (`MaestroDisplayFont`, licenza OFL in `docs/art/fonts/`); testo corrente nel carattere di sistema. Gli stili `display*`, `headline*` e `title*` di `MaterialTheme.typography` usano già Oswald.
+
 | Componente | File Sorgente | Descrizione |
 |---|---|---|
+| `ClubBackground` | `MenuComponents.kt` | Sfondo legno a tutto schermo con fascia di panno in basso (`feltFraction`). |
+| `ParchmentPanel` | `MenuComponents.kt` | Pannello su pergamena con bordo d'ottone, angoli e fregio superiore opzionale. |
+| `WoodPanel` / `WoodRowTile` | `MenuComponents.kt` | Pannello e riga in legno con filo d'ottone, icona e titolo. |
+| `FramedPortrait` | `MenuComponents.kt` | Ritratto senza cornice (avatar, Maestro) ritagliato in cerchio d'ottone. |
+| `BrassIconBadge` | `MenuComponents.kt` | Icona illustrata in cerchio blu e ottone con etichetta (barra in basso). |
+| `CurrencyPill` | `MenuComponents.kt` | Contatore a pillola con icona (monete, gemme). |
+| `WoodIconButton` | `MenuComponents.kt` | Pulsante quadrato in legno con icona (messaggi, impostazioni). |
+| `MaestroPillButton` | `TactileButtons.kt` | Pulsante a pillola con sfumatura e bordo dorato; varianti rosso, verde, blu, ambra, legno. |
+| `TactileSegmentedPill` | `TactileButtons.kt` | Selettore a pillola (11/16/21 punti, modalità). |
+| `ScorePlaque` | `TactileButtons.kt` | Targhetta punteggio Noi (blu) / Voi (rosso). |
+| `BrassHeaderPlaque` | `TactileButtons.kt` | Targhetta d'intestazione in legno con titolo dorato. |
+| `MaestroDialogueBox` | `TactileButtons.kt` | Fumetto del Maestro su cartoncino avorio con bordo d'ottone. |
+| `MaestroAvatarView` | `MaestroAvatarView.kt` | Avatar del Maestro con aura animata per i 5 stati d'animo (`maestro_<mood>`). |
+| `CardView` | `CardView.kt` | Carta da gioco con mazzo pluggabile (`DeckTheme`) e fallback vettoriale. |
+
+---|---|---|
 | `MaestroPillButton` | `TactileButtons.kt` | Pulsante a rilievo 3D con sfumatura verticale, riflesso satinato superiore, bordo dorato e ombra morbida. |
 | `ScorePlaque` | `TactileButtons.kt` | Targhetta punteggio in legno noce con scomparti Noi (blu) e Voi (rosso). |
 | `MaestroDialogueBox` | `TactileButtons.kt` | Fumetto del Maestro in cartoncino panna/avorio, bordo ottone, tipografia ad alto contrasto e slot per l'avatar. |

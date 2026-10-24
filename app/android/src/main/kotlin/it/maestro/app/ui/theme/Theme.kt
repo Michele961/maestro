@@ -2,10 +2,16 @@ package it.maestro.app.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import it.maestro.app.R
 
 // Palette ufficiale Maestro v1.0 (Guida di Stile, Circolo Italiano Tradizionale)
 public val TableFeltGreenLight: Color = Color(0xFF1E4D2B)
@@ -63,6 +69,32 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 /**
+ * Carattere dei titoli, pulsanti e targhette (Oswald, licenza SIL OFL 1.1: `docs/art/fonts/OFL-Oswald.txt`).
+ * Condensato e in grassetto come nei mockup; il testo corrente resta nel carattere di sistema, più leggibile.
+ */
+public val MaestroDisplayFont: FontFamily = FontFamily(
+    Font(R.font.oswald_medium, FontWeight.Medium),
+    Font(R.font.oswald_bold, FontWeight.Bold),
+)
+
+private val BaseTypography = Typography()
+
+private fun TextStyle.display(): TextStyle = copy(fontFamily = MaestroDisplayFont, fontWeight = FontWeight.Bold)
+
+/** Titoli in [MaestroDisplayFont]; corpo ed etichette nel carattere di sistema (F1-19). */
+public val MaestroTypography: Typography = BaseTypography.copy(
+    displayLarge = BaseTypography.displayLarge.display(),
+    displayMedium = BaseTypography.displayMedium.display(),
+    displaySmall = BaseTypography.displaySmall.display(),
+    headlineLarge = BaseTypography.headlineLarge.display(),
+    headlineMedium = BaseTypography.headlineMedium.display(),
+    headlineSmall = BaseTypography.headlineSmall.display(),
+    titleLarge = BaseTypography.titleLarge.display(),
+    titleMedium = BaseTypography.titleMedium.display(),
+    titleSmall = BaseTypography.titleSmall.display(),
+)
+
+/**
  * Tema Material3 per l'applicazione Maestro ispirato al circolo tradizionale italiano (Guida v1.0).
  */
 @Composable
@@ -73,6 +105,7 @@ public fun MaestroTheme(
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = MaestroTypography,
         content = content,
     )
 }
