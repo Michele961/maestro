@@ -2,11 +2,12 @@
 
 **Versione:** 1.0  
 **Data:** 2026-10-24  
-**Stato:** Trilogia Mockup Completata & Approvata da Michele  
+**Stato:** 4 Schermate Ufficiali Approvate da Michele (Flusso Completo)  
 **Schermate di Riferimento Ufficiali:**
 1. [`reference_menu_screen.jpg`](reference_menu_screen.jpg) — Menù Iniziale / Lobby
-2. [`reference_table_screen.jpg`](reference_table_screen.jpg) — Il Tavolo da Gioco
-3. [`reference_review_screen.png`](reference_review_screen.png) — Game Review & Fine Partita
+2. [`reference_pre_match_dialog.png`](reference_pre_match_dialog.png) — Modale Configurazione Partita ("Preparati a Giocare")
+3. [`reference_table_screen.jpg`](reference_table_screen.jpg) — Il Tavolo da Gioco
+4. [`reference_review_screen.png`](reference_review_screen.png) — Game Review & Fine Partita
 
 ---
 
