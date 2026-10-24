@@ -70,7 +70,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-03 — Livelli di difficoltà del Maestro
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/ai/maestro.md` (Livelli di difficoltà), `docs/reports/fase-0.md` §5–6, decisioni D2 e D3
 - **Obiettivo:** in `core:ai`, 5 livelli di difficoltà (Principiante, Dilettante, Intermedio, Avanzato, Maestro) come configurazioni di `PimcBot`: campioni, nodi, rumore nella scelta, memoria imperfetta (D3). Il simulatore accetta `--p1 level:<nome>` e calcola l'Elo dei livelli facendoli giocare tra loro. `PRIMIERA_DIFF` passa a 0,025 (D2). Parametri ed Elo finali si fissano con Michele sui dati del task.
 - **Perimetro autorizzato:** aggiungere livelli ed Elo al simulatore; aggiornare in `docs/ai/maestro.md` il peso della primiera e la sezione "Livelli di difficoltà" con i valori approvati.

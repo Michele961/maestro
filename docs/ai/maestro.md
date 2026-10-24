@@ -38,7 +38,7 @@ I nomi esatti si fissano nei task F0-08 e F0-10; non introdurre interfacce alter
 2. Si generano N distribuzioni compatibili: la mano avversaria ha la dimensione nota, il resto va nel mazzo in ordine casuale.
 3. Per ogni distribuzione si cerca la mossa migliore a informazione perfetta (minimax con potatura alfa-beta), fino a fine smazzata se il budget di nodi lo consente, altrimenti fino alla profondità data.
    - A fine smazzata il valore è esatto: punti di smazzata del giocatore − punti dell'avversario (spec §6).
-   - A profondità limitata vale la **valutazione provvisoria**: scope fatte × 1 + settebello preso × 1 + 0,1 × (differenza denari presi) + 0,05 × (differenza carte prese) + 0,02 × (differenza delle somme di primiera parziali), sempre dal punto di vista di chi muove. I pesi sono costanti nominate in un solo punto e si tarano in F0-13.
+   - A profondità limitata vale la **valutazione provvisoria**: scope fatte × 1 + settebello preso × 1 + 0,1 × (differenza denari presi) + 0,05 × (differenza carte prese) + 0,025 × (differenza delle somme di primiera parziali), sempre dal punto di vista di chi muove (decisione D2, task F1-03). I pesi sono costanti nominate in un solo punto (`PimcEvaluator.kt`).
 4. Valore di una mossa = media sui campioni. Si sceglie il massimo; parità → ordine canonico.
 
 **Ultima distribuzione:** quando il mazzo è vuoto, la mano avversaria si deduce per esclusione: la ricerca diventa esatta, senza campionamento (F0-10).
@@ -47,7 +47,15 @@ I nomi esatti si fissano nei task F0-08 e F0-10; non introdurre interfacce alter
 
 ## Livelli di difficoltà (Fase 1)
 
-Ricavati dallo stesso `PimcBot` variando i parametri: numero di campioni, profondità, rumore nella scelta, memoria imperfetta (il bot "dimentica" una parte delle carte uscite, quindi campiona come se fossero ancora in gioco). I valori per livello si decidono dopo la Fase 0.
+Ricavati dallo stesso `PimcBot` (decisione D3) variando i parametri: numero di campioni, nodi, rumore nella scelta e memoria imperfetta (il bot "dimentica" stocasticamente una frazione delle carte passate, trattandole come ancora incognite).
+
+| Livello | Target Elo | Campioni ($s$) | Max Nodi | Rumore ($\epsilon$) | Forget Rate |
+| --- | --- | --- | --- | --- | --- |
+| `PRINCIPIANTE` | 800 | 2 | 10 | 0.35 | 0.60 |
+| `DILETTANTE` | 1100 | 5 | 25 | 0.18 | 0.35 |
+| `INTERMEDIO` | 1400 | 12 | 60 | 0.05 | 0.15 |
+| `AVANZATO` | 1700 | 25 | 120 | 0.00 | 0.00 |
+| `MAESTRO` | 2000 | 50 | 200 | 0.00 | 0.00 |
 
 ## Analizzatore (F0-11)
 

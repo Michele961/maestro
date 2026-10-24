@@ -371,4 +371,56 @@ class MainTest {
             tempDir.toFile().deleteRecursively()
         }
     }
+
+    @Test
+    fun simAcceptsLevelNamesAsBots() {
+        val stdout = StringBuilder()
+        val stderr = StringBuilder()
+        val code = runCli(
+            args = arrayOf(
+                "--games", "2",
+                "--seed", "100",
+                "--p1", "level:principiante",
+                "--p2", "level:dilettante",
+            ),
+            out = stdout,
+            err = stderr,
+        )
+        assertEquals(0, code)
+        assertEquals("", stderr.toString())
+        assertTrue(stdout.toString().contains("level:principiante"))
+        assertTrue(stdout.toString().contains("level:dilettante"))
+    }
+
+    @Test
+    fun simRunsEloTournament() {
+        val outDir = Files.createTempDirectory("maestro-elo-test-")
+        try {
+            val jsonPath = outDir.resolve("elo.json")
+            val stdout = StringBuilder()
+            val stderr = StringBuilder()
+            val code = runCli(
+                args = arrayOf(
+                    "--elo",
+                    "--games", "2",
+                    "--seed", "20261024",
+                    "--out", jsonPath.toString(),
+                ),
+                out = stdout,
+                err = stderr,
+            )
+            assertEquals(0, code)
+            assertEquals("", stderr.toString())
+            assertTrue(stdout.toString().contains("Torneo e Misurazione Elo Livelli"))
+            assertTrue(stdout.toString().contains("PRINCIPIANTE"))
+            assertTrue(stdout.toString().contains("MAESTRO"))
+            assertTrue(Files.exists(jsonPath))
+            val json = Files.readString(jsonPath)
+            assertTrue(json.contains("\"PRINCIPIANTE\""))
+            assertTrue(json.contains("\"MAESTRO\""))
+            assertTrue(json.contains("\"matchups\""))
+        } finally {
+            outDir.toFile().deleteRecursively()
+        }
+    }
 }

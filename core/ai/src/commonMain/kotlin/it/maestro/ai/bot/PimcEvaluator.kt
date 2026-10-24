@@ -42,7 +42,7 @@ internal object ProvisionalHeuristicWeights {
     internal const val SETTEBELLO: Double = 1.0
     internal const val DENARI_DIFF: Double = 0.1
     internal const val CARDS_DIFF: Double = 0.05
-    internal const val PRIMIERA_DIFF: Double = 0.02
+    internal const val PRIMIERA_DIFF: Double = 0.025
 }
 
 /**
@@ -70,7 +70,9 @@ internal data class SampledDistribution(
  *    con i pesi di [ProvisionalHeuristicWeights].
  * 4. Il valore atteso di ciascuna mossa è la media aritmetica dei valori ottenuti sui campioni.
  */
-public object PimcEvaluator : MoveEvaluator {
+public open class PimcEvaluator(
+    public val primieraWeight: Double = ProvisionalHeuristicWeights.PRIMIERA_DIFF,
+) : MoveEvaluator {
 
     override fun evaluate(
         view: ScopaView,
@@ -104,6 +106,7 @@ public object PimcEvaluator : MoveEvaluator {
                     perspective = perspective,
                     maxDepth = FINAL_DISTRIBUTION_MAX_DEPTH,
                     nodeBudget = NodeBudget(maxNodes = Int.MAX_VALUE),
+                    primieraWeight = primieraWeight,
                 )
                 MoveValue(move = move, value = exactValue)
             }
@@ -132,6 +135,7 @@ public object PimcEvaluator : MoveEvaluator {
                     perspective = perspective,
                     maxDepth = searchDepth,
                     nodeBudget = nodeBudget,
+                    primieraWeight = primieraWeight,
                 )
                 sumValues[moveIndex] += sampleValue
             }
@@ -144,6 +148,8 @@ public object PimcEvaluator : MoveEvaluator {
             )
         }
     }
+
+    public companion object : PimcEvaluator()
 }
 
 /**
@@ -199,7 +205,11 @@ internal fun sampleCompatibleDistribution(
  * `scope fatte × 1 + settebello preso × 1 + 0,1 × (differenza denari presi)
  * + 0,05 × (differenza carte prese) + 0,02 × (differenza delle somme di primiera parziali)`.
  */
-internal fun evaluateProvisionalState(state: ScopaState, perspective: Seat): Double {
+internal fun evaluateProvisionalState(
+    state: ScopaState,
+    perspective: Seat,
+    primieraWeight: Double = ProvisionalHeuristicWeights.PRIMIERA_DIFF,
+): Double {
     val opponent = perspective.other()
     val myCaptured = state.captured(perspective)
     val oppCaptured = state.captured(opponent)
@@ -224,7 +234,7 @@ internal fun evaluateProvisionalState(state: ScopaState, perspective: Seat): Dou
         settebelloDiff * ProvisionalHeuristicWeights.SETTEBELLO +
         denariDiff * ProvisionalHeuristicWeights.DENARI_DIFF +
         cardsDiff * ProvisionalHeuristicWeights.CARDS_DIFF +
-        primieraDiff * ProvisionalHeuristicWeights.PRIMIERA_DIFF
+        primieraDiff * primieraWeight
 }
 
 /**
@@ -266,6 +276,7 @@ private fun evaluateRootMove(
     perspective: Seat,
     maxDepth: Int,
     nodeBudget: NodeBudget,
+    primieraWeight: Double = ProvisionalHeuristicWeights.PRIMIERA_DIFF,
 ): Double {
     nodeBudget.consumeNode()
     val applied = play(rootState, move) as? PlayResult.Applied
@@ -283,6 +294,7 @@ private fun evaluateRootMove(
         alpha = Double.NEGATIVE_INFINITY,
         beta = Double.POSITIVE_INFINITY,
         nodeBudget = nodeBudget,
+        primieraWeight = primieraWeight,
     )
 }
 
@@ -293,14 +305,15 @@ private fun alphaBeta(
     alpha: Double,
     beta: Double,
     nodeBudget: NodeBudget,
+    primieraWeight: Double = ProvisionalHeuristicWeights.PRIMIERA_DIFF,
 ): Double {
     if (remainingDepth <= 0 || nodeBudget.isExhausted) {
-        return evaluateProvisionalState(state, perspective)
+        return evaluateProvisionalState(state, perspective, primieraWeight)
     }
 
     val legal = legalMoves(state)
     if (legal.isEmpty()) {
-        return evaluateProvisionalState(state, perspective)
+        return evaluateProvisionalState(state, perspective, primieraWeight)
     }
 
     val isMaximizing = state.toMove == perspective
@@ -312,7 +325,7 @@ private fun alphaBeta(
         for (move in legal) {
             if (!nodeBudget.consumeNode()) {
                 return if (bestValue == Double.NEGATIVE_INFINITY) {
-                    evaluateProvisionalState(state, perspective)
+                    evaluateProvisionalState(state, perspective, primieraWeight)
                 } else {
                     bestValue
                 }
@@ -330,6 +343,7 @@ private fun alphaBeta(
                     alpha = currentAlpha,
                     beta = currentBeta,
                     nodeBudget = nodeBudget,
+                    primieraWeight = primieraWeight,
                 )
             }
             if (childValue > bestValue) {
@@ -348,7 +362,7 @@ private fun alphaBeta(
         for (move in legal) {
             if (!nodeBudget.consumeNode()) {
                 return if (bestValue == Double.POSITIVE_INFINITY) {
-                    evaluateProvisionalState(state, perspective)
+                    evaluateProvisionalState(state, perspective, primieraWeight)
                 } else {
                     bestValue
                 }
@@ -366,6 +380,7 @@ private fun alphaBeta(
                     alpha = currentAlpha,
                     beta = currentBeta,
                     nodeBudget = nodeBudget,
+                    primieraWeight = primieraWeight,
                 )
             }
             if (childValue < bestValue) {
