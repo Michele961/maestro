@@ -3,7 +3,8 @@
 
 Due modalità:
 
-  sheet    Immagine con uno o più oggetti su fondo verde piatto (#00FF00).
+  sheet    Immagine con uno o più oggetti su fondo verde piatto (#00FF00),
+           oppure magenta (#FF00FF) con --key magenta se gli oggetti contengono verde.
            Rimuove il verde, separa gli oggetti per forma (non per griglia),
            li ordina per righe e colonne e li salva come WebP con trasparenza.
   texture  Immagine di sfondo: ridimensiona e salva come WebP, senza trasparenza.
@@ -25,13 +26,21 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 
-def chroma_key(img):
-    """Restituisce l'immagine RGBA con il verde rimosso e i bordi senza alone verde."""
+def chroma_key(img, key="green"):
+    """Restituisce l'immagine RGBA senza il fondo (verde o magenta) e con i bordi senza alone."""
     a = np.asarray(img.convert("RGB")).astype(float)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    green = np.clip((g - np.maximum(r, b) - 40) / 60, 0, 1)
-    alpha = ((1 - green) * 255).astype("uint8")
-    a[..., 1] = np.minimum(g, np.maximum(r, b) + 10)  # despill
+    if key == "magenta":
+        # Per gli oggetti che contengono verde (panno, pulsanti verdi): fondo #FF00FF.
+        bg = np.clip((np.minimum(r, b) - g - 40) / 60, 0, 1)
+        # despill solo sui bordi semitrasparenti: rossi e blu pieni restano intatti
+        edge = bg > 0
+        a[..., 0] = np.where(edge, np.minimum(r, g + 60), r)
+        a[..., 2] = np.where(edge, np.minimum(b, g + 60), b)
+    else:
+        bg = np.clip((g - np.maximum(r, b) - 40) / 60, 0, 1)
+        a[..., 1] = np.minimum(g, np.maximum(r, b) + 10)  # despill
+    alpha = ((1 - bg) * 255).astype("uint8")
     out = Image.fromarray(a.astype("uint8")).convert("RGBA")
     out.putalpha(Image.fromarray(alpha).filter(ImageFilter.MinFilter(3)))
     return out
@@ -61,7 +70,7 @@ def components(alpha, merge, min_area):
     for i in range(1, next_id):
         ys, xs = np.nonzero(lab == i)
         if len(ys) >= min_area:
-            found.append((ys.min(), ys.max(), xs.mean(), lab == i))
+            found.append((ys.min(), ys.max(), xs.mean(), lab == i, full[0]))
     return found
 
 
@@ -76,15 +85,16 @@ def reading_order(found):
         row.append(c)
         bottom = max(bottom, c[1])
     rows.append(row)
-    return [c for r in rows for c in sorted(r, key=lambda c: c[2])]
+    # Nella riga: da sinistra a destra per colonne (1/8 della larghezza), poi dall'alto.
+    return [c for r in rows for c in sorted(r, key=lambda c: (int(c[2] // (c[4] / 8)), c[0]))]
 
 
 def sheet(args):
-    rgba = chroma_key(Image.open(args.input))
+    rgba = chroma_key(Image.open(args.input), args.key)
     found = reading_order(components(rgba.getchannel("A"), args.merge, args.min_area))
     if len(found) != len(args.names):
         sys.exit(f"trovati {len(found)} oggetti, ma ci sono {len(args.names)} nomi")
-    for name, (*_, mask) in zip(args.names, found):
+    for name, (_, _, _, mask, _) in zip(args.names, found):
         if name == "-":
             continue
         a = np.asarray(rgba).copy()
@@ -117,6 +127,7 @@ def main():
     p.add_argument("names", nargs="+", help="nomi dei file in ordine di lettura (- per scartare)")
     p.add_argument("--size", type=int, default=512, help="lato massimo in px (default 512)")
     p.add_argument("--merge", type=int, default=2, help="unisce pezzi distanti meno di N px (default 2)")
+    p.add_argument("--key", choices=["green", "magenta"], default="green", help="colore del fondo da togliere")
     p.add_argument("--min-area", type=int, default=5000, help="ignora frammenti più piccoli (px)")
     args = p.parse_args()
     Path(args.out).mkdir(parents=True, exist_ok=True)

@@ -71,23 +71,32 @@ public fun HomeScreen(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HomeHeader(onSettingsClicked = onSettingsClicked)
                 MaestroWelcome()
-                MaestroPillButton(
-                    text = stringResource(
-                        if (hasActiveMatch) R.string.home_resume_game else R.string.home_play_now,
-                    ).uppercase(),
-                    onClick = if (hasActiveMatch) onResumeGameClicked else onStartGameClicked,
-                    variant = PillButtonVariant.HERO_RED,
-                    height = 64.dp,
-                    fontSize = 26.sp,
-                    modifier = Modifier.fillMaxWidth(0.75f),
-                    testTag = if (hasActiveMatch) "resume_game_button" else "play_now_button",
-                )
+                // "Gioca ora" sul piedistallo di panno ovale, come nel mockup
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        painter = painterResource(R.drawable.felt_oval_base),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.fillMaxWidth().height(96.dp),
+                    )
+                    MaestroPillButton(
+                        text = stringResource(
+                            if (hasActiveMatch) R.string.home_resume_game else R.string.home_play_now,
+                        ).uppercase(),
+                        onClick = if (hasActiveMatch) onResumeGameClicked else onStartGameClicked,
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 80.dp,
+                        fontSize = if (hasActiveMatch) 26.sp else 34.sp,
+                        modifier = Modifier.fillMaxWidth(0.72f),
+                        testTag = if (hasActiveMatch) "resume_game_button" else "play_now_button",
+                    )
+                }
                 if (hasActiveMatch) {
                     MaestroPillButton(
                         text = stringResource(R.string.home_start_game),
@@ -118,7 +127,7 @@ public fun HomeScreen(
                 WoodRowTile(
                     icon = R.drawable.icon_newspaper,
                     title = stringResource(R.string.home_news),
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     WoodRowTile(
@@ -197,27 +206,38 @@ private fun HomeHeader(onSettingsClicked: () -> Unit) {
 
 @Composable
 private fun MaestroWelcome() {
-    ParchmentPanel(
-        showTopOrnament = true,
-        modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+    Box(modifier = Modifier.fillMaxWidth().height(244.dp)) {
+        WoodPanel(modifier = Modifier.fillMaxWidth().padding(top = 40.dp, start = 28.dp).height(204.dp)) {}
+        Image(
+            painter = painterResource(R.drawable.banner_italy),
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.TopStart).padding(top = 20.dp).size(width = 52.dp, height = 96.dp),
+        )
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter).padding(start = 28.dp, bottom = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             FramedPortrait(
                 portrait = R.drawable.maestro_neutral,
-                size = 112.dp,
+                size = 124.dp,
                 background = ButtonAmberBottom,
                 contentDescription = stringResource(R.string.maestro_avatar_description),
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            MaestroDialogueBox(
-                title = stringResource(R.string.game_player_maestro),
-                message = stringResource(R.string.home_coach_welcome),
-                modifier = Modifier.weight(1f),
+            MaestroPillButton(
+                text = stringResource(R.string.home_maestro_title).uppercase(),
+                onClick = {},
+                variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                height = 36.dp,
+                fontSize = 15.sp,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 28.dp),
+                modifier = Modifier.padding(top = 0.dp),
             )
         }
+        MaestroDialogueBox(
+            title = stringResource(R.string.game_player_maestro),
+            message = stringResource(R.string.home_coach_welcome),
+            modifier = Modifier.align(Alignment.TopCenter).padding(start = 40.dp).fillMaxWidth(0.82f),
+        )
     }
 }
 
@@ -244,7 +264,7 @@ private fun GameTile(
             contentDescription = null,
             modifier = Modifier
                 .padding(vertical = 8.dp)
-                .height(96.dp)
+                .height(70.dp)
                 .rotate(-6f)
                 .alpha(if (available) 1f else 0.55f)
                 .align(Alignment.CenterHorizontally),
@@ -254,8 +274,8 @@ private fun GameTile(
             onClick = onPlay,
             enabled = available,
             variant = if (available) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.WOOD,
-            height = 40.dp,
-            fontSize = 14.sp,
+            height = 44.dp,
+            fontSize = if (available) 18.sp else 13.sp,
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp),
             modifier = Modifier.fillMaxWidth(),
             testTag = "${testTag}_button",
@@ -272,8 +292,8 @@ private fun BottomNavBar() {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        BrassIconBadge(icon = R.drawable.icon_trophy, label = stringResource(R.string.home_nav_leaderboard))
-        BrassIconBadge(icon = R.drawable.icon_book_quill, label = stringResource(R.string.home_nav_training))
-        BrassIconBadge(icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
+        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_trophy, label = stringResource(R.string.home_nav_leaderboard))
+        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_book_quill, label = stringResource(R.string.home_nav_training))
+        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
     }
 }

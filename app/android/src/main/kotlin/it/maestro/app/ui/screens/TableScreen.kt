@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +69,7 @@ import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.MaestroAvatarView
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.components.MaestroPillButton
+import it.maestro.app.ui.components.NineSliceBox
 import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.PlaceholderCardView
 import it.maestro.app.ui.components.ScorePlaque
@@ -349,13 +351,21 @@ private fun TableTopBar(uiState: GameUiState) {
             .testTag("table_top_bar"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MaestroAvatarView(mood = mood, size = 52.dp)
-        Text(
-            text = stringResource(id = R.string.game_player_maestro),
-            style = MaterialTheme.typography.titleMedium,
-            color = GoldAccentColor,
-            modifier = Modifier.padding(start = 8.dp).weight(1f),
-        )
+        MaestroAvatarView(mood = mood, size = 60.dp)
+        NineSliceBox(
+            skin = R.drawable.skin_name_plaque,
+            slice = 0.35f,
+            corner = 14.dp,
+            modifier = Modifier.padding(start = 4.dp),
+        ) {
+            Text(
+                text = stringResource(id = R.string.game_player_maestro),
+                style = MaterialTheme.typography.titleMedium,
+                color = GoldAccentColor,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
         ScorePlaque(
             p1Score = uiState.humanScore,
             p2Score = uiState.opponentScore,
@@ -501,7 +511,7 @@ private fun TableCardsAndDeckZone(
                     modifier = Modifier.testTag("deck_pile"),
                 ) {
                     if (deckCount > 0) {
-                        CardBackView(width = 48.dp, height = 72.dp)
+                        DeckStack(cards = deckCount)
                     } else {
                         Box(
                             modifier = Modifier
@@ -528,15 +538,15 @@ private fun TableCardsAndDeckZone(
                         .testTag("table_cards_flow"),
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.Center,
-                    maxItemsInEachRow = 5,
+                    maxItemsInEachRow = 4,
                 ) {
                     for (card in tableCards) {
                         val isSuggestedCapture = suggestedCapture != null && card in suggestedCapture
                         PlaceholderCardView(
                             card = card,
                             isPlayable = false,
-                            width = 50.dp,
-                            height = 75.dp,
+                            width = 70.dp,
+                            height = 105.dp,
                             modifier = Modifier
                                 .padding(3.dp)
                                 .then(
@@ -647,8 +657,8 @@ private fun PlayerZone(
                         PlaceholderCardView(
                             card = card,
                             isPlayable = uiState.isHumanTurn,
-                            width = 64.dp,
-                            height = 96.dp,
+                            width = 94.dp,
+                            height = 141.dp,
                             onClick = { onCardClicked(card) },
                         )
                     }
@@ -1188,4 +1198,19 @@ private fun TrainingQuestionDialog(
             }
         },
     )
+}
+
+/** Pila del mazzo disegnata con il dorso del mazzo in uso, una copia sfalsata ogni ~5 carte (max 6). */
+@Composable
+private fun DeckStack(cards: Int) {
+    val layers = ((cards + 4) / 5).coerceIn(1, 6)
+    Box(modifier = Modifier.width(64.dp).height((96 + (layers - 1) * 3).dp)) {
+        repeat(layers) { i ->
+            CardBackView(
+                width = 64.dp,
+                height = 96.dp,
+                modifier = Modifier.offset(x = (i * 2).dp, y = ((layers - 1 - i) * 3).dp),
+            )
+        }
+    }
 }

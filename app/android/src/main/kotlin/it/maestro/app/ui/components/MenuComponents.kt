@@ -87,24 +87,15 @@ public fun ParchmentPanel(
     showTopOrnament: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(16.dp)
     Box(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .shadow(6.dp, shape)
-                .clip(shape)
-                .border(BorderStroke(4.dp, Brush.verticalGradient(listOf(ButtonGoldBorder, BrassShadow))), shape),
-        ) {
-            Image(
-                painter = painterResource(R.drawable.texture_parchment),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize().padding(4.dp).clip(RoundedCornerShape(12.dp)),
-            )
-        }
-        Column(modifier = Modifier.padding(16.dp), content = content)
-        Corners()
+        // Pelle generata (set 2): cornice d'ottone con angolari, pergamena all'interno.
+        NineSliceBox(
+            skin = R.drawable.skin_panel_parchment,
+            slice = 0.24f,
+            corner = 44.dp,
+            modifier = Modifier.matchParentSize(),
+        )
+        Column(modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp), content = content)
         if (showTopOrnament) {
             Image(
                 painter = painterResource(R.drawable.ornament_top),
@@ -137,13 +128,12 @@ public fun WoodPanel(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(14.dp)
-    Box(
-        modifier = modifier
-            .shadow(4.dp, shape)
-            .clip(shape)
-            .background(Brush.verticalGradient(listOf(WoodSurfaceLight, WoodSurfaceDark)))
-            .border(2.dp, ButtonGoldBorder, shape),
+    NineSliceBox(
+        skin = R.drawable.skin_plaque_wood,
+        slice = 0.3f,
+        corner = 20.dp,
+        modifier = modifier,
+        contentAlignment = Alignment.TopStart,
         content = content,
     )
 }

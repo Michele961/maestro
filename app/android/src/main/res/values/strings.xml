@@ -142,5 +142,6 @@
     <string name="home_nav_leaderboard">Classifica</string>
     <string name="home_nav_training">Palestra</string>
     <string name="home_nav_shop">Bottega</string>
+    <string name="home_maestro_title">Il Maestro</string>
     <string name="home_messages">Messaggi</string>
 </resources>

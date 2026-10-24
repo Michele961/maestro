@@ -1,6 +1,11 @@
 package it.maestro.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.draw.alpha
+import it.maestro.app.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -60,60 +65,40 @@ public fun MaestroPillButton(
     contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
     fontSize: TextUnit = 17.sp,
 ) {
-    val gradient = when (variant) {
-        PillButtonVariant.HERO_RED -> Brush.verticalGradient(
-            listOf(it.maestro.app.ui.theme.ButtonRedTop, it.maestro.app.ui.theme.ButtonRedBottom),
-        )
-        PillButtonVariant.PRIMARY_GREEN -> Brush.verticalGradient(
-            listOf(ButtonGreenTop, ButtonGreenBottom),
-        )
-        PillButtonVariant.EDUCATIONAL_BLUE -> Brush.verticalGradient(
-            listOf(ButtonBlueTop, ButtonBlueBottom),
-        )
-        PillButtonVariant.SECONDARY_AMBER -> Brush.verticalGradient(
-            listOf(ButtonAmberTop, ButtonAmberBottom),
-        )
-        PillButtonVariant.WOOD -> Brush.verticalGradient(
-            listOf(Color(0xFF5A3821), Color(0xFF3B2213)),
-        )
+    // Pelli generate in F1-13 (docs/art/asset-prompts.md, set 1): rilievo, ottone e rivetti dei mockup.
+    val skin = when (variant) {
+        PillButtonVariant.HERO_RED -> R.drawable.skin_button_red
+        PillButtonVariant.PRIMARY_GREEN -> R.drawable.skin_button_green
+        PillButtonVariant.EDUCATIONAL_BLUE -> R.drawable.skin_button_blue
+        PillButtonVariant.SECONDARY_AMBER -> R.drawable.skin_button_amber
+        PillButtonVariant.WOOD -> R.drawable.skin_button_wood
     }
-
-    val borderColor = when (variant) {
-        PillButtonVariant.HERO_RED, PillButtonVariant.PRIMARY_GREEN, PillButtonVariant.SECONDARY_AMBER -> ButtonGoldBorder
-        PillButtonVariant.EDUCATIONAL_BLUE -> Color(0xFF64B5F6)
-        PillButtonVariant.WOOD -> ButtonGoldBorder.copy(alpha = 0.6f)
-    }
-
-    val shape = RoundedCornerShape(26.dp)
-
-    Surface(
+    NineSliceBox(
+        skin = skin,
+        slice = 0.42f,
+        corner = height * 0.42f,
         modifier = modifier
             .height(height)
-            .shadow(elevation = if (enabled) 6.dp else 1.dp, shape = shape)
-            .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
-        shape = shape,
-        border = BorderStroke(width = 2.dp, color = if (enabled) borderColor else Color.Gray),
-        color = Color.Transparent,
+            .alpha(if (enabled) 1f else 0.6f)
+            .then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(contentPadding),
     ) {
-        Box(
-            modifier = Modifier
-                .background(gradient)
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(contentPadding),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = text,
-                color = Color.White,
-                fontSize = fontSize,
-                fontWeight = FontWeight.Bold,
-                fontFamily = MaestroDisplayFont,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.5.sp,
-            )
-        }
+        Text(
+            text = text,
+            color = ButtonTextCream,
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
+            textAlign = TextAlign.Center,
+            letterSpacing = 0.5.sp,
+            style = TextStyle(shadow = Shadow(Color(0x99000000), Offset(0f, 3f), 4f)),
+        )
     }
 }
+
+/** Testo crema dei pulsanti, come nei mockup. */
+private val ButtonTextCream = Color(0xFFFFF4D6)
 
 /**
  * Riquadro di dialogo del Maestro su cartoncino avorio caldo con cornice in ottone (Guida v1.0).
@@ -178,68 +163,37 @@ public fun ScorePlaque(
     p1Label: String = "Noi",
     p2Label: String = "Voi",
 ) {
-    val plaqueShape = RoundedCornerShape(20.dp)
-    val scoreBadgeShape = RoundedCornerShape(6.dp)
-
-    Surface(
-        modifier = modifier.shadow(4.dp, plaqueShape),
-        shape = plaqueShape,
-        color = WoodSurfaceDark,
-        border = BorderStroke(1.5.dp, ButtonGoldBorder),
+    // Targa d'ottone con rivetti (pelle generata), come "TU 4 – 2 AVV" del mockup del tavolo.
+    NineSliceBox(
+        skin = R.drawable.skin_score_plaque,
+        slice = 0.4f,
+        corner = 26.dp,
+        modifier = modifier,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 30.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = p1Label,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Box(
-                modifier = Modifier
-                    .clip(scoreBadgeShape)
-                    .background(Color(0xFF1E88E5))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-            ) {
-                Text(
-                    text = p1Score.toString(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    fontSize = 16.sp,
-                )
-            }
-
-            Box(modifier = Modifier.padding(horizontal = 10.dp)) {
-                Text(text = "•", color = ButtonGoldBorder, fontSize = 16.sp)
-            }
-
-            Text(
-                text = p2Label,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Box(
-                modifier = Modifier
-                    .clip(scoreBadgeShape)
-                    .background(Color(0xFFD32F2F))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-            ) {
-                Text(
-                    text = p2Score.toString(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    fontSize = 16.sp,
-                )
-            }
+            ScoreText(p1Label.uppercase(), ButtonTextCream, 18.sp)
+            ScoreText(p1Score.toString(), Color(0xFF42A5F5), 30.sp, Modifier.padding(start = 8.dp))
+            ScoreText("–", ButtonTextCream, 24.sp, Modifier.padding(horizontal = 8.dp))
+            ScoreText(p2Score.toString(), Color(0xFFEF5350), 30.sp, Modifier.padding(end = 8.dp))
+            ScoreText(p2Label.uppercase(), ButtonTextCream, 18.sp)
         }
     }
+}
+
+@Composable
+private fun ScoreText(text: String, color: Color, size: TextUnit, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = size,
+        fontWeight = FontWeight.Bold,
+        fontFamily = MaestroDisplayFont,
+        modifier = modifier,
+        style = TextStyle(shadow = Shadow(Color(0x99000000), Offset(0f, 2f), 3f)),
+    )
 }
 
 /**
@@ -253,36 +207,22 @@ public fun TactileSegmentedPill(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val shape = RoundedCornerShape(20.dp)
-    val backgroundBrush = if (selected) {
-        Brush.verticalGradient(listOf(ButtonGreenTop, ButtonGreenBottom))
-    } else {
-        Brush.verticalGradient(listOf(Color(0xFF4A321E), Color(0xFF2B1B10)))
-    }
-    val borderColor = if (selected) ButtonGoldBorder else ButtonGoldBorder.copy(alpha = 0.5f)
-    val textColor = if (selected) Color.White else Color(0xFFD7CCC8)
-
-    Surface(
+    NineSliceBox(
+        skin = if (selected) R.drawable.skin_button_green else R.drawable.skin_button_cream,
+        slice = 0.42f,
+        corner = 18.dp,
         modifier = modifier
-            .shadow(elevation = if (selected) 4.dp else 1.dp, shape = shape)
-            .clickable(enabled = enabled, onClick = onClick),
-        shape = shape,
-        border = BorderStroke(if (selected) 2.dp else 1.dp, borderColor),
-        color = Color.Transparent,
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .background(backgroundBrush)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = text,
-                color = textColor,
-                fontSize = 13.sp,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-            )
-        }
+        Text(
+            text = text,
+            color = if (selected) ButtonTextCream else WoodSurfaceDark,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -295,23 +235,13 @@ public fun BrassHeaderPlaque(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
 ) {
-    val shape = RoundedCornerShape(12.dp)
-    Surface(
-        modifier = modifier.shadow(6.dp, shape),
-        shape = shape,
-        color = Color.Transparent,
-        border = BorderStroke(2.dp, ButtonGoldBorder),
+    NineSliceBox(
+        skin = R.drawable.skin_plaque_wood,
+        slice = 0.3f,
+        corner = 22.dp,
+        modifier = modifier.padding(horizontal = 0.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color(0xFF5A3821), Color(0xFF3B2213)),
-                    ),
-                )
-                .padding(horizontal = 20.dp, vertical = 10.dp),
-            contentAlignment = Alignment.Center,
-        ) {
+        Box(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
             androidx.compose.foundation.layout.Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
