@@ -77,8 +77,8 @@ class GameReducerTest {
 
         val playResult = GameReducer.reduce(internal, GameIntent.PlayCard(playableCard))
         assertNull(playResult.state.lastError)
-        assertEquals(1, playResult.state.matchLog.moves.size)
-        assertEquals(expectedMove, playResult.state.matchLog.moves.first())
+        assertEquals(internal.matchLog.moves.size + 1, playResult.state.matchLog.moves.size)
+        assertEquals(expectedMove, playResult.state.matchLog.moves.last())
 
         // Dopo la mossa di P1, tocca al bot: deve essere emesso ScheduleBotMove
         if (playResult.state.scopaState.phase == DealPhase.PLAYING) {

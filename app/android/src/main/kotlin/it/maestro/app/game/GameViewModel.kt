@@ -24,8 +24,10 @@ import kotlinx.coroutines.withContext
  */
 public class GameViewModel(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
 ) : ViewModel() {
 
+    private val scope: kotlinx.coroutines.CoroutineScope = coroutineScope ?: viewModelScope
     private var internalState: GameInternalState
     private val _uiState: MutableStateFlow<GameUiState>
     public val uiState: StateFlow<GameUiState>
@@ -53,7 +55,7 @@ public class GameViewModel(
     private fun handleEffect(effect: GameEffect?) {
         when (effect) {
             is GameEffect.ScheduleBotMove -> {
-                viewModelScope.launch {
+                scope.launch {
                     val bot = effect.level.toBot()
                     val botSeat = effect.botSeat
                     // Il bot riceve SOLO viewFor e legalMoves, mai lo stato globale (ADR-0012, task F1-05)

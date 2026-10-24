@@ -5,6 +5,7 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.legalMoves
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,7 +16,11 @@ class GameViewModelTest {
 
     @Test
     fun viewModelEmitsInitialUiStateAndHandlesCardPlay() {
-        val viewModel = GameViewModel(ioDispatcher = Dispatchers.Unconfined)
+        val testScope = CoroutineScope(Dispatchers.Unconfined)
+        val viewModel = GameViewModel(
+            ioDispatcher = Dispatchers.Unconfined,
+            coroutineScope = testScope,
+        )
         val initialUi = viewModel.uiState.value
 
         assertEquals(DealPhase.PLAYING, initialUi.phase)
@@ -41,7 +46,11 @@ class GameViewModelTest {
 
     @Test
     fun viewModelHandlesDismissError() {
-        val viewModel = GameViewModel(ioDispatcher = Dispatchers.Unconfined)
+        val testScope = CoroutineScope(Dispatchers.Unconfined)
+        val viewModel = GameViewModel(
+            ioDispatcher = Dispatchers.Unconfined,
+            coroutineScope = testScope,
+        )
         viewModel.onIntent(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
 
         // Giochiamo una carta inesistente in mano per generare un errore
