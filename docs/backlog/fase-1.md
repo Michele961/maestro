@@ -285,7 +285,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-24 — Movimento e feedback (UX)
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** Transizioni, pressione dei pulsanti, animazioni di carte e Maestro, vibrazione opzionale.
 - **Criteri di accettazione:**
