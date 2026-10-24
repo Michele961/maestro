@@ -17,6 +17,16 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.data.local.db.MaestroDatabase
+import it.maestro.app.data.repository.MatchRepository
+import it.maestro.app.data.repository.RoomMatchRepository
+import it.maestro.app.audio.SoundManager
+import it.maestro.app.audio.NoOpSoundManager
+import it.maestro.app.game.GameViewModel
+import it.maestro.app.ui.screens.TableScreen
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -132,5 +142,53 @@ class TableScreenScreenshotTest {
         composeRule.waitForIdle()
 
         org.junit.Assert.assertTrue(viewModel.uiState.value.lastMoveId > 0L)
+    }
+
+    @Test
+    fun tableScreen_renders_via_koin() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(
+            context,
+            MaestroDatabase::class.java,
+        ).allowMainThreadQueries().build()
+
+        val koinApp = org.koin.dsl.koinApplication {
+            androidContext(context)
+            modules(
+                org.koin.dsl.module {
+                    single<MaestroDatabase> { testDb }
+                    single { testDb.savedMatchDao() }
+                    single<MatchRepository> {
+                        RoomMatchRepository(dao = get())
+                    }
+                    single<SoundManager> {
+                        NoOpSoundManager()
+                    }
+                    viewModel {
+                        GameViewModel(
+                            matchRepository = get(),
+                            ioDispatcher = kotlinx.coroutines.Dispatchers.Unconfined,
+                        )
+                    }
+                },
+            )
+        }
+        org.koin.core.context.stopKoin()
+        org.koin.core.context.startKoin(koinApp)
+
+        try {
+            composeRule.setContent {
+                MaestroTheme {
+                    TableScreen(
+                        level = DifficultyLevel.INTERMEDIO,
+                        targetScore = 11,
+                    )
+                }
+            }
+            composeRule.waitForIdle()
+        } finally {
+            org.koin.core.context.stopKoin()
+            testDb.close()
+        }
     }
 }

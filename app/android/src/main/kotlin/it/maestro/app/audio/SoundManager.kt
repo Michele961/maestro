@@ -80,9 +80,13 @@ public class AndroidSoundManager(
 
     override fun play(effect: SoundEffect) {
         if (!isEnabled) return
-        val soundId = soundMap[effect] ?: return
-        if (soundId > 0) {
-            soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f)
+        try {
+            val soundId = soundMap[effect] ?: return
+            if (soundId > 0) {
+                soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f)
+            }
+        } catch (_: Throwable) {
+            // Protezione contro errori del sottosistema audio della piattaforma
         }
     }
 

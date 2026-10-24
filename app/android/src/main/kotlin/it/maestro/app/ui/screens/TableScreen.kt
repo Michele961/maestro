@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -134,7 +135,7 @@ public fun TableScreen(
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: (MatchLog, Pair<Int, Int>?) -> Unit = { _, _ -> },
 ) {
-    LaunchedEffect(level, targetScore, seed, restoreState, trainingFundamental) {
+    LaunchedEffect(level, targetScore, seed, restoreState, restoreLog, trainingFundamental) {
         if (restoreState != null && restoreLog != null) {
             viewModel.onIntent(
                 GameIntent.RestoreMatch(
@@ -358,25 +359,25 @@ private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
-            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp)
             .testTag("table_top_bar"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MaestroAvatarView(mood = mood, size = 60.dp)
+        MaestroAvatarView(mood = mood, size = 48.dp)
         NineSliceBox(
             skin = R.drawable.skin_name_plaque,
             slice = 0.35f,
-            corner = 14.dp,
+            corner = 12.dp,
             modifier = Modifier.padding(start = 4.dp),
         ) {
             Text(
                 text = stringResource(id = R.string.game_player_maestro),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = GoldAccentColor,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.widthIn(min = 4.dp).weight(1f, fill = false))
         ScorePlaque(
             p1Score = uiState.humanScore,
             p2Score = uiState.opponentScore,
@@ -388,7 +389,7 @@ private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
             contentDescription = stringResource(id = R.string.game_pause),
             modifier = Modifier
                 .padding(start = 6.dp)
-                .size(52.dp)
+                .size(46.dp)
                 .clickable(onClick = onPause)
                 .testTag("pause_button"),
         )
@@ -962,9 +963,9 @@ private fun MoveFlightOverlay(
                         .graphicsLayer {
                             translationX = animOffsetX.value.dp.toPx()
                             translationY = animOffsetY.value.dp.toPx()
-                            scaleX = animScale.value * 0.9f
-                            scaleY = animScale.value * 0.9f
-                            alpha = animAlpha.value
+                            scaleX = (animScale.value * 0.9f).coerceAtLeast(0.01f)
+                            scaleY = (animScale.value * 0.9f).coerceAtLeast(0.01f)
+                            alpha = animAlpha.value.coerceIn(0f, 1f)
                         }
                         .shadow(6.dp, RoundedCornerShape(8.dp)),
                 ) {
@@ -984,9 +985,9 @@ private fun MoveFlightOverlay(
                 .graphicsLayer {
                     translationX = animOffsetX.value.dp.toPx()
                     translationY = animOffsetY.value.dp.toPx()
-                    scaleX = animScale.value
-                    scaleY = animScale.value
-                    alpha = animAlpha.value
+                    scaleX = animScale.value.coerceAtLeast(0.01f)
+                    scaleY = animScale.value.coerceAtLeast(0.01f)
+                    alpha = animAlpha.value.coerceIn(0f, 1f)
                 }
                 .shadow(12.dp, RoundedCornerShape(8.dp)),
         ) {

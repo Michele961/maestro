@@ -11,8 +11,10 @@ import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.viewFor
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +43,8 @@ public class GameViewModel(
     public val uiState: StateFlow<GameUiState>
 
     private var botRng: SeededRng = SeededRng(12345L)
+    private var botJob: Job? = null
+    private var hintJob: Job? = null
 
     public val currentMatchLog: MatchLog
         get() = internalState.matchLog
@@ -56,6 +60,11 @@ public class GameViewModel(
     public fun onIntent(intent: GameIntent) {
         if (intent is GameIntent.StartMatch) {
             botRng = SeededRng(intent.seed + 9999L)
+            botJob?.cancel()
+            hintJob?.cancel()
+        } else if (intent is GameIntent.RestoreMatch) {
+            botJob?.cancel()
+            hintJob?.cancel()
         }
         val result = GameReducer.reduce(internalState, intent)
         internalState = result.state
@@ -93,45 +102,83 @@ public class GameViewModel(
     private fun handleEffect(effect: GameEffect?) {
         when (effect) {
             is GameEffect.ScheduleBotMove -> {
-                scope.launch {
-                    if (botThinkDelayMillis > 0L) {
-                        kotlinx.coroutines.delay(botThinkDelayMillis)
-                    }
-                    val bot = effect.level.toBot()
-                    val botSeat = effect.botSeat
-                    // Il bot riceve SOLO viewFor e legalMoves, mai lo stato globale (ADR-0012, task F1-05)
-                    val view = viewFor(internalState.scopaState, botSeat)
-                    val legal = legalMoves(internalState.scopaState)
+                botJob?.cancel()
+                botJob = scope.launch {
+                    try {
+                        if (botThinkDelayMillis > 0L) {
+                            kotlinx.coroutines.delay(botThinkDelayMillis)
+                        }
+                        val botSeat = effect.botSeat
+                        val state = internalState.scopaState
+                        if (state.phase != DealPhase.PLAYING || state.toMove != botSeat) {
+                            return@launch
+                        }
 
-                    val chosenMove = withContext(ioDispatcher) {
-                        bot.chooseMove(view = view, legal = legal, rng = botRng)
-                    }
+                        val bot = effect.level.toBot()
+                        val view = viewFor(state, botSeat)
+                        val legal = legalMoves(state)
+                        if (legal.isEmpty()) {
+                            return@launch
+                        }
 
-                    onIntent(GameIntent.ApplyBotMove(chosenMove))
+                        val chosenMove = withContext(ioDispatcher) {
+                            bot.chooseMove(view = view, legal = legal, rng = botRng)
+                        }
+
+                        onIntent(GameIntent.ApplyBotMove(chosenMove))
+                    } catch (_: CancellationException) {
+                        // Normale annullamento job bot
+                    } catch (e: Throwable) {
+                        android.util.Log.e("GameViewModel", "Errore esecuzione mossa bot", e)
+                    }
                 }
             }
             is GameEffect.ComputeHint -> {
-                scope.launch {
-                    // Criterio di accettazione F1-11: Il suggerimento usa solo viewFor() del giocatore umano
-                    val humanView = viewFor(internalState.scopaState, effect.humanSeat)
-                    val legal = legalMoves(internalState.scopaState)
-                    val bestMove = withContext(ioDispatcher) {
-                        val evaluations = PimcEvaluator.evaluate(
-                            view = humanView,
-                            legal = legal,
-                            rng = SeededRng(internalState.scopaState.rngState xor 0x7E7E7EL),
-                            budget = SearchBudget(samples = 15, maxNodes = 60),
-                        )
-                        evaluations.maxByOrNull { it.value }?.move ?: legal.firstOrNull()
-                    }
-                    if (bestMove != null) {
-                        onIntent(GameIntent.ApplyHint(bestMove))
-                    } else {
+                hintJob?.cancel()
+                hintJob = scope.launch {
+                    try {
+                        val state = internalState.scopaState
+                        if (state.phase != DealPhase.PLAYING || state.toMove != effect.humanSeat) {
+                            onIntent(GameIntent.ClearHint)
+                            return@launch
+                        }
+
+                        val humanView = viewFor(state, effect.humanSeat)
+                        val legal = legalMoves(state)
+                        if (legal.isEmpty()) {
+                            onIntent(GameIntent.ClearHint)
+                            return@launch
+                        }
+
+                        val bestMove = withContext(ioDispatcher) {
+                            val evaluations = PimcEvaluator.evaluate(
+                                view = humanView,
+                                legal = legal,
+                                rng = SeededRng(state.rngState xor 0x7E7E7EL),
+                                budget = SearchBudget(samples = 15, maxNodes = 60),
+                            )
+                            evaluations.maxByOrNull { it.value }?.move ?: legal.firstOrNull()
+                        }
+                        if (bestMove != null) {
+                            onIntent(GameIntent.ApplyHint(bestMove))
+                        } else {
+                            onIntent(GameIntent.ClearHint)
+                        }
+                    } catch (_: CancellationException) {
+                        // Normale annullamento job suggerimento
+                    } catch (e: Throwable) {
+                        android.util.Log.e("GameViewModel", "Errore calcolo suggerimento", e)
                         onIntent(GameIntent.ClearHint)
                     }
                 }
             }
             null -> {}
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        botJob?.cancel()
+        hintJob?.cancel()
     }
 }
