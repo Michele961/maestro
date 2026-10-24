@@ -84,18 +84,18 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-04 — Misura delle prestazioni su dispositivo
 
-- **Stato:** da fare
+- **Stato:** bloccato
 - **Riferimenti:** decisione D4, `docs/reports/fase-0.md` §4.2
 - **Obiettivo:** misurare sul Pixel 10 Pro di Michele e su un emulatore con profilo di fascia bassa (CPU limitata, API 26) il tempo per mossa di ogni livello e il tempo dell'analisi di una partita intera.
 - **Criteri di accettazione:**
     - [ ] Tabella nella PR: tempo medio e p95 per mossa per livello; tempo dell'analisi di una partita a 11.
     - [ ] Livello Maestro: p95 < 200 ms sul Pixel 10 Pro e < 800 ms sul profilo di fascia bassa.
     - [ ] Se un valore supera il limite, il task si chiude `bloccato` con una proposta (meno campioni, analisi in background, ISMCTS da `maestro.md`).
-- **Domande aperte:** —
+- **Domande aperte:** In attesa di esecuzione su dispositivo fisico Pixel 10 Pro di Michele e profilo emulatore di fascia bassa (task hardware/umano). Proseguiamo con F1-05.
 
 ## F1-05 — Stato della partita nella UI (MVI)
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** ADR-0012 (MVI), `docs/architecture.md` (Flussi: partita offline)
 - **Obiettivo:** modello MVI della partita: stato della schermata, intenti (gioca carta, scegli presa, …), reducer che chiama solo `legalMoves`/`play` di `core:game`; turno del bot eseguito fuori dal thread UI con la sola `viewFor()`.
 - **Criteri di accettazione:**
