@@ -4,7 +4,6 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.viewFor
-import kotlin.reflect.full.memberProperties
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -18,14 +17,14 @@ class GameUiStateSecurityTest {
 
     @Test
     fun gameUiStateDoesNotExposeScopaStateOrHiddenCards() {
-        val uiStateProperties = GameUiState::class.memberProperties
+        val declaredFields = GameUiState::class.java.declaredFields
 
         // 1. Nessun campo di tipo ScopaState
-        for (prop in uiStateProperties) {
+        for (field in declaredFields) {
             assertNotEquals(
-                ScopaState::class,
-                prop.returnType.classifier,
-                "GameUiState non deve mai esporre ScopaState! Campo violato: ${prop.name}",
+                ScopaState::class.java,
+                field.type,
+                "GameUiState non deve mai esporre ScopaState! Campo violato: ${field.name}",
             )
         }
 
@@ -38,18 +37,18 @@ class GameUiStateSecurityTest {
             "scopaState",
             "authoritativeState",
         )
-        for (prop in uiStateProperties) {
+        for (field in declaredFields) {
             assertFalse(
-                prop.name in disallowedFieldNames,
-                "GameUiState contiene un campo proibito: ${prop.name}",
+                field.name in disallowedFieldNames,
+                "GameUiState contiene un campo proibito: ${field.name}",
             )
         }
 
-        // 3. I campi per avversario e mazzo devono essere strettamente di tipo Int (conteggi scalari)
-        val opponentCardCountProp = uiStateProperties.first { it.name == "opponentCardCount" }
-        val deckCardCountProp = uiStateProperties.first { it.name == "deckCardCount" }
-        assertEquals(Int::class, opponentCardCountProp.returnType.classifier)
-        assertEquals(Int::class, deckCardCountProp.returnType.classifier)
+        // 3. I campi per avversario e mazzo devono essere strettamente di tipo primitivo int (conteggi scalari)
+        val opponentCardCountField = declaredFields.first { it.name == "opponentCardCount" }
+        val deckCardCountField = declaredFields.first { it.name == "deckCardCount" }
+        assertEquals(Int::class.javaPrimitiveType, opponentCardCountField.type)
+        assertEquals(Int::class.javaPrimitiveType, deckCardCountField.type)
     }
 
     @Test
