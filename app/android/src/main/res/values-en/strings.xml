@@ -4,4 +4,16 @@
     <string name="home_welcome_title">Maestro</string>
     <string name="home_subtitle">Scopa and Briscola with AI coach</string>
     <string name="home_start_game">New Game</string>
+    <string name="game_error_not_your_turn">It\'s not your turn</string>
+    <string name="game_error_invalid_move">Invalid move</string>
+    <string name="game_event_sweep">Sweep!</string>
+    <string name="game_event_deal_ended">Deal ended</string>
+    <string name="game_event_match_ended">Match ended</string>
+    <string name="game_dialog_capture_title">Choose capture</string>
+    <string name="game_dialog_cancel">Cancel</string>
+    <string name="game_score_label">Score</string>
+    <string name="game_sweeps_label">Sweeps</string>
+    <string name="game_bot_thinking">The Maestro is thinking…</string>
+    <string name="game_your_turn">Your turn</string>
+    <string name="game_opponent_turn">Opponent\'s turn</string>
 </resources>

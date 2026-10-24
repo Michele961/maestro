@@ -1,0 +1,184 @@
+package it.maestro.app.game
+
+import it.maestro.game.CoreGame
+import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.GameEvent
+import it.maestro.game.scopa.MatchLog
+import it.maestro.game.scopa.PlayResult
+import it.maestro.game.scopa.ScopaMove
+import it.maestro.game.scopa.legalMoves
+import it.maestro.game.scopa.newMatch
+import it.maestro.game.scopa.play
+
+/**
+ * Reducer puro per la gestione dello stato della partita di Scopa (ADR-0012, task F1-05).
+ *
+ * È privo di dipendenze dalla piattaforma Android e può essere testato interamente
+ * come funzione pura `(State, Intent) -> (State, Effect?)`.
+ */
+public object GameReducer {
+
+    public fun initial(intent: GameIntent.StartMatch = GameIntent.StartMatch()): GameReducerResult {
+        val state = newMatch(config = intent.config, seed = intent.seed)
+        val log = MatchLog(
+            rulesVersion = CoreGame.RULES_VERSION,
+            config = intent.config,
+            seed = intent.seed,
+            moves = emptyList(),
+        )
+        val internalState = GameInternalState(
+            scopaState = state,
+            humanSeat = intent.humanSeat,
+            botLevel = intent.level,
+            matchLog = log,
+            pendingCapture = null,
+            isBotThinking = false,
+            lastError = null,
+            lastEvent = null,
+        )
+        val effect = if (state.toMove != intent.humanSeat && state.phase == DealPhase.PLAYING) {
+            GameEffect.ScheduleBotMove(
+                level = intent.level,
+                botSeat = intent.humanSeat.other(),
+            )
+        } else {
+            null
+        }
+        return GameReducerResult(
+            state = internalState.copy(isBotThinking = effect != null),
+            effect = effect,
+        )
+    }
+
+    public fun reduce(state: GameInternalState, intent: GameIntent): GameReducerResult {
+        return when (intent) {
+            is GameIntent.StartMatch -> initial(intent)
+
+            is GameIntent.PlayCard -> handlePlayCard(state, intent)
+
+            is GameIntent.SelectCapture -> handleSelectCapture(state, intent)
+
+            is GameIntent.CancelCaptureChoice -> {
+                GameReducerResult(state.copy(pendingCapture = null, lastError = null))
+            }
+
+            is GameIntent.RequestBotMove -> handleRequestBotMove(state)
+
+            is GameIntent.ApplyBotMove -> handleApplyBotMove(state, intent)
+
+            is GameIntent.DismissError -> {
+                GameReducerResult(state.copy(lastError = null))
+            }
+
+            is GameIntent.DismissEvent -> {
+                GameReducerResult(state.copy(lastEvent = null))
+            }
+        }
+    }
+
+    private fun handlePlayCard(state: GameInternalState, intent: GameIntent.PlayCard): GameReducerResult {
+        if (state.scopaState.phase != DealPhase.PLAYING) {
+            return GameReducerResult(state.copy(lastError = "Partita non in corso"))
+        }
+        if (state.scopaState.toMove != state.humanSeat) {
+            return GameReducerResult(state.copy(lastError = "Non è il tuo turno"))
+        }
+
+        val legal = legalMoves(state.scopaState).filter { it.card == intent.card }
+        if (legal.isEmpty()) {
+            return GameReducerResult(state.copy(lastError = "Mossa non valida: carta non giocabile"))
+        }
+
+        if (legal.size == 1) {
+            return applyMove(state, legal.first())
+        }
+
+        // Più opzioni di presa per la stessa carta: mostra la selezione all'utente
+        val pendingChoice = PendingCaptureChoice(
+            card = intent.card,
+            options = legal.map { it.capture },
+        )
+        return GameReducerResult(state.copy(pendingCapture = pendingChoice, lastError = null))
+    }
+
+    private fun handleSelectCapture(state: GameInternalState, intent: GameIntent.SelectCapture): GameReducerResult {
+        if (state.scopaState.phase != DealPhase.PLAYING || state.scopaState.toMove != state.humanSeat) {
+            return GameReducerResult(state.copy(lastError = "Non è il tuo turno"))
+        }
+        val move = ScopaMove(card = intent.card, capture = intent.capture)
+        val legal = legalMoves(state.scopaState)
+        if (move !in legal) {
+            return GameReducerResult(state.copy(lastError = "Mossa non valida: combinazione di presa non consentita"))
+        }
+        return applyMove(state.copy(pendingCapture = null), move)
+    }
+
+    private fun handleRequestBotMove(state: GameInternalState): GameReducerResult {
+        if (state.scopaState.phase != DealPhase.PLAYING) {
+            return GameReducerResult(state.copy(isBotThinking = false))
+        }
+        val botSeat = state.humanSeat.other()
+        if (state.scopaState.toMove != botSeat) {
+            return GameReducerResult(state.copy(isBotThinking = false))
+        }
+        return GameReducerResult(
+            state = state.copy(isBotThinking = true),
+            effect = GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat),
+        )
+    }
+
+    private fun handleApplyBotMove(state: GameInternalState, intent: GameIntent.ApplyBotMove): GameReducerResult {
+        val botSeat = state.humanSeat.other()
+        if (state.scopaState.toMove != botSeat) {
+            return GameReducerResult(state.copy(isBotThinking = false))
+        }
+        return applyMove(state.copy(isBotThinking = false), intent.move)
+    }
+
+    private fun applyMove(state: GameInternalState, move: ScopaMove): GameReducerResult {
+        return when (val result = play(state.scopaState, move)) {
+            is PlayResult.Applied -> {
+                val newLog = state.matchLog.copy(moves = state.matchLog.moves + move)
+                var lastEvent: UiGameEvent? = null
+                for (event in result.events) {
+                    when (event) {
+                        is GameEvent.Sweep -> lastEvent = UiGameEvent.Sweep(event.seat)
+                        is GameEvent.DealEnded -> lastEvent = UiGameEvent.DealEnded(event.score)
+                        is GameEvent.MatchEnded -> lastEvent = UiGameEvent.MatchEnded(event.winner, event.totals)
+                        else -> {}
+                    }
+                }
+                val newState = state.copy(
+                    scopaState = result.state,
+                    matchLog = newLog,
+                    pendingCapture = null,
+                    lastError = null,
+                    lastEvent = lastEvent ?: state.lastEvent,
+                )
+
+                val botSeat = state.humanSeat.other()
+                val nextEffect = if (result.state.phase == DealPhase.PLAYING && result.state.toMove == botSeat) {
+                    GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
+                } else {
+                    null
+                }
+
+                GameReducerResult(
+                    state = newState.copy(isBotThinking = nextEffect != null),
+                    effect = nextEffect,
+                )
+            }
+            is PlayResult.Rejected -> {
+                // Mossa rifiutata: produce un errore mostrabile, mai un crash (criterio di accettazione F1-05)
+                GameReducerResult(
+                    state = state.copy(
+                        lastError = "Mossa rifiutata: ${result.reason}",
+                        pendingCapture = null,
+                        isBotThinking = false,
+                    ),
+                    effect = null,
+                )
+            }
+        }
+    }
+}
