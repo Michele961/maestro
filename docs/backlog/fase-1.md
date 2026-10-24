@@ -28,6 +28,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 | F1-15 | Test interno su Play Console | F1-08, F1-10, F1-14 |
 | F1-16 | Playtest con giocatori umani | F1-15 |
 | F1-17 | Report di fine fase | F1-16 |
+| F1-18 | Componenti UI del menu con gli asset definitivi | F1-13 |
 
 Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro dopo F1-07; F1-13 (soprattutto lavoro di Michele) dal momento in cui esiste il tavolo.
 
@@ -184,7 +185,8 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
     - [x] Il mazzo è un tema separato dalle regole (`DeckTheme.kt`).
     - [x] Primi asset chiave approvati e integrati (`card_back`, `card_denari_7`, `card_bastoni_asso`, `maestro_neutral`).
     - [ ] Completamento intero mazzo 40 carte con approvazione di Michele.
-- **Domande aperte:** —
+- **Domande aperte:**
+    - Risolte con Michele: gli asset passano in `res/drawable-nodpi/` come WebP; `maestro_neutral` rigenerato senza cornice come le altre espressioni; i componenti del menu vanno in F1-18.
 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
 
@@ -215,3 +217,16 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 - **Stato:** da fare
 - **Obiettivo:** `docs/reports/fase-1.md`: esito del gate, metriche di F1-03/F1-04, crash, esito del playtest, proposta definitiva di soglie e formula della precisione, proposta per la Fase 2.
+
+## F1-18 — Componenti UI del menu con gli asset definitivi
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/design-system.md`, `docs/art/asset-catalog.md` §2bis, `docs/art/reference_menu_screen.jpg`
+- **Obiettivo:** portare nel menu iniziale gli asset di F1-13. Pulsanti tattili, pannelli, targhette e barra in basso restano disegnati in Compose con i colori del design system; icone, fregi, avatar e texture di `res/drawable-nodpi/` si appoggiano sopra. Testi solo da `strings.xml`.
+- **Criteri di accettazione:**
+    - [ ] Barra in basso con le icone `icon_trophy`, `icon_book_quill` e `icon_pouch` in cerchio d'ottone.
+    - [ ] Contatori monete e gemme, messaggi e impostazioni con le relative icone.
+    - [ ] Pannelli in pergamena con i fregi `ornament_*`, su sfondo `texture_wood`.
+    - [ ] Avatar del Maestro, degli avversari e del giocatore ritagliati in cerchio dal codice (le immagini sono senza cornice).
+    - [ ] Screenshot del menu affiancato a `reference_menu_screen.jpg` nella PR.
+- **Domande aperte:** —
