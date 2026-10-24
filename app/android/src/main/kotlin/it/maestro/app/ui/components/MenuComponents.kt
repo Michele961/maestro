@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.BrassRivetGold
 import it.maestro.app.ui.theme.ButtonBlueBottom
 import it.maestro.app.ui.theme.ButtonGoldBorder
@@ -212,7 +213,8 @@ public fun BrassIconBadge(
             text = label.uppercase(),
             color = BrassRivetGold,
             fontSize = 12.sp,
-            fontWeight = FontWeight.Black,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
             letterSpacing = 0.5.sp,
             modifier = Modifier.padding(top = 4.dp),
         )
@@ -240,7 +242,7 @@ public fun CurrencyPill(
                 .padding(start = 26.dp, end = 12.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = MaestroDisplayFont)
         }
         Image(painterResource(icon), contentDescription = null, modifier = Modifier.size(36.dp))
     }
@@ -298,7 +300,8 @@ public fun WoodRowTile(
                 text = title.uppercase(),
                 color = BrassRivetGold,
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Black,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f).padding(start = 8.dp),
             )
