@@ -9,22 +9,22 @@ Posizione target nel progetto Android:
 
 ## 1. Dorso e Tavolo
 
-| File Name | Descrizione | Risoluzione Minima Consigliata |
-|---|---|---|
-| `card_back.webp` (o `.png`) | Dorso della carta comune | `600 × 936 px` |
-| `table_felt_bg.webp` (o `.png`) | Texture panno verde con vignettatura e luce centrale | `1080 × 1920 px` |
+| File Name | Descrizione | Risoluzione Minima Consigliata | Stato |
+|---|---|---|---|
+| `card_back.png` | Dorso della carta comune (verde bottiglia e oro) | `600 × 936 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
+| `table_felt_bg.webp` (o `.png`) | Texture panno verde con vignettatura e luce centrale | `1080 × 1920 px` | Da completare (fallback procedurale attivo) |
 
 ---
 
 ## 2. Avatar del Maestro (5 Stati)
 
-| File Name | Stato Emotivo | Risoluzione Minima |
-|---|---|---|
-| `maestro_neutral.webp` | Stato normale / neutro | `512 × 512 px` |
-| `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` |
-| `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` |
-| `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` |
-| `maestro_celebrating.webp` | Scopa messa a segno o vittoria | `512 × 512 px` |
+| File Name | Stato Emotivo | Risoluzione Minima | Stato |
+|---|---|---|---|
+| `maestro_neutral.png` | Stato normale / neutro con cornice ottone e targa | `512 × 512 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
+| `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` | Fallback procedurale / aura animata |
+| `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` | Fallback procedurale / aura animata |
+| `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` | Fallback procedurale / aura animata |
+| `maestro_celebrating.webp` | Scopa messa a segno o vittoria | `512 × 512 px` | Fallback procedurale / aura animata |
 
 ---
 
@@ -40,7 +40,7 @@ La convenzione di denominazione è:
 4. `card_denari_4.webp`
 5. `card_denari_5.webp`
 6. `card_denari_6.webp`
-7. `card_denari_7.webp` *(Il Settebello: cura speciale su questa carta!)*
+7. `card_denari_7.png` *(Il Settebello: **Approvato v1.0**, integrato in `res/drawable/`)*
 8. `card_denari_fante.webp`
 9. `card_denari_cavallo.webp`
 10. `card_denari_re.webp`
@@ -70,7 +70,7 @@ La convenzione di denominazione è:
 30. `card_spade_re.webp`
 
 ### 3.4. Bastoni (`bastoni`)
-31. `card_bastoni_asso.webp`
+31. `card_bastoni_asso.png` *(Asso di Bastoni: **Approvato v1.0**, integrato in `res/drawable/`)*
 32. `card_bastoni_2.webp`
 33. `card_bastoni_3.webp`
 34. `card_bastoni_4.webp`
