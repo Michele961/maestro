@@ -48,6 +48,7 @@ public enum class PillButtonVariant {
     EDUCATIONAL_BLUE,
     SECONDARY_AMBER,
     WOOD,
+    CREAM,
 }
 
 /**
@@ -72,6 +73,7 @@ public fun MaestroPillButton(
         PillButtonVariant.EDUCATIONAL_BLUE -> R.drawable.skin_button_blue
         PillButtonVariant.SECONDARY_AMBER -> R.drawable.skin_button_amber
         PillButtonVariant.WOOD -> R.drawable.skin_button_wood
+        PillButtonVariant.CREAM -> R.drawable.skin_button_cream
     }
     NineSliceBox(
         skin = skin,
@@ -81,12 +83,12 @@ public fun MaestroPillButton(
             .height(height)
             .alpha(if (enabled) 1f else 0.6f)
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(contentPadding),
+            .clickable(enabled = enabled, onClick = onClick),
+        contentPadding = contentPadding,
     ) {
         Text(
             text = text,
-            color = ButtonTextCream,
+            color = if (variant == PillButtonVariant.CREAM) WoodSurfaceDark else ButtonTextCream,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             fontFamily = MaestroDisplayFont,
@@ -212,8 +214,8 @@ public fun TactileSegmentedPill(
         slice = 0.42f,
         corner = 18.dp,
         modifier = modifier
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .clickable(enabled = enabled, onClick = onClick),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(
             text = text,

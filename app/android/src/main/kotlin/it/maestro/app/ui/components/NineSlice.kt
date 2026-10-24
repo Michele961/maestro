@@ -3,6 +3,9 @@ package it.maestro.app.ui.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +22,7 @@ import kotlin.math.roundToInt
  * Fondo a 9 sezioni da un'immagine "pelle" (pulsanti, pannelli, targhe generati in F1-13).
  * Angoli e bordi restano intatti, si stira solo il centro; [slice] è la frazione dell'immagine
  * occupata da ciascun angolo, [corner] la dimensione con cui l'angolo viene disegnato.
+ * Il padding del contenuto va passato in [contentPadding], non in [modifier], altrimenti la pelle si rimpicciolisce.
  */
 @Composable
 public fun NineSliceBox(
@@ -27,11 +31,13 @@ public fun NineSliceBox(
     corner: Dp,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.Center,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     val image = ImageBitmap.imageResource(skin)
     Box(
-        modifier = modifier.drawBehind { drawNineSlice(image, slice, corner.toPx()) },
+        // La pelle va disegnata sull'area intera, prima del padding del contenuto.
+        modifier = modifier.drawBehind { drawNineSlice(image, slice, corner.toPx()) }.padding(contentPadding),
         contentAlignment = contentAlignment,
         content = content,
     )
