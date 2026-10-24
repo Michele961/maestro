@@ -15,6 +15,8 @@ import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,5 +96,41 @@ class TableScreenScreenshotTest {
         composeRule.onNodeWithTag("pause_button").performClick()
         composeRule.onNodeWithTag("pause_home_button").performClick()
         org.junit.Assert.assertEquals(1, home)
+    }
+
+    @Test
+    fun playing_card_in_game_does_not_crash() {
+        val viewModel = it.maestro.app.game.GameViewModel(
+            ioDispatcher = kotlinx.coroutines.Dispatchers.Unconfined,
+        )
+        viewModel.onIntent(
+            it.maestro.app.game.GameIntent.StartMatch(
+                config = it.maestro.game.scopa.ScopaConfig(targetScore = 11),
+                seed = 42L,
+                humanSeat = it.maestro.game.model.Seat.P1,
+            ),
+        )
+
+        composeRule.setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            MaestroTheme {
+                TableContent(
+                    uiState = uiState,
+                    onIntent = viewModel::onIntent,
+                )
+            }
+        }
+
+        // Troviamo la carta nella mano dell'umano e clicchiamola
+        val humanCard = viewModel.uiState.value.humanHand.first()
+        composeRule.onNodeWithTag("card_${humanCard.suit.name}_${humanCard.rank.name}").performClick()
+        composeRule.mainClock.advanceTimeBy(400L)
+        composeRule.waitForIdle()
+        composeRule.mainClock.advanceTimeBy(600L)
+        composeRule.waitForIdle()
+        composeRule.mainClock.advanceTimeBy(1000L)
+        composeRule.waitForIdle()
+
+        org.junit.Assert.assertTrue(viewModel.uiState.value.lastMoveId > 0L)
     }
 }
