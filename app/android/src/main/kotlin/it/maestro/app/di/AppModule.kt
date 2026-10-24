@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
@@ -57,5 +57,9 @@ public val appModule: Module = module {
         DefaultCrashReporter()
     }
 
-    viewModelOf(::GameViewModel)
+    viewModel {
+        GameViewModel(
+            matchRepository = get(),
+        )
+    }
 }
