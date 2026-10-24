@@ -16,6 +16,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -565,7 +569,7 @@ private fun androidx.compose.foundation.layout.RowScope.NavPill(
     )
 }
 
-/** Timeline delle tue mosse: blu = magistrale, giallo = imprecisione, rosso = errore grave. */
+/** Timeline delle tue mosse: un pallino per mossa, centrato automaticamente sulla mossa corrente. */
 @Composable
 private fun ReviewTimeline(
     currentIndex: Int,
@@ -573,29 +577,45 @@ private fun ReviewTimeline(
     humanSeat: Seat,
     onStepChanged: (Int) -> Unit,
 ) {
-    Row(
+    val humanSteps = remember(steps, humanSeat) {
+        steps.mapIndexedNotNull { index, step ->
+            if (step.mover == humanSeat) Pair(index, step) else null
+        }
+    }
+    val selectedHumanIndex = humanSteps.indexOfFirst { it.first == currentIndex }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(selectedHumanIndex) {
+        if (selectedHumanIndex >= 0) {
+            listState.animateScrollToItem(
+                index = (selectedHumanIndex - 4).coerceAtLeast(0),
+            )
+        }
+    }
+
+    LazyRow(
+        state = listState,
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
             .padding(vertical = 6.dp)
             .testTag("review_slider"),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
-        steps.forEachIndexed { index, step ->
-            if (step.mover != humanSeat) return@forEachIndexed
+        itemsIndexed(humanSteps) { _, (stepIndex, step) ->
             val color = when (step.analysis.grade) {
                 MoveGrade.BEST -> BestBadgeColor
                 MoveGrade.INACCURACY -> InaccuracyBadgeColor
                 MoveGrade.BLUNDER -> BlunderBadgeColor
             }
-            val selected = index == currentIndex
+            val selected = stepIndex == currentIndex
             Box(
                 modifier = Modifier
-                    .size(if (selected) 26.dp else 16.dp)
+                    .size(if (selected) 24.dp else 14.dp)
                     .background(color, CircleShape)
-                    .border(if (selected) 3.dp else 1.5.dp, GoldAccent, CircleShape)
-                    .clickable { onStepChanged(index) },
+                    .border(if (selected) 2.5.dp else 1.dp, GoldAccent, CircleShape)
+                    .clickable { onStepChanged(stepIndex) },
             )
         }
     }
