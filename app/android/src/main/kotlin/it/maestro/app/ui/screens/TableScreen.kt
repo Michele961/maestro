@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -74,6 +73,7 @@ import it.maestro.app.game.PendingCaptureChoice
 import it.maestro.app.game.TrainingAnswerFeedback
 import it.maestro.app.game.UiGameEvent
 import it.maestro.app.ui.components.CardBackView
+import it.maestro.app.ui.components.MaestroAlertDialog
 import it.maestro.app.ui.components.MaestroAvatarView
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.components.MaestroPillButton
@@ -412,7 +412,7 @@ private fun CaptureSelectionDialog(
     onConfirm: (Card, Set<Card>) -> Unit,
     onCancel: () -> Unit,
 ) {
-    AlertDialog(
+    MaestroAlertDialog(
         onDismissRequest = onCancel,
         title = {
             Text(
@@ -432,7 +432,7 @@ private fun CaptureSelectionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onConfirm(choice.card, option) }
-                            .border(1.dp, GoldAccentColor, RoundedCornerShape(6.dp))
+                            .border(1.dp, DialogGold, RoundedCornerShape(6.dp))
                             .testTag("capture_option_$index"),
                         shape = RoundedCornerShape(6.dp),
                         color = Color(0xFF264653),
@@ -489,7 +489,7 @@ private fun DealSummaryDialog(
         },
     )
 
-    AlertDialog(
+    MaestroAlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -513,21 +513,21 @@ private fun DealSummaryDialog(
                     Text(
                         text = stringResource(id = R.string.game_score_label),
                         style = MaterialTheme.typography.labelLarge,
-                        color = Color.Gray,
+                        color = DialogInkSoft,
                         modifier = Modifier.weight(2f),
                     )
                     Text(
                         text = stringResource(id = R.string.game_player_you),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = GoldAccentColor,
+                        color = DialogGold,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
                         text = stringResource(id = R.string.game_player_maestro),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = DialogInk,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -554,14 +554,14 @@ private fun DealSummaryDialog(
                             text = "$p1Pts",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = GoldAccentColor,
+                            color = DialogGold,
                             modifier = Modifier.weight(1f),
                         )
                         Text(
                             text = "$p2Pts",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = DialogInk,
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -587,14 +587,14 @@ private fun DealSummaryDialog(
                         text = "${score.totalPoints(humanSeat)}",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = GoldAccentColor,
+                        color = DialogGold,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
                         text = "${score.totalPoints(oppSeat)}",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = DialogInk,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -611,21 +611,21 @@ private fun DealSummaryDialog(
                         text = stringResource(id = R.string.deal_summary_match_total),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.LightGray,
+                        color = DialogInkSoft,
                         modifier = Modifier.weight(2f),
                     )
                     Text(
                         text = "${uiState.humanScore}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = GoldAccentColor,
+                        color = DialogGold,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
                         text = "${uiState.opponentScore}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = DialogInk,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -639,7 +639,7 @@ private fun DealSummaryDialog(
                         text = stringResource(id = R.string.training_score_label, pct, correct, total),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = GoldAccentColor,
+                        color = DialogGold,
                         modifier = Modifier.testTag("deal_summary_attention_score"),
                     )
                 }
@@ -669,7 +669,7 @@ private fun MatchOverDialog(
         else -> stringResource(id = R.string.game_tie)
     }
 
-    AlertDialog(
+    MaestroAlertDialog(
         onDismissRequest = {},
         title = {
             Text(
@@ -695,7 +695,7 @@ private fun MatchOverDialog(
                         text = stringResource(id = R.string.training_score_label, pct, correct, total),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = GoldAccentColor,
+                        color = DialogGold,
                         modifier = Modifier.testTag("match_over_attention_score"),
                     )
                 }
@@ -755,7 +755,7 @@ private fun TrainingQuestionDialog(
         TrainingFundamental.NONE -> R.string.training_dialog_subtitle
     }
 
-    AlertDialog(
+    MaestroAlertDialog(
         onDismissRequest = { /* Modal: interazione richiesta prima di chiudere */ },
         modifier = Modifier.testTag("training_question_dialog"),
         title = {
@@ -764,13 +764,13 @@ private fun TrainingQuestionDialog(
                     text = stringResource(id = R.string.training_dialog_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = GoldAccentColor,
+                    color = DialogGold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(id = R.string.training_dialog_subtitle),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.LightGray,
+                    color = DialogInkSoft,
                 )
             }
         },
@@ -783,7 +783,7 @@ private fun TrainingQuestionDialog(
                     text = stringResource(id = questionTitleResId),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White,
+                    color = DialogInk,
                     modifier = Modifier.testTag("training_question_text"),
                 )
 
@@ -840,7 +840,7 @@ private fun TrainingQuestionDialog(
                                 text = optionText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = if (isSelected || isCorrectOption) FontWeight.Bold else FontWeight.Normal,
-                                color = Color.White,
+                                color = DialogInk,
                                 modifier = Modifier.padding(12.dp),
                             )
                         }
@@ -867,7 +867,7 @@ private fun TrainingQuestionDialog(
                             text = feedbackText,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
+                            color = DialogInk,
                             modifier = Modifier.padding(12.dp),
                         )
                     }
@@ -1126,3 +1126,8 @@ private fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
         }
     }
 }
+
+// Colori dei testi nei dialoghi su pergamena (F1-23)
+private val DialogInk = Color(0xFF2B1A10)
+private val DialogInkSoft = Color(0xFF6D5A48)
+private val DialogGold = Color(0xFF9C6B00)

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -23,6 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import it.maestro.app.ui.components.MaestroAlertDialog
 import it.maestro.app.R
 
 /**
@@ -37,7 +37,7 @@ public fun SettingsDialog(
     onTriggerTestCrash: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
+    MaestroAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.testTag("settings_dialog"),
         title = {
@@ -70,7 +70,7 @@ public fun SettingsDialog(
                         Text(
                             text = stringResource(id = R.string.settings_sound_subtitle),
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.LightGray,
+                            color = Color(0xFF6D5A48),
                         )
                     }
                     Switch(
@@ -80,7 +80,7 @@ public fun SettingsDialog(
                     )
                 }
 
-                HorizontalDivider(color = Color.DarkGray)
+                HorizontalDivider(color = Color(0xFF8C6D1F))
 
                 // Sezione Crashlytics / Diagnostica
                 Column(
@@ -95,7 +95,7 @@ public fun SettingsDialog(
                     Text(
                         text = stringResource(id = R.string.settings_crash_warning),
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.LightGray,
+                        color = Color(0xFF6D5A48),
                     )
                     Button(
                         onClick = onTriggerTestCrash,
