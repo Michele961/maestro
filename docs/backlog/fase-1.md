@@ -240,7 +240,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-19 — Fondamenta UI: tipografia, sfondi e componenti condivisi
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** Tipografia del gioco in `Theme.kt`, sfondi condivisi e scaffold di schermata, libreria componenti unica con screenshot "catalogo", `design-system.md` §3 aggiornato.
 - **Criteri di accettazione:**
@@ -258,7 +258,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-21 — Tavolo da gioco con gli asset definitivi
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** `TableScreen` come in `reference_table_screen.jpg`; le carte restano su `DeckTheme`.
 - **Criteri di accettazione:**
