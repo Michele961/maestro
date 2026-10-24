@@ -58,9 +58,8 @@ class TrainingChecksUiTest {
         // Assicuriamoci che sia il turno di P1
         while (state.scopaState.toMove != Seat.P1) {
             val botMove = legalMoves(state.scopaState).first()
-            state = play(state.scopaState, botMove).state.let { nextScopa ->
-                state.copy(scopaState = nextScopa)
-            }
+            val applied = play(state.scopaState, botMove) as it.maestro.game.scopa.PlayResult.Applied
+            state = state.copy(scopaState = applied.state)
         }
 
         // Iniettiamo una domanda attiva
@@ -141,7 +140,8 @@ class TrainingChecksUiTest {
 
         while (state.scopaState.toMove != Seat.P1) {
             val botMove = legalMoves(state.scopaState).first()
-            state = play(state.scopaState, botMove).state.let { state.copy(scopaState = it) }
+            val applied = play(state.scopaState, botMove) as it.maestro.game.scopa.PlayResult.Applied
+            state = state.copy(scopaState = applied.state)
         }
 
         val stateWithQuestion = state.copy(activeTrainingQuestion = mockQuestion)
