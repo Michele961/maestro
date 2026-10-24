@@ -118,9 +118,9 @@ class MainTest {
         // wins: p1=928 (92.8000%), p2=72 (7.2000%)
         private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 928
 
-        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot):
-        // wins: p1=631 (63.1000%), p2=369 (36.9000%)
-        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 631
+        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot, PRIMIERA_DIFF=0.025 D2):
+        // wins: p1=634 (63.4000%), p2=366 (36.6000%)
+        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 634
     }
 
     @Test
