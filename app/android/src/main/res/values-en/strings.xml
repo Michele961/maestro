@@ -117,4 +117,13 @@
     <string name="training_feedback_wrong">Incorrect answer.</string>
     <string name="training_feedback_continue">Continue match</string>
     <string name="training_score_label">Attention score: %1$d%% (%2$d/%3$d correct)</string>
+    <string name="maestro_avatar_description">Maestro Avatar</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_sound_effects">Sound effects</string>
+    <string name="settings_sound_subtitle">Play sounds for cards, tricks and alerts</string>
+    <string name="settings_crash_title">Stability Diagnostics</string>
+    <string name="settings_crash_button">Trigger test crash (Crashlytics)</string>
+    <string name="settings_crash_warning">This action will force the app to crash to verify Crashlytics.</string>
+    <string name="settings_close">Close</string>
+    <string name="home_settings_button">Settings</string>
 </resources>

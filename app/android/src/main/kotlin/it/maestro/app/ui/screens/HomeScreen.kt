@@ -29,6 +29,7 @@ public fun HomeScreen(
     hasActiveMatch: Boolean = false,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
+    onSettingsClicked: () -> Unit = {},
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -75,6 +76,15 @@ public fun HomeScreen(
                 ) {
                     Text(text = stringResource(id = R.string.home_start_game))
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = onSettingsClicked,
+                modifier = Modifier.testTag("home_settings_button"),
+            ) {
+                Text(text = stringResource(id = R.string.home_settings_button))
             }
         }
     }

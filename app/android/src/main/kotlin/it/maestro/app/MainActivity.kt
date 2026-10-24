@@ -13,10 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.crash.CrashReporter
+import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.ui.dialogs.SettingsDialog
 import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
@@ -65,7 +70,11 @@ public class MainActivity : ComponentActivity() {
         setContent {
             MaestroTheme {
                 val matchRepository: MatchRepository = koinInject()
+                val settingsRepository: SettingsRepository = koinInject()
+                val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
+                val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
+                var showSettingsDialog by remember { mutableStateOf(false) }
                 var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
                 var hasActiveMatch by remember { mutableStateOf(false) }
                 var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -75,6 +84,17 @@ public class MainActivity : ComponentActivity() {
                         val active = matchRepository.restoreActiveMatch()
                         hasActiveMatch = active is RestoreMatchResult.Success
                     }
+                }
+
+                if (showSettingsDialog) {
+                    SettingsDialog(
+                        soundEnabled = settings.soundEnabled,
+                        onSoundToggled = { enabled ->
+                            scope.launch { settingsRepository.updateSoundEnabled(enabled) }
+                        },
+                        onTriggerTestCrash = { crashReporter.triggerTestCrash() },
+                        onDismiss = { showSettingsDialog = false },
+                    )
                 }
 
                 when (val screen = currentScreen) {
@@ -104,6 +124,7 @@ public class MainActivity : ComponentActivity() {
                             }
                         },
                         onStartGameClicked = { currentScreen = Screen.PreGame },
+                        onSettingsClicked = { showSettingsDialog = true },
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
