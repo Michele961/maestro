@@ -70,16 +70,16 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-03 — Livelli di difficoltà del Maestro
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/ai/maestro.md` (Livelli di difficoltà), `docs/reports/fase-0.md` §5–6, decisioni D2 e D3
 - **Obiettivo:** in `core:ai`, 5 livelli di difficoltà (Principiante, Dilettante, Intermedio, Avanzato, Maestro) come configurazioni di `PimcBot`: campioni, nodi, rumore nella scelta, memoria imperfetta (D3). Il simulatore accetta `--p1 level:<nome>` e calcola l'Elo dei livelli facendoli giocare tra loro. `PRIMIERA_DIFF` passa a 0,025 (D2). Parametri ed Elo finali si fissano con Michele sui dati del task.
 - **Perimetro autorizzato:** aggiungere livelli ed Elo al simulatore; aggiornare in `docs/ai/maestro.md` il peso della primiera e la sezione "Livelli di difficoltà" con i valori approvati.
 - **Criteri di accettazione:**
-    - [ ] Ogni livello è deterministico a parità di seed (test).
-    - [ ] La "memoria imperfetta" usa solo la vista: il bot non riceve mai lo stato completo (test).
-    - [ ] Report nella PR: Elo misurato di ogni livello (obiettivo di partenza 800 / 1100 / 1400 / 1700 / 2000), win-rate di ogni livello contro il successivo su 1000 partite, precisione media con `MatchAnalyzer`.
-    - [ ] Ogni livello batte il precedente con margine significativo.
-    - [ ] Confronto `PRIMIERA_DIFF` 0,02 vs 0,025 su 1000 partite di `PimcBot` contro sé stesso, allegato alla PR.
+    - [x] Ogni livello è deterministico a parità di seed (test).
+    - [x] La "memoria imperfetta" usa solo la vista: il bot non riceve mai lo stato completo (test).
+    - [x] Report nella PR: Elo misurato di ogni livello (obiettivo di partenza 800 / 1100 / 1400 / 1700 / 2000), win-rate di ogni livello contro il successivo su 1000 partite, precisione media con `MatchAnalyzer`.
+    - [x] Ogni livello batte il precedente con margine significativo.
+    - [x] Confronto `PRIMIERA_DIFF` 0,02 vs 0,025 su 1000 partite di `PimcBot` contro sé stesso, allegato alla PR.
 - **Domande aperte:** —
 
 ## F1-04 — Misura delle prestazioni su dispositivo
