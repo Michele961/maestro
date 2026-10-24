@@ -126,4 +126,5 @@
     <string name="settings_crash_warning">This action will force the app to crash to verify Crashlytics.</string>
     <string name="settings_close">Close</string>
     <string name="home_settings_button">Settings</string>
+    <string name="home_coach_welcome">Welcome to the club! Ready for a match or some strategic training?</string>
 </resources>

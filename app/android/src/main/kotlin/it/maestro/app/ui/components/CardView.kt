@@ -41,11 +41,11 @@ public val SuitSpadeColor: Color = Color(0xFF2C3E50)
 public val SuitCoppeColor: Color = Color(0xFFC0392B)
 public val SuitBastoniColor: Color = Color(0xFF27AE60)
 
-public val CardBackground: Color = Color(0xFFFFFDF8)
+public val CardBackground: Color = Color(0xFFFFFFFF)
 public val CardBorderDefault: Color = Color(0xFFBCAAA4)
 public val CardBorderPlayable: Color = Color(0xFFD4AF37)
-public val CardBackBackground: Color = Color(0xFF1E3A8A)
-public val CardBackBorder: Color = Color(0xFFFBBF24)
+public val CardBackBackground: Color = Color(0xFF1E4D2B)
+public val CardBackBorder: Color = Color(0xFFD4AF37)
 
 /**
  * Vista di una carta da gioco italiana con supporto al tema del mazzo sostituibile (ADR-0008, task F1-13).
@@ -211,13 +211,14 @@ public fun CardBackView(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(4.dp)
-                    .background(Color(0xFF172554), shape = RoundedCornerShape(4.dp)),
+                    .background(Color(0xFF14381E), shape = RoundedCornerShape(4.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "❖",
+                    text = "M",
                     color = CardBackBorder,
                     fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }

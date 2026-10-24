@@ -126,4 +126,5 @@
     <string name="settings_crash_warning">Questa azione causerà l\'interruzione immediata dell\'app per verificare Crashlytics.</string>
     <string name="settings_close">Chiudi</string>
     <string name="home_settings_button">Impostazioni</string>
+    <string name="home_coach_welcome">Benvenuto al circolo! Pronto per una sfida o per allenarti sulle strategie?</string>
 </resources>

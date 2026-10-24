@@ -67,6 +67,7 @@ import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.MaestroAvatarView
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.components.PlaceholderCardView
+import it.maestro.app.ui.components.ScorePlaque
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
@@ -383,32 +384,14 @@ private fun ScoreAndStatusHeader(uiState: GameUiState) {
             .testTag("score_and_status_header"),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Punteggio complessivo
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "${stringResource(id = R.string.game_player_you)}: ${uiState.humanScore}",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "—",
-                style = MaterialTheme.typography.titleLarge,
-                color = GoldAccentColor,
-            )
-            Text(
-                text = "${stringResource(id = R.string.game_player_maestro)}: ${uiState.opponentScore}",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        ScorePlaque(
+            p1Score = uiState.humanScore,
+            p2Score = uiState.opponentScore,
+            p1Label = stringResource(id = R.string.game_player_you),
+            p2Label = stringResource(id = R.string.game_player_maestro),
+        )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Indicatore di turno
         val statusText = if (uiState.isHumanTurn) {
