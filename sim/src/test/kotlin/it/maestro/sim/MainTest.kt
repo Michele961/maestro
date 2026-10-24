@@ -118,9 +118,9 @@ class MainTest {
         // wins: p1=928 (92.8000%), p2=72 (7.2000%)
         private const val EXPECTED_GREEDY_WINS_SEED_42: Int = 928
 
-        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot):
-        // wins: p1=631 (63.1000%), p2=369 (36.9000%)
-        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 631
+        // Risultato deterministico esatto su 1000 partite con seed 42 e samples 20 (PimcBot vs GreedyBot, PRIMIERA_DIFF=0.025 D2):
+        // wins: p1=634 (63.4000%), p2=366 (36.6000%)
+        private const val EXPECTED_PIMC_S20_WINS_SEED_42: Int = 634
     }
 
     @Test
@@ -369,6 +369,58 @@ class MainTest {
             assertTrue(errBad.toString().isNotBlank())
         } finally {
             tempDir.toFile().deleteRecursively()
+        }
+    }
+
+    @Test
+    fun simAcceptsLevelNamesAsBots() {
+        val stdout = StringBuilder()
+        val stderr = StringBuilder()
+        val code = runCli(
+            args = arrayOf(
+                "--games", "2",
+                "--seed", "100",
+                "--p1", "level:principiante",
+                "--p2", "level:dilettante",
+            ),
+            out = stdout,
+            err = stderr,
+        )
+        assertEquals(0, code)
+        assertEquals("", stderr.toString())
+        assertTrue(stdout.toString().contains("level:principiante"))
+        assertTrue(stdout.toString().contains("level:dilettante"))
+    }
+
+    @Test
+    fun simRunsEloTournament() {
+        val outDir = Files.createTempDirectory("maestro-elo-test-")
+        try {
+            val jsonPath = outDir.resolve("elo.json")
+            val stdout = StringBuilder()
+            val stderr = StringBuilder()
+            val code = runCli(
+                args = arrayOf(
+                    "--elo",
+                    "--games", "2",
+                    "--seed", "20261024",
+                    "--out", jsonPath.toString(),
+                ),
+                out = stdout,
+                err = stderr,
+            )
+            assertEquals(0, code)
+            assertEquals("", stderr.toString())
+            assertTrue(stdout.toString().contains("Torneo e Misurazione Elo Livelli"))
+            assertTrue(stdout.toString().contains("PRINCIPIANTE"))
+            assertTrue(stdout.toString().contains("MAESTRO"))
+            assertTrue(Files.exists(jsonPath))
+            val json = Files.readString(jsonPath)
+            assertTrue(json.contains("\"PRINCIPIANTE\""))
+            assertTrue(json.contains("\"MAESTRO\""))
+            assertTrue(json.contains("\"matchups\""))
+        } finally {
+            outDir.toFile().deleteRecursively()
         }
     }
 }

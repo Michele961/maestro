@@ -211,9 +211,9 @@ class PimcBotTest {
         // - diff settebello: 1 - 0 = +1 -> +1.0
         // - diff denari: 2 - 1 = +1 -> +0.1
         // - diff carte: 4 - 2 = +2 -> +0.10
-        // - diff primiera parziale: 55 - 34 = +21 -> 21 * 0.02 = +0.42
-        // Totale atteso per P1 = 1.0 + 1.0 + 0.1 + 0.10 + 0.42 = 2.62
-        val expectedP1 = 2.62
+        // - diff primiera parziale: 55 - 34 = +21 -> 21 * 0.025 = +0.525 (decisione D2, PRIMIERA_DIFF=0.025)
+        // Totale atteso per P1 = 1.0 + 1.0 + 0.1 + 0.10 + 0.525 = 2.725
+        val expectedP1 = 2.725
         val actualP1 = evaluateProvisionalState(state, Seat.P1)
         val actualP2 = evaluateProvisionalState(state, Seat.P2)
 

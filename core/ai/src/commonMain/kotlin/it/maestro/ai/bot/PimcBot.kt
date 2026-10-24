@@ -6,31 +6,50 @@ import it.maestro.game.scopa.ScopaView
 
 /**
  * Bot basato su **PIMC (Perfect Information Monte Carlo)** e ricerca esatta nell'ultima distribuzione
- * (`docs/ai/maestro.md` §Bot, §PIMC, task F0-10).
+ * (`docs/ai/maestro.md` §Bot, §PIMC, task F0-10, F1-03).
  *
- * Delega la stima del valore atteso di ciascuna mossa legale a [evaluator] con il [budget] configurato
- * e sceglie la mossa con valore atteso massimo; a parità di valore, sceglie la prima mossa secondo
- * l'ordine canonico di `legal` (`docs/ai/maestro.md` §PIMC punto 4).
+ * Supporta configurazioni avanzate tramite [PimcConfig], inclusa l'iniezione di rumore decisionale
+ * e la simulazione di memoria imperfetta sulle carte passate (decisione D3).
  *
- * Può essere utilizzato sia come istanza configurabile (`PimcBot(SearchBudget(samples = 50))`) sia
- * tramite il companion object con budget predefinito (`PimcBot`).
- *
- * @property budget Budget di ricerca in campioni e nodi per mossa.
+ * @property config Configurazione operativa di parametri (budget, rumore, decadimento mnemonico).
  * @property evaluator Valutatore delle mosse legali (default [PimcEvaluator]).
  */
 public class PimcBot(
-    public val budget: SearchBudget = SearchBudget(),
+    public val config: PimcConfig = PimcConfig(),
     public val evaluator: MoveEvaluator = PimcEvaluator,
 ) : Bot {
+
+    public constructor(
+        budget: SearchBudget,
+        evaluator: MoveEvaluator = PimcEvaluator,
+    ) : this(config = PimcConfig(budget = budget), evaluator = evaluator)
+
+    public val budget: SearchBudget get() = config.budget
 
     override fun chooseMove(view: ScopaView, legal: List<ScopaMove>, rng: SeededRng): ScopaMove {
         require(legal.isNotEmpty()) { "La lista delle mosse legali non può essere vuota" }
 
+        // 1. Rumore decisionale stocastico (decisione D3):
+        if (config.noiseProbability > 0.0) {
+            val noiseThreshold = (config.noiseProbability.coerceIn(0.0, 1.0) * 10000).toInt()
+            if (rng.nextInt(10000) < noiseThreshold) {
+                val randomIndex = rng.nextInt(legal.size)
+                return legal[randomIndex]
+            }
+        }
+
+        // 2. Memoria imperfetta (decisione D3, applicata rigorosamente solo sulla vista):
+        val effectiveView = if (config.forgetRate > 0.0) {
+            applyImperfectMemory(view = view, forgetRate = config.forgetRate, rng = rng)
+        } else {
+            view
+        }
+
         val evaluations = evaluator.evaluate(
-            view = view,
+            view = effectiveView,
             legal = legal,
             rng = rng,
-            budget = budget,
+            budget = config.budget,
         )
 
         var bestMoveValue = evaluations.first()

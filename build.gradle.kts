@@ -94,4 +94,14 @@ subprojects {
         }
     }
     tasks.matching { it.name == "check" }.configureEach { dependsOn(checkBoundaries) }
+
+    tasks.withType<Test>().configureEach {
+        testLogging {
+            events("failed")
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
 }

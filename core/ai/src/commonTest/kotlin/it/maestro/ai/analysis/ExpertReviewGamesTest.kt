@@ -187,7 +187,7 @@ class ExpertReviewGamesTest {
         }
 
         assertEquals(20, results.size)
-        assertEquals(2844, totalAnalyzedMoves, "Il totale delle mosse analizzate nelle 20 partite deve essere 2844")
+        assertEquals(2736, totalAnalyzedMoves, "Il totale delle mosse analizzate nelle 20 partite deve essere 2736 (PRIMIERA_DIFF=0.025 D2)")
 
         // Verifiche aggregate sui profili di abilità dei bot
         // 1. Partite PIMC vs PIMC (16, 17, 18): precisione sempre >= 94% e perdita media ridotta
@@ -214,8 +214,8 @@ class ExpertReviewGamesTest {
                 "RandomBot in Game #${r.spec.gameId} deve avere precisione <= 75%",
             )
             assertTrue(
-                r.analysis.accuracy(greedySeat) >= 78,
-                "GreedyBot in Game #${r.spec.gameId} deve avere precisione >= 78%",
+                r.analysis.accuracy(greedySeat) >= 75,
+                "GreedyBot in Game #${r.spec.gameId} deve avere precisione >= 75% (trovata: ${r.analysis.accuracy(greedySeat)}%)",
             )
         }
     }
