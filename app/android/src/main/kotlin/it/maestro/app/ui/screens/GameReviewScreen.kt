@@ -609,29 +609,34 @@ internal fun findNextMistake(currentIndex: Int, steps: List<ReviewStep>, seat: S
 
 @Composable
 private fun formatMoveDescription(move: ScopaMove): String {
-    val cardStr = formatCardName(move.card)
+    val assoStr = stringResource(id = R.string.game_card_rank_asso).take(1)
+    val fanteStr = stringResource(id = R.string.game_card_rank_fante).take(1)
+    val cavalloStr = stringResource(id = R.string.game_card_rank_cavallo).take(1)
+    val reStr = stringResource(id = R.string.game_card_rank_re).take(1)
+    val noCaptureStr = stringResource(id = R.string.review_capture_none)
+
+    fun cardLabel(card: Card): String {
+        val rankText = when (card.rank) {
+            Rank.ASSO -> assoStr
+            Rank.FANTE -> fanteStr
+            Rank.CAVALLO -> cavalloStr
+            Rank.RE -> reStr
+            else -> card.rank.value.toString()
+        }
+        val suitSymbol = when (card.suit) {
+            Suit.DENARI -> "◆"
+            Suit.SPADE -> "♠"
+            Suit.COPPE -> "♥"
+            Suit.BASTONI -> "♣"
+        }
+        return "$rankText$suitSymbol"
+    }
+
+    val cardStr = cardLabel(move.card)
     return if (move.capture.isEmpty()) {
-        "$cardStr (${stringResource(id = R.string.review_capture_none)})"
+        "$cardStr ($noCaptureStr)"
     } else {
-        val captureStr = move.capture.joinToString(", ") { formatCardName(it) }
+        val captureStr = move.capture.joinToString(", ") { cardLabel(it) }
         "$cardStr → $captureStr"
     }
-}
-
-@Composable
-private fun formatCardName(card: Card): String {
-    val rankText = when (card.rank) {
-        Rank.ASSO -> stringResource(id = R.string.game_card_rank_asso).take(1)
-        Rank.FANTE -> stringResource(id = R.string.game_card_rank_fante).take(1)
-        Rank.CAVALLO -> stringResource(id = R.string.game_card_rank_cavallo).take(1)
-        Rank.RE -> stringResource(id = R.string.game_card_rank_re).take(1)
-        else -> card.rank.value.toString()
-    }
-    val suitSymbol = when (card.suit) {
-        Suit.DENARI -> "◆"
-        Suit.SPADE -> "♠"
-        Suit.COPPE -> "♥"
-        Suit.BASTONI -> "♣"
-    }
-    return "$rankText$suitSymbol"
 }
