@@ -8,6 +8,7 @@ Il mazzo base dell'app usa le carte napoletane tradizionali in pubblico dominio 
 Fonte e procedura: `docs/art/napoletane/SOURCE.md`.
 
 ## Rapporto con ADR-0008
-Restringe ADR-0008 per il solo mazzo base: le carte non vengono ridisegnate con AI. Il dorso, il tavolo,
+Restringe ADR-0008 per il solo mazzo base: carte e dorso non vengono ridisegnati con AI (il dorso è quello
+napoletano ufficiale dello stesso autore, decisione di Michele). Il tavolo,
 il Maestro e il resto della grafica restano generati come da ADR-0008. I mazzi personalizzati (tema
 sostituibile, `DeckTheme`) arriveranno più avanti e potranno essere generati.

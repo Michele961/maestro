@@ -30,13 +30,17 @@ def card(art_path):
 
 def main():
     src, dst = Path(sys.argv[1]), Path(sys.argv[2])
-    files = sorted(src.glob("*.jpg"), key=lambda p: int(p.name.split("_")[0]))
+    files = sorted((p for p in src.glob("*.jpg") if p.name[0].isdigit()), key=lambda p: int(p.name.split("_")[0]))
     if len(files) != 40:
         sys.exit(f"attese 40 carte, trovate {len(files)}")
     for i, f in enumerate(files):
         name = f"card_{SUITS[i // 10]}_{RANKS[i % 10]}"
         card(f).save(dst / f"{name}.webp", "WEBP", quality=88, method=6)
         print(f.name, "->", name)
+    back = src / "Carte_Napoletane_retro.jpg"
+    if back.exists():
+        card(back).save(dst / "card_back.webp", "WEBP", quality=88, method=6)
+        print(back.name, "-> card_back")
 
 
 if __name__ == "__main__":
