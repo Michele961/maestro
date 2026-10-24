@@ -71,6 +71,20 @@ public object GameReducer {
 
             is GameIntent.ApplyBotMove -> handleApplyBotMove(state, intent)
 
+            is GameIntent.RequestHint -> handleRequestHint(state)
+
+            is GameIntent.ApplyHint -> {
+                GameReducerResult(
+                    state = state.copy(suggestedMove = intent.move, isHintLoading = false),
+                )
+            }
+
+            is GameIntent.ClearHint -> {
+                GameReducerResult(
+                    state = state.copy(suggestedMove = null, isHintLoading = false),
+                )
+            }
+
             is GameIntent.DismissError -> {
                 GameReducerResult(state.copy(lastError = null))
             }
@@ -79,6 +93,20 @@ public object GameReducer {
                 GameReducerResult(state.copy(lastEvent = null))
             }
         }
+    }
+
+    private fun handleRequestHint(state: GameInternalState): GameReducerResult {
+        if (!state.isSparring ||
+            state.scopaState.phase != DealPhase.PLAYING ||
+            state.scopaState.toMove != state.humanSeat ||
+            state.pendingDealScore != null
+        ) {
+            return GameReducerResult(state)
+        }
+        return GameReducerResult(
+            state = state.copy(isHintLoading = true, suggestedMove = null),
+            effect = GameEffect.ComputeHint(humanSeat = state.humanSeat),
+        )
     }
 
     private fun handlePlayCard(state: GameInternalState, intent: GameIntent.PlayCard): GameReducerResult {
@@ -197,6 +225,8 @@ public object GameReducer {
                     matchLog = newLog,
                     pendingCapture = null,
                     pendingDealScore = dealScore ?: state.pendingDealScore,
+                    suggestedMove = null,
+                    isHintLoading = false,
                     lastError = null,
                     lastEvent = lastEvent ?: state.lastEvent,
                 )

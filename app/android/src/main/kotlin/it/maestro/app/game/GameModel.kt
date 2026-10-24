@@ -54,6 +54,9 @@ public data class GameUiState(
     val opponentScore: Int,
     val isHumanTurn: Boolean,
     val isBotThinking: Boolean,
+    val isSparring: Boolean = true,
+    val suggestedMove: ScopaMove? = null,
+    val isHintLoading: Boolean = false,
     val pendingCaptureChoice: PendingCaptureChoice?,
     val pendingDealScore: DealScore? = null,
     val lastEvent: UiGameEvent?,
@@ -84,6 +87,9 @@ public sealed interface GameIntent {
     public data object DismissDealSummary : GameIntent
     public data object RequestBotMove : GameIntent
     public data class ApplyBotMove(val move: ScopaMove) : GameIntent
+    public data object RequestHint : GameIntent
+    public data class ApplyHint(val move: ScopaMove) : GameIntent
+    public data object ClearHint : GameIntent
     public data object DismissError : GameIntent
     public data object DismissEvent : GameIntent
 }
@@ -99,6 +105,9 @@ public data class GameInternalState(
     val pendingCapture: PendingCaptureChoice? = null,
     val pendingDealScore: DealScore? = null,
     val isBotThinking: Boolean = false,
+    val isSparring: Boolean = true,
+    val suggestedMove: ScopaMove? = null,
+    val isHintLoading: Boolean = false,
     val lastError: String? = null,
     val lastEvent: UiGameEvent? = null,
 ) {
@@ -120,6 +129,9 @@ public data class GameInternalState(
             opponentScore = view.totals[opponentSeat] ?: 0,
             isHumanTurn = view.phase == DealPhase.PLAYING && view.toMove == humanSeat && pendingDealScore == null,
             isBotThinking = isBotThinking,
+            isSparring = isSparring,
+            suggestedMove = suggestedMove,
+            isHintLoading = isHintLoading,
             pendingCaptureChoice = pendingCapture,
             pendingDealScore = pendingDealScore,
             lastEvent = lastEvent,
@@ -135,6 +147,10 @@ public sealed interface GameEffect {
     public data class ScheduleBotMove(
         val level: DifficultyLevel,
         val botSeat: Seat,
+    ) : GameEffect
+
+    public data class ComputeHint(
+        val humanSeat: Seat,
     ) : GameEffect
 }
 

@@ -88,4 +88,8 @@
     <string name="review_capture">Captures: %1$s</string>
     <string name="review_no_moves">No moves recorded</string>
     <string name="review_table_empty">Empty table</string>
+    <string name="game_hint_button">Ask the Master</string>
+    <string name="game_hint_loading">The Master is thinking…</string>
+    <string name="game_hint_banner">The Master suggests: %1$s</string>
+    <string name="game_hint_badge">Recommended</string>
 </resources>
