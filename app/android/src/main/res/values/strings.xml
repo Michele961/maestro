@@ -159,4 +159,13 @@
     <string name="game_suit_coppe">di coppe</string>
     <string name="game_suit_spade">di spade</string>
     <string name="game_suit_bastoni">di bastoni</string>
+    <string name="post_match_victory">Vittoria!</string>
+    <string name="post_match_defeat">Sconfitta</string>
+    <string name="post_match_final_score">Tu %1$d - %2$d Avversario</string>
+    <string name="post_match_accuracy_plaque">Precisione %1$d%% • %2$d errori gravi</string>
+    <string name="post_match_opponent_line">Il Maestro: precisione %1$d%%, %2$d errori gravi</string>
+    <string name="post_match_maestro_clean">Bella partita! Nessun errore grave: rivediamola insieme per migliorare ancora.</string>
+    <string name="post_match_maestro_review">Ho segnato i momenti chiave. Rivediamo insieme gli errori, mossa per mossa.</string>
+    <string name="post_match_rematch">Rivincita</string>
+    <string name="post_match_back_to_menu">Torna al menu</string>
 </resources>
