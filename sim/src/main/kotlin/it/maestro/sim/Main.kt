@@ -440,8 +440,8 @@ fun runEloTournament(options: EloCliOptions): EloTournamentReport {
                 moves = state.playedMoves,
             )
             val analysis = analyzer.analyze(log)
-            precisions.add(analysis.accuracyPercent[Seat.P1] ?: 0)
-            precisions.add(analysis.accuracyPercent[Seat.P2] ?: 0)
+            precisions.add(analysis.accuracy(Seat.P1))
+            precisions.add(analysis.accuracy(Seat.P2))
         }
         avgAccuracies[level] = precisions.average().roundToInt()
     }
