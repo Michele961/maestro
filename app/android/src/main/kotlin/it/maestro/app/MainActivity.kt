@@ -17,16 +17,18 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
 import it.maestro.app.ui.screens.HomeScreen
+import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
 import it.maestro.app.ui.screens.TableScreen
 import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaState
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 /**
- * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08).
+ * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09).
  */
 public sealed interface Screen {
     public data object Home : Screen
@@ -36,6 +38,11 @@ public sealed interface Screen {
         val targetScore: Int,
         val restoredState: ScopaState? = null,
         val restoredLog: MatchLog? = null,
+    ) : Screen
+    public data class PostMatchPreview(
+        val matchLog: MatchLog,
+        val level: DifficultyLevel,
+        val humanSeat: Seat = Seat.P1,
     ) : Screen
 }
 
@@ -100,6 +107,24 @@ public class MainActivity : ComponentActivity() {
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
                         onNavigateHome = { currentScreen = Screen.Home },
+                        onViewAnalysis = { log ->
+                            currentScreen = Screen.PostMatchPreview(
+                                matchLog = log,
+                                level = screen.level,
+                            )
+                        },
+                    )
+                    is Screen.PostMatchPreview -> PostMatchPreviewScreen(
+                        matchLog = screen.matchLog,
+                        level = screen.level,
+                        humanSeat = screen.humanSeat,
+                        onRematchClicked = {
+                            currentScreen = Screen.Table(
+                                level = screen.level,
+                                targetScore = screen.matchLog.config.targetScore,
+                            )
+                        },
+                        onHomeClicked = { currentScreen = Screen.Home },
                     )
                 }
 

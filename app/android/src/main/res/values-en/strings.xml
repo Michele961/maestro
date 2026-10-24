@@ -58,4 +58,13 @@
     <string name="game_menu_home">Main Menu</string>
     <string name="home_resume_game">Resume Match</string>
     <string name="error_wrong_rules_version">Cannot resume: match was saved with a different rules version.</string>
+    <string name="post_match_title">Match Summary</string>
+    <string name="post_match_subtitle">AI Coach Analysis</string>
+    <string name="post_match_analyzing">The Master is analyzing your match…</string>
+    <string name="post_match_view_analysis">Match Analysis</string>
+    <string name="post_match_accuracy_label">Accuracy</string>
+    <string name="post_match_blunders_label">Blunders</string>
+    <string name="post_match_inaccuracies_label">Inaccuracies</string>
+    <string name="post_match_best_moves_label">Best moves</string>
+    <string name="post_match_review_button">Review Match</string>
 </resources>

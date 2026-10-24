@@ -125,7 +125,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-08 — Salvataggio, ripresa e impostazioni
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** ADR-0003
 - **Obiettivo:** Room per lo storico delle partite (solo `MatchLog` + metadati); ripresa della partita interrotta rigiocando il log; DataStore per le impostazioni (lingua, suoni, livello preferito).
 - **Perimetro autorizzato:** Room e DataStore nel version catalog.
@@ -136,12 +136,12 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-09 — Anteprima post-partita
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** ADR-0005, `docs/vision.md` §3.4
 - **Obiettivo:** a fine partita, `MatchAnalyzer` sul telefono (in background) e schermata con precisione % e numero di errori gravi del giocatore.
 - **Criteri di accettazione:**
-    - [ ] I numeri mostrati coincidono con `sim --analyze` sullo stesso log (test).
-    - [ ] La UI resta reattiva durante l'analisi.
+    - [x] I numeri mostrati coincidono con `sim --analyze` sullo stesso log (test).
+    - [x] La UI resta reattiva durante l'analisi.
 - **Domande aperte:** —
 
 ## F1-10 — Game Review mossa per mossa

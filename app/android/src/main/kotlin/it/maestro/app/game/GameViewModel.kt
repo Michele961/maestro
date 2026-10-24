@@ -6,6 +6,7 @@ import it.maestro.app.data.repository.MatchRepository
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
 import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.viewFor
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +38,9 @@ public class GameViewModel(
     public val uiState: StateFlow<GameUiState>
 
     private var botRng: SeededRng = SeededRng(12345L)
+
+    public val currentMatchLog: MatchLog
+        get() = internalState.matchLog
 
     init {
         val initialResult = GameReducer.initial()
