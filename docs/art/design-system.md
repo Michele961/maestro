@@ -2,8 +2,11 @@
 
 **Versione:** 1.0  
 **Data:** 2026-10-24  
-**Stato:** In pianificazione / Allineamento progressivo  
-**Stile di Riferimento:** Guida di Stile v1.0 (*Circolo Italiano Tradizionale*) — [`style-guide.md`](style-guide.md)
+**Stato:** Trilogia Mockup Completata & Approvata da Michele  
+**Schermate di Riferimento Ufficiali:**
+1. [`reference_menu_screen.jpg`](reference_menu_screen.jpg) — Menù Iniziale / Lobby
+2. [`reference_table_screen.jpg`](reference_table_screen.jpg) — Il Tavolo da Gioco
+3. [`reference_review_screen.png`](reference_review_screen.png) — Game Review & Fine Partita
 
 ---
 
