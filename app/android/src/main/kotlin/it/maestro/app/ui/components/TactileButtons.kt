@@ -252,18 +252,18 @@ public fun ScorePlaque(
     NineSliceBox(
         skin = R.drawable.skin_score_plaque,
         slice = 0.4f,
-        corner = 26.dp,
+        corner = 18.dp,
         modifier = modifier,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 30.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ScoreText(p1Label.uppercase(), ButtonTextCream, 18.sp)
-            ScoreText(p1Score.toString(), Color(0xFF42A5F5), 30.sp, Modifier.padding(start = 8.dp))
-            ScoreText("–", ButtonTextCream, 24.sp, Modifier.padding(horizontal = 8.dp))
-            ScoreText(p2Score.toString(), Color(0xFFEF5350), 30.sp, Modifier.padding(end = 8.dp))
-            ScoreText(p2Label.uppercase(), ButtonTextCream, 18.sp)
+            ScoreText(p1Label.uppercase(), ButtonTextCream, 14.sp)
+            ScoreText(p1Score.toString(), Color(0xFF42A5F5), 22.sp, Modifier.padding(start = 6.dp))
+            ScoreText("–", ButtonTextCream, 18.sp, Modifier.padding(horizontal = 6.dp))
+            ScoreText(p2Score.toString(), Color(0xFFEF5350), 22.sp, Modifier.padding(end = 6.dp))
+            ScoreText(p2Label.uppercase(), ButtonTextCream, 14.sp)
         }
     }
 }

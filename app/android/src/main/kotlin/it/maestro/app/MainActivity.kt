@@ -10,15 +10,22 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +65,7 @@ public sealed interface Screen {
         val level: DifficultyLevel,
         val targetScore: Int,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
+        val seed: Long = System.currentTimeMillis(),
         val restoredState: ScopaState? = null,
         val restoredLog: MatchLog? = null,
     ) : Screen
@@ -107,6 +115,48 @@ public class MainActivity : ComponentActivity() {
                 var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
                 var hasActiveMatch by remember { mutableStateOf(false) }
                 var errorMessage by remember { mutableStateOf<String?>(null) }
+                var crashReport by remember { mutableStateOf<String?>(null) }
+
+                LaunchedEffect(Unit) {
+                    try {
+                        val file = filesDir.resolve("last_crash.txt")
+                        if (file.exists()) {
+                            val content = file.readText()
+                            file.delete()
+                            if (content.isNotBlank()) {
+                                crashReport = content
+                            }
+                        }
+                    } catch (_: Throwable) {}
+                }
+
+                if (crashReport != null) {
+                    AlertDialog(
+                        onDismissRequest = { crashReport = null },
+                        title = { Text("Segnalazione Errore") },
+                        text = {
+                            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                                Text(
+                                    text = "Dettaglio crash rilevato nella sessione precedente:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                androidx.compose.foundation.text.selection.SelectionContainer {
+                                    Text(
+                                        text = crashReport ?: "",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            Button(onClick = { crashReport = null }) {
+                                Text("Chiudi")
+                            }
+                        },
+                    )
+                }
 
                 LaunchedEffect(currentScreen) {
                     if (currentScreen is Screen.Home) {
@@ -169,6 +219,7 @@ public class MainActivity : ComponentActivity() {
                         level = screen.level,
                         targetScore = screen.targetScore,
                         trainingFundamental = screen.trainingFundamental,
+                        seed = screen.seed,
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
                         onNavigateHome = { currentScreen = Screen.Home },
