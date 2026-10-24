@@ -100,7 +100,7 @@ class PostMatchPreviewTest {
         )
 
         // Metriche valide e coerenti con le mosse giocate
-        val p1TotalMoves = phoneAnalysis.moves.count { it.mover == Seat.P1 }
+        val p1TotalMoves = phoneAnalysis.moves.count { it.seat == Seat.P1 }
         val p1GradedSum = phoneAnalysis.count(Seat.P1, MoveGrade.BEST) +
             phoneAnalysis.count(Seat.P1, MoveGrade.INACCURACY) +
             phoneAnalysis.count(Seat.P1, MoveGrade.BLUNDER)
