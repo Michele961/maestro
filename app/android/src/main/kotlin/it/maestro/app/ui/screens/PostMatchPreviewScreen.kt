@@ -1,5 +1,23 @@
 package it.maestro.app.ui.screens
 
+import it.maestro.game.scopa.replay
+import it.maestro.game.scopa.ReplayResult
+import it.maestro.app.ui.components.PillButtonVariant
+import it.maestro.app.ui.components.ParchmentPanel
+import it.maestro.app.ui.components.NineSliceBox
+import it.maestro.app.ui.components.MaestroPillButton
+import it.maestro.app.ui.components.MaestroDialogueBox
+import it.maestro.app.ui.components.FramedPortrait
+import it.maestro.app.ui.components.ClubBackground
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.Image
+import androidx.annotation.StringRes
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,42 +98,53 @@ public fun PostMatchPreviewScreen(
         isAnalyzing = false
     }
 
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag("post_match_preview_screen"),
-        color = MaterialTheme.colorScheme.background,
-    ) {
+    // Punteggio finale dal replay della partita (ADR-0003)
+    val finalState = remember(matchLog) { (replay(matchLog) as? ReplayResult.Ok)?.state }
+    val opponentSeat = humanSeat.other()
+    val humanTotal = finalState?.totals?.get(humanSeat) ?: 0
+    val opponentTotal = finalState?.totals?.get(opponentSeat) ?: 0
+    val won = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
+
+    ClubBackground(modifier = modifier.testTag("post_match_preview_screen"), feltFraction = 0.55f) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = stringResource(id = R.string.post_match_title),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(id = R.string.post_match_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray,
-            )
+            // Targa del risultato, come "VITTORIA! TU 11 - 8 AVVERSARIO"
+            NineSliceBox(
+                skin = R.drawable.skin_score_plaque,
+                slice = 0.4f,
+                corner = 30.dp,
+                modifier = Modifier.fillMaxWidth(0.94f).testTag("match_result_plaque"),
+                contentPadding = PaddingValues(horizontal = 30.dp, vertical = 14.dp),
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(id = if (won) R.string.post_match_victory else R.string.post_match_defeat).uppercase(),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = CreamText,
+                    )
+                    Text(
+                        text = stringResource(
+                            id = R.string.post_match_final_score,
+                            humanTotal,
+                            opponentTotal,
+                        ).uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = CreamText,
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (isAnalyzing || analysisResult == null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
+                ParchmentPanel(modifier = Modifier.fillMaxWidth()) {
                     Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
@@ -126,212 +155,132 @@ public fun PostMatchPreviewScreen(
                         Text(
                             text = stringResource(id = R.string.post_match_analyzing),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White,
+                            color = InkText,
                         )
                     }
                 }
             } else {
                 val analysis = analysisResult!!
-                val opponentSeat = humanSeat.other()
-
-                // Sezione Prestazione Giocatore
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, GoldAccent, RoundedCornerShape(12.dp))
-                        .testTag("player_summary_card"),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardBgColor),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                ParchmentPanel(modifier = Modifier.fillMaxWidth().testTag("player_summary_card")) {
+                    // Precisione in targhetta, come "PRECISIONE 88% • 2 ERRORI CHIAVE"
+                    NineSliceBox(
+                        skin = R.drawable.skin_plaque_wood,
+                        slice = 0.3f,
+                        corner = 18.dp,
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp),
                     ) {
                         Text(
-                            text = stringResource(id = R.string.game_player_you),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = GoldAccent,
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_accuracy_label),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = "${analysis.accuracy(humanSeat)}%",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = GoldAccent,
-                                modifier = Modifier.testTag("player_accuracy"),
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_blunders_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${analysis.count(humanSeat, MoveGrade.BLUNDER)}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = BlunderColor,
-                                modifier = Modifier.testTag("player_blunders"),
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_inaccuracies_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${analysis.count(humanSeat, MoveGrade.INACCURACY)}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = InaccuracyColor,
-                                modifier = Modifier.testTag("player_inaccuracies"),
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_best_moves_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${analysis.count(humanSeat, MoveGrade.BEST)}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = BestColor,
-                                modifier = Modifier.testTag("player_best_moves"),
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Sezione Prestazione Avversario (Maestro)
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("opponent_summary_card"),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardBgColor),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.game_player_maestro),
+                            text = stringResource(
+                                id = R.string.post_match_accuracy_plaque,
+                                analysis.accuracy(humanSeat),
+                                analysis.count(humanSeat, MoveGrade.BLUNDER),
+                            ).uppercase(),
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = Color(0xFFFFE082),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.testTag("player_accuracy"),
                         )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_accuracy_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${analysis.accuracy(opponentSeat)}%",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                modifier = Modifier.testTag("opponent_accuracy"),
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.post_match_blunders_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${analysis.count(opponentSeat, MoveGrade.BLUNDER)}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.LightGray,
-                                modifier = Modifier.testTag("opponent_blunders"),
-                            )
-                        }
                     }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        GradeStat(R.drawable.badge_best, analysis.count(humanSeat, MoveGrade.BEST), R.string.post_match_best_moves_label, "player_best_moves")
+                        GradeStat(R.drawable.badge_warning, analysis.count(humanSeat, MoveGrade.INACCURACY), R.string.post_match_inaccuracies_label, "player_inaccuracies")
+                        GradeStat(R.drawable.badge_wrong, analysis.count(humanSeat, MoveGrade.BLUNDER), R.string.post_match_blunders_label, "player_blunders")
+                    }
+                    Text(
+                        text = stringResource(
+                            id = R.string.post_match_opponent_line,
+                            analysis.accuracy(opponentSeat),
+                            analysis.count(opponentSeat, MoveGrade.BLUNDER),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = InkText.copy(alpha = 0.75f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("opponent_summary_card"),
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Pulsanti di navigazione
-                Button(
+                // Il Maestro commenta la partita
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    FramedPortrait(
+                        portrait = if (won) R.drawable.maestro_celebrating else R.drawable.maestro_thinking,
+                        size = 84.dp,
+                        background = Color(0xFF7D3F19),
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    MaestroDialogueBox(
+                        title = stringResource(id = R.string.game_player_maestro),
+                        message = stringResource(
+                            id = if (analysis.count(humanSeat, MoveGrade.BLUNDER) == 0) {
+                                R.string.post_match_maestro_clean
+                            } else {
+                                R.string.post_match_maestro_review
+                            },
+                        ),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                MaestroPillButton(
+                    text = stringResource(id = R.string.post_match_review_button).uppercase(),
                     onClick = { analysisResult?.let { onReviewClicked(it) } },
-                    enabled = analysisResult != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .testTag("post_match_review_button"),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.post_match_review_button),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedButton(
+                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                    height = 58.dp,
+                    fontSize = 22.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "post_match_review_button",
+                )
+                MaestroPillButton(
+                    text = stringResource(id = R.string.post_match_rematch).uppercase(),
                     onClick = onRematchClicked,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .testTag("post_match_rematch_button"),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.game_rematch_button),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedButton(
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 72.dp,
+                    fontSize = 30.sp,
+                    modifier = Modifier.fillMaxWidth(0.8f).padding(top = 12.dp),
+                    testTag = "post_match_rematch_button",
+                )
+                MaestroPillButton(
+                    text = stringResource(id = R.string.post_match_back_to_menu).uppercase(),
                     onClick = onHomeClicked,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .testTag("post_match_home_button"),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.game_menu_home),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
+                    variant = PillButtonVariant.SECONDARY_AMBER,
+                    height = 54.dp,
+                    fontSize = 20.sp,
+                    modifier = Modifier.fillMaxWidth(0.8f).padding(top = 10.dp),
+                    testTag = "post_match_home_button",
+                )
             }
         }
+    }
+}
+
+private val CreamText = Color(0xFFFFF4D6)
+private val InkText = Color(0xFF2B1A10)
+
+/** Bollino della review (asset F1-13) con il numero di mosse di quel tipo. */
+@Composable
+private fun GradeStat(@DrawableRes badge: Int, count: Int, @StringRes label: Int, tag: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(96.dp)) {
+        Box(contentAlignment = Alignment.Center) {
+            Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(58.dp))
+        }
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.headlineSmall,
+            color = InkText,
+            modifier = Modifier.testTag(tag),
+        )
+        Text(
+            text = stringResource(id = label),
+            style = MaterialTheme.typography.bodySmall,
+            color = InkText,
+            textAlign = TextAlign.Center,
+        )
     }
 }

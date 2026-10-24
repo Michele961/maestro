@@ -249,7 +249,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-20 — Modale "Preparati a giocare"
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** `PreGameScreen` come in `reference_pre_match_dialog.png`.
 - **Criteri di accettazione:**
@@ -267,7 +267,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-22 — Fine partita e Game Review con gli asset definitivi
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** `PostMatchPreviewScreen` e `GameReviewScreen` come in `reference_review_screen.png`.
 - **Criteri di accettazione:**
