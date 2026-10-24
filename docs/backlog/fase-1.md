@@ -136,7 +136,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-09 — Anteprima post-partita
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** ADR-0005, `docs/vision.md` §3.4
 - **Obiettivo:** a fine partita, `MatchAnalyzer` sul telefono (in background) e schermata con precisione % e numero di errori gravi del giocatore.
 - **Criteri di accettazione:**
@@ -146,12 +146,12 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-10 — Game Review mossa per mossa
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** `docs/ai/maestro.md` (Analizzatore), `docs/vision.md` §5.B
 - **Obiettivo:** rivedere la partita mossa per mossa (avanti, indietro, salto ai momenti chiave) con il colore della classe (Blu/Giallo/Rosso) e, per gli errori, la mossa migliore mostrata sul tavolo con il suo valore.
 - **Criteri di accettazione:**
-    - [ ] La review mostra solo ciò che il giocatore sapeva in quel momento più le carte uscite dopo; mai la mano avversaria del momento (test).
-    - [ ] Gratuita e solo locale (ADR-0005).
+    - [x] La review mostra solo ciò che il giocatore sapeva in quel momento più le carte uscite dopo; mai la mano avversaria del momento (test).
+    - [x] Gratuita e solo locale (ADR-0005).
 - **Domande aperte:** —
 
 ## F1-11 — Suggerimento su richiesta in Sparring

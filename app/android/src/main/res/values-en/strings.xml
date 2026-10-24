@@ -67,4 +67,25 @@
     <string name="post_match_inaccuracies_label">Inaccuracies</string>
     <string name="post_match_best_moves_label">Best moves</string>
     <string name="post_match_review_button">Review Match</string>
+    <string name="review_title">Game Review</string>
+    <string name="review_subtitle">Move by move analysis</string>
+    <string name="review_move_indicator">Move %1$d of %2$d</string>
+    <string name="review_turn_player">Your turn</string>
+    <string name="review_turn_opponent">Opponent\'s turn</string>
+    <string name="review_grade_best">Best Move</string>
+    <string name="review_grade_inaccuracy">Inaccuracy</string>
+    <string name="review_grade_blunder">Blunder</string>
+    <string name="review_played_label">Played:</string>
+    <string name="review_best_label">Best move:</string>
+    <string name="review_value_diff">Loss: %1$.2f pts</string>
+    <string name="review_expected_value">Expected value: %1$.2f pts</string>
+    <string name="review_prev_button">Previous</string>
+    <string name="review_next_button">Next</string>
+    <string name="review_prev_mistake">Prev mistake</string>
+    <string name="review_next_mistake">Next mistake</string>
+    <string name="review_back_button">Back to summary</string>
+    <string name="review_capture_none">No capture</string>
+    <string name="review_capture">Captures: %1$s</string>
+    <string name="review_no_moves">No moves recorded</string>
+    <string name="review_table_empty">Empty table</string>
 </resources>
