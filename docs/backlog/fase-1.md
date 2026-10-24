@@ -220,8 +220,9 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-18 — Componenti UI del menu con gli asset definitivi
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/art/design-system.md`, `docs/art/asset-catalog.md` §2bis, `docs/art/reference_menu_screen.jpg`
+- **Perimetro autorizzato (Michele, 2026-10-24):** Roborazzi, Robolectric e JUnit 4 come dipendenze di test; ottimizzazione del workflow CI. Briscola mostrata come "Presto disponibile"; monete, gemme, Notizie, Premi, Amici, Classifica, Palestra e Bottega come decorazioni non cliccabili con valori fissi.
 - **Obiettivo:** portare nel menu iniziale gli asset di F1-13. Pulsanti tattili, pannelli, targhette e barra in basso restano disegnati in Compose con i colori del design system; icone, fregi, avatar e texture di `res/drawable-nodpi/` si appoggiano sopra. Testi solo da `strings.xml`.
 - **Criteri di accettazione:**
     - [ ] Barra in basso con le icone `icon_trophy`, `icon_book_quill` e `icon_pouch` in cerchio d'ottone.

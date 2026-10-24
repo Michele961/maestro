@@ -48,6 +48,11 @@ val allowedExternalDeps: Map<String, Set<String>> = mapOf(
         "androidx.room:room-compiler",
         "androidx.datastore:datastore-preferences",
         "androidx.datastore:datastore-preferences-core",
+        // Solo test: screenshot della UI (F1-18, approvato da Michele)
+        "junit:junit",
+        "org.robolectric:robolectric",
+        "io.github.takahirom.roborazzi:roborazzi",
+        "io.github.takahirom.roborazzi:roborazzi-compose",
     ),
 )
 

@@ -6,17 +6,65 @@ on:
   pull_request:
     branches: [main]
 
+# Un nuovo push sulla stessa PR annulla la CI ancora in corso del push precedente.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check:
     name: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Se cambiano solo documenti (docs/, *.md) build e test non servono.
+      # Il job resta comunque verde, così il controllo richiesto su main non resta in attesa.
+      - name: Rileva modifiche al codice
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          if ! git cat-file -e "$base" 2>/dev/null; then
+            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --name-only "$base" HEAD | grep -qvE '^docs/|\.md$'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+            echo "Solo documentazione: build e test saltati."
+          fi
+
       - uses: actions/setup-java@v4
+        if: steps.changes.outputs.code == 'true'
         with:
           distribution: temurin
           java-version: '21'
-      - name: Gradle check
-        run: ./gradlew check
-      - name: Assemble debug APK
-        run: ./gradlew :app:android:assembleDebug
+          cache: gradle
+
+      # Runtime Android scaricato da Robolectric per i test di screenshot (~200 MB).
+      - uses: actions/cache@v4
+        if: steps.changes.outputs.code == 'true'
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-${{ hashFiles('gradle/libs.versions.toml') }}
+
+      # Un solo avvio di Gradle per test, confini tra moduli e APK di debug.
+      # Gli screenshot vengono registrati a ogni run e allegati come artifact.
+      - name: Gradle check e APK di debug
+        if: steps.changes.outputs.code == 'true'
+        run: ./gradlew check :app:android:assembleDebug -Proborazzi.record=true
+
+      - name: Screenshot della UI
+        if: always() && steps.changes.outputs.code == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/android/build/outputs/roborazzi/
+          if-no-files-found: ignore
+          retention-days: 7

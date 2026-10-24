@@ -59,6 +59,18 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric ha bisogno delle risorse Android per disegnare le schermate.
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // -Proborazzi.record=true scrive gli screenshot in build/outputs/roborazzi.
+            it.systemProperty(
+                "roborazzi.test.record",
+                project.findProperty("roborazzi.record")?.toString() ?: "false",
+            )
+            // I test Compose su Robolectric usano l'activity di ui-test-manifest, presente solo in debug:
+            // nella variante release girerebbero due volte gli stessi test senza poterli avviare.
+            if (it.name.contains("Release")) it.exclude("**/ui/screenshot/**")
+        }
     }
 }
 
@@ -98,6 +110,12 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
 }
