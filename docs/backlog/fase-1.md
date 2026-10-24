@@ -184,7 +184,10 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
     - [x] Il mazzo è un tema separato dalle regole (`DeckTheme.kt`).
     - [x] Primi asset chiave approvati e integrati (`card_back`, `card_denari_7`, `card_bastoni_asso`, `maestro_neutral`).
     - [ ] Completamento intero mazzo 40 carte con approvazione di Michele.
-- **Domande aperte:** —
+- **Domande aperte:**
+    - `maestro_neutral.png` ha cornice e targhetta disegnate nell'immagine, le altre 4 espressioni no: rigenerare la neutra senza cornice?
+    - I 4 PNG in `res/drawable/` (536 × 800) vengono ingranditi fino a 3× sui telefoni ad alta densità (~15 MB di memoria per carta): spostarli in `drawable-nodpi/` come WebP?
+    - I componenti Compose del menu (pulsanti tattili, pannelli con fregi, barra in basso) che usano i nuovi asset vanno in un task dedicato?
 
 ## F1-14 — Audio, animazioni del Maestro, Crashlytics e build di rilascio
 

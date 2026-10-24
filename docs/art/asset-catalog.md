@@ -12,7 +12,7 @@ Posizione target nel progetto Android:
 | File Name | Descrizione | Risoluzione Minima Consigliata | Stato |
 |---|---|---|---|
 | `card_back.png` | Dorso della carta comune (verde bottiglia e oro) | `600 × 936 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
-| `table_felt_bg.webp` (o `.png`) | Texture panno verde con vignettatura e luce centrale | `1080 × 1920 px` | Da completare (fallback procedurale attivo) |
+| `table_felt_bg.webp` | Texture panno verde con vignettatura e luce centrale | `1080 × 1920 px` | **Approvato v1.0** (`res/drawable-nodpi/`, 1000 × 1116) |
 
 ---
 
@@ -21,10 +21,34 @@ Posizione target nel progetto Android:
 | File Name | Stato Emotivo | Risoluzione Minima | Stato |
 |---|---|---|---|
 | `maestro_neutral.png` | Stato normale / neutro con cornice ottone e targa | `512 × 512 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
-| `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` | Fallback procedurale / aura animata |
-| `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` | Fallback procedurale / aura animata |
-| `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` | Fallback procedurale / aura animata |
-| `maestro_celebrating.webp` | Scopa messa a segno o vittoria | `512 × 512 px` | Fallback procedurale / aura animata |
+| `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
+| `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
+| `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
+| `maestro_celebrating.webp` | Scopa messa a segno o vittoria | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
+
+---
+
+## 2bis. Asset del menu e dell'interfaccia (v1.0)
+
+Generati con Gemini su fondo verde piatto e preparati con `scripts/prepare_assets.py`. Gli originali sono in `docs/art/generated/`. Tutti in `app/android/src/main/res/drawable-nodpi/`, WebP con trasparenza.
+
+Pulsanti, pannelli, targhette, fumetti e cornici dritte non sono immagini: li disegna il codice Compose con i colori di `design-system.md`. Gli asset qui sotto si appoggiano sopra.
+
+| File | Uso | Sorgente |
+|---|---|---|
+| `icon_trophy`, `icon_book_quill`, `icon_pouch` | Barra in basso: Classifica, Palestra, Bottega | `menu_icons.jpg` |
+| `icon_coin`, `icon_gem` | Contatori crediti e gemme | `menu_icons.jpg` |
+| `icon_envelope`, `icon_gear` | Messaggi, impostazioni | `menu_icons.jpg` |
+| `icon_gift`, `icon_newspaper`, `icon_shield_fleur` | Premi giornalieri, Notizie dal circolo, stemma livello | `menu_icons.jpg` |
+| `icon_book_closed` | Riserva (regole / tutorial) | `menu_icons.jpg` |
+| `ornament_top`, `ornament_bottom`, `ornament_corner` | Fregi in ottone sopra i pannelli (l'angolo si ribalta per i 4 lati) | `ornaments.jpg` |
+| `avatar_beginner`, `avatar_expert` | Avversari Principiante ed Esperto | `avatars.jpg` |
+| `avatar_player_default`, `avatar_player_alt` | Avatar del giocatore (due scelte) | `avatars.jpg` |
+| `avatar_friends` | Scheda Amici | `avatars.jpg` |
+| `texture_wood` | Sfondo legno, steso a tutto schermo (non ripetuto) | `texture_wood.jpg` |
+| `texture_parchment` | Fondo di modali e schede | `texture_parchment.jpg` |
+
+Avatar e ritratti del Maestro sono **senza cornice**: cerchio, bordo e targhetta li aggiunge il codice.
 
 ---
 
