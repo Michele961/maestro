@@ -12,7 +12,7 @@ Portare tutte le schermate dell'app allo stile dei mockup approvati (circolo ita
 1. **Asset illustrati generati con AI** (Gemini, nella stessa conversazione dei mockup, per tenere lo stile), un oggetto per immagine o più oggetti separati su fondo verde `#00FF00`, senza testo né cornici.
 2. **Preparazione con `scripts/prepare_assets.py`**: scontorno, ridimensionamento, WebP in `res/drawable-nodpi/`; gli originali vanno in `docs/art/generated/`.
 3. **Tutto il resto in Compose**: pulsanti, pannelli, targhette, fumetti, cornici dritte, con i colori di `design-system.md`. Niente testo dentro le immagini.
-4. **Verifica con screenshot Roborazzi**: ogni schermata ha un test che la disegna; la CI allega gli screenshot alla run e la PR mostra il confronto con il mockup.
+4. **Verifica con screenshot Roborazzi**: ogni schermata ha un test che la disegna; la CI allega gli screenshot alla run e la PR mostra il confronto con il mockup. Procedura completa per gli agenti: [`ui-verification.md`](ui-verification.md).
 5. **Voci senza funzione** (monete, gemme, negozio, amici…): decorazioni non cliccabili con valori fissi, finché non arrivano i task dedicati.
 
 ## 3. Task proposti (Fase 1)
