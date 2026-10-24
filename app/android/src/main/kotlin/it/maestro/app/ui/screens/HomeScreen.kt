@@ -1,5 +1,10 @@
 package it.maestro.app.ui.screens
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
+import it.maestro.app.ui.components.BubbleTail
+import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,8 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,13 +73,13 @@ public fun HomeScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HomeHeader(onSettingsClicked = onSettingsClicked)
-                MaestroWelcome()
+                // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
+                MaestroWelcome(modifier = Modifier.weight(1f))
                 // "Gioca ora" sul piedistallo di panno ovale, come nel mockup
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
                     Image(
@@ -205,21 +208,25 @@ private fun HomeHeader(onSettingsClicked: () -> Unit) {
 }
 
 @Composable
-private fun MaestroWelcome() {
-    Box(modifier = Modifier.fillMaxWidth().height(244.dp)) {
-        WoodPanel(modifier = Modifier.fillMaxWidth().padding(top = 40.dp, start = 28.dp).height(204.dp)) {}
+private fun MaestroWelcome(modifier: Modifier = Modifier) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 160.dp)) {
+        val compact = maxHeight < 230.dp
+        val portrait = (maxHeight - 104.dp).coerceIn(76.dp, 134.dp)
+        WoodPanel(modifier = Modifier.fillMaxSize().padding(top = 24.dp, start = 28.dp)) {}
         Image(
             painter = painterResource(R.drawable.banner_italy),
             contentDescription = null,
-            modifier = Modifier.align(Alignment.TopStart).padding(top = 20.dp).size(width = 52.dp, height = 96.dp),
+            modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp).size(width = 48.dp, height = 88.dp),
         )
         Column(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(start = 28.dp, bottom = 6.dp),
+            modifier = Modifier
+                .align(if (compact) Alignment.BottomStart else Alignment.BottomCenter)
+                .padding(start = if (compact) 46.dp else 28.dp, bottom = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             FramedPortrait(
                 portrait = R.drawable.maestro_neutral,
-                size = 124.dp,
+                size = portrait,
                 background = ButtonAmberBottom,
                 contentDescription = stringResource(R.string.maestro_avatar_description),
             )
@@ -227,16 +234,21 @@ private fun MaestroWelcome() {
                 text = stringResource(R.string.home_maestro_title).uppercase(),
                 onClick = {},
                 variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                height = 36.dp,
-                fontSize = 15.sp,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 28.dp),
-                modifier = Modifier.padding(top = 0.dp),
+                height = if (compact) 28.dp else 34.dp,
+                fontSize = if (compact) 12.sp else 14.sp,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = if (compact) 16.dp else 24.dp),
+                modifier = Modifier.offset(y = (-10).dp),
             )
         }
-        MaestroDialogueBox(
-            title = stringResource(R.string.game_player_maestro),
+        // Fumetto compatto in alto, come nel mockup: non copre il ritratto.
+        MaestroSpeechBubble(
             message = stringResource(R.string.home_coach_welcome),
-            modifier = Modifier.align(Alignment.TopCenter).padding(start = 40.dp).fillMaxWidth(0.82f),
+            tail = if (compact) BubbleTail.BOTTOM_START else BubbleTail.BOTTOM_CENTER,
+            fontSize = if (compact) 12.sp else 13.sp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 10.dp)
+                .fillMaxWidth(if (compact) 0.56f else 0.62f),
         )
     }
 }
@@ -274,8 +286,8 @@ private fun GameTile(
             onClick = onPlay,
             enabled = available,
             variant = if (available) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.WOOD,
-            height = 44.dp,
-            fontSize = if (available) 18.sp else 13.sp,
+            height = 46.dp,
+            fontSize = if (available) 18.sp else 12.sp,
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp),
             modifier = Modifier.fillMaxWidth(),
             testTag = "${testTag}_button",

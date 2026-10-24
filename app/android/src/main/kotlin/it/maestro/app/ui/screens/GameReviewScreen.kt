@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -189,24 +188,24 @@ public fun GameReviewScreen(
         val playerView = currentStep.playerView
         val isHumanMove = currentStep.mover == humanSeat
 
+        // F1-26: tutto in una schermata, senza scroll: il tavolo assorbe lo spazio rimasto.
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            // Header con titolo e indicatore mossa
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = stringResource(id = R.string.review_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = stringResource(id = R.string.review_title).uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
                         color = Color(0xFFFFE082),
+                        maxLines = 1,
                     )
                     Text(
                         text = stringResource(
@@ -214,12 +213,11 @@ public fun GameReviewScreen(
                             stepIndex + 1,
                             steps.size,
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFFFF4D6),
                         modifier = Modifier.testTag("review_move_indicator"),
                     )
                 }
-
                 Text(
                     text = if (isHumanMove) {
                         stringResource(id = R.string.review_turn_player)
@@ -233,25 +231,17 @@ public fun GameReviewScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Banner di valutazione della mossa
             MoveEvaluationBanner(
                 analysis = moveAnalysis,
                 isHumanMove = isHumanMove,
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Vista del tavolo al momento della mossa
             ReviewBoardView(
                 step = currentStep,
                 humanSeat = humanSeat,
+                modifier = Modifier.weight(1f),
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Controlli di navigazione (Momenti chiave e passo-passo)
             ReviewNavigationControls(
                 currentIndex = stepIndex,
                 totalSteps = steps.size,
@@ -283,90 +273,82 @@ private fun MoveEvaluationBanner(
     }
     ParchmentPanel(modifier = modifier.fillMaxWidth().testTag("review_evaluation_banner")) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-        Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(52.dp))
-        Spacer(modifier = Modifier.width(10.dp))
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                // Badge di classe
-                Surface(
-                    color = badgeColor,
-                    shape = RoundedCornerShape(6.dp),
-                    modifier = Modifier.testTag("review_grade_badge"),
-                ) {
-                    Text(
-                        text = stringResource(id = gradeStringRes),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    )
-                }
-
-                if (analysis.grade != MoveGrade.BEST && analysis.loss > 0.0) {
-                    Text(
-                        text = stringResource(id = R.string.review_value_diff, analysis.loss),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = BlunderBadgeColor,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.testTag("review_loss_label"),
-                    )
-                }
-            }
-
-            // Mossa giocata
+            Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(40.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f).padding(vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                Text(
-                    text = stringResource(id = R.string.review_played_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = InkColor,
-                )
-                Text(
-                    text = formatMoveDescription(analysis.playedMove),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = InkColor,
-                    modifier = Modifier.testTag("review_played_move"),
-                )
-            }
-
-            // Per errori o imprecisioni, mostra la mossa migliore alternativa
-            if (analysis.grade != MoveGrade.BEST) {
-                Column(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.review_best_label),
-                        style = MaterialTheme.typography.bodyMedium,
+                    Surface(
+                        color = badgeColor,
+                        shape = RoundedCornerShape(6.dp),
+                        modifier = Modifier.testTag("review_grade_badge"),
+                    ) {
+                        Text(
+                            text = stringResource(id = gradeStringRes),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            maxLines = 1,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    if (analysis.grade != MoveGrade.BEST && analysis.loss > 0.0) {
+                        Text(
+                            text = stringResource(id = R.string.review_value_diff, analysis.loss),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = BlunderBadgeColor,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            modifier = Modifier.testTag("review_loss_label"),
+                        )
+                    }
+                }
+                MoveLine(
+                    label = stringResource(id = R.string.review_played_label),
+                    move = formatMoveDescription(analysis.playedMove),
+                    color = InkColor,
+                    tag = "review_played_move",
+                )
+                if (analysis.grade != MoveGrade.BEST) {
+                    MoveLine(
+                        label = stringResource(id = R.string.review_best_label),
+                        move = formatMoveDescription(analysis.bestMove),
                         color = Color(0xFF1F683D),
+                        tag = "review_best_move",
                     )
                     Text(
-                        text = formatMoveDescription(analysis.bestMove),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1F683D),
-                        modifier = Modifier.testTag("review_best_move"),
+                        text = stringResource(id = R.string.review_expected_value, analysis.bestValue),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = InkColor.copy(alpha = 0.7f),
+                        modifier = Modifier.testTag("review_best_value"),
                     )
                 }
-
-                Text(
-                    text = stringResource(id = R.string.review_expected_value, analysis.bestValue),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = InkColor.copy(alpha = 0.7f),
-                    modifier = Modifier.testTag("review_best_value"),
-                )
             }
-        }
         }
     }
+}
+
+/** Riga compatta "Etichetta: mossa" su una o due righe al massimo. */
+@Composable
+private fun MoveLine(label: String, move: String, color: Color, tag: String) {
+    Text(
+        text = androidx.compose.ui.text.buildAnnotatedString {
+            append("$label ")
+            pushStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold))
+            append(move)
+            pop()
+        },
+        style = MaterialTheme.typography.bodyMedium,
+        color = color,
+        maxLines = 2,
+        modifier = Modifier.testTag(tag),
+    )
 }
 
 @Composable
@@ -387,9 +369,15 @@ private fun ReviewBoardView(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E4D2B)),
         border = BorderStroke(4.dp, Brush.verticalGradient(listOf(Color(0xFFFFE082), GoldAccent, Color(0xFF8C6D1F)))),
     ) {
+        // F1-26: le carte si ridimensionano sull'altezza disponibile, così la review non scorre.
+        androidx.compose.foundation.layout.BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val unit = (maxHeight / 330f).value.coerceIn(0.55f, 1.15f)
+        val backW = (44 * unit).dp
+        val tableW = (64 * unit).dp
+        val handW = (84 * unit).dp
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize().padding(10.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Mano avversaria: visualizza ESCLUSIVAMENTE dorsi coperti (mai le carte vere!)
@@ -401,8 +389,8 @@ private fun ReviewBoardView(
             ) {
                 repeat(playerView.opponentHandSize) {
                     CardBackView(
-                        width = 44.dp,
-                        height = 66.dp,
+                        width = backW,
+                        height = backW * 1.5f,
                         modifier = Modifier.padding(horizontal = 2.dp),
                     )
                 }
@@ -436,8 +424,8 @@ private fun ReviewBoardView(
                         PlaceholderCardView(
                             card = card,
                             isPlayable = false,
-                            width = 64.dp,
-                            height = 96.dp,
+                            width = tableW,
+                            height = tableW * 1.5f,
                             modifier = Modifier
                                 .padding(horizontal = 2.dp)
                                 .then(
@@ -467,8 +455,8 @@ private fun ReviewBoardView(
                         PlaceholderCardView(
                             card = card,
                             isPlayable = false,
-                            width = 84.dp,
-                            height = 126.dp,
+                            width = handW,
+                            height = handW * 1.5f,
                             modifier = if (isRecommendedBest) {
                                 Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
                             } else {
@@ -493,6 +481,7 @@ private fun ReviewBoardView(
                 }
             }
         }
+        }
     }
 }
 
@@ -515,7 +504,7 @@ private fun ReviewNavigationControls(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         // Timeline: un pallino per ogni tua mossa, colorato per classe; tocca per saltare
         ReviewTimeline(
@@ -527,70 +516,53 @@ private fun ReviewNavigationControls(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            MaestroPillButton(
-                text = stringResource(id = R.string.review_prev_button),
-                onClick = { onStepChanged((currentIndex - 1).coerceAtLeast(0)) },
-                enabled = currentIndex > 0,
-                variant = PillButtonVariant.WOOD,
-                height = 48.dp,
-                fontSize = 16.sp,
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                modifier = Modifier.weight(1f),
-                testTag = "review_prev_button",
-            )
-            MaestroPillButton(
-                text = stringResource(id = R.string.review_next_button),
-                onClick = { onStepChanged((currentIndex + 1).coerceAtMost(totalSteps - 1)) },
-                enabled = currentIndex < totalSteps - 1,
-                variant = PillButtonVariant.WOOD,
-                height = 48.dp,
-                fontSize = 16.sp,
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                modifier = Modifier.weight(1f),
-                testTag = "review_next_button",
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MaestroPillButton(
-                text = stringResource(id = R.string.review_prev_mistake),
-                onClick = { onStepChanged(prevMistakeIndex) },
-                enabled = prevMistakeIndex != currentIndex,
-                variant = PillButtonVariant.SECONDARY_AMBER,
-                height = 48.dp,
-                fontSize = 16.sp,
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                modifier = Modifier.weight(1f),
-                testTag = "review_prev_mistake",
-            )
-            MaestroPillButton(
-                text = stringResource(id = R.string.review_next_mistake),
-                onClick = { onStepChanged(nextMistakeIndex) },
-                enabled = nextMistakeIndex != currentIndex,
-                variant = PillButtonVariant.SECONDARY_AMBER,
-                height = 48.dp,
-                fontSize = 16.sp,
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                modifier = Modifier.weight(1f),
-                testTag = "review_next_mistake",
-            )
+            NavPill(R.string.review_prev_button, PillButtonVariant.WOOD, currentIndex > 0, "review_prev_button") {
+                onStepChanged((currentIndex - 1).coerceAtLeast(0))
+            }
+            NavPill(R.string.review_prev_mistake, PillButtonVariant.SECONDARY_AMBER, prevMistakeIndex != currentIndex, "review_prev_mistake") {
+                onStepChanged(prevMistakeIndex)
+            }
+            NavPill(R.string.review_next_mistake, PillButtonVariant.SECONDARY_AMBER, nextMistakeIndex != currentIndex, "review_next_mistake") {
+                onStepChanged(nextMistakeIndex)
+            }
+            NavPill(R.string.review_next_button, PillButtonVariant.WOOD, currentIndex < totalSteps - 1, "review_next_button") {
+                onStepChanged((currentIndex + 1).coerceAtMost(totalSteps - 1))
+            }
         }
 
         MaestroPillButton(
             text = stringResource(id = R.string.review_back_button),
             onClick = onNavigateBack,
             variant = PillButtonVariant.PRIMARY_GREEN,
-            height = 54.dp,
-            fontSize = 20.sp,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            height = 46.dp,
+            fontSize = 18.sp,
+            modifier = Modifier.fillMaxWidth(),
             testTag = "review_back_button",
         )
     }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.RowScope.NavPill(
+    text: Int,
+    variant: PillButtonVariant,
+    enabled: Boolean,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    MaestroPillButton(
+        text = stringResource(id = text),
+        onClick = onClick,
+        enabled = enabled,
+        variant = variant,
+        height = 42.dp,
+        fontSize = 13.sp,
+        contentPadding = PaddingValues(horizontal = 4.dp),
+        modifier = Modifier.weight(1f),
+        testTag = tag,
+    )
 }
 
 /** Timeline delle tue mosse: blu = magistrale, giallo = imprecisione, rosso = errore grave. */

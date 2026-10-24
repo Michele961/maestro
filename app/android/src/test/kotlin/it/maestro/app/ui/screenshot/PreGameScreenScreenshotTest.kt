@@ -45,8 +45,8 @@ class PreGameScreenScreenshotTest {
         }
         composeRule.onNodeWithTag("target_score_option_21").performClick()
         composeRule.onNodeWithTag("level_option_MAESTRO").performClick()
-        composeRule.onNodeWithTag("mode_option_classic").performScrollTo().performClick()
-        composeRule.onNodeWithTag("start_game_button").performScrollTo().performClick()
+        composeRule.onNodeWithTag("mode_option_classic").performClick()
+        composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(Triple(DifficultyLevel.MAESTRO, 21, TrainingFundamental.NONE), chosen)
     }
 }

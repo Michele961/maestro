@@ -79,7 +79,7 @@ class ReviewScreensScreenshotTest {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
         // Salta al primo errore, come la mano evidenziata nel mockup
-        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
+        composeRule.onNodeWithTag("review_next_mistake").performClick()
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review.png")
     }
 }

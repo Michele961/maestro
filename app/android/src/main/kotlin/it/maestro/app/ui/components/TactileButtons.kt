@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -153,6 +154,66 @@ public fun MaestroDialogueBox(
         }
     }
 }
+
+/** Lato da cui esce la codina del [MaestroSpeechBubble]. */
+public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END }
+
+/**
+ * Fumetto compatto del Maestro come nei mockup (F1-26): carta avorio, testo centrato,
+ * codina verso il ritratto, nessuna intestazione. Ingombro minimo: la larghezza va limitata
+ * dal chiamante.
+ */
+@Composable
+public fun MaestroSpeechBubble(
+    message: String,
+    modifier: Modifier = Modifier,
+    tail: BubbleTail = BubbleTail.BOTTOM_START,
+    fontSize: TextUnit = 14.sp,
+    maxLines: Int = 3,
+) {
+    val tailAlign = when (tail) {
+        BubbleTail.BOTTOM_START -> Alignment.Start
+        BubbleTail.BOTTOM_CENTER -> Alignment.CenterHorizontally
+        BubbleTail.BOTTOM_END -> Alignment.End
+    }
+    androidx.compose.foundation.layout.Column(modifier = modifier) {
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = BubblePaper,
+            border = BorderStroke(1.dp, Color(0x55603813)),
+            shadowElevation = 4.dp,
+        ) {
+            Text(
+                text = message,
+                color = WoodSurfaceDark,
+                fontSize = fontSize,
+                lineHeight = fontSize * 1.2f,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
+                textAlign = TextAlign.Center,
+                maxLines = maxLines,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            )
+        }
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .align(tailAlign)
+                .padding(horizontal = 22.dp)
+                .size(width = 16.dp, height = 10.dp),
+        ) {
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(0f, 0f)
+                lineTo(size.width, 0f)
+                lineTo(size.width * 0.25f, size.height)
+                close()
+            }
+            drawPath(path, BubblePaper)
+        }
+    }
+}
+
+private val BubblePaper = Color(0xFFF7EEDC)
 
 /**
  * Targhetta orizzontale in legno/metallo divisa a scomparti per il punteggio: Noi [7] | Voi [3] (Guida v1.0).

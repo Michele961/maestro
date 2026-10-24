@@ -22,7 +22,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import it.maestro.app.ui.components.MaestroAlertDialog
+import it.maestro.app.ui.components.MaestroPillButton
+import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.R
 
 /**
@@ -97,30 +100,27 @@ public fun SettingsDialog(
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF6D5A48),
                     )
-                    Button(
+                    MaestroPillButton(
+                        text = stringResource(id = R.string.settings_crash_button),
                         onClick = onTriggerTestCrash,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("trigger_test_crash_button"),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.settings_crash_button),
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 46.dp,
+                        fontSize = 15.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        testTag = "trigger_test_crash_button",
+                    )
                 }
             }
         },
         confirmButton = {
-            TextButton(
+            MaestroPillButton(
+                text = stringResource(id = R.string.settings_close),
                 onClick = onDismiss,
-                modifier = Modifier.testTag("close_settings_button"),
-            ) {
-                Text(text = stringResource(id = R.string.settings_close))
-            }
+                variant = PillButtonVariant.PRIMARY_GREEN,
+                height = 44.dp,
+                fontSize = 16.sp,
+                testTag = "close_settings_button",
+            )
         },
     )
 }

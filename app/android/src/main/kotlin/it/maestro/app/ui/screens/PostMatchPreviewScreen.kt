@@ -80,6 +80,7 @@ public fun PostMatchPreviewScreen(
     level: DifficultyLevel,
     modifier: Modifier = Modifier,
     humanSeat: Seat = Seat.P1,
+    trainingScore: Pair<Int, Int>? = null,
     analyzer: MatchAnalyzer = remember { MatchAnalyzer() },
     ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     onReviewClicked: (MatchAnalysis) -> Unit = {},
@@ -109,8 +110,7 @@ public fun PostMatchPreviewScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Targa del risultato, come "VITTORIA! TU 11 - 8 AVVERSARIO"
@@ -201,6 +201,17 @@ public fun PostMatchPreviewScreen(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("opponent_summary_card"),
                     )
+                    if (trainingScore != null && trainingScore.second > 0) {
+                        val (correct, total) = trainingScore
+                        Text(
+                            text = stringResource(id = R.string.training_score_label, correct * 100 / total, correct, total),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF9C6B00),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("match_over_attention_score"),
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))

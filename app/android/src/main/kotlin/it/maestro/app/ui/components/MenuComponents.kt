@@ -280,7 +280,7 @@ public fun WoodRowTile(
 ) {
     WoodPanel(modifier = modifier) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
@@ -289,11 +289,12 @@ public fun WoodRowTile(
             Text(
                 text = title.uppercase(),
                 color = BrassRivetGold,
-                fontSize = 15.sp,
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f).padding(start = 8.dp),
+                modifier = Modifier.weight(1f).padding(start = 4.dp),
             )
         }
     }

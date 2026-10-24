@@ -12,6 +12,9 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.ScoreCategory
+import it.maestro.game.training.TrainingFundamental
+import it.maestro.game.training.TrainingOption
+import it.maestro.game.training.TrainingQuestion
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,10 +73,15 @@ class DialogsScreenshotTest {
     }
 
     @Test
-    fun match_over_dialog_screenshot() {
+    fun training_question_dialog_screenshot() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SEVENS_COUNT,
+            options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
+            correctIndex = 2,
+        )
         composeRule.setContent {
-            MaestroTheme { TableContent(uiState = base.copy(phase = DealPhase.MATCH_OVER, humanScore = 11, opponentScore = 8), onIntent = {}) }
+            MaestroTheme { TableContent(uiState = base.copy(phase = DealPhase.PLAYING, activeTrainingQuestion = question), onIntent = {}) }
         }
-        captureScreenRoboImage("build/outputs/roborazzi/dialog_match_over.png")
+        captureScreenRoboImage("build/outputs/roborazzi/dialog_training_question.png")
     }
 }
