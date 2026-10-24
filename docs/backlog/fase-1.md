@@ -29,6 +29,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 | F1-16 | Playtest con giocatori umani | F1-15 |
 | F1-17 | Report di fine fase | F1-16 |
 | F1-18 | Componenti UI del menu con gli asset definitivi | F1-13 |
+| F1-19 | Fondamenta UI: tipografia, sfondi e componenti condivisi | F1-18 |
+| F1-20 | Modale "Preparati a giocare" | F1-19 |
+| F1-21 | Tavolo da gioco con gli asset definitivi | F1-19 |
+| F1-22 | Fine partita e Game Review con gli asset definitivi | F1-19 |
+| F1-23 | Impostazioni, pausa e check didattici | F1-19 |
+| F1-24 | Movimento e feedback (UX) | F1-20, F1-21, F1-22, F1-23 |
 
 Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro dopo F1-07; F1-13 (soprattutto lavoro di Michele) dal momento in cui esiste il tavolo.
 
@@ -230,4 +236,58 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
     - [ ] Pannelli in pergamena con i fregi `ornament_*`, su sfondo `texture_wood`.
     - [ ] Avatar del Maestro, degli avversari e del giocatore ritagliati in cerchio dal codice (le immagini sono senza cornice).
     - [ ] Screenshot del menu affiancato a `reference_menu_screen.jpg` nella PR.
+- **Domande aperte:** —
+
+## F1-19 — Fondamenta UI: tipografia, sfondi e componenti condivisi
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** Tipografia del gioco in `Theme.kt`, sfondi condivisi e scaffold di schermata, libreria componenti unica con screenshot "catalogo", `design-system.md` §3 aggiornato.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
+- **Domande aperte:** —
+
+## F1-20 — Modale "Preparati a giocare"
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** `PreGameScreen` come in `reference_pre_match_dialog.png`.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
+- **Domande aperte:** —
+
+## F1-21 — Tavolo da gioco con gli asset definitivi
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** `TableScreen` come in `reference_table_screen.jpg`; le carte restano su `DeckTheme`.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
+- **Domande aperte:** —
+
+## F1-22 — Fine partita e Game Review con gli asset definitivi
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** `PostMatchPreviewScreen` e `GameReviewScreen` come in `reference_review_screen.png`.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
+- **Domande aperte:** —
+
+## F1-23 — Impostazioni, pausa e check didattici
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** Modali su pergamena con lo stesso linguaggio della modale pre-partita.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
+- **Domande aperte:** —
+
+## F1-24 — Movimento e feedback (UX)
+
+- **Stato:** da fare
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** Transizioni, pressione dei pulsanti, animazioni di carte e Maestro, vibrazione opzionale.
+- **Criteri di accettazione:**
+    - [ ] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
 - **Domande aperte:** —

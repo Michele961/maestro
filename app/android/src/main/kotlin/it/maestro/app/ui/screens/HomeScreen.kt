@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
 import it.maestro.app.ui.components.BrassIconBadge
+import it.maestro.app.ui.components.ClubBackground
 import it.maestro.app.ui.components.CurrencyPill
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.MaestroDialogueBox
@@ -63,20 +64,7 @@ public fun HomeScreen(
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
 ) {
-    Box(modifier = modifier.fillMaxSize().background(WoodSurfaceDark)) {
-        Image(
-            painter = painterResource(R.drawable.texture_wood),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Image(
-            painter = painterResource(R.drawable.table_felt_bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f).align(Alignment.BottomCenter),
-        )
-
+    ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier

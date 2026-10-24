@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,6 +46,35 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 import it.maestro.app.ui.theme.WoodSurfaceLight
 
 private val BrassShadow = Color(0xFF8C6D1F)
+
+/**
+ * Sfondo del circolo: legno a tutto schermo e, in basso, il panno verde per [feltFraction] dell'altezza
+ * (0 = solo legno, 1 = solo panno). Base comune delle schermate (piano UI, F1-18/F1-19).
+ */
+@Composable
+public fun ClubBackground(
+    modifier: Modifier = Modifier,
+    feltFraction: Float = 0f,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(modifier = modifier.fillMaxSize().background(WoodSurfaceDark)) {
+        Image(
+            painter = painterResource(R.drawable.texture_wood),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        if (feltFraction > 0f) {
+            Image(
+                painter = painterResource(R.drawable.table_felt_bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(feltFraction).align(Alignment.BottomCenter),
+            )
+        }
+        content()
+    }
+}
 
 /**
  * Pannello su pergamena con bordo in ottone e fregi dorati (asset `ornament_*`, F1-13).
