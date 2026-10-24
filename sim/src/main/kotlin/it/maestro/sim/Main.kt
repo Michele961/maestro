@@ -91,29 +91,23 @@ data class SimulationReport(
     val winRateP1Percent: Double get() = (winsP1.toDouble() / games) * PERCENT_MULTIPLIER
     val winRateP2Percent: Double get() = (winsP2.toDouble() / games) * PERCENT_MULTIPLIER
 
-    fun toStdoutText(): String = buildString {
-        appendLine("=== Maestro — Report di Simulazione ===")
-        appendLine("Partite: $games | Seme: $seed")
-        appendLine("Bot P1: $p1BotName | Bot P2: $p2BotName")
-        appendLine(
-            "Vittorie: P1 = $winsP1 (${formatDecimal(winRateP1Percent)}%) | " +
-                "P2 = $winsP2 (${formatDecimal(winRateP2Percent)}%)",
-        )
-        appendLine("--- Punti medi per smazzata/partita ---")
-        for (category in ScoreCategory.entries) {
-            val p1Avg = avgPointsP1[category] ?: 0.0
-            val p2Avg = avgPointsP2[category] ?: 0.0
-            appendLine(
-                "  %-12s: P1 = %-6s | P2 = %-6s".format(
-                    Locale.US,
-                    category.name,
-                    formatDecimal(p1Avg),
-                    formatDecimal(p2Avg),
-                ),
-            )
+    fun toStdoutText(): String {
+        val p1WinPct = (winsP1.toDouble() / games) * PERCENT_MULTIPLIER
+        val p2WinPct = (winsP2.toDouble() / games) * PERCENT_MULTIPLIER
+        val p1Categories = ScoreCategory.entries.joinToString(", ") { category ->
+            "${category.name}=${formatDecimal(avgPointsP1.getValue(category))}"
         }
-        appendLine("--- Tempi per mossa ---")
-        appendLine("  Media: ${formatDecimal(meanMsPerMove)} ms | p95: ${formatDecimal(p95MsPerMove)} ms")
+        val p2Categories = ScoreCategory.entries.joinToString(", ") { category ->
+            "${category.name}=${formatDecimal(avgPointsP2.getValue(category))}"
+        }
+        return buildString {
+            appendLine("maestro-sim report")
+            appendLine("games: $games | seed: $seed | bots: p1=$p1BotName, p2=$p2BotName")
+            appendLine("wins: p1=$winsP1 (${formatDecimal(p1WinPct)}%), p2=$winsP2 (${formatDecimal(p2WinPct)}%)")
+            appendLine("avg points p1: $p1Categories")
+            appendLine("avg points p2: $p2Categories")
+            appendLine("msPerMove: mean=${formatDecimal(meanMsPerMove)}, p95=${formatDecimal(p95MsPerMove)}")
+        }
     }
 
     fun toJson(): String = buildString {

@@ -96,22 +96,22 @@ class DifficultyLevelsTest {
         val originalView = createSampleMidgameView()
         val rng = SeededRng(42L)
 
-        // Verifica con forgetRate 1.0 (dimentica tutto il passato)
+        // Verifica con forgetRate 1.0 (dimentica e riassegna casualmente le prese passate)
         val degradedView = applyImperfectMemory(originalView, forgetRate = 1.0, rng = rng)
 
-        // La mano corrente e la tavola non devono mai essere modificate
+        // La mano corrente, la tavola, le dimensioni e il mazzo non devono mai essere modificate
         assertEquals(originalView.hand, degradedView.hand)
         assertEquals(originalView.table, degradedView.table)
         assertEquals(originalView.opponentHandSize, degradedView.opponentHandSize)
+        assertEquals(originalView.deckSize, degradedView.deckSize)
 
-        // Le prese passate sono state dimenticate e riversate nel deckSize
-        val forgottenCount = originalView.capturedBy.values.sumOf { it.size }
-        val remainingCount = degradedView.capturedBy.values.sumOf { it.size }
-        assertEquals(0, remainingCount)
-        assertEquals(originalView.deckSize + forgottenCount, degradedView.deckSize)
+        // Il conteggio complessivo delle carte prese rimane identico (nessuna carta viene persa o inventata)
+        val originalCapturedCount = originalView.capturedBy.values.sumOf { it.size }
+        val degradedCapturedCount = degradedView.capturedBy.values.sumOf { it.size }
+        assertEquals(originalCapturedCount, degradedCapturedCount)
 
         // L'invariante delle 40 carte totali per la determinizzazione è preservato perfettamente
-        val knownLocations = degradedView.hand.size + degradedView.table.size + remainingCount
+        val knownLocations = degradedView.hand.size + degradedView.table.size + degradedCapturedCount
         val totalCards = knownLocations + degradedView.opponentHandSize + degradedView.deckSize
         assertEquals(40, totalCards)
 

@@ -126,10 +126,15 @@ public enum class DifficultyLevel(
 /**
  * Applica il meccanismo di memoria imperfetta a partire unicamente da [view] e da [rng] (`docs/ai/maestro.md`).
  *
- * Non accede **mai** allo stato globale della partita né a carte nascoste. Rimuove stocasticamente
- * carte dai mazzetti di presa visibili (`view.capturedBy`) e dalle carte giocate (`view.playedCards`),
- * incrementando contestualmente [ScopaView.deckSize] in modo tale da preservare rigorosamente l'invariante
- * delle 40 carte totali per la determinizzazione PIMC.
+ * Non accede **mai** allo stato globale della partita né a carte nascoste. Con probabilità [forgetRate],
+ * il bot "dimentica" a chi appartiene ciascuna carta già catturata, riassegnandola stocasticamente
+ * tra i mazzetti delle prese di P1 e P2. In questo modo:
+ * - Le carte note restano esattamente le stesse e l'invariante delle 40 carte per la determinizzazione PIMC
+ *   è perfettamente preservato;
+ * - Le dimensioni di mano, tavolo e tallone ([ScopaView.deckSize]) non vengono alterate, evitando anomalie
+ *   o violazioni delle regole di distribuzione in minimax;
+ * - La valutazione euristica di prese, denari, settebello e primiera risulta degradata in proporzione
+ *   a [forgetRate], simulando accuratamente la distrazione o amnesia di un giocatore principiante.
  */
 internal fun applyImperfectMemory(
     view: ScopaView,
@@ -142,37 +147,29 @@ internal fun applyImperfectMemory(
     if (p1Captured.isEmpty() && p2Captured.isEmpty()) return view
 
     val threshold = (forgetRate.coerceIn(0.0, 1.0) * 10000).toInt()
-    val forgotten = mutableSetOf<Card>()
-
     val newP1 = mutableListOf<Card>()
+    val newP2 = mutableListOf<Card>()
+
     for (card in p1Captured) {
         if (rng.nextInt(10000) < threshold) {
-            forgotten.add(card)
+            if (rng.nextInt(2) == 0) newP1.add(card) else newP2.add(card)
         } else {
             newP1.add(card)
         }
     }
 
-    val newP2 = mutableListOf<Card>()
     for (card in p2Captured) {
         if (rng.nextInt(10000) < threshold) {
-            forgotten.add(card)
+            if (rng.nextInt(2) == 0) newP1.add(card) else newP2.add(card)
         } else {
             newP2.add(card)
         }
     }
-
-    if (forgotten.isEmpty()) return view
-
-    val newPlayed = view.playedCards.filterNot { it in forgotten }
-    val newDeckSize = view.deckSize + forgotten.size
 
     return view.copy(
         capturedBy = mapOf(
             Seat.P1 to newP1,
             Seat.P2 to newP2,
         ),
-        playedCards = newPlayed,
-        deckSize = newDeckSize,
     )
 }
