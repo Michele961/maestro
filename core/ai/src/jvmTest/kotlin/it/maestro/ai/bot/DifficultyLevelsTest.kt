@@ -10,7 +10,6 @@ import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.ScopaView
 import it.maestro.game.scopa.determinize
-import it.maestro.game.scopa.sampleCompatibleDistribution
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -68,10 +67,10 @@ class DifficultyLevelsTest {
     fun everyLevelIsDeterministicWithSameSeed() {
         val view = createSampleMidgameView()
         val legal = listOf(
-            ScopaMove.Discard(Card(Rank.QUATTRO, Suit.SPADE)),
-            ScopaMove.Capture(
+            ScopaMove(card = Card(Rank.QUATTRO, Suit.SPADE), capture = emptySet()),
+            ScopaMove(
                 card = Card(Rank.SETTE, Suit.COPPE),
-                taken = listOf(Card(Rank.SETTE, Suit.BASTONI)),
+                capture = setOf(Card(Rank.SETTE, Suit.BASTONI)),
             ),
         )
 
@@ -116,7 +115,11 @@ class DifficultyLevelsTest {
         assertEquals(40, totalCards)
 
         // Verifichiamo che sampleCompatibleDistribution e determinize funzionino senza eccezioni
-        val distribution = sampleCompatibleDistribution(degradedView, unseenCards(degradedView))
+        val distribution = sampleCompatibleDistribution(
+            view = degradedView,
+            unseen = unseenCards(degradedView),
+            rng = rng,
+        )
         val determinizedState = determinize(
             view = degradedView,
             opponentHand = distribution.opponentHand,
