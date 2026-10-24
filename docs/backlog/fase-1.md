@@ -116,7 +116,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-07 — Flusso completo della partita
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Obiettivo:** pre-partita (livello, punteggio obiettivo 11/16/21 da `ScopaConfig`), partita, riepilogo di fine smazzata con i punti di `scopa.md` §6, fine partita con rivincita. Navigazione tra schermate.
 - **Criteri di accettazione:**
     - [x] Una partita completa contro ciascun livello si gioca dall'inizio alla fine (test UI su seed fisso).
@@ -125,7 +125,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-08 — Salvataggio, ripresa e impostazioni
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** ADR-0003
 - **Obiettivo:** Room per lo storico delle partite (solo `MatchLog` + metadati); ripresa della partita interrotta rigiocando il log; DataStore per le impostazioni (lingua, suoni, livello preferito).
 - **Perimetro autorizzato:** Room e DataStore nel version catalog.
