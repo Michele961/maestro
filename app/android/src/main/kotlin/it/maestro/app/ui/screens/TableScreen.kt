@@ -4,6 +4,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import it.maestro.app.ui.components.ParchmentPanel
+import it.maestro.app.ui.components.FramedPortrait
+import it.maestro.app.ui.components.MaestroDialogueBox
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.rotate
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -168,6 +176,7 @@ public fun TableContent(
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var showPause by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.lastEvent) {
         when (uiState.lastEvent) {
@@ -219,7 +228,7 @@ public fun TableContent(
             modifier = Modifier.fillMaxSize(),
         )
         Column(modifier = Modifier.fillMaxSize()) {
-            TableTopBar(uiState = uiState)
+            TableTopBar(uiState = uiState, onPause = { showPause = true })
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -238,48 +247,22 @@ public fun TableContent(
                 } else {
                     Box(modifier = Modifier.fillMaxSize().background(feltBrush))
                 }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // 1. ZONA AVVERSARIO (MAESTRO)
-            OpponentZone(uiState = uiState)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 2. STATO TURNO (il punteggio è nella barra superiore)
-            ScoreAndStatusHeader(uiState = uiState)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 3. TAVOLO CENTRALE E MAZZO
-            TableCardsAndDeckZone(
-                tableCards = uiState.tableCards,
-                deckCount = uiState.deckCardCount,
-                lastEvent = uiState.lastEvent,
-                suggestedCapture = uiState.suggestedMove?.capture,
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 4. ZONA GIOCATORE UMANO
-            PlayerZone(
-                uiState = uiState,
-                onCardClicked = { card ->
-                    soundManager.play(SoundEffect.CARD_PLAY)
-                    onIntent(GameIntent.PlayCard(card))
-                },
-                onRequestHint = {
-                    soundManager.play(SoundEffect.BUTTON_CLICK)
-                    onIntent(GameIntent.RequestHint)
-                },
-            )
-        }
+                FeltLayout(
+                    uiState = uiState,
+                    onCardClicked = { card ->
+                        soundManager.play(SoundEffect.CARD_PLAY)
+                        onIntent(GameIntent.PlayCard(card))
+                    },
+                    onRequestHint = {
+                        soundManager.play(SoundEffect.BUTTON_CLICK)
+                        onIntent(GameIntent.RequestHint)
+                    },
+                )
             }
+        }
+
+        if (showPause) {
+            PauseDialog(onResume = { showPause = false }, onNavigateHome = onNavigateHome)
         }
 
         // Host per notifiche di errore
@@ -336,7 +319,7 @@ public fun TableContent(
 
 /** Barra superiore su legno: avversario con espressione e punteggio della partita (F1-21). */
 @Composable
-private fun TableTopBar(uiState: GameUiState) {
+private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
     val mood = when {
         uiState.lastEvent is UiGameEvent.Sweep -> MaestroMood.CELEBRATING
         uiState.isBotThinking || uiState.isHintLoading -> MaestroMood.THINKING
@@ -370,321 +353,23 @@ private fun TableTopBar(uiState: GameUiState) {
             p1Score = uiState.humanScore,
             p2Score = uiState.opponentScore,
             p1Label = stringResource(id = R.string.game_player_you),
-            p2Label = stringResource(id = R.string.game_player_maestro),
+            p2Label = stringResource(id = R.string.game_opponent_short),
+        )
+        Image(
+            painter = painterResource(R.drawable.button_pause),
+            contentDescription = stringResource(id = R.string.game_pause),
+            modifier = Modifier
+                .padding(start = 6.dp)
+                .size(52.dp)
+                .clickable(onClick = onPause)
+                .testTag("pause_button"),
         )
     }
 }
 
-@Composable
-private fun OpponentZone(uiState: GameUiState) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("opponent_zone"),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Spacer(modifier = Modifier.width(1.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = "${stringResource(id = R.string.game_sweeps_label)}: ${uiState.opponentSweeps}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                    )
-                    Text(
-                        text = "${stringResource(id = R.string.game_captured_label)}: ${uiState.opponentCapturedCount}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                    )
-                }
-            }
 
-            Spacer(modifier = Modifier.height(6.dp))
 
-            // Carte coperte in mano all'avversario
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                repeat(uiState.opponentCardCount) {
-                    CardBackView(width = 44.dp, height = 66.dp)
-                }
-            }
-        }
-    }
-}
 
-@Composable
-private fun ScoreAndStatusHeader(uiState: GameUiState) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("score_and_status_header"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        // Indicatore di turno
-        val statusText = if (uiState.isHumanTurn) {
-            stringResource(id = R.string.game_your_turn)
-        } else {
-            stringResource(id = R.string.game_bot_thinking)
-        }
-
-        Box(
-            modifier = Modifier
-                .background(
-                    color = if (uiState.isHumanTurn) GoldAccentColor else Color(0xFF374151),
-                    shape = RoundedCornerShape(12.dp),
-                )
-                .padding(horizontal = 14.dp, vertical = 4.dp),
-        ) {
-            Text(
-                text = statusText,
-                style = MaterialTheme.typography.labelMedium,
-                color = if (uiState.isHumanTurn) Color.Black else Color.White,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun TableCardsAndDeckZone(
-    tableCards: List<Card>,
-    deckCount: Int,
-    lastEvent: UiGameEvent?,
-    suggestedCapture: Set<Card>? = null,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("table_cards_zone"),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Notifica evento Scopa se presente
-            AnimatedVisibility(
-                visible = lastEvent is UiGameEvent.Sweep,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(bottom = 6.dp)
-                        .background(GoldAccentColor, shape = RoundedCornerShape(8.dp))
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.game_event_sweep),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Black,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                // Tallone (Mazzo coperto)
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.testTag("deck_pile"),
-                ) {
-                    if (deckCount > 0) {
-                        DeckStack(cards = deckCount)
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .width(48.dp)
-                                .height(72.dp)
-                                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp)),
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "$deckCount",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Carte sul tavolo disposte in griglia flessibile
-                FlowRow(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                        .testTag("table_cards_flow"),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalArrangement = Arrangement.Center,
-                    maxItemsInEachRow = 4,
-                ) {
-                    for (card in tableCards) {
-                        val isSuggestedCapture = suggestedCapture != null && card in suggestedCapture
-                        PlaceholderCardView(
-                            card = card,
-                            isPlayable = false,
-                            width = 70.dp,
-                            height = 105.dp,
-                            modifier = Modifier
-                                .padding(3.dp)
-                                .then(
-                                    if (isSuggestedCapture) {
-                                        Modifier.background(
-                                            color = Color(0xFF2196F3).copy(alpha = 0.35f),
-                                            shape = RoundedCornerShape(6.dp),
-                                        )
-                                    } else {
-                                        Modifier
-                                    },
-                                ),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlayerZone(
-    uiState: GameUiState,
-    onCardClicked: (Card) -> Unit,
-    onRequestHint: () -> Unit = {},
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("player_zone"),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(id = R.string.game_player_you),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = GoldAccentColor,
-                    fontWeight = FontWeight.Bold,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = "${stringResource(id = R.string.game_sweeps_label)}: ${uiState.humanSweeps}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                    )
-                    Text(
-                        text = "${stringResource(id = R.string.game_captured_label)}: ${uiState.humanCapturedCount}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                    )
-                }
-            }
-
-            // Banner del suggerimento del Maestro se presente
-            val suggested = uiState.suggestedMove
-            if (suggested != null) {
-                Spacer(modifier = Modifier.height(6.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF2196F3).copy(alpha = 0.2f), shape = RoundedCornerShape(6.dp))
-                        .border(1.dp, Color(0xFF2196F3), shape = RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .testTag("game_hint_banner"),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.game_hint_banner, formatHintMove(suggested)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Carte in mano al giocatore umano
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.testTag("human_hand_row"),
-            ) {
-                for (card in uiState.humanHand) {
-                    val isSuggested = uiState.suggestedMove?.card == card
-                    Box(
-                        modifier = Modifier.then(
-                            if (isSuggested) {
-                                Modifier
-                                    .background(Color(0xFF2196F3).copy(alpha = 0.35f), shape = RoundedCornerShape(6.dp))
-                                    .border(2.dp, Color(0xFF2196F3), shape = RoundedCornerShape(6.dp))
-                            } else {
-                                Modifier
-                            },
-                        ),
-                    ) {
-                        PlaceholderCardView(
-                            card = card,
-                            isPlayable = uiState.isHumanTurn,
-                            width = 94.dp,
-                            height = 141.dp,
-                            onClick = { onCardClicked(card) },
-                        )
-                    }
-                }
-            }
-
-            // Pulsante "Chiedi al Maestro" (solo nelle partite di Sparring, F1-11, D9)
-            if (uiState.isSparring) {
-                Spacer(modifier = Modifier.height(10.dp))
-                MaestroPillButton(
-                    text = if (uiState.isHintLoading) {
-                        stringResource(id = R.string.game_hint_loading)
-                    } else {
-                        stringResource(id = R.string.game_hint_button)
-                    },
-                    onClick = onRequestHint,
-                    enabled = uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading,
-                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                    height = 46.dp,
-                    modifier = Modifier.fillMaxWidth(),
-                    testTag = "game_hint_button",
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun formatHintMove(move: ScopaMove): String {
@@ -692,6 +377,14 @@ private fun formatHintMove(move: ScopaMove): String {
     val fanteStr = stringResource(id = R.string.game_card_rank_fante).take(1)
     val cavalloStr = stringResource(id = R.string.game_card_rank_cavallo).take(1)
     val reStr = stringResource(id = R.string.game_card_rank_re).take(1)
+
+    // Semi napoletani per nome (niente simboli francesi), es. "7 di denari"
+    val suitNames = mapOf(
+        Suit.DENARI to stringResource(id = R.string.game_suit_denari),
+        Suit.COPPE to stringResource(id = R.string.game_suit_coppe),
+        Suit.SPADE to stringResource(id = R.string.game_suit_spade),
+        Suit.BASTONI to stringResource(id = R.string.game_suit_bastoni),
+    )
 
     fun cardLabel(card: Card): String {
         val rankText = when (card.rank) {
@@ -701,13 +394,7 @@ private fun formatHintMove(move: ScopaMove): String {
             Rank.RE -> reStr
             else -> card.rank.value.toString()
         }
-        val suitSymbol = when (card.suit) {
-            Suit.DENARI -> "◆"
-            Suit.SPADE -> "♠"
-            Suit.COPPE -> "♥"
-            Suit.BASTONI -> "♣"
-        }
-        return "$rankText$suitSymbol"
+        return "$rankText ${suitNames.getValue(card.suit)}"
     }
 
     val cardStr = cardLabel(move.card)
@@ -1210,6 +897,231 @@ private fun DeckStack(cards: Int) {
                 width = 64.dp,
                 height = 96.dp,
                 modifier = Modifier.offset(x = (i * 2).dp, y = ((layers - 1 - i) * 3).dp),
+            )
+        }
+    }
+}
+
+/**
+ * Disposizione del tavolo come `reference_table_screen.jpg` (F1-21): mano dell'avversario in alto,
+ * carte in tavola al centro, Maestro con fumetto a sinistra, mazzo e prese a destra, mano a ventaglio in basso.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FeltLayout(
+    uiState: GameUiState,
+    onCardClicked: (Card) -> Unit,
+    onRequestHint: () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize().padding(10.dp).testTag("felt_layout")) {
+        // Mano dell'avversario, coperta e sovrapposta
+        Row(
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 4.dp).testTag("opponent_zone"),
+            horizontalArrangement = Arrangement.spacedBy((-26).dp),
+        ) {
+            repeat(uiState.opponentCardCount) { CardBackView(width = 72.dp, height = 108.dp) }
+        }
+
+        // Colonna destra: mazzo e prese
+        Column(
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            CapturePile(count = uiState.opponentCapturedCount, sweeps = uiState.opponentSweeps, tag = "opponent_captures")
+            Box(modifier = Modifier.testTag("deck_pile"), contentAlignment = Alignment.BottomCenter) {
+                if (uiState.deckCardCount > 0) DeckStack(cards = uiState.deckCardCount)
+                CountBadge(uiState.deckCardCount.toString())
+            }
+            CapturePile(count = uiState.humanCapturedCount, sweeps = uiState.humanSweeps, tag = "human_captures")
+        }
+
+        // Carte in tavola, al centro in griglia
+        FlowRow(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(start = if (uiState.suggestedMove != null) 128.dp else 30.dp, end = 86.dp, bottom = 40.dp)
+                .testTag("table_cards_zone"),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            maxItemsInEachRow = if (uiState.tableCards.size <= 4) 2 else 3,
+        ) {
+            val suggested = uiState.suggestedMove?.capture
+            for (card in uiState.tableCards) {
+                val big = uiState.tableCards.size <= 4 && uiState.suggestedMove == null
+                PlaceholderCardView(
+                    card = card,
+                    isPlayable = false,
+                    width = if (big) 92.dp else 72.dp,
+                    height = if (big) 138.dp else 108.dp,
+                    modifier = if (suggested != null && card in suggested) {
+                        Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
+                    } else {
+                        Modifier
+                    },
+                )
+            }
+        }
+
+        // Il Maestro a sinistra, con il fumetto quando ha qualcosa da dire
+        Column(
+            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 120.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AnimatedVisibility(visible = uiState.suggestedMove != null, enter = fadeIn(), exit = fadeOut()) {
+                val move = uiState.suggestedMove
+                if (move != null) {
+                    MaestroDialogueBox(
+                        message = formatHintMove(move),
+                        title = stringResource(id = R.string.game_player_maestro),
+                        modifier = Modifier.width(120.dp).testTag("game_hint_banner"),
+                    )
+                }
+            }
+            AnimatedVisibility(visible = uiState.lastEvent is UiGameEvent.Sweep, enter = fadeIn(), exit = fadeOut()) {
+                MaestroPillButton(
+                    text = stringResource(id = R.string.game_event_sweep).uppercase(),
+                    onClick = {},
+                    variant = PillButtonVariant.HERO_RED,
+                    height = 44.dp,
+                    fontSize = 20.sp,
+                    modifier = Modifier.width(150.dp),
+                )
+            }
+            if (uiState.suggestedMove != null || uiState.lastEvent is UiGameEvent.Sweep) {
+                FramedPortrait(
+                    portrait = if (uiState.lastEvent is UiGameEvent.Sweep) R.drawable.maestro_celebrating else R.drawable.maestro_pleased,
+                    size = 84.dp,
+                    background = Color(0xFF7D3F19),
+                )
+            }
+        }
+
+        // Mano del giocatore a ventaglio
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter).testTag("player_zone"),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            HandFan(uiState = uiState, onCardClicked = onCardClicked)
+            if (uiState.isSparring) {
+                MaestroPillButton(
+                    text = if (uiState.isHintLoading) {
+                        stringResource(id = R.string.game_hint_loading)
+                    } else {
+                        stringResource(id = R.string.game_hint_button)
+                    },
+                    onClick = onRequestHint,
+                    enabled = uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading,
+                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                    height = 42.dp,
+                    fontSize = 16.sp,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 24.dp),
+                    modifier = Modifier.padding(top = 6.dp),
+                    testTag = "game_hint_button",
+                )
+            }
+        }
+    }
+}
+
+/** Mano a ventaglio: carte sovrapposte e ruotate; quando tocca a te sono più alte e brillano. */
+@Composable
+private fun HandFan(uiState: GameUiState, onCardClicked: (Card) -> Unit) {
+    val cards = uiState.humanHand
+    Row(
+        modifier = Modifier.testTag("human_hand_row"),
+        horizontalArrangement = Arrangement.spacedBy((-22).dp),
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        cards.forEachIndexed { i, card ->
+            val mid = (cards.size - 1) / 2f
+            val angle = (i - mid) * 8f
+            val drop = kotlin.math.abs(i - mid) * 12f
+            val isSuggested = uiState.suggestedMove?.card == card
+            Box(
+                modifier = Modifier
+                    .offset(y = drop.dp)
+                    .rotate(angle)
+                    .then(
+                        if (isSuggested || uiState.isHumanTurn) {
+                            Modifier.shadow(
+                                elevation = if (isSuggested) 18.dp else 8.dp,
+                                shape = RoundedCornerShape(10.dp),
+                                ambientColor = Color(0xFFFFD54F),
+                                spotColor = Color(0xFFFFD54F),
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
+            ) {
+                PlaceholderCardView(
+                    card = card,
+                    isPlayable = uiState.isHumanTurn,
+                    width = 110.dp,
+                    height = 165.dp,
+                    onClick = { onCardClicked(card) },
+                )
+            }
+        }
+    }
+}
+
+/** Pila delle prese, con il conteggio delle carte e delle scope. */
+@Composable
+private fun CapturePile(count: Int, sweeps: Int, tag: String) {
+    Box(modifier = Modifier.testTag(tag), contentAlignment = Alignment.BottomCenter) {
+        if (count > 0) {
+            DeckStack(cards = count)
+        } else {
+            Box(
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(96.dp)
+                    .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(8.dp)),
+            )
+        }
+        CountBadge(if (sweeps > 0) "$count · ${stringResource(id = R.string.game_sweeps_short, sweeps)}" else "$count")
+    }
+}
+
+@Composable
+private fun CountBadge(text: String) {
+    Box(
+        modifier = Modifier
+            .offset(y = 10.dp)
+            .background(Color(0xCC2A170C), RoundedCornerShape(10.dp))
+            .border(1.dp, GoldAccentColor, RoundedCornerShape(10.dp))
+            .padding(horizontal = 8.dp, vertical = 1.dp),
+    ) {
+        Text(text = text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+/** Pausa: riprendi o torna al menu (la partita in corso resta salvata, F1-08). */
+@Composable
+private fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onResume) {
+        ParchmentPanel(modifier = Modifier.width(300.dp).testTag("pause_dialog")) {
+            Text(
+                text = stringResource(id = R.string.game_pause).uppercase(),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color(0xFF2B1A10),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 10.dp),
+            )
+            MaestroPillButton(
+                text = stringResource(id = R.string.game_resume),
+                onClick = onResume,
+                variant = PillButtonVariant.PRIMARY_GREEN,
+                modifier = Modifier.fillMaxWidth(),
+                testTag = "pause_resume_button",
+            )
+            MaestroPillButton(
+                text = stringResource(id = R.string.game_menu_home),
+                onClick = onNavigateHome,
+                variant = PillButtonVariant.WOOD,
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp),
+                testTag = "pause_home_button",
             )
         }
     }

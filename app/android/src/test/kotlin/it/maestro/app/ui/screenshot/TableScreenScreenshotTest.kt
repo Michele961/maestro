@@ -12,6 +12,9 @@ import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
 import it.maestro.game.model.Suit
 import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.ScopaMove
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,5 +62,21 @@ class TableScreenScreenshotTest {
     fun table_mid_deal_screenshot() {
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}) } }
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_mid_deal.png")
+    }
+
+    @Test
+    fun table_with_maestro_hint_screenshot() {
+        val hint = ScopaMove(card = midDeal.humanHand[0], capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal.copy(suggestedMove = hint), onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_hint.png")
+    }
+
+    @Test
+    fun pause_opens_dialog_and_menu_goes_home() {
+        var home = 0
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}, onNavigateHome = { home++ }) } }
+        composeRule.onNodeWithTag("pause_button").performClick()
+        composeRule.onNodeWithTag("pause_home_button").performClick()
+        org.junit.Assert.assertEquals(1, home)
     }
 }
