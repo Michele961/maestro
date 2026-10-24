@@ -10,9 +10,11 @@ import it.maestro.app.game.GameViewModel
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
 import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.PlayResult
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.newMatch
+import it.maestro.game.scopa.play
 import it.maestro.game.scopa.viewFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,13 @@ class SparringHintTest {
 
     @Test
     fun hintUsesExclusivelyViewForHumanPlayerAndNeverExposesOpponentSecretHand() {
-        val state = newMatch(config = ScopaConfig(targetScore = 11), seed = 12345L)
+        var state = newMatch(config = ScopaConfig(targetScore = 11), seed = 12345L)
+        // Se non è il turno di P1, avanziamo finché non tocca al giocatore umano
+        while (state.toMove != Seat.P1) {
+            val moves = legalMoves(state)
+            val result = play(state, moves.first())
+            state = (result as PlayResult.Applied).state
+        }
         val humanSeat = Seat.P1
 
         // 1. Costruiamo la vista autorizzata per il giocatore umano
