@@ -108,7 +108,7 @@ public fun determinePrimieraLead(view: ScopaView): SeatLead {
  * Determina la posizione del Settebello (7 di Denari) a partire dalla vista.
  */
 public fun determineSettebelloLocation(view: ScopaView): SettebelloLocation {
-    val settebello = Card(Suit.DENARI, Rank.SETTE)
+    val settebello = Card(Rank.SETTE, Suit.DENARI)
     val myCaptures = view.capturedBy[view.seat] ?: emptyList()
     val oppCaptures = view.capturedBy[view.seat.other()] ?: emptyList()
     return when {

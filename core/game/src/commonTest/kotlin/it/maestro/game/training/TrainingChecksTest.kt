@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 
 class TrainingChecksTest {
 
-    private fun card(rank: Rank, suit: Suit) = Card(suit, rank)
+    private fun card(rank: Rank, suit: Suit) = Card(rank, suit)
 
     private fun createView(
         playedCards: List<Card> = emptyList(),
