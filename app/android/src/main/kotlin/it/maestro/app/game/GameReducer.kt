@@ -10,6 +10,10 @@ import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.newMatch
 import it.maestro.game.scopa.play
+import it.maestro.game.scopa.viewFor
+import it.maestro.game.training.TrainingFundamental
+import it.maestro.game.training.buildTrainingQuestion
+import it.maestro.game.training.isCriticalTrainingMoment
 
 /**
  * Reducer puro per la gestione dello stato della partita di Scopa (ADR-0012, task F1-05).
@@ -34,6 +38,7 @@ public object GameReducer {
             matchLog = log,
             pendingCapture = null,
             isBotThinking = false,
+            trainingFundamental = intent.trainingFundamental,
             lastError = null,
             lastEvent = null,
         )
@@ -85,6 +90,16 @@ public object GameReducer {
                 )
             }
 
+            is GameIntent.SelectTrainingFundamental -> {
+                GameReducerResult(state.copy(trainingFundamental = intent.fundamental))
+            }
+
+            is GameIntent.AnswerTrainingQuestion -> handleAnswerTrainingQuestion(state, intent)
+
+            is GameIntent.DismissTrainingQuestion -> {
+                GameReducerResult(state.copy(activeTrainingQuestion = null, trainingQuestionFeedback = null))
+            }
+
             is GameIntent.DismissError -> {
                 GameReducerResult(state.copy(lastError = null))
             }
@@ -110,6 +125,9 @@ public object GameReducer {
     }
 
     private fun handlePlayCard(state: GameInternalState, intent: GameIntent.PlayCard): GameReducerResult {
+        if (state.activeTrainingQuestion != null) {
+            return GameReducerResult(state.copy(lastError = "Rispondi prima alla domanda del Maestro"))
+        }
         if (state.scopaState.phase != DealPhase.PLAYING) {
             return GameReducerResult(state.copy(lastError = "Partita non in corso"))
         }
@@ -135,6 +153,9 @@ public object GameReducer {
     }
 
     private fun handleSelectCapture(state: GameInternalState, intent: GameIntent.SelectCapture): GameReducerResult {
+        if (state.activeTrainingQuestion != null) {
+            return GameReducerResult(state.copy(lastError = "Rispondi prima alla domanda del Maestro"))
+        }
         if (state.scopaState.phase != DealPhase.PLAYING || state.scopaState.toMove != state.humanSeat) {
             return GameReducerResult(state.copy(lastError = "Non è il tuo turno"))
         }
@@ -147,7 +168,12 @@ public object GameReducer {
     }
 
     private fun handleDismissDealSummary(state: GameInternalState): GameReducerResult {
-        val cleared = state.copy(pendingDealScore = null)
+        val cleared = state.copy(
+            pendingDealScore = null,
+            hasAskedQuestionThisDeal = false,
+            activeTrainingQuestion = null,
+            trainingQuestionFeedback = null,
+        )
         val botSeat = state.humanSeat.other()
         val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
         val effect = if (shouldScheduleBot) {
@@ -167,6 +193,7 @@ public object GameReducer {
             humanSeat = intent.humanSeat,
             botLevel = intent.level,
             matchLog = intent.matchLog,
+            trainingFundamental = intent.trainingFundamental,
         )
         val botSeat = intent.humanSeat.other()
         val botPlays = intent.state.phase == DealPhase.PLAYING && intent.state.toMove == botSeat
@@ -178,6 +205,32 @@ public object GameReducer {
         return GameReducerResult(
             state = internalState.copy(isBotThinking = botPlays),
             effect = effect,
+        )
+    }
+
+    private fun handleAnswerTrainingQuestion(
+        state: GameInternalState,
+        intent: GameIntent.AnswerTrainingQuestion,
+    ): GameReducerResult {
+        val question = state.activeTrainingQuestion ?: return GameReducerResult(state)
+        val isCorrect = intent.selectedIndex == question.correctIndex
+        val feedback = TrainingAnswerFeedback(
+            selectedIndex = intent.selectedIndex,
+            isCorrect = isCorrect,
+            correctIndex = question.correctIndex,
+            explanationValues = question.explanationValues,
+        )
+        val result = TrainingCheckResult(
+            fundamental = question.fundamental,
+            question = question,
+            selectedIndex = intent.selectedIndex,
+            isCorrect = isCorrect,
+        )
+        return GameReducerResult(
+            state = state.copy(
+                trainingQuestionFeedback = feedback,
+                trainingResults = state.trainingResults + result,
+            ),
         )
     }
 
@@ -220,6 +273,25 @@ public object GameReducer {
                         else -> {}
                     }
                 }
+
+                val isDealOver = dealScore != null
+                val botSeat = state.humanSeat.other()
+                val nextPhase = result.state.phase
+                val nextToMove = result.state.toMove
+
+                // Verifica se attivare la domanda di allenamento per il giocatore umano
+                var activeQuestion: it.maestro.game.training.TrainingQuestion? = null
+                var questionAskedNow = false
+                if (!isDealOver && nextPhase == DealPhase.PLAYING && nextToMove == state.humanSeat &&
+                    state.isSparring && state.trainingFundamental != TrainingFundamental.NONE && !state.hasAskedQuestionThisDeal
+                ) {
+                    val view = viewFor(result.state, state.humanSeat)
+                    if (isCriticalTrainingMoment(state.trainingFundamental, view)) {
+                        activeQuestion = buildTrainingQuestion(state.trainingFundamental, view)
+                        questionAskedNow = true
+                    }
+                }
+
                 val newState = state.copy(
                     scopaState = result.state,
                     matchLog = newLog,
@@ -227,12 +299,13 @@ public object GameReducer {
                     pendingDealScore = dealScore ?: state.pendingDealScore,
                     suggestedMove = null,
                     isHintLoading = false,
+                    activeTrainingQuestion = activeQuestion ?: state.activeTrainingQuestion,
+                    hasAskedQuestionThisDeal = if (isDealOver) false else (state.hasAskedQuestionThisDeal || questionAskedNow),
                     lastError = null,
                     lastEvent = lastEvent ?: state.lastEvent,
                 )
 
-                val botSeat = state.humanSeat.other()
-                val nextEffect = if (dealScore == null && result.state.phase == DealPhase.PLAYING && result.state.toMove == botSeat) {
+                val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {
                     GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
                 } else {
                     null

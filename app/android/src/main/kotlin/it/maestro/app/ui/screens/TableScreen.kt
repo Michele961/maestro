@@ -53,6 +53,7 @@ import it.maestro.app.game.GameIntent
 import it.maestro.app.game.GameUiState
 import it.maestro.app.game.GameViewModel
 import it.maestro.app.game.PendingCaptureChoice
+import it.maestro.app.game.TrainingAnswerFeedback
 import it.maestro.app.game.UiGameEvent
 import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.PlaceholderCardView
@@ -67,6 +68,11 @@ import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.ScoreCategory
+import it.maestro.game.training.SeatLead
+import it.maestro.game.training.SettebelloLocation
+import it.maestro.game.training.TrainingFundamental
+import it.maestro.game.training.TrainingOption
+import it.maestro.game.training.TrainingQuestion
 import org.koin.androidx.compose.koinViewModel
 
 public val TableFeltColor: Color = Color(0xFF1B4332)
@@ -81,6 +87,7 @@ public fun TableScreen(
     modifier: Modifier = Modifier,
     level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     targetScore: Int = 11,
+    trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     seed: Long = 42L,
     restoreState: ScopaState? = null,
     restoreLog: MatchLog? = null,
@@ -88,13 +95,14 @@ public fun TableScreen(
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: (MatchLog) -> Unit = {},
 ) {
-    LaunchedEffect(level, targetScore, seed, restoreState) {
+    LaunchedEffect(level, targetScore, seed, restoreState, trainingFundamental) {
         if (restoreState != null && restoreLog != null) {
             viewModel.onIntent(
                 GameIntent.RestoreMatch(
                     state = restoreState,
                     matchLog = restoreLog,
                     level = level,
+                    trainingFundamental = trainingFundamental,
                 ),
             )
         } else {
@@ -103,6 +111,7 @@ public fun TableScreen(
                     config = ScopaConfig(targetScore = targetScore),
                     level = level,
                     seed = seed,
+                    trainingFundamental = trainingFundamental,
                 ),
             )
         }
@@ -121,6 +130,7 @@ public fun TableScreen(
                     config = ScopaConfig(targetScore = targetScore),
                     level = level,
                     seed = System.currentTimeMillis(),
+                    trainingFundamental = trainingFundamental,
                 ),
             )
         },
@@ -197,6 +207,17 @@ public fun TableContent(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+
+        // Dialog Check di allenamento del Maestro (task F1-12)
+        val question = uiState.activeTrainingQuestion
+        if (question != null) {
+            TrainingQuestionDialog(
+                question = question,
+                feedback = uiState.trainingQuestionFeedback,
+                onAnswer = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
+                onContinue = { onIntent(GameIntent.DismissTrainingQuestion) },
+            )
+        }
 
         // Dialog per scelta di presa multipla
         if (uiState.pendingCaptureChoice != null) {
@@ -837,6 +858,20 @@ private fun DealSummaryDialog(
                         modifier = Modifier.weight(1f),
                     )
                 }
+
+                if (uiState.trainingResults.isNotEmpty()) {
+                    val correct = uiState.trainingResults.count { it.isCorrect }
+                    val total = uiState.trainingResults.size
+                    val pct = (correct * 100) / total
+                    HorizontalDivider(color = Color.DarkGray)
+                    Text(
+                        text = stringResource(id = R.string.training_score_label, pct, correct, total),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = GoldAccentColor,
+                        modifier = Modifier.testTag("deal_summary_attention_score"),
+                    )
+                }
             }
         },
         confirmButton = {
@@ -881,6 +916,18 @@ private fun MatchOverDialog(
                     text = "${stringResource(id = R.string.game_score_label)}: ${uiState.humanScore} — ${uiState.opponentScore}",
                     style = MaterialTheme.typography.bodyLarge,
                 )
+                if (uiState.trainingResults.isNotEmpty()) {
+                    val correct = uiState.trainingResults.count { it.isCorrect }
+                    val total = uiState.trainingResults.size
+                    val pct = (correct * 100) / total
+                    Text(
+                        text = stringResource(id = R.string.training_score_label, pct, correct, total),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = GoldAccentColor,
+                        modifier = Modifier.testTag("match_over_attention_score"),
+                    )
+                }
                 Button(
                     onClick = onViewAnalysis,
                     modifier = Modifier
@@ -905,6 +952,151 @@ private fun MatchOverDialog(
                 modifier = Modifier.testTag("navigate_home_button"),
             ) {
                 Text(text = stringResource(id = R.string.game_menu_home))
+            }
+        },
+    )
+}
+
+@Composable
+private fun TrainingQuestionDialog(
+    question: TrainingQuestion,
+    feedback: TrainingAnswerFeedback?,
+    onAnswer: (Int) -> Unit,
+    onContinue: () -> Unit,
+) {
+    val questionTitleResId = when (question.fundamental) {
+        TrainingFundamental.SEVENS_COUNT -> R.string.training_question_sevens
+        TrainingFundamental.DENARI_COUNT -> R.string.training_question_denari
+        TrainingFundamental.PRIMIERA_LEAD -> R.string.training_question_primiera
+        TrainingFundamental.SETTEBELLO_LOCATION -> R.string.training_question_settebello
+        TrainingFundamental.CARDS_LEAD -> R.string.training_question_cards
+        TrainingFundamental.NONE -> R.string.training_dialog_subtitle
+    }
+
+    AlertDialog(
+        onDismissRequest = { /* Modal: interazione richiesta prima di chiudere */ },
+        modifier = Modifier.testTag("training_question_dialog"),
+        title = {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.training_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = GoldAccentColor,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(id = R.string.training_dialog_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.LightGray,
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = stringResource(id = questionTitleResId),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                    modifier = Modifier.testTag("training_question_text"),
+                )
+
+                // Opzioni di risposta
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    question.options.forEachIndexed { index, option ->
+                        val optionText = when (option) {
+                            is TrainingOption.IntCount -> stringResource(id = R.string.training_option_count_format, option.count)
+                            is TrainingOption.Lead -> when (option.lead) {
+                                SeatLead.HUMAN -> stringResource(id = R.string.training_option_lead_human)
+                                SeatLead.OPPONENT -> stringResource(id = R.string.training_option_lead_opponent)
+                                SeatLead.TIE -> stringResource(id = R.string.training_option_lead_tie)
+                            }
+                            is TrainingOption.Location -> when (option.location) {
+                                SettebelloLocation.CAPTURED_BY_ME -> stringResource(id = R.string.training_option_settebello_by_me)
+                                SettebelloLocation.CAPTURED_BY_OPPONENT -> stringResource(id = R.string.training_option_settebello_by_opp)
+                                SettebelloLocation.IN_PLAY_OR_UNKNOWN -> stringResource(id = R.string.training_option_settebello_in_play)
+                            }
+                        }
+
+                        val isAnswered = feedback != null
+                        val isSelected = feedback?.selectedIndex == index
+                        val isCorrectOption = index == question.correctIndex
+
+                        val borderCol = when {
+                            !isAnswered -> Color.DarkGray
+                            isCorrectOption -> Color(0xFF4CAF50)
+                            isSelected -> Color(0xFFE57373)
+                            else -> Color.DarkGray
+                        }
+                        val bgCol = when {
+                            !isAnswered -> TableFeltDarkColor
+                            isCorrectOption -> Color(0xFF1B5E20)
+                            isSelected -> Color(0xFFB71C1C)
+                            else -> TableFeltDarkColor
+                        }
+
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("training_option_$index")
+                                .border(1.dp, borderCol, RoundedCornerShape(8.dp))
+                                .clickable(enabled = feedback == null) { onAnswer(index) },
+                            shape = RoundedCornerShape(8.dp),
+                            color = bgCol,
+                        ) {
+                            Text(
+                                text = optionText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (isSelected || isCorrectOption) FontWeight.Bold else FontWeight.Normal,
+                                color = Color.White,
+                                modifier = Modifier.padding(12.dp),
+                            )
+                        }
+                    }
+                }
+
+                // Banner di feedback dopo la risposta
+                if (feedback != null) {
+                    val feedbackText = if (feedback.isCorrect) {
+                        stringResource(id = R.string.training_feedback_correct)
+                    } else {
+                        stringResource(id = R.string.training_feedback_wrong)
+                    }
+                    val feedbackBg = if (feedback.isCorrect) Color(0xFF2E7D32) else Color(0xFFC62828)
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("training_feedback_banner"),
+                        shape = RoundedCornerShape(8.dp),
+                        color = feedbackBg,
+                    ) {
+                        Text(
+                            text = feedbackText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            modifier = Modifier.padding(12.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (feedback != null) {
+                Button(
+                    onClick = onContinue,
+                    modifier = Modifier.testTag("training_continue_button"),
+                ) {
+                    Text(text = stringResource(id = R.string.training_feedback_continue))
+                }
             }
         },
     )
