@@ -110,21 +110,21 @@ public fun PostMatchPreviewScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Targa del risultato, come "VITTORIA! TU 11 - 8 AVVERSARIO"
             NineSliceBox(
                 skin = R.drawable.skin_score_plaque,
                 slice = 0.4f,
-                corner = 30.dp,
-                modifier = Modifier.fillMaxWidth(0.94f).testTag("match_result_plaque"),
-                contentPadding = PaddingValues(horizontal = 30.dp, vertical = 14.dp),
+                corner = 24.dp,
+                modifier = Modifier.fillMaxWidth(0.92f).testTag("match_result_plaque"),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 10.dp),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(id = if (won) R.string.post_match_victory else R.string.post_match_defeat).uppercase(),
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         color = CreamText,
                     )
                     Text(
@@ -133,13 +133,13 @@ public fun PostMatchPreviewScreen(
                             humanTotal,
                             opponentTotal,
                         ).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = CreamText,
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (isAnalyzing || analysisResult == null) {
                 ParchmentPanel(modifier = Modifier.fillMaxWidth()) {
@@ -166,9 +166,9 @@ public fun PostMatchPreviewScreen(
                     NineSliceBox(
                         skin = R.drawable.skin_plaque_wood,
                         slice = 0.3f,
-                        corner = 18.dp,
+                        corner = 16.dp,
                         modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp),
+                        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 12.dp),
                     ) {
                         Text(
                             text = stringResource(
@@ -177,13 +177,14 @@ public fun PostMatchPreviewScreen(
                                 analysis.count(humanSeat, MoveGrade.BLUNDER),
                             ).uppercase(),
                             style = MaterialTheme.typography.titleMedium,
+                            fontSize = 15.sp,
                             color = Color(0xFFFFE082),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.testTag("player_accuracy"),
                         )
                     }
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 4.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 2.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         GradeStat(R.drawable.badge_best, analysis.count(humanSeat, MoveGrade.BEST), R.string.post_match_best_moves_label, "player_best_moves")
@@ -196,34 +197,34 @@ public fun PostMatchPreviewScreen(
                             analysis.accuracy(opponentSeat),
                             analysis.count(opponentSeat, MoveGrade.BLUNDER),
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = InkText.copy(alpha = 0.75f),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("opponent_summary_card"),
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("opponent_summary_card"),
                     )
                     if (trainingScore != null && trainingScore.second > 0) {
                         val (correct, total) = trainingScore
                         Text(
                             text = stringResource(id = R.string.training_score_label, correct * 100 / total, correct, total),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF9C6B00),
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("match_over_attention_score"),
+                            modifier = Modifier.fillMaxWidth().padding(top = 2.dp).testTag("match_over_attention_score"),
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Il Maestro commenta la partita
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     FramedPortrait(
                         portrait = if (won) R.drawable.maestro_celebrating else R.drawable.maestro_thinking,
-                        size = 84.dp,
+                        size = 68.dp,
                         background = Color(0xFF7D3F19),
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     MaestroDialogueBox(
                         title = stringResource(id = R.string.game_player_maestro),
                         message = stringResource(
@@ -237,14 +238,14 @@ public fun PostMatchPreviewScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 MaestroPillButton(
                     text = stringResource(id = R.string.post_match_review_button).uppercase(),
                     onClick = { analysisResult?.let { onReviewClicked(it) } },
                     variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                    height = 58.dp,
-                    fontSize = 22.sp,
+                    height = 50.dp,
+                    fontSize = 20.sp,
                     modifier = Modifier.fillMaxWidth(),
                     testTag = "post_match_review_button",
                 )
@@ -252,18 +253,18 @@ public fun PostMatchPreviewScreen(
                     text = stringResource(id = R.string.post_match_rematch).uppercase(),
                     onClick = onRematchClicked,
                     variant = PillButtonVariant.PRIMARY_GREEN,
-                    height = 72.dp,
-                    fontSize = 30.sp,
-                    modifier = Modifier.fillMaxWidth(0.8f).padding(top = 12.dp),
+                    height = 58.dp,
+                    fontSize = 24.sp,
+                    modifier = Modifier.fillMaxWidth(0.85f).padding(top = 8.dp),
                     testTag = "post_match_rematch_button",
                 )
                 MaestroPillButton(
                     text = stringResource(id = R.string.post_match_back_to_menu).uppercase(),
                     onClick = onHomeClicked,
                     variant = PillButtonVariant.SECONDARY_AMBER,
-                    height = 54.dp,
-                    fontSize = 20.sp,
-                    modifier = Modifier.fillMaxWidth(0.8f).padding(top = 10.dp),
+                    height = 46.dp,
+                    fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(0.85f).padding(top = 6.dp),
                     testTag = "post_match_home_button",
                 )
             }
@@ -277,19 +278,20 @@ private val InkText = Color(0xFF2B1A10)
 /** Bollino della review (asset F1-13) con il numero di mosse di quel tipo. */
 @Composable
 private fun GradeStat(@DrawableRes badge: Int, count: Int, @StringRes label: Int, tag: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(96.dp)) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(90.dp)) {
         Box(contentAlignment = Alignment.Center) {
-            Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(58.dp))
+            Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(46.dp))
         }
         Text(
             text = count.toString(),
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
             color = InkText,
             modifier = Modifier.testTag(tag),
         )
         Text(
             text = stringResource(id = label),
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelSmall,
             color = InkText,
             textAlign = TextAlign.Center,
         )

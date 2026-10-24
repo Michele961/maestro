@@ -3,18 +3,20 @@ package it.maestro.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import it.maestro.app.ui.theme.WoodSurfaceDark
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -81,15 +83,20 @@ public sealed interface Screen {
 public class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        // Esperienza da gioco immersivo a tutto schermo: nasconde status bar e navigation bar
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+
         setContent {
             MaestroTheme {
-                // F1-26: niente rimbalzo "da web app" e contenuto mai sotto notch o status bar.
+                // F1-26: niente rimbalzo "da web app" e contenuto ad altezza naturale.
                 CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(WoodSurfaceDark)
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                 val matchRepository: MatchRepository = koinInject()
                 val settingsRepository: SettingsRepository = koinInject()

@@ -80,13 +80,13 @@ public fun HomeScreen(
                 HomeHeader(onSettingsClicked = onSettingsClicked)
                 // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
                 MaestroWelcome(modifier = Modifier.weight(1f))
-                // "Gioca ora" sul piedistallo di panno ovale, come nel mockup
+                // "Gioca ora" / "Riprendi partita" sul piedistallo di panno ovale, come nel mockup
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
                     Image(
                         painter = painterResource(R.drawable.felt_oval_base),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.fillMaxWidth().height(96.dp),
+                        modifier = Modifier.fillMaxWidth().height(if (hasActiveMatch) 82.dp else 96.dp),
                     )
                     MaestroPillButton(
                         text = stringResource(
@@ -94,9 +94,9 @@ public fun HomeScreen(
                         ).uppercase(),
                         onClick = if (hasActiveMatch) onResumeGameClicked else onStartGameClicked,
                         variant = PillButtonVariant.HERO_RED,
-                        height = 80.dp,
-                        fontSize = if (hasActiveMatch) 26.sp else 34.sp,
-                        modifier = Modifier.fillMaxWidth(0.72f),
+                        height = if (hasActiveMatch) 66.dp else 80.dp,
+                        fontSize = if (hasActiveMatch) 24.sp else 34.sp,
+                        modifier = Modifier.fillMaxWidth(if (hasActiveMatch) 0.82f else 0.72f),
                         testTag = if (hasActiveMatch) "resume_game_button" else "play_now_button",
                     )
                 }
@@ -105,7 +105,9 @@ public fun HomeScreen(
                         text = stringResource(R.string.home_start_game),
                         onClick = onStartGameClicked,
                         variant = PillButtonVariant.SECONDARY_AMBER,
-                        modifier = Modifier.fillMaxWidth(0.6f),
+                        height = 42.dp,
+                        fontSize = 16.sp,
+                        modifier = Modifier.fillMaxWidth(0.55f),
                         testTag = "new_game_button",
                     )
                 }
@@ -209,19 +211,24 @@ private fun HomeHeader(onSettingsClicked: () -> Unit) {
 
 @Composable
 private fun MaestroWelcome(modifier: Modifier = Modifier) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 160.dp)) {
-        val compact = maxHeight < 230.dp
-        val portrait = (maxHeight - 104.dp).coerceIn(76.dp, 134.dp)
-        WoodPanel(modifier = Modifier.fillMaxSize().padding(top = 24.dp, start = 28.dp)) {}
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 130.dp)) {
+        val compact = maxHeight < 210.dp
+        val ultraCompact = maxHeight < 170.dp
+        val portrait = when {
+            ultraCompact -> 72.dp
+            compact -> 86.dp
+            else -> (maxHeight - 100.dp).coerceIn(90.dp, 134.dp)
+        }
+        WoodPanel(modifier = Modifier.fillMaxSize().padding(top = 18.dp, start = 28.dp)) {}
         Image(
             painter = painterResource(R.drawable.banner_italy),
             contentDescription = null,
-            modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp).size(width = 48.dp, height = 88.dp),
+            modifier = Modifier.align(Alignment.TopStart).padding(top = 6.dp).size(width = 44.dp, height = 80.dp),
         )
         Column(
             modifier = Modifier
                 .align(if (compact) Alignment.BottomStart else Alignment.BottomCenter)
-                .padding(start = if (compact) 46.dp else 28.dp, bottom = 6.dp),
+                .padding(start = if (compact) 42.dp else 28.dp, bottom = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             FramedPortrait(
@@ -234,21 +241,21 @@ private fun MaestroWelcome(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.home_maestro_title).uppercase(),
                 onClick = {},
                 variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                height = if (compact) 28.dp else 34.dp,
-                fontSize = if (compact) 12.sp else 14.sp,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = if (compact) 16.dp else 24.dp),
-                modifier = Modifier.offset(y = (-10).dp),
+                height = if (compact) 26.dp else 34.dp,
+                fontSize = if (compact) 11.sp else 14.sp,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = if (compact) 14.dp else 24.dp),
+                modifier = Modifier.offset(y = (-8).dp),
             )
         }
-        // Fumetto compatto in alto, come nel mockup: non copre il ritratto.
+        // Fumetto compatto in alto, a destra, come nel mockup: non copre il ritratto.
         MaestroSpeechBubble(
             message = stringResource(R.string.home_coach_welcome),
             tail = if (compact) BubbleTail.BOTTOM_START else BubbleTail.BOTTOM_CENTER,
-            fontSize = if (compact) 12.sp else 13.sp,
+            fontSize = if (compact) 11.sp else 13.sp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(end = 10.dp)
-                .fillMaxWidth(if (compact) 0.56f else 0.62f),
+                .padding(end = 8.dp, top = if (ultraCompact) 0.dp else 4.dp)
+                .fillMaxWidth(if (compact) 0.55f else 0.62f),
         )
     }
 }
