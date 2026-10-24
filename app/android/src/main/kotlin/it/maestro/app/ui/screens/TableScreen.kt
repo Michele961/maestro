@@ -3,6 +3,7 @@ package it.maestro.app.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,8 +41,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -177,12 +182,37 @@ public fun TableContent(
         }
     }
 
+    val context = LocalContext.current
+    val tableFeltResId = remember {
+        val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
+        if (id != 0) id else null
+    }
+
+    val feltBrush = remember {
+        Brush.radialGradient(
+            colors = listOf(
+                Color(0xFF225740),
+                Color(0xFF1B4332),
+                Color(0xFF0D281E),
+                Color(0xFF081C15),
+            ),
+        )
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TableFeltColor)
+            .background(feltBrush)
             .testTag("table_screen"),
     ) {
+        if (tableFeltResId != null) {
+            Image(
+                painter = painterResource(id = tableFeltResId),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
