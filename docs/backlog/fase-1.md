@@ -156,7 +156,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-11 — Suggerimento su richiesta in Sparring
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §4, decisione D9
 - **Obiettivo:** pulsante "Chiedi al Maestro" che evidenzia la mossa migliore secondo il valutatore, solo nelle partite di Sparring.
 - **Criteri di accettazione:**
@@ -165,7 +165,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-12 — Check di allenamento
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** `docs/ai/maestro.md` (Check e puzzle), `docs/vision.md` §5.A
 - **Obiettivo:** scelta di un fondamentale prima della partita e domande a scelta multipla calcolate dalla vista (carte di un seme uscite, sette passati, chi è avanti in primiera); punteggio di attenzione a fine partita.
 - **Criteri di accettazione:**
