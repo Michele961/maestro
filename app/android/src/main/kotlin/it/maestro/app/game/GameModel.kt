@@ -55,6 +55,7 @@ public data class GameUiState(
     val isHumanTurn: Boolean,
     val isBotThinking: Boolean,
     val pendingCaptureChoice: PendingCaptureChoice?,
+    val pendingDealScore: DealScore? = null,
     val lastEvent: UiGameEvent?,
     val errorMessage: String?,
 )
@@ -73,6 +74,7 @@ public sealed interface GameIntent {
     public data class PlayCard(val card: Card) : GameIntent
     public data class SelectCapture(val card: Card, val capture: Set<Card>) : GameIntent
     public data object CancelCaptureChoice : GameIntent
+    public data object DismissDealSummary : GameIntent
     public data object RequestBotMove : GameIntent
     public data class ApplyBotMove(val move: ScopaMove) : GameIntent
     public data object DismissError : GameIntent
@@ -88,6 +90,7 @@ public data class GameInternalState(
     val botLevel: DifficultyLevel,
     val matchLog: MatchLog,
     val pendingCapture: PendingCaptureChoice? = null,
+    val pendingDealScore: DealScore? = null,
     val isBotThinking: Boolean = false,
     val lastError: String? = null,
     val lastEvent: UiGameEvent? = null,
@@ -108,9 +111,10 @@ public data class GameInternalState(
             opponentSweeps = view.sweeps[opponentSeat] ?: 0,
             humanScore = view.totals[humanSeat] ?: 0,
             opponentScore = view.totals[opponentSeat] ?: 0,
-            isHumanTurn = view.phase == DealPhase.PLAYING && view.toMove == humanSeat,
+            isHumanTurn = view.phase == DealPhase.PLAYING && view.toMove == humanSeat && pendingDealScore == null,
             isBotThinking = isBotThinking,
             pendingCaptureChoice = pendingCapture,
+            pendingDealScore = pendingDealScore,
             lastEvent = lastEvent,
             errorMessage = lastError,
         )

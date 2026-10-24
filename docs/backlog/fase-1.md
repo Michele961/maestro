@@ -106,21 +106,21 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-06 — Schermata del tavolo con carte segnaposto
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §2 (solo contesto), ADR-0008 (segnaposto fino a Fase 1 avanzata)
 - **Obiettivo:** tavolo in Compose: mano del giocatore, carte coperte dell'avversario, tavolo, mazzetti delle prese, mazzo residuo, punteggio. Quando la carta giocata ha più prese possibili (`scopa.md` §4.2–4.3), il giocatore sceglie quale. Animazioni base di giocata e presa.
 - **Criteri di accettazione:**
-    - [ ] Test UI: giocata semplice, presa obbligatoria, scelta tra due prese, scopa.
-    - [ ] Leggibile su schermo da 5" in verticale.
+    - [x] Test UI: giocata semplice, presa obbligatoria, scelta tra due prese, scopa.
+    - [x] Leggibile su schermo da 5" in verticale.
 - **Domande aperte:** —
 
 ## F1-07 — Flusso completo della partita
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Obiettivo:** pre-partita (livello, punteggio obiettivo 11/16/21 da `ScopaConfig`), partita, riepilogo di fine smazzata con i punti di `scopa.md` §6, fine partita con rivincita. Navigazione tra schermate.
 - **Criteri di accettazione:**
-    - [ ] Una partita completa contro ciascun livello si gioca dall'inizio alla fine (test UI su seed fisso).
-    - [ ] Il riepilogo di smazzata mostra le stesse voci e gli stessi valori dell'evento `DealEnded`.
+    - [x] Una partita completa contro ciascun livello si gioca dall'inizio alla fine (test UI su seed fisso).
+    - [x] Il riepilogo di smazzata mostra le stesse voci e gli stessi valori dell'evento `DealEnded`.
 - **Domande aperte:** —
 
 ## F1-08 — Salvataggio, ripresa e impostazioni

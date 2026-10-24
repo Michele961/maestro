@@ -25,6 +25,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.game.GameIntent
 import it.maestro.app.game.GameUiState
@@ -56,6 +58,9 @@ import it.maestro.app.ui.components.PlaceholderCardView
 import it.maestro.game.model.Card
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.DealScore
+import it.maestro.game.scopa.ScopaConfig
+import it.maestro.game.scopa.ScoreCategory
 import org.koin.androidx.compose.koinViewModel
 
 public val TableFeltColor: Color = Color(0xFF1B4332)
@@ -63,20 +68,42 @@ public val TableFeltDarkColor: Color = Color(0xFF081C15)
 public val GoldAccentColor: Color = Color(0xFFD4AF37)
 
 /**
- * Schermata di gioco del tavolo di Scopa (ADR-0012, task F1-06).
+ * Schermata di gioco del tavolo di Scopa (ADR-0012, task F1-06, F1-07).
  */
 @Composable
 public fun TableScreen(
     modifier: Modifier = Modifier,
+    level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
+    targetScore: Int = 11,
+    seed: Long = 42L,
     viewModel: GameViewModel = koinViewModel(),
     onNavigateHome: () -> Unit = {},
 ) {
+    LaunchedEffect(level, targetScore, seed) {
+        viewModel.onIntent(
+            GameIntent.StartMatch(
+                config = ScopaConfig(targetScore = targetScore),
+                level = level,
+                seed = seed,
+            ),
+        )
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     TableContent(
         uiState = uiState,
         onIntent = viewModel::onIntent,
         modifier = modifier,
         onNavigateHome = onNavigateHome,
+        onRematch = {
+            viewModel.onIntent(
+                GameIntent.StartMatch(
+                    config = ScopaConfig(targetScore = targetScore),
+                    level = level,
+                    seed = System.currentTimeMillis(),
+                ),
+            )
+        },
     )
 }
 
@@ -87,6 +114,7 @@ public fun TableContent(
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateHome: () -> Unit = {},
+    onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -156,11 +184,22 @@ public fun TableContent(
             )
         }
 
-        // Dialog fine partita
-        if (uiState.phase == DealPhase.MATCH_OVER) {
+        // Dialog riepilogo smazzata (task F1-07)
+        val dealScore = uiState.pendingDealScore
+        if (dealScore != null) {
+            DealSummaryDialog(
+                score = dealScore,
+                uiState = uiState,
+                onDismiss = { onIntent(GameIntent.DismissDealSummary) },
+            )
+        }
+
+        // Dialog fine partita (mostrato a partita finita se non c'è il riepilogo smazzata aperto)
+        if (uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null) {
             MatchOverDialog(
                 uiState = uiState,
-                onRematch = { onIntent(GameIntent.StartMatch()) },
+                onRematch = onRematch,
+                onNavigateHome = onNavigateHome,
             )
         }
     }
@@ -504,9 +543,185 @@ private fun CaptureSelectionDialog(
 }
 
 @Composable
+private fun DealSummaryDialog(
+    score: DealScore,
+    uiState: GameUiState,
+    onDismiss: () -> Unit,
+) {
+    val humanSeat = uiState.humanSeat
+    val oppSeat = humanSeat.other()
+
+    val categories = listOfNotNull(
+        ScoreCategory.CARTE to R.string.score_category_carte,
+        ScoreCategory.DENARI to R.string.score_category_denari,
+        ScoreCategory.SETTEBELLO to R.string.score_category_settebello,
+        ScoreCategory.PRIMIERA to R.string.score_category_primiera,
+        ScoreCategory.SCOPE to R.string.score_category_scope,
+        if (score.pointsBySeatAndCategory.getValue(humanSeat).containsKey(ScoreCategory.RE_BELLO)) {
+            ScoreCategory.RE_BELLO to R.string.score_category_re_bello
+        } else {
+            null
+        },
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = R.string.deal_summary_title),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("deal_summary_dialog"),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // Intestazione colonne: Categoria | Tu | Maestro
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.game_score_label),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.Gray,
+                        modifier = Modifier.weight(2f),
+                    )
+                    Text(
+                        text = stringResource(id = R.string.game_player_you),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = GoldAccentColor,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = stringResource(id = R.string.game_player_maestro),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                HorizontalDivider(color = Color.DarkGray)
+
+                for ((category, labelResId) in categories) {
+                    val tag = "deal_summary_${category.name.lowercase()}"
+                    val p1Pts = score.points(humanSeat, category)
+                    val p2Pts = score.points(oppSeat, category)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(tag),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(id = labelResId),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(2f),
+                        )
+                        Text(
+                            text = "$p1Pts",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = GoldAccentColor,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = "$p2Pts",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+
+                HorizontalDivider(color = Color.DarkGray)
+
+                // Totale smazzata
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("deal_summary_deal_total"),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.deal_summary_deal_total),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(2f),
+                    )
+                    Text(
+                        text = "${score.totalPoints(humanSeat)}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = GoldAccentColor,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "${score.totalPoints(oppSeat)}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                // Punteggio complessivo partita
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("deal_summary_match_total"),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.deal_summary_match_total),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.LightGray,
+                        modifier = Modifier.weight(2f),
+                    )
+                    Text(
+                        text = "${uiState.humanScore}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = GoldAccentColor,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "${uiState.opponentScore}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier.testTag("deal_summary_continue_button"),
+            ) {
+                Text(text = stringResource(id = R.string.deal_summary_continue))
+            }
+        },
+    )
+}
+
+@Composable
 private fun MatchOverDialog(
     uiState: GameUiState,
     onRematch: () -> Unit,
+    onNavigateHome: () -> Unit = {},
 ) {
     val winnerTitle = when {
         uiState.humanScore > uiState.opponentScore -> stringResource(id = R.string.game_winner_you)
@@ -535,6 +750,14 @@ private fun MatchOverDialog(
                 modifier = Modifier.testTag("rematch_button"),
             ) {
                 Text(text = stringResource(id = R.string.game_rematch_button))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onNavigateHome,
+                modifier = Modifier.testTag("navigate_home_button"),
+            ) {
+                Text(text = stringResource(id = R.string.game_menu_home))
             }
         },
     )
