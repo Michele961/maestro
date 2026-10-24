@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.ui.theme.ButtonAmberBottom
@@ -56,6 +57,7 @@ public fun MaestroPillButton(
     testTag: String? = null,
     height: Dp = 52.dp,
     contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+    fontSize: TextUnit = 17.sp,
 ) {
     val gradient = when (variant) {
         PillButtonVariant.HERO_RED -> Brush.verticalGradient(
@@ -102,7 +104,7 @@ public fun MaestroPillButton(
             Text(
                 text = text,
                 color = Color.White,
-                fontSize = 17.sp,
+                fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 letterSpacing = 0.5.sp,

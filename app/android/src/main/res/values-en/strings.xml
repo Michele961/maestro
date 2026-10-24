@@ -127,4 +127,20 @@
     <string name="settings_close">Close</string>
     <string name="home_settings_button">Settings</string>
     <string name="home_coach_welcome">Welcome to the club! Ready for a match or some strategic training?</string>
+    <!-- Home (F1-18): decorative entries with fixed values until the features exist -->
+    <string name="home_play_now">Play now</string>
+    <string name="home_play">Play</string>
+    <string name="home_coming_soon">Coming soon</string>
+    <string name="home_game_briscola">Briscola</string>
+    <string name="home_game_scopa">Scopa</string>
+    <string name="home_player_name">Player · Lv. 1</string>
+    <string name="home_coins_placeholder">12,450</string>
+    <string name="home_gems_placeholder">280</string>
+    <string name="home_news">Club news</string>
+    <string name="home_daily_rewards">Daily rewards</string>
+    <string name="home_friends">Friends</string>
+    <string name="home_nav_leaderboard">Leaderboard</string>
+    <string name="home_nav_training">Training</string>
+    <string name="home_nav_shop">Shop</string>
+    <string name="home_messages">Messages</string>
 </resources>

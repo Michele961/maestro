@@ -127,4 +127,20 @@
     <string name="settings_close">Chiudi</string>
     <string name="home_settings_button">Impostazioni</string>
     <string name="home_coach_welcome">Benvenuto al circolo! Pronto per una sfida o per allenarti sulle strategie?</string>
+    <!-- Home (F1-18): voci decorative con valori fissi finché non esistono le funzioni -->
+    <string name="home_play_now">Gioca ora</string>
+    <string name="home_play">Gioca</string>
+    <string name="home_coming_soon">Presto disponibile</string>
+    <string name="home_game_briscola">Briscola</string>
+    <string name="home_game_scopa">Scopa</string>
+    <string name="home_player_name">Giocatore · Liv. 1</string>
+    <string name="home_coins_placeholder">12.450</string>
+    <string name="home_gems_placeholder">280</string>
+    <string name="home_news">Notizie dal circolo</string>
+    <string name="home_daily_rewards">Premi giornalieri</string>
+    <string name="home_friends">Amici</string>
+    <string name="home_nav_leaderboard">Classifica</string>
+    <string name="home_nav_training">Palestra</string>
+    <string name="home_nav_shop">Bottega</string>
+    <string name="home_messages">Messaggi</string>
 </resources>
