@@ -100,8 +100,11 @@ public class RoomMatchRepository(
 
     override suspend fun restoreActiveMatch(): RestoreMatchResult {
         val active = dao.getActiveMatch() ?: return RestoreMatchResult.None
-        val parsedLog = MatchLog.parse(active.matchLogText)
-            ?: return RestoreMatchResult.Corrupted("Log non valido o illeggibile")
+        val parsedLog = try {
+            MatchLog.parse(active.matchLogText)
+        } catch (e: Exception) {
+            return RestoreMatchResult.Corrupted("Log non valido o illeggibile: ${e.message}")
+        }
 
         return when (val result = replay(parsedLog)) {
             is ReplayResult.Ok -> {
@@ -176,8 +179,11 @@ public class InMemoryMatchRepository : MatchRepository {
     override suspend fun restoreActiveMatch(): RestoreMatchResult {
         val active = activeMatch ?: return RestoreMatchResult.None
         if (active.status != "IN_PROGRESS") return RestoreMatchResult.None
-        val parsedLog = MatchLog.parse(active.matchLogText)
-            ?: return RestoreMatchResult.Corrupted("Log non valido o illeggibile")
+        val parsedLog = try {
+            MatchLog.parse(active.matchLogText)
+        } catch (e: Exception) {
+            return RestoreMatchResult.Corrupted("Log non valido o illeggibile: ${e.message}")
+        }
 
         return when (val result = replay(parsedLog)) {
             is ReplayResult.Ok -> {

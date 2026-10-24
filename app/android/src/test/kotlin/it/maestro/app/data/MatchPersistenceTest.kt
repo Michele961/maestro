@@ -128,8 +128,8 @@ class MatchPersistenceTest {
             moves = emptyList(),
         )
         val validText = validLog.toText()
-        // Sostituiamo la riga della rulesVersion
-        val wrongVersionText = validText.replace("rulesVersion: ${CoreGame.RULES_VERSION}", "rulesVersion: 99")
+        // Sostituiamo la riga della rulesVersion (formato "rules <version>")
+        val wrongVersionText = validText.replace("rules ${CoreGame.RULES_VERSION}", "rules 99")
 
         repository.setActiveMatchDirectly(
             SavedMatchEntity(
@@ -158,14 +158,14 @@ class MatchPersistenceTest {
     fun logWithCorruptedMovesIsHandledGracefullyWithoutCrash() = runBlocking {
         val repository = InMemoryMatchRepository()
 
-        // Log con mossa illegale (carta inventata)
-        val corruptedText = "rulesVersion: ${CoreGame.RULES_VERSION}\n" +
-            "targetScore: 11\n" +
-            "reBello: false\n" +
-            "redealOnThreeKings: true\n" +
-            "seed: 42\n" +
-            "moves:\n" +
-            "- card: 99_X\n"
+        val validLog = MatchLog(
+            rulesVersion = CoreGame.RULES_VERSION,
+            config = ScopaConfig(),
+            seed = 42L,
+            moves = emptyList(),
+        )
+        // Log con mossa illeggibile/corrotta
+        val corruptedText = validLog.toText() + "\nmove 99_X -"
 
         repository.setActiveMatchDirectly(
             SavedMatchEntity(
