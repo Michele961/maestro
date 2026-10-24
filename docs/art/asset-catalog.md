@@ -3,7 +3,7 @@
 Questo documento elenca l'elenco esatto dei file richiesti per il mazzo di carte napoletane, il tavolo e l'avatar del Maestro (task F1-13).
 
 Posizione target nel progetto Android:
-`app/android/src/main/res/drawable/` (oppure `app/android/src/main/res/drawable-nodpi/` per file WebP/PNG ad alta risoluzione non scalati).
+`app/android/src/main/res/drawable-nodpi/` (WebP, non ridimensionati da Android in base alla densità dello schermo).
 
 ---
 
@@ -11,7 +11,7 @@ Posizione target nel progetto Android:
 
 | File Name | Descrizione | Risoluzione Minima Consigliata | Stato |
 |---|---|---|---|
-| `card_back.png` | Dorso della carta comune (verde bottiglia e oro) | `600 × 936 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
+| `card_back.webp` | Dorso della carta comune (verde bottiglia e oro) | `600 × 936 px` | **Approvato v1.0** (integrato in `res/drawable-nodpi/`) |
 | `table_felt_bg.webp` | Texture panno verde con vignettatura e luce centrale | `1080 × 1920 px` | **Approvato v1.0** (`res/drawable-nodpi/`, 1000 × 1116) |
 
 ---
@@ -20,7 +20,7 @@ Posizione target nel progetto Android:
 
 | File Name | Stato Emotivo | Risoluzione Minima | Stato |
 |---|---|---|---|
-| `maestro_neutral.png` | Stato normale / neutro con cornice ottone e targa | `512 × 512 px` | **Approvato v1.0** (integrato in `res/drawable/`) |
+| `maestro_neutral.webp` | Stato normale / neutro con cornice ottone e targa | `512 × 512 px` | **Approvato v1.0** (integrato in `res/drawable-nodpi/`) |
 | `maestro_thinking.webp` | Il bot o l'utente stanno pensando | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
 | `maestro_pleased.webp` | Risposta corretta nei check o mossa ottima | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
 | `maestro_warning.webp` | Risposta errata nei check o blunder | `512 × 512 px` | **Approvato v1.0** (`res/drawable-nodpi/`, ritratto senza cornice) |
@@ -64,7 +64,7 @@ La convenzione di denominazione è:
 4. `card_denari_4.webp`
 5. `card_denari_5.webp`
 6. `card_denari_6.webp`
-7. `card_denari_7.png` *(Il Settebello: **Approvato v1.0**, integrato in `res/drawable/`)*
+7. `card_denari_7.webp` *(Il Settebello: **Approvato v1.0**, integrato in `res/drawable-nodpi/`)*
 8. `card_denari_fante.webp`
 9. `card_denari_cavallo.webp`
 10. `card_denari_re.webp`
@@ -94,7 +94,7 @@ La convenzione di denominazione è:
 30. `card_spade_re.webp`
 
 ### 3.4. Bastoni (`bastoni`)
-31. `card_bastoni_asso.png` *(Asso di Bastoni: **Approvato v1.0**, integrato in `res/drawable/`)*
+31. `card_bastoni_asso.webp` *(Asso di Bastoni: **Approvato v1.0**, integrato in `res/drawable-nodpi/`)*
 32. `card_bastoni_2.webp`
 33. `card_bastoni_3.webp`
 34. `card_bastoni_4.webp`
@@ -110,6 +110,6 @@ La convenzione di denominazione è:
 ## 4. Integrazione nell'App
 
 Nel codice Compose, la classe [`DeckTheme`](file:///Users/mike/Projects/maestro/app/android/src/main/kotlin/it/maestro/app/ui/theme/DeckTheme.kt) controllerà la presenza del drawable con l'ID corrispondente:
-- Se l'asset `card_<seme>_<valore>` è presente nella cartella `res/drawable/`, verrà renderizzato direttamente con ombreggiatura e bordi appropriati.
+- Se l'asset `card_<seme>_<valore>` è presente nella cartella `res/drawable-nodpi/`, verrà renderizzato direttamente con ombreggiatura e bordi appropriati.
 - Se un asset non è ancora presente, il sistema utilizzerà automaticamente e senza crash il rendering vettoriale segnaposto.
 Questo permette di aggiungere o sostituire carte anche una alla volta o a gruppi.
