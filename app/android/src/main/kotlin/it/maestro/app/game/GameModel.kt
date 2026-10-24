@@ -10,9 +10,32 @@ import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.viewFor
+import it.maestro.game.training.TrainingFundamental
+import it.maestro.game.training.TrainingQuestion
+
+/**
+ * Risultato memorizzato di un quesito di allenamento completato durante la partita (task F1-12).
+ */
+public data class TrainingCheckResult(
+    val fundamental: TrainingFundamental,
+    val question: TrainingQuestion,
+    val selectedIndex: Int,
+    val isCorrect: Boolean,
+)
+
+/**
+ * Feedback mostrato all'utente subito dopo aver risposto al quesito di allenamento (task F1-12).
+ */
+public data class TrainingAnswerFeedback(
+    val selectedIndex: Int,
+    val isCorrect: Boolean,
+    val correctIndex: Int,
+    val explanationValues: List<Int> = emptyList(),
+)
 
 /**
  * Rappresenta la scelta di presa multipla per il giocatore umano quando una carta giocata
+
  * può effettuare più prese distinte dal tavolo (spec §4.2–4.3, ADR-0012, task F1-05).
  *
  * @property card Carta giocata dalla mano che ha generato la scelta.
@@ -57,6 +80,10 @@ public data class GameUiState(
     val isSparring: Boolean = true,
     val suggestedMove: ScopaMove? = null,
     val isHintLoading: Boolean = false,
+    val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+    val activeTrainingQuestion: TrainingQuestion? = null,
+    val trainingQuestionFeedback: TrainingAnswerFeedback? = null,
+    val trainingResults: List<TrainingCheckResult> = emptyList(),
     val pendingCaptureChoice: PendingCaptureChoice?,
     val pendingDealScore: DealScore? = null,
     val lastEvent: UiGameEvent?,
@@ -72,6 +99,7 @@ public sealed interface GameIntent {
         val level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
         val seed: Long = 42L,
         val humanSeat: Seat = Seat.P1,
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     ) : GameIntent
 
     public data class RestoreMatch(
@@ -79,6 +107,7 @@ public sealed interface GameIntent {
         val matchLog: MatchLog,
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     ) : GameIntent
 
     public data class PlayCard(val card: Card) : GameIntent
@@ -90,6 +119,9 @@ public sealed interface GameIntent {
     public data object RequestHint : GameIntent
     public data class ApplyHint(val move: ScopaMove) : GameIntent
     public data object ClearHint : GameIntent
+    public data class SelectTrainingFundamental(val fundamental: TrainingFundamental) : GameIntent
+    public data class AnswerTrainingQuestion(val selectedIndex: Int) : GameIntent
+    public data object DismissTrainingQuestion : GameIntent
     public data object DismissError : GameIntent
     public data object DismissEvent : GameIntent
 }
@@ -108,6 +140,11 @@ public data class GameInternalState(
     val isSparring: Boolean = true,
     val suggestedMove: ScopaMove? = null,
     val isHintLoading: Boolean = false,
+    val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+    val activeTrainingQuestion: TrainingQuestion? = null,
+    val trainingQuestionFeedback: TrainingAnswerFeedback? = null,
+    val trainingResults: List<TrainingCheckResult> = emptyList(),
+    val hasAskedQuestionThisDeal: Boolean = false,
     val lastError: String? = null,
     val lastEvent: UiGameEvent? = null,
 ) {
@@ -127,11 +164,18 @@ public data class GameInternalState(
             opponentSweeps = view.sweeps[opponentSeat] ?: 0,
             humanScore = view.totals[humanSeat] ?: 0,
             opponentScore = view.totals[opponentSeat] ?: 0,
-            isHumanTurn = view.phase == DealPhase.PLAYING && view.toMove == humanSeat && pendingDealScore == null,
+            isHumanTurn = view.phase == DealPhase.PLAYING &&
+                view.toMove == humanSeat &&
+                pendingDealScore == null &&
+                activeTrainingQuestion == null,
             isBotThinking = isBotThinking,
             isSparring = isSparring,
             suggestedMove = suggestedMove,
             isHintLoading = isHintLoading,
+            trainingFundamental = trainingFundamental,
+            activeTrainingQuestion = activeTrainingQuestion,
+            trainingQuestionFeedback = trainingQuestionFeedback,
+            trainingResults = trainingResults,
             pendingCaptureChoice = pendingCapture,
             pendingDealScore = pendingDealScore,
             lastEvent = lastEvent,

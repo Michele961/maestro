@@ -26,6 +26,7 @@ import it.maestro.app.ui.theme.MaestroTheme
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaState
+import it.maestro.game.training.TrainingFundamental
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -38,6 +39,7 @@ public sealed interface Screen {
     public data class Table(
         val level: DifficultyLevel,
         val targetScore: Int,
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
         val restoredState: ScopaState? = null,
         val restoredLog: MatchLog? = null,
     ) : Screen
@@ -104,14 +106,19 @@ public class MainActivity : ComponentActivity() {
                         onStartGameClicked = { currentScreen = Screen.PreGame },
                     )
                     Screen.PreGame -> PreGameScreen(
-                        onStartGame = { level, targetScore ->
-                            currentScreen = Screen.Table(level = level, targetScore = targetScore)
+                        onStartGame = { level, targetScore, fundamental ->
+                            currentScreen = Screen.Table(
+                                level = level,
+                                targetScore = targetScore,
+                                trainingFundamental = fundamental,
+                            )
                         },
                         onNavigateBack = { currentScreen = Screen.Home },
                     )
                     is Screen.Table -> TableScreen(
                         level = screen.level,
                         targetScore = screen.targetScore,
+                        trainingFundamental = screen.trainingFundamental,
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
                         onNavigateHome = { currentScreen = Screen.Home },

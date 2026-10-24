@@ -33,4 +33,17 @@ class PreGameScreenTest {
             assertTrue(config.targetScore in 1..100)
         }
     }
+
+    @Test
+    fun trainingFundamentalsIncludeAllSupportedOptions() {
+        val expected = listOf(
+            it.maestro.game.training.TrainingFundamental.NONE,
+            it.maestro.game.training.TrainingFundamental.SEVENS_COUNT,
+            it.maestro.game.training.TrainingFundamental.DENARI_COUNT,
+            it.maestro.game.training.TrainingFundamental.PRIMIERA_LEAD,
+            it.maestro.game.training.TrainingFundamental.SETTEBELLO_LOCATION,
+            it.maestro.game.training.TrainingFundamental.CARDS_LEAD,
+        )
+        assertEquals(expected, it.maestro.game.training.TrainingFundamental.entries)
+    }
 }

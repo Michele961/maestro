@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.game.training.TrainingFundamental
 
 private val SelectedBorderColor = Color(0xFFE9C46A)
 private val SelectedCardColor = Color(0xFF264653)
@@ -49,11 +50,13 @@ public fun PreGameScreen(
     modifier: Modifier = Modifier,
     initialLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     initialTargetScore: Int = 11,
-    onStartGame: (DifficultyLevel, Int) -> Unit = { _, _ -> },
+    initialFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
+    onStartGame: (DifficultyLevel, Int, TrainingFundamental) -> Unit = { _, _, _ -> },
     onNavigateBack: () -> Unit = {},
 ) {
     var selectedLevel by remember { mutableStateOf(initialLevel) }
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
+    var selectedFundamental by remember { mutableStateOf(initialFundamental) }
 
     val levels = listOf(
         DifficultyLevel.PRINCIPIANTE to R.string.level_principiante,
@@ -67,6 +70,15 @@ public fun PreGameScreen(
         11 to R.string.target_score_11,
         16 to R.string.target_score_16,
         21 to R.string.target_score_21,
+    )
+
+    val fundamentals = listOf(
+        TrainingFundamental.SEVENS_COUNT to R.string.training_fundamental_sevens,
+        TrainingFundamental.DENARI_COUNT to R.string.training_fundamental_denari,
+        TrainingFundamental.PRIMIERA_LEAD to R.string.training_fundamental_primiera,
+        TrainingFundamental.SETTEBELLO_LOCATION to R.string.training_fundamental_settebello,
+        TrainingFundamental.CARDS_LEAD to R.string.training_fundamental_cards,
+        TrainingFundamental.NONE to R.string.training_fundamental_none,
     )
 
     Surface(
@@ -191,11 +203,62 @@ public fun PreGameScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Sezione Obiettivo di Allenamento (Check)
+            Text(
+                text = stringResource(id = R.string.pre_game_training_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(bottom = 8.dp),
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("training_fundamental_selector"),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                for ((fundamental, stringResId) in fundamentals) {
+                    val isSelected = selectedFundamental == fundamental
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { selectedFundamental = fundamental }
+                            .testTag("training_fundamental_option_${fundamental.name}")
+                            .border(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = if (isSelected) SelectedBorderColor else Color.DarkGray,
+                                shape = RoundedCornerShape(8.dp),
+                            ),
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) SelectedCardColor else UnselectedCardColor,
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = stringResource(id = stringResId),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) SelectedBorderColor else Color.White,
+                            )
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // Pulsanti di azione
             Button(
-                onClick = { onStartGame(selectedLevel, selectedTargetScore) },
+                onClick = { onStartGame(selectedLevel, selectedTargetScore, selectedFundamental) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

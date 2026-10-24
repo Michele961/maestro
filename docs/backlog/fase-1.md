@@ -165,13 +165,13 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-12 — Check di allenamento
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** `docs/ai/maestro.md` (Check e puzzle), `docs/vision.md` §5.A
 - **Obiettivo:** scelta di un fondamentale prima della partita e domande a scelta multipla calcolate dalla vista (carte di un seme uscite, sette passati, chi è avanti in primiera); punteggio di attenzione a fine partita.
 - **Criteri di accettazione:**
-    - [ ] Le risposte corrette sono calcolate da funzioni pure sulla vista, testate.
-    - [ ] Elenco dei Check e momento delle domande approvati da Michele prima dell'implementazione.
-- **Domande aperte:** quali Check per primi, quante domande per partita, quando vengono poste.
+    - [x] Le risposte corrette sono calcolate da funzioni pure sulla vista, testate.
+    - [x] Elenco dei Check e momento delle domande approvati da Michele prima dell'implementazione.
+- **Domande aperte:** risolte con Michele (5 fondamentali: Sette, Denari, Primiera, Settebello, Carte; 1 domanda a smazzata triggerata nei momenti critici o a metà smazzata; punteggio di attenzione a fine partita).
 
 ## F1-13 — Guida di stile e asset definitivi
 
