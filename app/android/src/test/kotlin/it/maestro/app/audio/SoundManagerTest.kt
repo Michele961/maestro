@@ -2,10 +2,7 @@ package it.maestro.app.audio
 
 import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runCurrent
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -47,9 +44,8 @@ class SoundManagerTest {
         assertEquals(expected, SoundEffect.entries.toSet())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun settingsFlowUpdatesSoundManagerEnabledState() = runTest {
+    fun settingsFlowUpdatesSoundManagerEnabledState() = runBlocking {
         val settingsRepo = InMemorySettingsRepository(AppSettings(soundEnabled = true))
         val soundManager = NoOpSoundManager(isEnabled = true)
 
