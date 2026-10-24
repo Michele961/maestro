@@ -56,4 +56,6 @@
     <string name="deal_summary_match_total">Match total</string>
     <string name="deal_summary_continue">Continue</string>
     <string name="game_menu_home">Main Menu</string>
+    <string name="home_resume_game">Resume Match</string>
+    <string name="error_wrong_rules_version">Cannot resume: match was saved with a different rules version.</string>
 </resources>

@@ -56,4 +56,6 @@
     <string name="deal_summary_match_total">Totale partita</string>
     <string name="deal_summary_continue">Continua</string>
     <string name="game_menu_home">Menu Principale</string>
+    <string name="home_resume_game">Riprendi Partita</string>
+    <string name="error_wrong_rules_version">Impossibile riprendere: la partita è stata salvata con una versione di regole diversa.</string>
 </resources>

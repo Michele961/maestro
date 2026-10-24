@@ -130,8 +130,8 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Obiettivo:** Room per lo storico delle partite (solo `MatchLog` + metadati); ripresa della partita interrotta rigiocando il log; DataStore per le impostazioni (lingua, suoni, livello preferito).
 - **Perimetro autorizzato:** Room e DataStore nel version catalog.
 - **Criteri di accettazione:**
-    - [ ] Chiudere l'app a metà partita e riaprirla porta allo stesso identico stato (test).
-    - [ ] Un log con `rulesVersion` diverso è gestito senza crash (`WrongRulesVersion`).
+    - [x] Chiudere l'app a metà partita e riaprirla porta allo stesso identico stato (test).
+    - [x] Un log con `rulesVersion` diverso è gestito senza crash (`WrongRulesVersion`).
 - **Domande aperte:** —
 
 ## F1-09 — Anteprima post-partita

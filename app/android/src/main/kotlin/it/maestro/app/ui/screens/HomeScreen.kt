@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.maestro.app.R
@@ -24,6 +26,8 @@ import it.maestro.app.R
 @Composable
 public fun HomeScreen(
     modifier: Modifier = Modifier,
+    hasActiveMatch: Boolean = false,
+    onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
 ) {
     Surface(
@@ -49,10 +53,28 @@ public fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = onStartGameClicked,
-            ) {
-                Text(text = stringResource(id = R.string.home_start_game))
+
+            if (hasActiveMatch) {
+                Button(
+                    onClick = onResumeGameClicked,
+                    modifier = Modifier.testTag("resume_game_button"),
+                ) {
+                    Text(text = stringResource(id = R.string.home_resume_game))
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = onStartGameClicked,
+                    modifier = Modifier.testTag("new_game_button"),
+                ) {
+                    Text(text = stringResource(id = R.string.home_start_game))
+                }
+            } else {
+                Button(
+                    onClick = onStartGameClicked,
+                    modifier = Modifier.testTag("new_game_button"),
+                ) {
+                    Text(text = stringResource(id = R.string.home_start_game))
+                }
             }
         }
     }

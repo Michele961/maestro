@@ -2,7 +2,10 @@ package it.maestro.app.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.maestro.app.data.repository.MatchRepository
+import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
+import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.viewFor
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * ViewModel MVI per la schermata di gioco della Scopa (ADR-0012, task F1-05).
+ * ViewModel MVI per la schermata di gioco della Scopa (ADR-0012, task F1-05, F1-08).
  *
  * Mantiene il flusso unidirezionale dei dati:
  * `UI -> Intent -> Reducer -> State -> UI`
@@ -23,6 +26,7 @@ import kotlinx.coroutines.withContext
  * default [Dispatchers.Default]) passando unicamente [viewFor] e [legalMoves].
  */
 public class GameViewModel(
+    private val matchRepository: MatchRepository? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
 ) : ViewModel() {
@@ -49,6 +53,29 @@ public class GameViewModel(
         val result = GameReducer.reduce(internalState, intent)
         internalState = result.state
         _uiState.value = internalState.toUiState()
+
+        // Persistenza automatica della partita (ADR-0003, task F1-08)
+        if (matchRepository != null) {
+            scope.launch {
+                val scopaState = internalState.scopaState
+                if (scopaState.phase == DealPhase.PLAYING) {
+                    matchRepository.saveActiveMatch(
+                        log = internalState.matchLog,
+                        level = internalState.botLevel,
+                        targetScore = scopaState.config.targetScore,
+                        p1Score = scopaState.totals[Seat.P1] ?: 0,
+                        p2Score = scopaState.totals[Seat.P2] ?: 0,
+                    )
+                } else if (scopaState.phase == DealPhase.MATCH_OVER) {
+                    matchRepository.markCompleted(
+                        winner = scopaState.winner,
+                        p1Score = scopaState.totals[Seat.P1] ?: 0,
+                        p2Score = scopaState.totals[Seat.P2] ?: 0,
+                    )
+                }
+            }
+        }
+
         handleEffect(result.effect)
     }
 

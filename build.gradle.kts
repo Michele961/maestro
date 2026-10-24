@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 /*
@@ -42,6 +43,11 @@ val allowedExternalDeps: Map<String, Set<String>> = mapOf(
         "androidx.lifecycle:lifecycle-viewmodel-compose",
         "io.insert-koin:koin-android",
         "io.insert-koin:koin-androidx-compose",
+        "androidx.room:room-runtime",
+        "androidx.room:room-ktx",
+        "androidx.room:room-compiler",
+        "androidx.datastore:datastore-preferences",
+        "androidx.datastore:datastore-preferences-core",
     ),
 )
 

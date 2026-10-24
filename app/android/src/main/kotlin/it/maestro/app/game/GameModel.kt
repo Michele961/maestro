@@ -71,6 +71,13 @@ public sealed interface GameIntent {
         val humanSeat: Seat = Seat.P1,
     ) : GameIntent
 
+    public data class RestoreMatch(
+        val state: ScopaState,
+        val matchLog: MatchLog,
+        val level: DifficultyLevel,
+        val humanSeat: Seat = Seat.P1,
+    ) : GameIntent
+
     public data class PlayCard(val card: Card) : GameIntent
     public data class SelectCapture(val card: Card, val capture: Set<Card>) : GameIntent
     public data object CancelCaptureChoice : GameIntent
