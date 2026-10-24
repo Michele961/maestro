@@ -140,8 +140,8 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Riferimenti:** ADR-0005, `docs/vision.md` §3.4
 - **Obiettivo:** a fine partita, `MatchAnalyzer` sul telefono (in background) e schermata con precisione % e numero di errori gravi del giocatore.
 - **Criteri di accettazione:**
-    - [ ] I numeri mostrati coincidono con `sim --analyze` sullo stesso log (test).
-    - [ ] La UI resta reattiva durante l'analisi.
+    - [x] I numeri mostrati coincidono con `sim --analyze` sullo stesso log (test).
+    - [x] La UI resta reattiva durante l'analisi.
 - **Domande aperte:** —
 
 ## F1-10 — Game Review mossa per mossa

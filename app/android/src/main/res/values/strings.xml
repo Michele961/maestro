@@ -58,4 +58,13 @@
     <string name="game_menu_home">Menu Principale</string>
     <string name="home_resume_game">Riprendi Partita</string>
     <string name="error_wrong_rules_version">Impossibile riprendere: la partita è stata salvata con una versione di regole diversa.</string>
+    <string name="post_match_title">Resoconto Partita</string>
+    <string name="post_match_subtitle">Analisi del Coach AI</string>
+    <string name="post_match_analyzing">Il Maestro sta analizzando la tua partita…</string>
+    <string name="post_match_view_analysis">Analisi Partita</string>
+    <string name="post_match_accuracy_label">Precisione</string>
+    <string name="post_match_blunders_label">Errori gravi</string>
+    <string name="post_match_inaccuracies_label">Inesattezze</string>
+    <string name="post_match_best_moves_label">Mosse ottime</string>
+    <string name="post_match_review_button">Rivedi Partita</string>
 </resources>

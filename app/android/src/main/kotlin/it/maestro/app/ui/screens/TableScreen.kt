@@ -82,6 +82,7 @@ public fun TableScreen(
     restoreLog: MatchLog? = null,
     viewModel: GameViewModel = koinViewModel(),
     onNavigateHome: () -> Unit = {},
+    onViewAnalysis: (MatchLog) -> Unit = {},
 ) {
     LaunchedEffect(level, targetScore, seed, restoreState) {
         if (restoreState != null && restoreLog != null) {
@@ -109,6 +110,7 @@ public fun TableScreen(
         onIntent = viewModel::onIntent,
         modifier = modifier,
         onNavigateHome = onNavigateHome,
+        onViewAnalysis = { onViewAnalysis(viewModel.currentMatchLog) },
         onRematch = {
             viewModel.onIntent(
                 GameIntent.StartMatch(
@@ -128,6 +130,7 @@ public fun TableContent(
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateHome: () -> Unit = {},
+    onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -213,6 +216,7 @@ public fun TableContent(
             MatchOverDialog(
                 uiState = uiState,
                 onRematch = onRematch,
+                onViewAnalysis = onViewAnalysis,
                 onNavigateHome = onNavigateHome,
             )
         }
@@ -735,6 +739,7 @@ private fun DealSummaryDialog(
 private fun MatchOverDialog(
     uiState: GameUiState,
     onRematch: () -> Unit,
+    onViewAnalysis: () -> Unit = {},
     onNavigateHome: () -> Unit = {},
 ) {
     val winnerTitle = when {
@@ -753,10 +758,23 @@ private fun MatchOverDialog(
             )
         },
         text = {
-            Text(
-                text = "${stringResource(id = R.string.game_score_label)}: ${uiState.humanScore} — ${uiState.opponentScore}",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "${stringResource(id = R.string.game_score_label)}: ${uiState.humanScore} — ${uiState.opponentScore}",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Button(
+                    onClick = onViewAnalysis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("view_analysis_button"),
+                ) {
+                    Text(text = stringResource(id = R.string.post_match_view_analysis))
+                }
+            }
         },
         confirmButton = {
             Button(
