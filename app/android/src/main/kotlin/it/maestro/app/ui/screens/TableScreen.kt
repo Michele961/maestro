@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -510,11 +511,7 @@ private fun TableCardsAndDeckZone(
                     modifier = Modifier.testTag("deck_pile"),
                 ) {
                     if (deckCount > 0) {
-                        Image(
-                            painter = painterResource(R.drawable.card_stack),
-                            contentDescription = null,
-                            modifier = Modifier.width(64.dp),
-                        )
+                        DeckStack(cards = deckCount)
                     } else {
                         Box(
                             modifier = Modifier
@@ -1201,4 +1198,19 @@ private fun TrainingQuestionDialog(
             }
         },
     )
+}
+
+/** Pila del mazzo disegnata con il dorso del mazzo in uso, una copia sfalsata ogni ~5 carte (max 6). */
+@Composable
+private fun DeckStack(cards: Int) {
+    val layers = ((cards + 4) / 5).coerceIn(1, 6)
+    Box(modifier = Modifier.width(64.dp).height((96 + (layers - 1) * 3).dp)) {
+        repeat(layers) { i ->
+            CardBackView(
+                width = 64.dp,
+                height = 96.dp,
+                modifier = Modifier.offset(x = (i * 2).dp, y = ((layers - 1 - i) * 3).dp),
+            )
+        }
+    }
 }
