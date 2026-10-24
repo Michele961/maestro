@@ -281,6 +281,7 @@ public fun TactileSegmentedPill(
                 color = textColor,
                 fontSize = 13.sp,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                textAlign = TextAlign.Center,
             )
         }
     }

@@ -249,7 +249,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-20 — Modale "Preparati a giocare"
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** `PreGameScreen` come in `reference_pre_match_dialog.png`.
 - **Criteri di accettazione:**
@@ -258,7 +258,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-21 — Tavolo da gioco con gli asset definitivi
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** `TableScreen` come in `reference_table_screen.jpg`; le carte restano su `DeckTheme`.
 - **Criteri di accettazione:**
