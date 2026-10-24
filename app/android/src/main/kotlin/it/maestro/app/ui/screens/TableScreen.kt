@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -66,6 +67,8 @@ import it.maestro.app.game.UiGameEvent
 import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.MaestroAvatarView
 import it.maestro.app.ui.components.MaestroMood
+import it.maestro.app.ui.components.MaestroPillButton
+import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.PlaceholderCardView
 import it.maestro.app.ui.components.ScorePlaque
 import it.maestro.game.model.Card
@@ -206,14 +209,33 @@ public fun TableContent(
             .background(feltBrush)
             .testTag("table_screen"),
     ) {
-        if (tableFeltResId != null) {
-            Image(
-                painter = painterResource(id = tableFeltResId),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
+        // Cornice in legno attorno al panno, come in reference_table_screen.jpg (F1-21)
+        Image(
+            painter = painterResource(R.drawable.texture_wood),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            TableTopBar(uiState = uiState)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
+            ) {
+                if (tableFeltResId != null) {
+                    Image(
+                        painter = painterResource(id = tableFeltResId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Box(modifier = Modifier.fillMaxSize().background(feltBrush))
+                }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -227,7 +249,7 @@ public fun TableContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 2. TABELLONE PUNTEGGIO E STATO TURNO
+            // 2. STATO TURNO (il punteggio è nella barra superiore)
             ScoreAndStatusHeader(uiState = uiState)
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -254,6 +276,8 @@ public fun TableContent(
                     onIntent(GameIntent.RequestHint)
                 },
             )
+        }
+            }
         }
 
         // Host per notifiche di errore
@@ -308,6 +332,39 @@ public fun TableContent(
     }
 }
 
+/** Barra superiore su legno: avversario con espressione e punteggio della partita (F1-21). */
+@Composable
+private fun TableTopBar(uiState: GameUiState) {
+    val mood = when {
+        uiState.lastEvent is UiGameEvent.Sweep -> MaestroMood.CELEBRATING
+        uiState.isBotThinking || uiState.isHintLoading -> MaestroMood.THINKING
+        uiState.trainingQuestionFeedback?.isCorrect == true -> MaestroMood.PLEASED
+        uiState.trainingQuestionFeedback?.isCorrect == false -> MaestroMood.WARNING
+        else -> MaestroMood.NEUTRAL
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .testTag("table_top_bar"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MaestroAvatarView(mood = mood, size = 52.dp)
+        Text(
+            text = stringResource(id = R.string.game_player_maestro),
+            style = MaterialTheme.typography.titleMedium,
+            color = GoldAccentColor,
+            modifier = Modifier.padding(start = 8.dp).weight(1f),
+        )
+        ScorePlaque(
+            p1Score = uiState.humanScore,
+            p2Score = uiState.opponentScore,
+            p1Label = stringResource(id = R.string.game_player_you),
+            p2Label = stringResource(id = R.string.game_player_maestro),
+        )
+    }
+}
+
 @Composable
 private fun OpponentZone(uiState: GameUiState) {
     Card(
@@ -315,7 +372,7 @@ private fun OpponentZone(uiState: GameUiState) {
             .fillMaxWidth()
             .testTag("opponent_zone"),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = TableFeltDarkColor),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Column(
             modifier = Modifier
@@ -328,25 +385,7 @@ private fun OpponentZone(uiState: GameUiState) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    val mood = when {
-                        uiState.lastEvent is UiGameEvent.Sweep -> MaestroMood.CELEBRATING
-                        uiState.isBotThinking || uiState.isHintLoading -> MaestroMood.THINKING
-                        uiState.trainingQuestionFeedback?.isCorrect == true -> MaestroMood.PLEASED
-                        uiState.trainingQuestionFeedback?.isCorrect == false -> MaestroMood.WARNING
-                        else -> MaestroMood.NEUTRAL
-                    }
-                    MaestroAvatarView(mood = mood, size = 32.dp)
-                    Text(
-                        text = stringResource(id = R.string.game_player_maestro),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = GoldAccentColor,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                Spacer(modifier = Modifier.width(1.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = "${stringResource(id = R.string.game_sweeps_label)}: ${uiState.opponentSweeps}",
@@ -384,15 +423,6 @@ private fun ScoreAndStatusHeader(uiState: GameUiState) {
             .testTag("score_and_status_header"),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ScorePlaque(
-            p1Score = uiState.humanScore,
-            p2Score = uiState.opponentScore,
-            p1Label = stringResource(id = R.string.game_player_you),
-            p2Label = stringResource(id = R.string.game_player_maestro),
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
         // Indicatore di turno
         val statusText = if (uiState.isHumanTurn) {
             stringResource(id = R.string.game_your_turn)
@@ -431,7 +461,7 @@ private fun TableCardsAndDeckZone(
             .fillMaxWidth()
             .testTag("table_cards_zone"),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF14382A)),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Column(
             modifier = Modifier
@@ -538,7 +568,7 @@ private fun PlayerZone(
             .fillMaxWidth()
             .testTag("player_zone"),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = TableFeltDarkColor),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Column(
             modifier = Modifier
@@ -628,28 +658,19 @@ private fun PlayerZone(
             // Pulsante "Chiedi al Maestro" (solo nelle partite di Sparring, F1-11, D9)
             if (uiState.isSparring) {
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(
+                MaestroPillButton(
+                    text = if (uiState.isHintLoading) {
+                        stringResource(id = R.string.game_hint_loading)
+                    } else {
+                        stringResource(id = R.string.game_hint_button)
+                    },
                     onClick = onRequestHint,
                     enabled = uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(42.dp)
-                        .testTag("game_hint_button"),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF1976D2),
-                        disabledContainerColor = Color(0xFF374151),
-                    ),
-                ) {
-                    Text(
-                        text = if (uiState.isHintLoading) {
-                            stringResource(id = R.string.game_hint_loading)
-                        } else {
-                            stringResource(id = R.string.game_hint_button)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                    height = 46.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "game_hint_button",
+                )
             }
         }
     }
