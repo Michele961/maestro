@@ -45,6 +45,13 @@ import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.R
 import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.PlaceholderCardView
+import it.maestro.app.ui.theme.ButtonGoldBorder
+import it.maestro.app.ui.theme.GradeErroreGraveRed
+import it.maestro.app.ui.theme.GradeImprecisioneYellow
+import it.maestro.app.ui.theme.GradeMagistraleBlue
+import it.maestro.app.ui.theme.TableFeltGreenDark
+import it.maestro.app.ui.theme.WoodSurfaceDark
+import it.maestro.app.ui.theme.WoodSurfaceLight
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
@@ -57,14 +64,14 @@ import it.maestro.game.scopa.newMatch
 import it.maestro.game.scopa.play
 import it.maestro.game.scopa.viewFor
 
-private val TableSurfaceColor = Color(0xFF132A13)
-private val BoardFeltColor = Color(0xFF1B4332)
-private val CardAreaBg = Color(0xFF1E293B)
-private val GoldAccent = Color(0xFFE9C46A)
+private val TableSurfaceColor = WoodSurfaceDark
+private val BoardFeltColor = TableFeltGreenDark
+private val CardAreaBg = WoodSurfaceLight
+private val GoldAccent = ButtonGoldBorder
 
-private val BestBadgeColor = Color(0xFF2196F3)
-private val InaccuracyBadgeColor = Color(0xFFFFB300)
-private val BlunderBadgeColor = Color(0xFFE53935)
+private val BestBadgeColor = GradeMagistraleBlue
+private val InaccuracyBadgeColor = GradeImprecisioneYellow
+private val BlunderBadgeColor = GradeErroreGraveRed
 
 /**
  * Singolo stato visualizzato durante la Game Review mossa per mossa (F1-10, ADR-0005).
