@@ -151,4 +151,12 @@
     <string name="pre_game_mode_classic">Classica</string>
     <string name="pre_game_mode_sparring">Sparring</string>
     <string name="pre_game_mode_sparring_hint">Con consigli del Maestro</string>
+    <string name="game_pause">Pausa</string>
+    <string name="game_resume">Riprendi</string>
+    <string name="game_opponent_short">Avv</string>
+    <string name="game_sweeps_short">%1$d scope</string>
+    <string name="game_suit_denari">di denari</string>
+    <string name="game_suit_coppe">di coppe</string>
+    <string name="game_suit_spade">di spade</string>
+    <string name="game_suit_bastoni">di bastoni</string>
 </resources>
