@@ -175,6 +175,7 @@ public fun TableContent(
                 tableCards = uiState.tableCards,
                 deckCount = uiState.deckCardCount,
                 lastEvent = uiState.lastEvent,
+                suggestedCapture = uiState.suggestedMove?.capture,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -183,6 +184,7 @@ public fun TableContent(
             PlayerZone(
                 uiState = uiState,
                 onCardClicked = { card -> onIntent(GameIntent.PlayCard(card)) },
+                onRequestHint = { onIntent(GameIntent.RequestHint) },
             )
         }
 
@@ -344,6 +346,7 @@ private fun TableCardsAndDeckZone(
     tableCards: List<Card>,
     deckCount: Int,
     lastEvent: UiGameEvent?,
+    suggestedCapture: Set<Card>? = null,
 ) {
     Card(
         modifier = Modifier
@@ -420,12 +423,24 @@ private fun TableCardsAndDeckZone(
                     maxItemsInEachRow = 5,
                 ) {
                     for (card in tableCards) {
+                        val isSuggestedCapture = suggestedCapture != null && card in suggestedCapture
                         PlaceholderCardView(
                             card = card,
                             isPlayable = false,
                             width = 50.dp,
                             height = 75.dp,
-                            modifier = Modifier.padding(3.dp),
+                            modifier = Modifier
+                                .padding(3.dp)
+                                .then(
+                                    if (isSuggestedCapture) {
+                                        Modifier.background(
+                                            color = Color(0xFF2196F3).copy(alpha = 0.35f),
+                                            shape = RoundedCornerShape(6.dp),
+                                        )
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                         )
                     }
                 }
@@ -438,6 +453,7 @@ private fun TableCardsAndDeckZone(
 private fun PlayerZone(
     uiState: GameUiState,
     onCardClicked: (Card) -> Unit,
+    onRequestHint: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier
@@ -477,6 +493,28 @@ private fun PlayerZone(
                 }
             }
 
+            // Banner del suggerimento del Maestro se presente
+            val suggested = uiState.suggestedMove
+            if (suggested != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF2196F3).copy(alpha = 0.2f), shape = RoundedCornerShape(6.dp))
+                        .border(1.dp, Color(0xFF2196F3), shape = RoundedCornerShape(6.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .testTag("game_hint_banner"),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.game_hint_banner, formatHintMove(suggested)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Carte in mano al giocatore umano
@@ -486,16 +524,89 @@ private fun PlayerZone(
                 modifier = Modifier.testTag("human_hand_row"),
             ) {
                 for (card in uiState.humanHand) {
-                    PlaceholderCardView(
-                        card = card,
-                        isPlayable = uiState.isHumanTurn,
-                        width = 64.dp,
-                        height = 96.dp,
-                        onClick = { onCardClicked(card) },
+                    val isSuggested = uiState.suggestedMove?.card == card
+                    Box(
+                        modifier = Modifier.then(
+                            if (isSuggested) {
+                                Modifier
+                                    .background(Color(0xFF2196F3).copy(alpha = 0.35f), shape = RoundedCornerShape(6.dp))
+                                    .border(2.dp, Color(0xFF2196F3), shape = RoundedCornerShape(6.dp))
+                            } else {
+                                Modifier
+                            },
+                        ),
+                    ) {
+                        PlaceholderCardView(
+                            card = card,
+                            isPlayable = uiState.isHumanTurn,
+                            width = 64.dp,
+                            height = 96.dp,
+                            onClick = { onCardClicked(card) },
+                        )
+                    }
+                }
+            }
+
+            // Pulsante "Chiedi al Maestro" (solo nelle partite di Sparring, F1-11, D9)
+            if (uiState.isSparring) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = onRequestHint,
+                    enabled = uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(42.dp)
+                        .testTag("game_hint_button"),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1976D2),
+                        disabledContainerColor = Color(0xFF374151),
+                    ),
+                ) {
+                    Text(
+                        text = if (uiState.isHintLoading) {
+                            stringResource(id = R.string.game_hint_loading)
+                        } else {
+                            stringResource(id = R.string.game_hint_button)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun formatHintMove(move: ScopaMove): String {
+    val assoStr = stringResource(id = R.string.game_card_rank_asso).take(1)
+    val fanteStr = stringResource(id = R.string.game_card_rank_fante).take(1)
+    val cavalloStr = stringResource(id = R.string.game_card_rank_cavallo).take(1)
+    val reStr = stringResource(id = R.string.game_card_rank_re).take(1)
+
+    fun cardLabel(card: Card): String {
+        val rankText = when (card.rank) {
+            Rank.ASSO -> assoStr
+            Rank.FANTE -> fanteStr
+            Rank.CAVALLO -> cavalloStr
+            Rank.RE -> reStr
+            else -> card.rank.value.toString()
+        }
+        val suitSymbol = when (card.suit) {
+            Suit.DENARI -> "◆"
+            Suit.SPADE -> "♠"
+            Suit.COPPE -> "♥"
+            Suit.BASTONI -> "♣"
+        }
+        return "$rankText$suitSymbol"
+    }
+
+    val cardStr = cardLabel(move.card)
+    return if (move.capture.isEmpty()) {
+        cardStr
+    } else {
+        val captureStr = move.capture.joinToString(", ") { cardLabel(it) }
+        "$cardStr → $captureStr"
     }
 }
 

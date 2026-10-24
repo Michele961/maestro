@@ -2,6 +2,8 @@ package it.maestro.app.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.maestro.ai.bot.PimcEvaluator
+import it.maestro.ai.bot.SearchBudget
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
@@ -98,6 +100,27 @@ public class GameViewModel(
                     }
 
                     onIntent(GameIntent.ApplyBotMove(chosenMove))
+                }
+            }
+            is GameEffect.ComputeHint -> {
+                scope.launch {
+                    // Criterio di accettazione F1-11: Il suggerimento usa solo viewFor() del giocatore umano
+                    val humanView = viewFor(internalState.scopaState, effect.humanSeat)
+                    val legal = legalMoves(internalState.scopaState)
+                    val bestMove = withContext(ioDispatcher) {
+                        val evaluations = PimcEvaluator.evaluate(
+                            view = humanView,
+                            legal = legal,
+                            rng = SeededRng(internalState.scopaState.rngState xor 0x7E7E7EL),
+                            budget = SearchBudget(samples = 15, maxNodes = 60),
+                        )
+                        evaluations.maxByOrNull { it.value }?.move ?: legal.firstOrNull()
+                    }
+                    if (bestMove != null) {
+                        onIntent(GameIntent.ApplyHint(bestMove))
+                    } else {
+                        onIntent(GameIntent.ClearHint)
+                    }
                 }
             }
             null -> {}

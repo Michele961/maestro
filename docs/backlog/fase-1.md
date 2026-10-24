@@ -146,7 +146,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-10 — Game Review mossa per mossa
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Riferimenti:** `docs/ai/maestro.md` (Analizzatore), `docs/vision.md` §5.B
 - **Obiettivo:** rivedere la partita mossa per mossa (avanti, indietro, salto ai momenti chiave) con il colore della classe (Blu/Giallo/Rosso) e, per gli errori, la mossa migliore mostrata sul tavolo con il suo valore.
 - **Criteri di accettazione:**
@@ -156,11 +156,11 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-11 — Suggerimento su richiesta in Sparring
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Riferimenti:** `docs/vision.md` §4, decisione D9
 - **Obiettivo:** pulsante "Chiedi al Maestro" che evidenzia la mossa migliore secondo il valutatore, solo nelle partite di Sparring.
 - **Criteri di accettazione:**
-    - [ ] Il suggerimento usa solo `viewFor()` del giocatore umano (test).
+    - [x] Il suggerimento usa solo `viewFor()` del giocatore umano (test).
 - **Domande aperte:** —
 
 ## F1-12 — Check di allenamento
