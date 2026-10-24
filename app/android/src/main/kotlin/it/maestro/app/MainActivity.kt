@@ -3,7 +3,18 @@ package it.maestro.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import it.maestro.app.ui.theme.WoodSurfaceDark
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +63,8 @@ public sealed interface Screen {
         val matchLog: MatchLog,
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
+        /** Check di allenamento: risposte corrette e totali, se ce ne sono stati (F1-12). */
+        val trainingScore: Pair<Int, Int>? = null,
     ) : Screen
     public data class GameReview(
         val matchLog: MatchLog,
@@ -64,11 +77,20 @@ public sealed interface Screen {
 /**
  * Singola Activity dell'app Android Maestro (ADR-0012).
  */
+@OptIn(ExperimentalFoundationApi::class)
 public class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaestroTheme {
+                // F1-26: niente rimbalzo "da web app" e contenuto mai sotto notch o status bar.
+                CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(WoodSurfaceDark)
+                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                ) {
                 val matchRepository: MatchRepository = koinInject()
                 val settingsRepository: SettingsRepository = koinInject()
                 val crashReporter: CrashReporter = koinInject()
@@ -143,10 +165,11 @@ public class MainActivity : ComponentActivity() {
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
                         onNavigateHome = { currentScreen = Screen.Home },
-                        onViewAnalysis = { log ->
+                        onViewAnalysis = { log, training ->
                             currentScreen = Screen.PostMatchPreview(
                                 matchLog = log,
                                 level = screen.level,
+                                trainingScore = training,
                             )
                         },
                     )
@@ -154,6 +177,7 @@ public class MainActivity : ComponentActivity() {
                         matchLog = screen.matchLog,
                         level = screen.level,
                         humanSeat = screen.humanSeat,
+                        trainingScore = screen.trainingScore,
                         onReviewClicked = { analysis ->
                             currentScreen = Screen.GameReview(
                                 matchLog = screen.matchLog,
@@ -195,6 +219,8 @@ public class MainActivity : ComponentActivity() {
                             }
                         },
                     )
+                }
+                }
                 }
             }
         }

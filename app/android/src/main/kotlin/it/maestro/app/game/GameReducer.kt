@@ -262,9 +262,13 @@ public object GameReducer {
                 val newLog = state.matchLog.copy(moves = state.matchLog.moves + move)
                 var dealScore: DealScore? = null
                 var lastEvent: UiGameEvent? = null
+                var sweepCards = state.sweepCards
                 for (event in result.events) {
                     when (event) {
-                        is GameEvent.Sweep -> lastEvent = UiGameEvent.Sweep(event.seat)
+                        is GameEvent.Sweep -> {
+                            lastEvent = UiGameEvent.Sweep(event.seat)
+                            sweepCards = sweepCards + (event.seat to sweepCards[event.seat].orEmpty() + move.card)
+                        }
                         is GameEvent.DealEnded -> {
                             dealScore = event.score
                             lastEvent = UiGameEvent.DealEnded(event.score)
@@ -303,6 +307,7 @@ public object GameReducer {
                     hasAskedQuestionThisDeal = if (isDealOver) false else (state.hasAskedQuestionThisDeal || questionAskedNow),
                     lastError = null,
                     lastEvent = lastEvent ?: state.lastEvent,
+                    sweepCards = sweepCards,
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {

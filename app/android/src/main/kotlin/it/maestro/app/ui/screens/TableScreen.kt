@@ -6,10 +6,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.FramedPortrait
-import it.maestro.app.ui.components.MaestroDialogueBox
+import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
@@ -119,7 +120,7 @@ public fun TableScreen(
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     onNavigateHome: () -> Unit = {},
-    onViewAnalysis: (MatchLog) -> Unit = {},
+    onViewAnalysis: (MatchLog, Pair<Int, Int>?) -> Unit = { _, _ -> },
 ) {
     LaunchedEffect(level, targetScore, seed, restoreState, trainingFundamental) {
         if (restoreState != null && restoreLog != null) {
@@ -150,7 +151,11 @@ public fun TableScreen(
         modifier = modifier,
         soundManager = soundManager,
         onNavigateHome = onNavigateHome,
-        onViewAnalysis = { onViewAnalysis(viewModel.currentMatchLog) },
+        onViewAnalysis = {
+            val results = uiState.trainingResults
+            val training = if (results.isEmpty()) null else results.count { it.isCorrect } to results.size
+            onViewAnalysis(viewModel.currentMatchLog, training)
+        },
         onRematch = {
             viewModel.onIntent(
                 GameIntent.StartMatch(
@@ -183,6 +188,23 @@ public fun TableContent(
             is UiGameEvent.Sweep -> soundManager.play(SoundEffect.SWEEP)
             is UiGameEvent.DealEnded -> soundManager.play(SoundEffect.CARD_CAPTURE)
             else -> {}
+        }
+    }
+
+    // F1-26: "SCOPA!" e il Maestro festante restano a schermo solo per un momento.
+    LaunchedEffect(uiState.lastEvent) {
+        if (uiState.lastEvent is UiGameEvent.Sweep) {
+            kotlinx.coroutines.delay(SWEEP_BANNER_MILLIS)
+            onIntent(GameIntent.DismissEvent)
+        }
+    }
+
+    // F1-26: a fine partita si passa subito alla schermata di fine partita in stile (niente dialog Material).
+    val matchOver = uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null
+    LaunchedEffect(matchOver) {
+        if (matchOver) {
+            kotlinx.coroutines.delay(MATCH_OVER_PAUSE_MILLIS)
+            onViewAnalysis()
         }
     }
 
@@ -305,15 +327,6 @@ public fun TableContent(
             )
         }
 
-        // Dialog fine partita (mostrato a partita finita se non c'è il riepilogo smazzata aperto)
-        if (uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null) {
-            MatchOverDialog(
-                uiState = uiState,
-                onRematch = onRematch,
-                onViewAnalysis = onViewAnalysis,
-                onNavigateHome = onNavigateHome,
-            )
-        }
     }
 }
 
@@ -646,84 +659,13 @@ private fun DealSummaryDialog(
             }
         },
         confirmButton = {
-            Button(
+            MaestroPillButton(
+                text = stringResource(id = R.string.deal_summary_continue),
                 onClick = onDismiss,
-                modifier = Modifier.testTag("deal_summary_continue_button"),
-            ) {
-                Text(text = stringResource(id = R.string.deal_summary_continue))
-            }
-        },
-    )
-}
-
-@Composable
-private fun MatchOverDialog(
-    uiState: GameUiState,
-    onRematch: () -> Unit,
-    onViewAnalysis: () -> Unit = {},
-    onNavigateHome: () -> Unit = {},
-) {
-    val winnerTitle = when {
-        uiState.humanScore > uiState.opponentScore -> stringResource(id = R.string.game_winner_you)
-        uiState.opponentScore > uiState.humanScore -> stringResource(id = R.string.game_winner_maestro)
-        else -> stringResource(id = R.string.game_tie)
-    }
-
-    MaestroAlertDialog(
-        onDismissRequest = {},
-        title = {
-            Text(
-                text = winnerTitle,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
+                variant = PillButtonVariant.PRIMARY_GREEN,
+                height = 46.dp,
+                testTag = "deal_summary_continue_button",
             )
-        },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    text = "${stringResource(id = R.string.game_score_label)}: ${uiState.humanScore} — ${uiState.opponentScore}",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                if (uiState.trainingResults.isNotEmpty()) {
-                    val correct = uiState.trainingResults.count { it.isCorrect }
-                    val total = uiState.trainingResults.size
-                    val pct = (correct * 100) / total
-                    Text(
-                        text = stringResource(id = R.string.training_score_label, pct, correct, total),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = DialogGold,
-                        modifier = Modifier.testTag("match_over_attention_score"),
-                    )
-                }
-                Button(
-                    onClick = onViewAnalysis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("view_analysis_button"),
-                ) {
-                    Text(text = stringResource(id = R.string.post_match_view_analysis))
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onRematch,
-                modifier = Modifier.testTag("rematch_button"),
-            ) {
-                Text(text = stringResource(id = R.string.game_rematch_button))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onNavigateHome,
-                modifier = Modifier.testTag("navigate_home_button"),
-            ) {
-                Text(text = stringResource(id = R.string.game_menu_home))
-            }
         },
     )
 }
@@ -811,36 +753,39 @@ private fun TrainingQuestionDialog(
                         val isSelected = feedback?.selectedIndex == index
                         val isCorrectOption = index == question.correctIndex
 
+                        // F1-26: opzioni su cartoncino chiaro con inchiostro scuro; colori pieni solo dopo la risposta.
                         val borderCol = when {
-                            !isAnswered -> Color.DarkGray
-                            isCorrectOption -> Color(0xFF4CAF50)
-                            isSelected -> Color(0xFFE57373)
-                            else -> Color.DarkGray
+                            !isAnswered -> GoldAccentColor
+                            isCorrectOption -> Color(0xFF2E7D32)
+                            isSelected -> Color(0xFFC62828)
+                            else -> Color(0x553B2213)
                         }
                         val bgCol = when {
-                            !isAnswered -> TableFeltDarkColor
-                            isCorrectOption -> Color(0xFF1B5E20)
-                            isSelected -> Color(0xFFB71C1C)
-                            else -> TableFeltDarkColor
+                            !isAnswered -> OptionPaper
+                            isCorrectOption -> Color(0xFF2E7D32)
+                            isSelected -> Color(0xFFC62828)
+                            else -> OptionPaper.copy(alpha = 0.5f)
                         }
+                        val textCol = if (isAnswered && (isCorrectOption || isSelected)) Color.White else DialogInk
 
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("training_option_$index")
-                                .border(1.dp, borderCol, RoundedCornerShape(8.dp))
+                                .border(2.dp, borderCol, RoundedCornerShape(10.dp))
                                 .clickable(enabled = feedback == null) {
                                     soundManager.play(SoundEffect.BUTTON_CLICK)
                                     onAnswer(index)
                                 },
-                            shape = RoundedCornerShape(8.dp),
+                            shape = RoundedCornerShape(10.dp),
                             color = bgCol,
                         ) {
                             Text(
                                 text = optionText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = if (isSelected || isCorrectOption) FontWeight.Bold else FontWeight.Normal,
-                                color = DialogInk,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = textCol,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 modifier = Modifier.padding(12.dp),
                             )
                         }
@@ -867,7 +812,7 @@ private fun TrainingQuestionDialog(
                             text = feedbackText,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = DialogInk,
+                            color = Color.White,
                             modifier = Modifier.padding(12.dp),
                         )
                     }
@@ -876,12 +821,13 @@ private fun TrainingQuestionDialog(
         },
         confirmButton = {
             if (feedback != null) {
-                Button(
+                MaestroPillButton(
+                    text = stringResource(id = R.string.training_feedback_continue),
                     onClick = onContinue,
-                    modifier = Modifier.testTag("training_continue_button"),
-                ) {
-                    Text(text = stringResource(id = R.string.training_feedback_continue))
-                }
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 46.dp,
+                    testTag = "training_continue_button",
+                )
             }
         },
     )
@@ -925,22 +871,45 @@ private fun FeltLayout(
         // Colonna destra: mazzo e prese
         Column(
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
-            CapturePile(count = uiState.opponentCapturedCount, sweeps = uiState.opponentSweeps, tag = "opponent_captures")
+            CapturePile(count = uiState.opponentCapturedCount, sweepCards = uiState.opponentSweepCards, sweeps = uiState.opponentSweeps, tag = "opponent_captures")
             Box(modifier = Modifier.testTag("deck_pile"), contentAlignment = Alignment.BottomCenter) {
                 if (uiState.deckCardCount > 0) DeckStack(cards = uiState.deckCardCount)
                 CountBadge(uiState.deckCardCount.toString())
             }
-            CapturePile(count = uiState.humanCapturedCount, sweeps = uiState.humanSweeps, tag = "human_captures")
+            CapturePile(count = uiState.humanCapturedCount, sweepCards = uiState.humanSweepCards, sweeps = uiState.humanSweeps, tag = "human_captures")
         }
+
+        // Il Maestro a sinistra, come nel mockup: fumetto compatto che sparisce da solo o con un tap.
+        // In Sparring il ritratto resta visibile e toccarlo chiede il consiglio (niente pulsante extra).
+        val hint = uiState.suggestedMove
+        var hintDismissed by remember(hint) { mutableStateOf(false) }
+        LaunchedEffect(hint) {
+            if (hint != null) {
+                kotlinx.coroutines.delay(HINT_BUBBLE_MILLIS)
+                hintDismissed = true
+            }
+        }
+        val showHint = hint != null && !hintDismissed
+        val sweeping = uiState.lastEvent is UiGameEvent.Sweep
+        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading
+        val showLeftBubble = showHint || uiState.isHintLoading || sweeping
 
         // Carte in tavola, al centro in griglia
         FlowRow(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(start = if (uiState.suggestedMove != null) 128.dp else 30.dp, end = 86.dp, bottom = 40.dp)
+                .padding(
+                    start = when {
+                        showLeftBubble -> 108.dp
+                        uiState.isSparring -> 80.dp
+                        else -> 24.dp
+                    },
+                    end = 86.dp,
+                    bottom = 40.dp,
+                )
                 .testTag("table_cards_zone"),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -948,12 +917,12 @@ private fun FeltLayout(
         ) {
             val suggested = uiState.suggestedMove?.capture
             for (card in uiState.tableCards) {
-                val big = uiState.tableCards.size <= 4 && uiState.suggestedMove == null
+                val big = uiState.tableCards.size <= 4 && !showLeftBubble
                 PlaceholderCardView(
                     card = card,
                     isPlayable = false,
-                    width = if (big) 92.dp else 72.dp,
-                    height = if (big) 138.dp else 108.dp,
+                    width = if (big) 82.dp else 72.dp,
+                    height = if (big) 123.dp else 108.dp,
                     modifier = if (suggested != null && card in suggested) {
                         Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
                     } else {
@@ -963,37 +932,48 @@ private fun FeltLayout(
             }
         }
 
-        // Il Maestro a sinistra, con il fumetto quando ha qualcosa da dire
         Column(
-            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 120.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 150.dp).width(120.dp),
+            horizontalAlignment = Alignment.Start,
         ) {
-            AnimatedVisibility(visible = uiState.suggestedMove != null, enter = fadeIn(), exit = fadeOut()) {
-                val move = uiState.suggestedMove
-                if (move != null) {
-                    MaestroDialogueBox(
-                        message = formatHintMove(move),
-                        title = stringResource(id = R.string.game_player_maestro),
-                        modifier = Modifier.width(120.dp).testTag("game_hint_banner"),
-                    )
-                }
+            AnimatedVisibility(visible = showHint || uiState.isHintLoading, enter = fadeIn(), exit = fadeOut()) {
+                MaestroSpeechBubble(
+                    message = if (hint != null) formatHintMove(hint) else stringResource(id = R.string.game_hint_loading),
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .clickable { hintDismissed = true }
+                        .testTag("game_hint_banner"),
+                )
             }
-            AnimatedVisibility(visible = uiState.lastEvent is UiGameEvent.Sweep, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = sweeping, enter = fadeIn(), exit = fadeOut()) {
                 MaestroPillButton(
                     text = stringResource(id = R.string.game_event_sweep).uppercase(),
                     onClick = {},
                     variant = PillButtonVariant.HERO_RED,
-                    height = 44.dp,
-                    fontSize = 20.sp,
-                    modifier = Modifier.width(150.dp),
+                    height = 38.dp,
+                    fontSize = 17.sp,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
                 )
             }
-            if (uiState.suggestedMove != null || uiState.lastEvent is UiGameEvent.Sweep) {
-                FramedPortrait(
-                    portrait = if (uiState.lastEvent is UiGameEvent.Sweep) R.drawable.maestro_celebrating else R.drawable.maestro_pleased,
-                    size = 84.dp,
-                    background = Color(0xFF7D3F19),
-                )
+            AnimatedVisibility(visible = uiState.isSparring || showHint || sweeping, enter = fadeIn(), exit = fadeOut()) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .alpha(if (canAskHint || showHint || sweeping) 1f else 0.7f)
+                        .clickable(enabled = canAskHint, onClick = onRequestHint)
+                        .testTag("game_hint_button"),
+                ) {
+                    FramedPortrait(
+                        portrait = when {
+                            sweeping -> R.drawable.maestro_celebrating
+                            showHint -> R.drawable.maestro_pleased
+                            else -> R.drawable.maestro_neutral
+                        },
+                        size = 72.dp,
+                        background = Color(0xFF7D3F19),
+                        contentDescription = stringResource(id = R.string.game_hint_button),
+                    )
+                }
             }
         }
 
@@ -1003,23 +983,6 @@ private fun FeltLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             HandFan(uiState = uiState, onCardClicked = onCardClicked)
-            if (uiState.isSparring) {
-                MaestroPillButton(
-                    text = if (uiState.isHintLoading) {
-                        stringResource(id = R.string.game_hint_loading)
-                    } else {
-                        stringResource(id = R.string.game_hint_button)
-                    },
-                    onClick = onRequestHint,
-                    enabled = uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading,
-                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                    height = 42.dp,
-                    fontSize = 16.sp,
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 24.dp),
-                    modifier = Modifier.padding(top = 6.dp),
-                    testTag = "game_hint_button",
-                )
-            }
         }
     }
 }
@@ -1067,21 +1030,45 @@ private fun HandFan(uiState: GameUiState, onCardClicked: (Card) -> Unit) {
     }
 }
 
-/** Pila delle prese, con il conteggio delle carte e delle scope. */
+/**
+ * Pila delle prese con il conteggio. Le carte che hanno fatto scopa stanno scoperte e di traverso
+ * sotto la pila, sporgendo in basso, come in `reference_table_screen.jpg` (F1-26).
+ */
 @Composable
-private fun CapturePile(count: Int, sweeps: Int, tag: String) {
-    Box(modifier = Modifier.testTag(tag), contentAlignment = Alignment.BottomCenter) {
-        if (count > 0) {
-            DeckStack(cards = count)
-        } else {
-            Box(
+private fun CapturePile(count: Int, sweepCards: List<Card>, sweeps: Int, tag: String) {
+    Box(
+        modifier = Modifier
+            .width(86.dp)
+            .height(if (sweepCards.isNotEmpty()) 128.dp else 96.dp)
+            .testTag(tag),
+        contentAlignment = Alignment.TopEnd,
+    ) {
+        sweepCards.forEachIndexed { i, card ->
+            PlaceholderCardView(
+                card = card,
+                isPlayable = false,
+                width = 56.dp,
+                height = 84.dp,
                 modifier = Modifier
-                    .width(64.dp)
-                    .height(96.dp)
-                    .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(8.dp)),
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-14 - i * 4).dp, y = (6 - i * 4).dp)
+                    .rotate(90f)
+                    .testTag("${tag}_sweep_$i"),
             )
         }
-        CountBadge(if (sweeps > 0) "$count · ${stringResource(id = R.string.game_sweeps_short, sweeps)}" else "$count")
+        Box(modifier = Modifier.align(Alignment.TopEnd), contentAlignment = Alignment.BottomCenter) {
+            if (count > 0) {
+                DeckStack(cards = count)
+            } else {
+                Box(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .height(96.dp)
+                        .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(8.dp)),
+                )
+            }
+            CountBadge(if (sweeps > sweepCards.size) "$count · ${stringResource(id = R.string.game_sweeps_short, sweeps)}" else "$count")
+        }
     }
 }
 
@@ -1127,7 +1114,12 @@ private fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
     }
 }
 
+private const val SWEEP_BANNER_MILLIS = 2_000L
+private const val HINT_BUBBLE_MILLIS = 6_000L
+private const val MATCH_OVER_PAUSE_MILLIS = 1_200L
+
 // Colori dei testi nei dialoghi su pergamena (F1-23)
 private val DialogInk = Color(0xFF2B1A10)
 private val DialogInkSoft = Color(0xFF6D5A48)
 private val DialogGold = Color(0xFF9C6B00)
+private val OptionPaper = Color(0xFFF3E6C8)

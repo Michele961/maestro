@@ -73,6 +73,9 @@ public data class GameUiState(
     val opponentCapturedCount: Int,
     val humanSweeps: Int,
     val opponentSweeps: Int,
+    /** Carte con cui sono state fatte le scope della smazzata, mostrate scoperte sotto le prese (F1-26). */
+    val humanSweepCards: List<Card> = emptyList(),
+    val opponentSweepCards: List<Card> = emptyList(),
     val humanScore: Int,
     val opponentScore: Int,
     val isHumanTurn: Boolean,
@@ -147,6 +150,8 @@ public data class GameInternalState(
     val hasAskedQuestionThisDeal: Boolean = false,
     val lastError: String? = null,
     val lastEvent: UiGameEvent? = null,
+    /** Carte giocate (quindi pubbliche) che hanno fatto scopa, per giocatore, in ordine (F1-26). */
+    val sweepCards: Map<Seat, List<Card>> = emptyMap(),
 ) {
     public fun toUiState(): GameUiState {
         val view = viewFor(scopaState, humanSeat)
@@ -162,6 +167,8 @@ public data class GameInternalState(
             opponentCapturedCount = view.capturedBy[opponentSeat]?.size ?: 0,
             humanSweeps = view.sweeps[humanSeat] ?: 0,
             opponentSweeps = view.sweeps[opponentSeat] ?: 0,
+            humanSweepCards = sweepCards[humanSeat].orEmpty().takeLast(view.sweeps[humanSeat] ?: 0),
+            opponentSweepCards = sweepCards[opponentSeat].orEmpty().takeLast(view.sweeps[opponentSeat] ?: 0),
             humanScore = view.totals[humanSeat] ?: 0,
             opponentScore = view.totals[opponentSeat] ?: 0,
             isHumanTurn = view.phase == DealPhase.PLAYING &&

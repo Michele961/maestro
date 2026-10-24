@@ -78,18 +78,18 @@ public fun PreGameScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 18.dp, vertical = 20.dp),
+                .padding(horizontal = 18.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                ParchmentPanel(modifier = Modifier.fillMaxWidth().padding(top = 56.dp)) {
+                ParchmentPanel(modifier = Modifier.fillMaxWidth().padding(top = 50.dp)) {
                     Text(
                         text = stringResource(id = R.string.pre_game_title).uppercase(),
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color(0xFF2B1A10),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(top = 36.dp, bottom = 4.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 30.dp, bottom = 2.dp),
                     )
 
                     RibbonHeader(stringResource(id = R.string.pre_game_target_score_title))
@@ -202,9 +202,9 @@ public fun PreGameScreen(
 
 private data class LevelOption(
     val level: DifficultyLevel,
-    @StringRes val label: Int,
+    @param:StringRes val label: Int,
     val number: Int,
-    @DrawableRes val portrait: Int,
+    @param:DrawableRes val portrait: Int,
 )
 
 @Composable
@@ -260,6 +260,8 @@ private fun LevelTile(
                 Text(
                     text = stringResource(id = option.label),
                     style = MaterialTheme.typography.titleMedium,
+                    fontSize = 14.sp,
+                    maxLines = 1,
                     color = if (selected) Color(0xFFFFF4D6) else Color(0xFF2B1A10),
                     textAlign = TextAlign.Center,
                 )

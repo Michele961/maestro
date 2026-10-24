@@ -46,6 +46,7 @@ public fun MaestroAlertDialog(
             MaterialTheme(
                 colorScheme = MaterialTheme.colorScheme.copy(
                     primary = ButtonGreenBottom,
+                    onPrimary = Color(0xFFFFF4D6),
                     onSurface = ParchmentInk,
                     onSurfaceVariant = ParchmentInk,
                 ),
