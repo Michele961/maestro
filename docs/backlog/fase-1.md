@@ -119,8 +119,8 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Stato:** in corso
 - **Obiettivo:** pre-partita (livello, punteggio obiettivo 11/16/21 da `ScopaConfig`), partita, riepilogo di fine smazzata con i punti di `scopa.md` §6, fine partita con rivincita. Navigazione tra schermate.
 - **Criteri di accettazione:**
-    - [ ] Una partita completa contro ciascun livello si gioca dall'inizio alla fine (test UI su seed fisso).
-    - [ ] Il riepilogo di smazzata mostra le stesse voci e gli stessi valori dell'evento `DealEnded`.
+    - [x] Una partita completa contro ciascun livello si gioca dall'inizio alla fine (test UI su seed fisso).
+    - [x] Il riepilogo di smazzata mostra le stesse voci e gli stessi valori dell'evento `DealEnded`.
 - **Domande aperte:** —
 
 ## F1-08 — Salvataggio, ripresa e impostazioni

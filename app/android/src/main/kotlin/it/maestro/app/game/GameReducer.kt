@@ -2,6 +2,7 @@ package it.maestro.app.game
 
 import it.maestro.game.CoreGame
 import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.GameEvent
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.PlayResult
@@ -62,6 +63,8 @@ public object GameReducer {
                 GameReducerResult(state.copy(pendingCapture = null, lastError = null))
             }
 
+            is GameIntent.DismissDealSummary -> handleDismissDealSummary(state)
+
             is GameIntent.RequestBotMove -> handleRequestBotMove(state)
 
             is GameIntent.ApplyBotMove -> handleApplyBotMove(state, intent)
@@ -113,6 +116,21 @@ public object GameReducer {
         return applyMove(state.copy(pendingCapture = null), move)
     }
 
+    private fun handleDismissDealSummary(state: GameInternalState): GameReducerResult {
+        val cleared = state.copy(pendingDealScore = null)
+        val botSeat = state.humanSeat.other()
+        val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
+        val effect = if (shouldScheduleBot) {
+            GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
+        } else {
+            null
+        }
+        return GameReducerResult(
+            state = cleared.copy(isBotThinking = shouldScheduleBot),
+            effect = effect,
+        )
+    }
+
     private fun handleRequestBotMove(state: GameInternalState): GameReducerResult {
         if (state.scopaState.phase != DealPhase.PLAYING) {
             return GameReducerResult(state.copy(isBotThinking = false))
@@ -139,11 +157,15 @@ public object GameReducer {
         return when (val result = play(state.scopaState, move)) {
             is PlayResult.Applied -> {
                 val newLog = state.matchLog.copy(moves = state.matchLog.moves + move)
+                var dealScore: DealScore? = null
                 var lastEvent: UiGameEvent? = null
                 for (event in result.events) {
                     when (event) {
                         is GameEvent.Sweep -> lastEvent = UiGameEvent.Sweep(event.seat)
-                        is GameEvent.DealEnded -> lastEvent = UiGameEvent.DealEnded(event.score)
+                        is GameEvent.DealEnded -> {
+                            dealScore = event.score
+                            lastEvent = UiGameEvent.DealEnded(event.score)
+                        }
                         is GameEvent.MatchEnded -> lastEvent = UiGameEvent.MatchEnded(event.winner, event.totals)
                         else -> {}
                     }
@@ -152,12 +174,13 @@ public object GameReducer {
                     scopaState = result.state,
                     matchLog = newLog,
                     pendingCapture = null,
+                    pendingDealScore = dealScore ?: state.pendingDealScore,
                     lastError = null,
                     lastEvent = lastEvent ?: state.lastEvent,
                 )
 
                 val botSeat = state.humanSeat.other()
-                val nextEffect = if (result.state.phase == DealPhase.PLAYING && result.state.toMove == botSeat) {
+                val nextEffect = if (dealScore == null && result.state.phase == DealPhase.PLAYING && result.state.toMove == botSeat) {
                     GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
                 } else {
                     null
