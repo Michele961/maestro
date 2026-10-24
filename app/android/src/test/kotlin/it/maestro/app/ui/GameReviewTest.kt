@@ -13,7 +13,6 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.PlayResult
 import it.maestro.game.scopa.ScopaConfig
-import it.maestro.game.scopa.legalMoves
 import it.maestro.game.scopa.newMatch
 import it.maestro.game.scopa.play
 import kotlinx.coroutines.CoroutineScope
@@ -69,10 +68,8 @@ class GameReviewTest {
                 )
                 continue
             }
-            if (state.isHumanTurn && state.myHand.isNotEmpty()) {
-                val card = state.myHand.first()
-                val move = state.legalMoves.first { it.card == card }
-                viewModel.onIntent(GameIntent.PlayCard(move))
+            if (state.isHumanTurn && state.humanHand.isNotEmpty()) {
+                viewModel.onIntent(GameIntent.PlayCard(state.humanHand.first()))
             }
         }
 
@@ -173,10 +170,8 @@ class GameReviewTest {
                 )
                 continue
             }
-            if (state.isHumanTurn && state.myHand.isNotEmpty()) {
-                val card = state.myHand.first()
-                val move = state.legalMoves.first { it.card == card }
-                viewModel.onIntent(GameIntent.PlayCard(move))
+            if (state.isHumanTurn && state.humanHand.isNotEmpty()) {
+                viewModel.onIntent(GameIntent.PlayCard(state.humanHand.first()))
             }
         }
 
@@ -237,10 +232,8 @@ class GameReviewTest {
                 )
                 continue
             }
-            if (state.isHumanTurn && state.myHand.isNotEmpty()) {
-                val card = state.myHand.first()
-                val move = state.legalMoves.first { it.card == card }
-                viewModel.onIntent(GameIntent.PlayCard(move))
+            if (state.isHumanTurn && state.humanHand.isNotEmpty()) {
+                viewModel.onIntent(GameIntent.PlayCard(state.humanHand.first()))
             }
         }
 
