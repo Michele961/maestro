@@ -1,5 +1,12 @@
 package it.maestro.app.ui.components
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
@@ -76,15 +83,30 @@ public fun MaestroPillButton(
         PillButtonVariant.WOOD -> R.drawable.skin_button_wood
         PillButtonVariant.CREAM -> R.drawable.skin_button_cream
     }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(targetValue = if (isPressed) 0.96f else 1f, label = "pill_scale")
+    val pressY by animateDpAsState(targetValue = if (isPressed) 2.dp else 0.dp, label = "pill_press_y")
+
     NineSliceBox(
         skin = skin,
         slice = 0.42f,
         corner = height * 0.42f,
         modifier = modifier
             .height(height)
+            .graphicsLayer {
+                scaleX = pressScale
+                scaleY = pressScale
+                translationY = pressY.toPx()
+            }
             .alpha(if (enabled) 1f else 0.6f)
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
         contentPadding = contentPadding,
     ) {
         Text(

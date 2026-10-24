@@ -91,6 +91,10 @@ public data class GameUiState(
     val pendingDealScore: DealScore? = null,
     val lastEvent: UiGameEvent?,
     val errorMessage: String?,
+    /** Ultima mossa giocata, utile per l'animazione al tavolo (task F1-24). */
+    val lastMove: ScopaMove? = null,
+    val lastMover: Seat? = null,
+    val lastMoveId: Long = 0L,
 )
 
 /**
@@ -152,6 +156,9 @@ public data class GameInternalState(
     val lastEvent: UiGameEvent? = null,
     /** Carte giocate (quindi pubbliche) che hanno fatto scopa, per giocatore, in ordine (F1-26). */
     val sweepCards: Map<Seat, List<Card>> = emptyMap(),
+    val lastMove: ScopaMove? = null,
+    val lastMover: Seat? = null,
+    val lastMoveId: Long = 0L,
 ) {
     public fun toUiState(): GameUiState {
         val view = viewFor(scopaState, humanSeat)
@@ -187,6 +194,9 @@ public data class GameInternalState(
             pendingDealScore = pendingDealScore,
             lastEvent = lastEvent,
             errorMessage = lastError,
+            lastMove = lastMove,
+            lastMover = lastMover,
+            lastMoveId = lastMoveId,
         )
     }
 }
