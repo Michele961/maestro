@@ -131,6 +131,19 @@ class TableScreenScreenshotTest {
     }
 
     @Test
+    fun table_with_opponent_drop_screenshot() {
+        val state = midDeal.copy(
+            opponentLastMove = OpponentMoveSummary(
+                card = Card(Rank.SEI, Suit.DENARI),
+                capture = emptySet(),
+                isSweep = false,
+            ),
+        )
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_opponent_drop.png")
+    }
+
+    @Test
     fun pause_opens_dialog_and_menu_goes_home() {
         var home = 0
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}, onNavigateHome = { home++ }) } }
