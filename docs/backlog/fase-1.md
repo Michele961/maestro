@@ -295,7 +295,7 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 
 ## F1-25 — Game Feel: animazione Scopa e celebrazioni
 
-- **Stato:** in corso
+- **Stato:** in revisione
 - **Riferimenti:** `docs/art/ui-redesign-plan.md`
 - **Obiettivo:** Trasformare i momenti decisivi della partita (Scopa, Settebello, fine smazzata) in eventi memorabili ed emotivamente appaganti con grafica dedicata, particelle Compose, feedback aptico e pose del Maestro.
 - **Perimetro autorizzato:**
@@ -305,12 +305,12 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
   - Animazione sequenziale del conteggio punti in `DealSummaryDialog`.
   - Nuove pose del Maestro in risposta agli eventi di gioco.
 - **Criteri di accettazione:**
-  - [ ] **Animazione Scopa Giocatore:** banner "SCOPA!" con rimbalzo elastico, particelle di foglie d'oro, vibrazione e rotazione carta a 90° verso il mazzo prese (durata ~1.6 s, saltabile con tap).
-  - [ ] **Scopa Avversario:** banner rosso sobrio con piccolo tonfo a schermo (senza coriandoli/foglie d'oro).
-  - [ ] **Scope Consecutive:** gestione automatica dell'escalation visiva ("ANCORA!" o "DOPPIA!").
-  - [ ] **Reazioni Maestro:** il ritratto reagisce con le nuove pose (es. applauso su Scopa, finta disperazione su scopa subita, pugno su vittoria finale).
-  - [ ] **Riepilogo Smazzata Appagante:** i punti (Carte, Denari, Settebello, Primiera, Scope) si accendono in sequenza con incremento numerico animato.
-  - [ ] **Settebello:** evidenziazione con cornice oro e bagliore alla cattura.
-  - [ ] **Test Roborazzi / UI:** screenshot test aggiornati e test di non-regressione verdi (`./gradlew check`).
+  - [x] **Animazione Scopa Giocatore:** banner "SCOPA!" con rimbalzo elastico, particelle di foglie d'oro, vibrazione e rotazione carta a 90° verso il mazzo prese (durata ~1.6 s, saltabile con tap).
+  - [x] **Scopa Avversario:** banner rosso sobrio con piccolo tonfo a schermo (senza coriandoli/foglie d'oro).
+  - [x] **Scope Consecutive:** gestione automatica dell'escalation visiva ("ANCORA!" o "DOPPIA!").
+  - [x] **Reazioni Maestro:** il ritratto reagisce con le nuove pose (es. applauso su Scopa, finta disperazione su scopa subita, pugno su vittoria finale).
+  - [x] **Riepilogo Smazzata Appagante:** i punti (Carte, Denari, Settebello, Primiera, Scope) si accendono in sequenza con incremento numerico animato.
+  - [x] **Settebello:** evidenziazione con cornice oro e bagliore alla cattura.
+  - [x] **Test Roborazzi / UI:** screenshot test aggiornati e test di non-regressione verdi (`./gradlew check`).
 - **Domande aperte:** —
 
