@@ -11,6 +11,7 @@ import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
 import it.maestro.game.model.Suit
+import it.maestro.app.game.OpponentMoveSummary
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
 import androidx.compose.ui.test.onNodeWithTag
@@ -97,6 +98,36 @@ class TableScreenScreenshotTest {
         )
         composeRule.setContent { MaestroTheme { TableContent(uiState = botState, onIntent = {}) } }
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_bot_play.png")
+    }
+
+    @Test
+    fun table_with_opponent_last_move_and_card_selected_screenshot() {
+        val state = midDeal.copy(
+            opponentLastMove = OpponentMoveSummary(
+                card = Card(Rank.SETTE, Suit.SPADE),
+                capture = setOf(Card(Rank.SETTE, Suit.COPPE)),
+                isSweep = false,
+            ),
+        )
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        val cardToSelect = state.humanHand.first()
+        val cardTag = "card_${cardToSelect.suit.name}_${cardToSelect.rank.name}"
+        composeRule.onNodeWithTag(cardTag).performClick()
+        composeRule.waitForIdle()
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_card_selected_and_opponent_hud.png")
+    }
+
+    @Test
+    fun table_with_opponent_sweep_screenshot() {
+        val state = midDeal.copy(
+            opponentLastMove = OpponentMoveSummary(
+                card = Card(Rank.SETTE, Suit.DENARI),
+                capture = setOf(Card(Rank.SETTE, Suit.COPPE)),
+                isSweep = true,
+            ),
+        )
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_opponent_sweep.png")
     }
 
     @Test
