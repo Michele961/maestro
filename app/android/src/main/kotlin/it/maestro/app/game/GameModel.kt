@@ -229,6 +229,7 @@ public sealed interface GameEffect {
     public data class ScheduleBotMove(
         val level: DifficultyLevel,
         val botSeat: Seat,
+        val delayMillis: Long? = null,
     ) : GameEffect
 
     public data class ComputeHint(

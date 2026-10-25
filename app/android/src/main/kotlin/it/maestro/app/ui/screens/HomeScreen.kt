@@ -224,48 +224,52 @@ private fun MaestroWelcome(modifier: Modifier = Modifier) {
         val compact = maxHeight < 210.dp
         val ultraCompact = maxHeight < 170.dp
         val portrait = when {
-            ultraCompact -> 72.dp
-            compact -> 86.dp
-            else -> (maxHeight - 100.dp).coerceIn(90.dp, 134.dp)
+            ultraCompact -> 68.dp
+            compact -> 80.dp
+            else -> (maxHeight - 90.dp).coerceIn(84.dp, 120.dp)
         }
-        WoodPanel(modifier = Modifier.fillMaxSize().padding(top = 18.dp, start = 28.dp)) {}
-        Image(
-            painter = painterResource(R.drawable.banner_italy),
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.TopStart).padding(top = 6.dp).size(width = 44.dp, height = 80.dp),
-        )
-        Column(
-            modifier = Modifier
-                .align(if (compact) Alignment.BottomStart else Alignment.BottomCenter)
-                .padding(start = if (compact) 42.dp else 28.dp, bottom = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            FramedPortrait(
-                portrait = R.drawable.maestro_neutral,
-                size = portrait,
-                background = ButtonAmberBottom,
-                contentDescription = stringResource(R.string.maestro_avatar_description),
-            )
-            MaestroPillButton(
-                text = stringResource(R.string.home_maestro_title).uppercase(),
-                onClick = {},
-                variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                height = if (compact) 26.dp else 34.dp,
-                fontSize = if (compact) 11.sp else 14.sp,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = if (compact) 14.dp else 24.dp),
-                modifier = Modifier.offset(y = (-8).dp),
-            )
+        WoodPanel(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    FramedPortrait(
+                        portrait = R.drawable.maestro_neutral,
+                        size = portrait,
+                        background = ButtonAmberBottom,
+                        contentDescription = stringResource(R.string.maestro_avatar_description),
+                    )
+                    MaestroPillButton(
+                        text = stringResource(R.string.home_maestro_title).uppercase(),
+                        onClick = {},
+                        variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                        height = if (compact) 24.dp else 30.dp,
+                        fontSize = if (compact) 10.sp else 12.sp,
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = if (compact) 10.dp else 16.dp),
+                        modifier = Modifier.offset(y = (-6).dp),
+                    )
+                }
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    MaestroSpeechBubble(
+                        message = stringResource(R.string.home_coach_welcome),
+                        tail = BubbleTail.START,
+                        fontSize = if (compact) 11.sp else 13.sp,
+                        maxLines = 4,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
         }
-        // Fumetto compatto in alto, a destra, come nel mockup: non copre il ritratto.
-        MaestroSpeechBubble(
-            message = stringResource(R.string.home_coach_welcome),
-            tail = if (compact) BubbleTail.BOTTOM_START else BubbleTail.BOTTOM_CENTER,
-            fontSize = if (compact) 11.sp else 13.sp,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 8.dp, top = if (ultraCompact) 0.dp else 4.dp)
-                .fillMaxWidth(if (compact) 0.55f else 0.62f),
-        )
     }
 }
 
