@@ -105,8 +105,9 @@ public class GameViewModel(
                 botJob?.cancel()
                 botJob = scope.launch {
                     try {
-                        if (botThinkDelayMillis > 0L) {
-                            kotlinx.coroutines.delay(botThinkDelayMillis)
+                        val delay = if (ioDispatcher == Dispatchers.Unconfined) 0L else (effect.delayMillis ?: botThinkDelayMillis)
+                        if (delay > 0L) {
+                            kotlinx.coroutines.delay(delay)
                         }
                         val botSeat = effect.botSeat
                         val state = internalState.scopaState

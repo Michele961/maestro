@@ -15,6 +15,10 @@ import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.buildTrainingQuestion
 import it.maestro.game.training.isCriticalTrainingMoment
 
+private const val BOT_INITIAL_DEAL_DELAY_MS = 2500L
+private const val BOT_HAND_DEAL_DELAY_MS = 2600L
+private const val BOT_NORMAL_MOVE_DELAY_MS = 1400L
+
 /**
  * Reducer puro per la gestione dello stato della partita di Scopa (ADR-0012, task F1-05).
  *
@@ -48,6 +52,7 @@ public object GameReducer {
             GameEffect.ScheduleBotMove(
                 level = intent.level,
                 botSeat = intent.humanSeat.other(),
+                delayMillis = BOT_INITIAL_DEAL_DELAY_MS,
             )
         } else {
             null
@@ -184,7 +189,11 @@ public object GameReducer {
         val botSeat = state.humanSeat.other()
         val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
         val effect = if (shouldScheduleBot) {
-            GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
+            GameEffect.ScheduleBotMove(
+                level = state.botLevel,
+                botSeat = botSeat,
+                delayMillis = BOT_INITIAL_DEAL_DELAY_MS,
+            )
         } else {
             null
         }
@@ -205,7 +214,11 @@ public object GameReducer {
         val botSeat = intent.humanSeat.other()
         val botPlays = intent.state.phase == DealPhase.PLAYING && intent.state.toMove == botSeat
         val effect = if (botPlays) {
-            GameEffect.ScheduleBotMove(level = intent.level, botSeat = botSeat)
+            GameEffect.ScheduleBotMove(
+                level = intent.level,
+                botSeat = botSeat,
+                delayMillis = BOT_NORMAL_MOVE_DELAY_MS,
+            )
         } else {
             null
         }
@@ -251,7 +264,11 @@ public object GameReducer {
         }
         return GameReducerResult(
             state = state.copy(isBotThinking = true),
-            effect = GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat),
+            effect = GameEffect.ScheduleBotMove(
+                level = state.botLevel,
+                botSeat = botSeat,
+                delayMillis = BOT_NORMAL_MOVE_DELAY_MS,
+            ),
         )
     }
 
@@ -338,7 +355,12 @@ public object GameReducer {
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {
-                    GameEffect.ScheduleBotMove(level = state.botLevel, botSeat = botSeat)
+                    val delay = if (hadCardsDealt) BOT_HAND_DEAL_DELAY_MS else BOT_NORMAL_MOVE_DELAY_MS
+                    GameEffect.ScheduleBotMove(
+                        level = state.botLevel,
+                        botSeat = botSeat,
+                        delayMillis = delay,
+                    )
                 } else {
                     null
                 }

@@ -1,5 +1,7 @@
 package it.maestro.app.ui.components
 
+import androidx.compose.ui.zIndex
+import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -178,7 +180,7 @@ public fun MaestroDialogueBox(
 }
 
 /** Lato da cui esce la codina del [MaestroSpeechBubble]. */
-public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START }
+public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START, START }
 
 /**
  * Fumetto compatto del Maestro come nei mockup (F1-26): carta avorio, testo centrato,
@@ -193,9 +195,52 @@ public fun MaestroSpeechBubble(
     fontSize: TextUnit = 14.sp,
     maxLines: Int = 3,
 ) {
+    if (tail == BubbleTail.START) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            androidx.compose.foundation.Canvas(
+                modifier = Modifier
+                    .size(width = 10.dp, height = 16.dp)
+                    .offset(x = 1.dp)
+                    .zIndex(1f),
+            ) {
+                val path = androidx.compose.ui.graphics.Path().apply {
+                    moveTo(size.width, 0f)
+                    lineTo(0f, size.height * 0.5f)
+                    lineTo(size.width, size.height)
+                    close()
+                }
+                drawPath(path, BubblePaper)
+            }
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = BubblePaper,
+                border = BorderStroke(1.dp, Color(0x55603813)),
+                shadowElevation = 4.dp,
+                modifier = Modifier.weight(1f, fill = false),
+            ) {
+                Text(
+                    text = message,
+                    color = WoodSurfaceDark,
+                    fontSize = fontSize,
+                    lineHeight = fontSize * 1.2f,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
+                    textAlign = TextAlign.Center,
+                    maxLines = maxLines,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                )
+            }
+        }
+        return
+    }
+
     val isTop = tail == BubbleTail.TOP_START
     val tailAlign = when (tail) {
-        BubbleTail.BOTTOM_START, BubbleTail.TOP_START -> Alignment.Start
+        BubbleTail.BOTTOM_START, BubbleTail.TOP_START, BubbleTail.START -> Alignment.Start
         BubbleTail.BOTTOM_CENTER -> Alignment.CenterHorizontally
         BubbleTail.BOTTOM_END -> Alignment.End
     }

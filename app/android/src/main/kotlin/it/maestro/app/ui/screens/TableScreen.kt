@@ -1340,6 +1340,10 @@ private fun FeltLayout(
 
     LaunchedEffect(uiState.dealAnimationId) {
         if (uiState.dealAnimationId == 0L) return@LaunchedEffect
+        // Attende che l'eventuale animazione della mossa precedente (volo carta / presa) sia terminata
+        while (activeMoveAnim != null) {
+            delay(40L)
+        }
         try {
             if (uiState.isInitialDeal) {
                 // Smazzata iniziale: taglio del mazzo
@@ -1396,6 +1400,10 @@ private fun FeltLayout(
         val move = uiState.lastMove ?: return@LaunchedEffect
         val mover = uiState.lastMover ?: return@LaunchedEffect
         if (uiState.lastMoveId == 0L) return@LaunchedEffect
+        // Attende che l'eventuale animazione di smazzata o distribuzione carte sia completata
+        while (activeDealAnim != null) {
+            delay(40L)
+        }
 
         val isSweep = uiState.lastEvent is UiGameEvent.Sweep
         val isOpponent = mover != uiState.humanSeat
