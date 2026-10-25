@@ -9,6 +9,7 @@ import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.MaestroDialogueBox
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.ClubBackground
+import it.maestro.app.ui.components.ConfettiCelebration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
@@ -112,13 +113,14 @@ public fun PostMatchPreviewScreen(
     val won = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
 
     ClubBackground(modifier = modifier.testTag("post_match_preview_screen"), feltFraction = 0.55f) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
-                .padding(horizontal = 16.dp, vertical = 6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
             // Targa del risultato, come "VITTORIA! TU 11 - 8 AVVERSARIO"
             NineSliceBox(
                 skin = R.drawable.skin_score_plaque,
@@ -226,7 +228,7 @@ public fun PostMatchPreviewScreen(
                 // Il Maestro commenta la partita
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     FramedPortrait(
-                        portrait = if (won) R.drawable.maestro_celebrating else R.drawable.maestro_thinking,
+                        portrait = if (won) R.drawable.maestro_triumphant else R.drawable.maestro_encouraging,
                         size = 68.dp,
                         background = Color(0xFF7D3F19),
                     )
@@ -274,8 +276,12 @@ public fun PostMatchPreviewScreen(
                     testTag = "post_match_home_button",
                 )
             }
+            if (won) {
+                ConfettiCelebration()
+            }
         }
     }
+}
 }
 
 private val CreamText = Color(0xFFFFF4D6)

@@ -56,6 +56,7 @@ public fun CardView(
     card: Card,
     modifier: Modifier = Modifier,
     isPlayable: Boolean = true,
+    showGoldFrame: Boolean = false,
     width: Dp = 64.dp,
     height: Dp = 96.dp,
     deckTheme: DeckTheme = NeapolitanDeckTheme,
@@ -66,29 +67,42 @@ public fun CardView(
         deckTheme.getCardDrawableResId(context, card)
     }
 
-    Card(
+    Box(
         modifier = modifier
             .width(width)
             .height(height)
             .testTag("card_${card.suit.name}_${card.rank.name}")
             .clickable(enabled = isPlayable, onClick = onClick),
-        shape = RoundedCornerShape(6.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isPlayable) 4.dp else 1.dp),
-        border = BorderStroke(
-            width = if (isPlayable) 2.dp else 1.dp,
-            color = if (isPlayable) CardBorderPlayable else CardBorderDefault,
-        ),
     ) {
-        if (customDrawableResId != null) {
+        Card(
+            modifier = Modifier.fillMaxSize(),
+            shape = RoundedCornerShape(6.dp),
+            colors = CardDefaults.cardColors(containerColor = CardBackground),
+            elevation = CardDefaults.cardElevation(defaultElevation = if (isPlayable) 4.dp else 1.dp),
+            border = BorderStroke(
+                width = if (isPlayable) 2.dp else 1.dp,
+                color = if (isPlayable) CardBorderPlayable else CardBorderDefault,
+            ),
+        ) {
+            if (customDrawableResId != null) {
+                Image(
+                    painter = painterResource(id = customDrawableResId),
+                    contentDescription = "${card.rank.name} ${card.suit.name}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                ProceduralCardContent(card = card)
+            }
+        }
+
+        if (showGoldFrame) {
             Image(
-                painter = painterResource(id = customDrawableResId),
-                contentDescription = "${card.rank.name} ${card.suit.name}",
-                contentScale = ContentScale.Crop,
+                painter = painterResource(id = R.drawable.card_frame_gold),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize(),
             )
-        } else {
-            ProceduralCardContent(card = card)
         }
     }
 }
@@ -101,6 +115,7 @@ public fun PlaceholderCardView(
     card: Card,
     modifier: Modifier = Modifier,
     isPlayable: Boolean = true,
+    showGoldFrame: Boolean = false,
     width: Dp = 64.dp,
     height: Dp = 96.dp,
     deckTheme: DeckTheme = NeapolitanDeckTheme,
@@ -110,6 +125,7 @@ public fun PlaceholderCardView(
         card = card,
         modifier = modifier,
         isPlayable = isPlayable,
+        showGoldFrame = showGoldFrame,
         width = width,
         height = height,
         deckTheme = deckTheme,

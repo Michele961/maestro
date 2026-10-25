@@ -59,7 +59,10 @@ public data class PendingCaptureChoice(
  * Eventi visivi/notifiche di partita per la UI (ADR-0012, task F1-05).
  */
 public sealed interface UiGameEvent {
-    public data class Sweep(val seat: Seat) : UiGameEvent
+    public data class Sweep(
+        val seat: Seat,
+        val sweepCountThisDeal: Int = 1,
+    ) : UiGameEvent
     public data class DealEnded(val score: DealScore) : UiGameEvent
     public data class MatchEnded(val winner: Seat, val totals: Map<Seat, Int>) : UiGameEvent
 }
