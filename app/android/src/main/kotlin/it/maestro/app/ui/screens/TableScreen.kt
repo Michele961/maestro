@@ -1510,6 +1510,30 @@ private fun FeltLayout(
     val isDealPending = uiState.dealAnimationId > 0L && lastCompletedDealId < uiState.dealAnimationId
     val hideHands = isDealPending || currentDealAnim != null
 
+    // Conteggio visibile delle carte nel mazzo:
+    // Durante la smazzata/distribuzione (sia iniziale che mid-game), il mazzo
+    // decrementa gradualmente di una carta man mano che ciascuna carta viene distribuita,
+    // invece di passare immediatamente al conteggio finale.
+    val visibleDeckCount = if (isDealPending || currentDealAnim != null) {
+        val totalToDeal = if (uiState.isInitialDeal) 10 else 6
+        val dealt = when (currentDealAnim?.stage) {
+            null, DealAnimStage.SHUFFLE -> 0
+            DealAnimStage.DEAL_TABLE_0 -> 1
+            DealAnimStage.DEAL_TABLE_1 -> 2
+            DealAnimStage.DEAL_TABLE_2 -> 3
+            DealAnimStage.DEAL_TABLE_3 -> 4
+            DealAnimStage.DEAL_HAND_OPP_0 -> if (uiState.isInitialDeal) 5 else 1
+            DealAnimStage.DEAL_HAND_HUMAN_0 -> if (uiState.isInitialDeal) 6 else 2
+            DealAnimStage.DEAL_HAND_OPP_1 -> if (uiState.isInitialDeal) 7 else 3
+            DealAnimStage.DEAL_HAND_HUMAN_1 -> if (uiState.isInitialDeal) 8 else 4
+            DealAnimStage.DEAL_HAND_OPP_2 -> if (uiState.isInitialDeal) 9 else 5
+            DealAnimStage.DEAL_HAND_HUMAN_2 -> if (uiState.isInitialDeal) 10 else 6
+        }
+        (uiState.deckCardCount + totalToDeal - dealt).coerceAtLeast(0)
+    } else {
+        uiState.deckCardCount
+    }
+
     // Le carte visibili sul tavolo:
     // - Durante la smazzata iniziale, le carte atterrate compaiono a faccia in su mano a mano che atterrano
     // - Durante una calata semplice (capture.isEmpty()), la carta vola nell'overlay e NON
@@ -1581,8 +1605,8 @@ private fun FeltLayout(
         ) {
             CapturePile(count = uiState.opponentCapturedCount, sweepCards = uiState.opponentSweepCards, sweeps = uiState.opponentSweeps, tag = "opponent_captures")
             Box(modifier = Modifier.testTag("deck_pile"), contentAlignment = Alignment.BottomCenter) {
-                if (uiState.deckCardCount > 0) DeckStack(cards = uiState.deckCardCount)
-                CountBadge(uiState.deckCardCount.toString())
+                if (visibleDeckCount > 0) DeckStack(cards = visibleDeckCount)
+                CountBadge(visibleDeckCount.toString())
             }
             CapturePile(count = uiState.humanCapturedCount, sweepCards = uiState.humanSweepCards, sweeps = uiState.humanSweeps, tag = "human_captures")
         }
