@@ -35,6 +35,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 | F1-22 | Fine partita e Game Review con gli asset definitivi | F1-19 |
 | F1-23 | Impostazioni, pausa e check didattici | F1-19 |
 | F1-24 | Movimento e feedback (UX) | F1-20, F1-21, F1-22, F1-23 |
+| F1-25 | Game Feel: animazione Scopa e celebrazioni | F1-24 |
 
 Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro dopo F1-07; F1-13 (soprattutto lavoro di Michele) dal momento in cui esiste il tavolo.
 
@@ -291,3 +292,25 @@ Si possono lavorare in parallelo: F1-03 con F1-01/F1-02; F1-09…F1-12 tra loro 
 - **Criteri di accettazione:**
     - [x] Test Roborazzi della schermata, screenshot affiancato al mockup nella PR.
 - **Domande aperte:** —
+
+## F1-25 — Game Feel: animazione Scopa e celebrazioni
+
+- **Stato:** in corso
+- **Riferimenti:** `docs/art/ui-redesign-plan.md`
+- **Obiettivo:** Trasformare i momenti decisivi della partita (Scopa, Settebello, fine smazzata) in eventi memorabili ed emotivamente appaganti con grafica dedicata, particelle Compose, feedback aptico e pose del Maestro.
+- **Perimetro autorizzato:**
+  - Estrazione e conversione degli asset in `res/drawable-nodpi/` tramite `scripts/prepare_assets.py`.
+  - Nuovi componenti Compose per overlay Scopa e particelle fisiche (senza dipendenze esterne non autorizzate).
+  - Integrazione feedback aptico di sistema (`LocalHapticFeedback`).
+  - Animazione sequenziale del conteggio punti in `DealSummaryDialog`.
+  - Nuove pose del Maestro in risposta agli eventi di gioco.
+- **Criteri di accettazione:**
+  - [ ] **Animazione Scopa Giocatore:** banner "SCOPA!" con rimbalzo elastico, particelle di foglie d'oro, vibrazione e rotazione carta a 90° verso il mazzo prese (durata ~1.6 s, saltabile con tap).
+  - [ ] **Scopa Avversario:** banner rosso sobrio con piccolo tonfo a schermo (senza coriandoli/foglie d'oro).
+  - [ ] **Scope Consecutive:** gestione automatica dell'escalation visiva ("ANCORA!" o "DOPPIA!").
+  - [ ] **Reazioni Maestro:** il ritratto reagisce con le nuove pose (es. applauso su Scopa, finta disperazione su scopa subita, pugno su vittoria finale).
+  - [ ] **Riepilogo Smazzata Appagante:** i punti (Carte, Denari, Settebello, Primiera, Scope) si accendono in sequenza con incremento numerico animato.
+  - [ ] **Settebello:** evidenziazione con cornice oro e bagliore alla cattura.
+  - [ ] **Test Roborazzi / UI:** screenshot test aggiornati e test di non-regressione verdi (`./gradlew check`).
+- **Domande aperte:** —
+

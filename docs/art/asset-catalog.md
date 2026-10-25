@@ -113,3 +113,25 @@ Nel codice Compose, la classe [`DeckTheme`](file:///Users/mike/Projects/maestro/
 - Se l'asset `card_<seme>_<valore>` è presente nella cartella `res/drawable-nodpi/`, verrà renderizzato direttamente con ombreggiatura e bordi appropriati.
 - Se un asset non è ancora presente, il sistema utilizzerà automaticamente e senza crash il rendering vettoriale segnaposto.
 Questo permette di aggiungere o sostituire carte anche una alla volta o a gruppi.
+
+---
+
+## 5. Asset Game Feel (task F1-25)
+
+Generati con Gemini su fondo magenta/verde e preparati con `scripts/prepare_assets.py`.
+Sorgenti in `docs/art/generated/game-feel/`.
+
+| File | Uso |
+|---|---|
+| `text_scopa_gold.webp` | Scritta "SCOPA!" oro con allori per scopa del giocatore |
+| `text_scopa_red.webp` | Scritta "SCOPA!" rossa per scopa dell'avversario |
+| `text_ancora_gold.webp` | Scritta "ANCORA!" per seconda scopa consecutiva |
+| `text_doppia_gold.webp` | Scritta "DOPPIA!" per scope multiple |
+| `particle_leaf_1.webp` … `particle_leaf_8.webp` | 8 foglioline d'oro per l'effetto burst della Scopa |
+| `particle_confetti_1.webp` … `particle_confetti_10.webp` | 10 coriandoli tricolore e oro per vittoria partita |
+| `card_frame_gold.webp` | Cornice oro luminosa per catture importanti (es. Settebello) |
+| `maestro_applauding.webp` | Ritratto Maestro che applaude felice |
+| `maestro_triumphant.webp` | Ritratto Maestro pugno della vittoria |
+| `maestro_despair.webp` | Ritratto Maestro mano sulla fronte (scopa subita) |
+| `maestro_encouraging.webp` | Ritratto Maestro pollice in su incoraggiante |
+
