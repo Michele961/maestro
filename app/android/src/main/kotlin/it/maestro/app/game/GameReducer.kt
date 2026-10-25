@@ -173,6 +173,7 @@ public object GameReducer {
             hasAskedQuestionThisDeal = false,
             activeTrainingQuestion = null,
             trainingQuestionFeedback = null,
+            opponentLastMove = null,
         )
         val botSeat = state.humanSeat.other()
         val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
@@ -284,6 +285,16 @@ public object GameReducer {
                 val botSeat = state.humanSeat.other()
                 val nextPhase = result.state.phase
                 val nextToMove = result.state.toMove
+                val isBotMove = (mover == botSeat)
+                val newOpponentLastMove = if (isBotMove) {
+                    OpponentMoveSummary(
+                        card = move.card,
+                        capture = move.capture,
+                        isSweep = result.events.any { it is GameEvent.Sweep },
+                    )
+                } else {
+                    state.opponentLastMove
+                }
 
                 // Verifica se attivare la domanda di allenamento per il giocatore umano
                 var activeQuestion: it.maestro.game.training.TrainingQuestion? = null
@@ -313,6 +324,7 @@ public object GameReducer {
                     lastMove = move,
                     lastMover = mover,
                     lastMoveId = nextMoveId,
+                    opponentLastMove = newOpponentLastMove,
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {

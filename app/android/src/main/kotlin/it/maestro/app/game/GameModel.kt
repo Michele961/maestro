@@ -14,6 +14,15 @@ import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingQuestion
 
 /**
+ * Riepilogo dell'ultima mossa effettuata dall'avversario per il registro e l'HUD a schermo.
+ */
+public data class OpponentMoveSummary(
+    val card: Card,
+    val capture: Set<Card>,
+    val isSweep: Boolean,
+)
+
+/**
  * Risultato memorizzato di un quesito di allenamento completato durante la partita (task F1-12).
  */
 public data class TrainingCheckResult(
@@ -95,6 +104,8 @@ public data class GameUiState(
     val lastMove: ScopaMove? = null,
     val lastMover: Seat? = null,
     val lastMoveId: Long = 0L,
+    /** Ultima mossa effettuata dall'avversario per il registro visivo a schermo. */
+    val opponentLastMove: OpponentMoveSummary? = null,
 )
 
 /**
@@ -159,6 +170,7 @@ public data class GameInternalState(
     val lastMove: ScopaMove? = null,
     val lastMover: Seat? = null,
     val lastMoveId: Long = 0L,
+    val opponentLastMove: OpponentMoveSummary? = null,
 ) {
     public fun toUiState(): GameUiState {
         val view = viewFor(scopaState, humanSeat)
@@ -197,6 +209,7 @@ public data class GameInternalState(
             lastMove = lastMove,
             lastMover = lastMover,
             lastMoveId = lastMoveId,
+            opponentLastMove = opponentLastMove,
         )
     }
 }

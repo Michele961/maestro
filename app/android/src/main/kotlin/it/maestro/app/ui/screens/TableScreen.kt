@@ -6,7 +6,16 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.zIndex
+import it.maestro.app.game.OpponentMoveSummary
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
@@ -880,6 +889,86 @@ private fun TrainingQuestionDialog(
     )
 }
 
+/**
+ * Targhetta compatta con il riepilogo dell'ultima giocata dell'avversario (carta giocata, prese effettuate, eventuale scopa).
+ */
+@Composable
+private fun OpponentLastMovePlaque(
+    summary: OpponentMoveSummary,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .testTag("opponent_last_move_banner")
+            .shadow(6.dp, RoundedCornerShape(10.dp))
+            .border(1.5.dp, GoldAccentColor, RoundedCornerShape(10.dp)),
+        shape = RoundedCornerShape(10.dp),
+        color = OptionPaper,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                text = stringResource(id = R.string.game_opponent_last_move) + ":",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = DialogInk,
+                fontSize = 11.sp,
+            )
+            PlaceholderCardView(
+                card = summary.card,
+                isPlayable = false,
+                width = 28.dp,
+                height = 42.dp,
+            )
+            Text(
+                text = stringResource(id = R.string.game_arrow_symbol),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = DialogInkSoft,
+                fontSize = 11.sp,
+            )
+            if (summary.capture.isEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.game_opponent_drop_table),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = DialogInkSoft,
+                    fontSize = 11.sp,
+                )
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
+                    for (taken in summary.capture) {
+                        PlaceholderCardView(
+                            card = taken,
+                            isPlayable = false,
+                            width = 28.dp,
+                            height = 42.dp,
+                        )
+                    }
+                }
+            }
+            if (summary.isSweep) {
+                Surface(
+                    color = Color(0xFFC62828),
+                    shape = RoundedCornerShape(4.dp),
+                    modifier = Modifier.padding(start = 2.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.game_event_sweep).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
 /** Pila del mazzo disegnata con il dorso del mazzo in uso, una copia sfalsata ogni ~5 carte (max 6). */
 @Composable
 private fun DeckStack(cards: Int) {
@@ -1024,6 +1113,7 @@ private fun FeltLayout(
         if (uiState.lastMoveId == 0L) return@LaunchedEffect
 
         val isSweep = uiState.lastEvent is UiGameEvent.Sweep
+        val isOpponent = mover != uiState.humanSeat
         try {
             // 1. Carta parte dalla mano e vola al centro del tavolo
             activeMoveAnim = ActiveMoveAnimation(
@@ -1034,19 +1124,24 @@ private fun FeltLayout(
                 isSweep = isSweep,
                 stage = MoveAnimStage.PLAYING_TO_TABLE,
             )
-            delay(360L)
+            delay(if (isOpponent) 400L else 320L)
+            if (isOpponent) {
+                // Pausa con la carta giocata in primo piano al centro prima della presa o calata
+                delay(650L)
+            }
 
             if (move.capture.isNotEmpty()) {
-                // 2. Le carte catturate sul tavolo si evidenziano e il bot annuncia la presa
+                // 2. Le carte catturate sul tavolo si evidenziano
                 activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.SHOWING_CAPTURE)
-                delay(480L)
+                delay(if (isOpponent) 950L else 450L)
 
                 // 3. Volo congiunto verso la pila delle prese
                 activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.FLYING_TO_PILE)
                 soundManager.play(SoundEffect.CARD_CAPTURE)
-                delay(360L)
+                delay(if (isOpponent) 450L else 350L)
             } else {
-                delay(160L)
+                // Calata semplice: tempo per vederla chiaramente posata sul tavolo
+                delay(if (isOpponent) 650L else 150L)
             }
         } finally {
             if (activeMoveAnim?.moveId == uiState.lastMoveId) {
@@ -1056,17 +1151,6 @@ private fun FeltLayout(
     }
 
     val currentAnim = activeMoveAnim
-    val formatCard = rememberCardFormatter()
-    val botPlaying = currentAnim != null && currentAnim.mover != uiState.humanSeat
-    val botSpeechMessage: String? = if (currentAnim != null && currentAnim.mover != uiState.humanSeat) {
-        val cardStr = formatCard(currentAnim.card)
-        if (currentAnim.capture.isEmpty()) {
-            stringResource(id = R.string.game_bot_plays_card, cardStr)
-        } else {
-            val takesStr = currentAnim.capture.joinToString(", ") { formatCard(it) }
-            stringResource(id = R.string.game_bot_takes_cards, cardStr, takesStr)
-        }
-    } else null
 
     // Le carte catturate restano visibili sul tavolo finché non volano alla pila
     val visibleTableCards = remember(uiState.tableCards, currentAnim) {
@@ -1087,6 +1171,18 @@ private fun FeltLayout(
             repeat(uiState.opponentCardCount) { CardBackView(width = 72.dp, height = 108.dp) }
         }
 
+        // Piccolo registro / HUD dell'ultima giocata effettuata dall'avversario
+        val opponentLastMove = uiState.opponentLastMove
+        if (opponentLastMove != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 114.dp),
+            ) {
+                OpponentLastMovePlaque(summary = opponentLastMove)
+            }
+        }
+
         // Colonna destra: mazzo e prese
         Column(
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
@@ -1101,8 +1197,8 @@ private fun FeltLayout(
             CapturePile(count = uiState.humanCapturedCount, sweepCards = uiState.humanSweepCards, sweeps = uiState.humanSweeps, tag = "human_captures")
         }
 
-        // Il Maestro a sinistra, come nel mockup: fumetto compatto che sparisce da solo o con un tap.
-        // In Sparring il ritratto resta visibile e toccarlo chiede il consiglio (niente pulsante extra).
+        // Il Maestro a sinistra: fumetto solo quando richiesto dall'utente (consiglio) o per scopa.
+        // Posizione ancorata e stabile (non si muove su e giù in base alle carte in tavola).
         val hint = uiState.suggestedMove
         var hintDismissed by remember(hint) { mutableStateOf(false) }
         LaunchedEffect(hint) {
@@ -1114,35 +1210,30 @@ private fun FeltLayout(
         val showHint = hint != null && !hintDismissed
         val sweeping = uiState.lastEvent is UiGameEvent.Sweep
         val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && currentAnim == null
-        val showLeftBubble = showHint || uiState.isHintLoading || sweeping || botPlaying
 
-        // Carte in tavola, al centro in griglia
+        // Carte in tavola, al centro in griglia stabile con margini fissi
         FlowRow(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(
-                    start = when {
-                        showLeftBubble -> 108.dp
-                        uiState.isSparring -> 80.dp
-                        else -> 24.dp
-                    },
-                    end = 86.dp,
-                    bottom = 40.dp,
+                    start = 76.dp,
+                    end = 76.dp,
+                    top = 28.dp,
+                    bottom = 28.dp,
                 )
                 .testTag("table_cards_zone"),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = if (visibleTableCards.size <= 4) 2 else 3,
+            maxItemsInEachRow = 3,
         ) {
             val suggested = uiState.suggestedMove?.capture
             for (card in visibleTableCards) {
-                val big = visibleTableCards.size <= 4 && !showLeftBubble
                 val isBeingCaptured = currentAnim != null && card in currentAnim.capture && currentAnim.stage == MoveAnimStage.SHOWING_CAPTURE
                 PlaceholderCardView(
                     card = card,
                     isPlayable = false,
-                    width = if (big) 82.dp else 72.dp,
-                    height = if (big) 123.dp else 108.dp,
+                    width = 72.dp,
+                    height = 108.dp,
                     modifier = when {
                         isBeingCaptured -> Modifier
                             .graphicsLayer { scaleX = 1.08f; scaleY = 1.08f }
@@ -1154,53 +1245,72 @@ private fun FeltLayout(
             }
         }
 
-        Column(
-            modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 150.dp).width(135.dp),
-            horizontalAlignment = Alignment.Start,
+        // Ritratto del Maestro: ancorato in basso a sinistra (posizione FISSA)
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 8.dp, bottom = 110.dp)
+                .width(135.dp),
         ) {
-            AnimatedVisibility(visible = showHint || uiState.isHintLoading || botPlaying, enter = fadeIn(), exit = fadeOut()) {
-                MaestroSpeechBubble(
-                    message = when {
-                        botSpeechMessage != null -> botSpeechMessage
-                        hint != null -> formatHintMove(hint)
-                        else -> stringResource(id = R.string.game_hint_loading)
-                    },
-                    fontSize = if (botSpeechMessage != null) 11.sp else 12.sp,
-                    modifier = Modifier
-                        .clickable { hintDismissed = true }
-                        .testTag("game_hint_banner"),
-                )
-            }
-            AnimatedVisibility(visible = sweeping, enter = fadeIn(), exit = fadeOut()) {
-                MaestroPillButton(
-                    text = stringResource(id = R.string.game_event_sweep).uppercase(),
-                    onClick = {},
-                    variant = PillButtonVariant.HERO_RED,
-                    height = 38.dp,
-                    fontSize = 17.sp,
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
-                )
-            }
-            AnimatedVisibility(visible = uiState.isSparring || showHint || sweeping || botPlaying, enter = fadeIn(), exit = fadeOut()) {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .alpha(if (canAskHint || showHint || sweeping || botPlaying) 1f else 0.7f)
-                        .clickable(enabled = canAskHint, onClick = onRequestHint)
-                        .testTag("game_hint_button"),
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                AnimatedVisibility(
+                    visible = showHint || uiState.isHintLoading,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
                 ) {
-                    FramedPortrait(
-                        portrait = when {
-                            sweeping -> R.drawable.maestro_celebrating
-                            uiState.isBotThinking -> R.drawable.maestro_thinking
-                            botPlaying -> R.drawable.maestro_pleased
-                            showHint -> R.drawable.maestro_pleased
-                            else -> R.drawable.maestro_neutral
+                    MaestroSpeechBubble(
+                        message = when {
+                            hint != null -> formatHintMove(hint)
+                            else -> stringResource(id = R.string.game_hint_loading)
                         },
-                        size = 72.dp,
-                        background = Color(0xFF7D3F19),
-                        contentDescription = stringResource(id = R.string.game_hint_button),
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .padding(bottom = 6.dp)
+                            .clickable { hintDismissed = true }
+                            .testTag("game_hint_banner"),
                     )
+                }
+                AnimatedVisibility(
+                    visible = sweeping,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    MaestroPillButton(
+                        text = stringResource(id = R.string.game_event_sweep).uppercase(),
+                        onClick = {},
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 38.dp,
+                        fontSize = 17.sp,
+                        modifier = Modifier.padding(bottom = 6.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = uiState.isSparring,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .alpha(if (canAskHint || showHint) 1f else 0.7f)
+                            .clickable(enabled = canAskHint, onClick = onRequestHint)
+                            .testTag("game_hint_button"),
+                    ) {
+                        FramedPortrait(
+                            portrait = when {
+                                sweeping -> R.drawable.maestro_celebrating
+                                uiState.isBotThinking -> R.drawable.maestro_thinking
+                                showHint -> R.drawable.maestro_pleased
+                                else -> R.drawable.maestro_neutral
+                            },
+                            size = 64.dp,
+                            background = Color(0xFF7D3F19),
+                            contentDescription = stringResource(id = R.string.game_hint_button),
+                        )
+                    }
                 }
             }
         }
@@ -1213,7 +1323,7 @@ private fun FeltLayout(
             )
         }
 
-        // Mano del giocatore a ventaglio
+        // Mano del giocatore a ventaglio con supporto a trascinamento e conferma
         Column(
             modifier = Modifier.align(Alignment.BottomCenter).testTag("player_zone"),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1227,7 +1337,10 @@ private fun FeltLayout(
     }
 }
 
-/** Mano a ventaglio: carte sovrapposte e ruotate; quando tocca a te sono più alte e brillano. */
+/**
+ * Mano a ventaglio: carte sovrapposte e ruotate.
+ * Supporta sia il trascinamento verso il tavolo (drag-to-play) sia la selezione con conferma (tap-to-confirm).
+ */
 @Composable
 private fun HandFan(
     uiState: GameUiState,
@@ -1235,45 +1348,147 @@ private fun HandFan(
     onCardClicked: (Card) -> Unit,
 ) {
     val cards = uiState.humanHand
-    Row(
-        modifier = Modifier.testTag("human_hand_row"),
-        horizontalArrangement = Arrangement.spacedBy((-22).dp),
-        verticalAlignment = Alignment.Bottom,
+    var selectedCard by remember(cards) { mutableStateOf<Card?>(null) }
+    var draggingCard by remember { mutableStateOf<Card?>(null) }
+    val dragOffsetY = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
+    val dragPlayThreshold = with(LocalDensity.current) { -75.dp.toPx() }
+
+    val activeSelected = selectedCard?.takeIf { it in cards }
+
+    Column(
+        modifier = Modifier.testTag("player_zone_fan"),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        cards.forEachIndexed { i, card ->
-            val mid = (cards.size - 1) / 2f
-            val angle = (i - mid) * 8f
-            val drop = kotlin.math.abs(i - mid) * 12f
-            val isSuggested = uiState.suggestedMove?.card == card
-            val canPlay = enabled && uiState.isHumanTurn
-            Box(
-                modifier = Modifier
-                    .offset(y = drop.dp)
-                    .rotate(angle)
-                    .then(
-                        if (isSuggested || canPlay) {
-                            Modifier.shadow(
-                                elevation = if (isSuggested) 18.dp else 8.dp,
-                                shape = RoundedCornerShape(10.dp),
-                                ambientColor = Color(0xFFFFD54F),
-                                spotColor = Color(0xFFFFD54F),
-                            )
-                        } else {
-                            Modifier
+        AnimatedVisibility(
+            visible = activeSelected != null && enabled && uiState.isHumanTurn,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            if (activeSelected != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 8.dp),
+                ) {
+                    MaestroPillButton(
+                        text = stringResource(id = R.string.game_card_play_confirm),
+                        onClick = {
+                            selectedCard = null
+                            onCardClicked(activeSelected)
                         },
-                    ),
-            ) {
-                PlaceholderCardView(
-                    card = card,
-                    isPlayable = canPlay,
-                    width = 110.dp,
-                    height = 165.dp,
-                    onClick = {
-                        if (canPlay) {
-                            onCardClicked(card)
+                        variant = PillButtonVariant.PRIMARY_GREEN,
+                        height = 36.dp,
+                        fontSize = 14.sp,
+                        testTag = "confirm_play_button",
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
+                    )
+                    Text(
+                        text = stringResource(id = R.string.game_card_drag_hint),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = GoldAccentColor,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.testTag("human_hand_row"),
+            horizontalArrangement = Arrangement.spacedBy((-22).dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            cards.forEachIndexed { i, card ->
+                val mid = (cards.size - 1) / 2f
+                val angle = (i - mid) * 8f
+                val baseDrop = kotlin.math.abs(i - mid) * 12f
+                val isSuggested = uiState.suggestedMove?.card == card
+                val canPlay = enabled && uiState.isHumanTurn
+                val isSelected = activeSelected == card
+                val isDragging = draggingCard == card
+
+                val visualOffset = when {
+                    isDragging -> dragOffsetY.value
+                    isSelected -> -36f
+                    else -> 0f
+                }
+                val visualAngle = if (isDragging || isSelected) 0f else angle
+                val visualScale = if (isDragging) 1.08f else if (isSelected) 1.04f else 1f
+                val isOverThreshold = isDragging && dragOffsetY.value < dragPlayThreshold
+
+                Box(
+                    modifier = Modifier
+                        .zIndex(if (isDragging) 10f else if (isSelected) 5f else i.toFloat())
+                        .offset { IntOffset(0, (baseDrop.dp.toPx() + visualOffset).roundToInt()) }
+                        .rotate(visualAngle)
+                        .graphicsLayer {
+                            scaleX = visualScale
+                            scaleY = visualScale
                         }
-                    },
-                )
+                        .draggable(
+                            state = rememberDraggableState { delta ->
+                                coroutineScope.launch {
+                                    dragOffsetY.snapTo(dragOffsetY.value + delta)
+                                }
+                            },
+                            orientation = Orientation.Vertical,
+                            enabled = canPlay,
+                            onDragStarted = {
+                                draggingCard = card
+                                selectedCard = card
+                            },
+                            onDragStopped = {
+                                val shouldPlay = dragOffsetY.value < dragPlayThreshold
+                                coroutineScope.launch {
+                                    dragOffsetY.animateTo(0f, tween(200))
+                                }
+                                draggingCard = null
+                                if (shouldPlay) {
+                                    selectedCard = null
+                                    onCardClicked(card)
+                                }
+                            },
+                        )
+                        .then(
+                            if (isOverThreshold) {
+                                Modifier.shadow(
+                                    elevation = 20.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    ambientColor = GoldAccentColor,
+                                    spotColor = GoldAccentColor,
+                                )
+                            } else if (isSuggested || isSelected || canPlay) {
+                                Modifier.shadow(
+                                    elevation = if (isSelected) 16.dp else if (isSuggested) 14.dp else 6.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    ambientColor = if (isSelected) GoldAccentColor else Color(0xFFFFD54F),
+                                    spotColor = if (isSelected) GoldAccentColor else Color(0xFFFFD54F),
+                                )
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    PlaceholderCardView(
+                        card = card,
+                        isPlayable = canPlay,
+                        width = 110.dp,
+                        height = 165.dp,
+                        modifier = if (isSelected || isOverThreshold) {
+                            Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(6.dp))
+                        } else Modifier,
+                        onClick = {
+                            if (canPlay) {
+                                if (isSelected) {
+                                    selectedCard = null
+                                    onCardClicked(card)
+                                } else {
+                                    selectedCard = card
+                                }
+                            }
+                        },
+                    )
+                }
             }
         }
     }
