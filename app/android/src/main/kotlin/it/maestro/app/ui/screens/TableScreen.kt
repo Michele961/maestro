@@ -1133,6 +1133,7 @@ public data class ActiveDealAnimation(
 @Composable
 private fun DealAnimationOverlay(
     anim: ActiveDealAnimation,
+    tableCards: List<Card> = emptyList(),
 ) {
     // Coordinate del mazzo (destra centro)
     val deckX = 135f
@@ -1151,10 +1152,10 @@ private fun DealAnimationOverlay(
     }
 
     val tableTargets = listOf(
-        Pair(-44f, -54f),
-        Pair(44f, -54f),
-        Pair(-44f, 54f),
-        Pair(44f, 54f),
+        Pair(-40f, -58f),
+        Pair(40f, -58f),
+        Pair(-40f, 58f),
+        Pair(40f, 58f),
     )
     val oppTargets = listOf(
         Pair(-40f, -240f),
@@ -1166,15 +1167,6 @@ private fun DealAnimationOverlay(
         Pair(0f, 240f),
         Pair(48f, 240f),
     )
-
-    // Conteggio carte già atterrate sul tavolo e nelle mani
-    val tableLandedCount = when (anim.stage) {
-        DealAnimStage.SHUFFLE, DealAnimStage.DEAL_TABLE_0 -> 0
-        DealAnimStage.DEAL_TABLE_1 -> 1
-        DealAnimStage.DEAL_TABLE_2 -> 2
-        DealAnimStage.DEAL_TABLE_3 -> 3
-        else -> if (anim.isInitial) 4 else 0
-    }
 
     val oppLandedCount = when (anim.stage) {
         DealAnimStage.DEAL_HAND_HUMAN_0, DealAnimStage.DEAL_HAND_OPP_1 -> 1
@@ -1189,19 +1181,24 @@ private fun DealAnimationOverlay(
         else -> 0
     }
 
-    // Bersaglio della carta attualmente in volo
-    val currentFlyingTarget: Pair<Float, Float>? = when (anim.stage) {
-        DealAnimStage.DEAL_TABLE_0 -> tableTargets[0]
-        DealAnimStage.DEAL_TABLE_1 -> tableTargets[1]
-        DealAnimStage.DEAL_TABLE_2 -> tableTargets[2]
-        DealAnimStage.DEAL_TABLE_3 -> tableTargets[3]
+    // Bersaglio della carta tavolo in volo
+    val currentFlyingTableIndex = when (anim.stage) {
+        DealAnimStage.DEAL_TABLE_0 -> 0
+        DealAnimStage.DEAL_TABLE_1 -> 1
+        DealAnimStage.DEAL_TABLE_2 -> 2
+        DealAnimStage.DEAL_TABLE_3 -> 3
+        else -> null
+    }
+
+    // Bersaglio della carta mano in volo
+    val currentFlyingHandTarget: Pair<Float, Float>? = when (anim.stage) {
         DealAnimStage.DEAL_HAND_OPP_0 -> oppTargets[0]
         DealAnimStage.DEAL_HAND_HUMAN_0 -> humanTargets[0]
         DealAnimStage.DEAL_HAND_OPP_1 -> oppTargets[1]
         DealAnimStage.DEAL_HAND_HUMAN_1 -> humanTargets[1]
         DealAnimStage.DEAL_HAND_OPP_2 -> oppTargets[2]
         DealAnimStage.DEAL_HAND_HUMAN_2 -> humanTargets[2]
-        DealAnimStage.SHUFFLE -> null
+        else -> null
     }
 
     val isFlyingToHuman = anim.stage in listOf(
@@ -1229,22 +1226,11 @@ private fun DealAnimationOverlay(
             )
         }
 
-        // Carte già atterrate a terra (dorso)
-        for (i in 0 until tableLandedCount) {
-            val (tx, ty) = tableTargets[i]
-            CardBackView(
-                width = 64.dp,
-                height = 96.dp,
-                modifier = Modifier
-                    .graphicsLayer {
-                        translationX = tx.dp.toPx()
-                        translationY = ty.dp.toPx()
-                    }
-                    .shadow(8.dp, RoundedCornerShape(6.dp)),
-            )
-        }
+        // NOTA BENE: Nessun dorso statico disegnato sul tavolo!
+        // Le carte a terra che sono già atterrate vengono disegnate direttamente da FlowRow
+        // a faccia in su in modo stabile, naturale e perfettamente allineato.
 
-        // Carte già atterrate all'avversario
+        // Carte già atterrate all'avversario (dorso)
         for (i in 0 until oppLandedCount) {
             val (tx, ty) = oppTargets[i]
             CardBackView(
@@ -1259,7 +1245,7 @@ private fun DealAnimationOverlay(
             )
         }
 
-        // Carte già atterrate al giocatore umano
+        // Carte già atterrate al giocatore umano (dorso)
         for (i in 0 until humanLandedCount) {
             val (tx, ty) = humanTargets[i]
             CardBackView(
@@ -1274,10 +1260,48 @@ private fun DealAnimationOverlay(
             )
         }
 
-        // Carta attualmente in volo
-        if (currentFlyingTarget != null) {
+        // Carta attualmente in volo verso il tavolo:
+        // Parte di dorso dal mazzo e si gira a faccia in su in volo, atterrando scoperta sul tavolo!
+        if (currentFlyingTableIndex != null) {
             val p = flyProgress.value
-            val (targetX, targetY) = currentFlyingTarget
+            val (targetX, targetY) = tableTargets[currentFlyingTableIndex]
+            val cardX = deckX + (targetX - deckX) * p
+            val cardY = deckY + (targetY - deckY) * p
+            val card = tableCards.getOrNull(currentFlyingTableIndex)
+
+            val isFaceUp = p >= 0.45f
+            val rotY = if (p < 0.45f) (1f - p) * 180f else (1f - p) * 180f - 180f
+
+            Box(
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = cardX.dp.toPx()
+                        translationY = cardY.dp.toPx()
+                        rotationY = rotY
+                        alpha = p.coerceIn(0.3f, 1f)
+                    }
+                    .shadow(8.dp, RoundedCornerShape(6.dp)),
+            ) {
+                if (card != null && isFaceUp) {
+                    PlaceholderCardView(
+                        card = card,
+                        isPlayable = false,
+                        width = 72.dp,
+                        height = 108.dp,
+                    )
+                } else {
+                    CardBackView(
+                        width = 72.dp,
+                        height = 108.dp,
+                    )
+                }
+            }
+        }
+
+        // Carta attualmente in volo verso le mani (dorso coperto)
+        if (currentFlyingHandTarget != null) {
+            val p = flyProgress.value
+            val (targetX, targetY) = currentFlyingHandTarget
             val cardX = deckX + (targetX - deckX) * p
             val cardY = deckY + (targetY - deckY) * p
             val cardScale = if (isFlyingToHuman) 0.85f + 0.25f * p else 0.85f + 0.15f * p
@@ -1419,21 +1443,21 @@ private fun FeltLayout(
     val currentDealAnim = activeDealAnim
 
     // Le carte visibili sul tavolo:
-    // - Durante la smazzata iniziale prima della calata a terra, il tavolo è vuoto
+    // - Durante la smazzata iniziale, le carte atterrate compaiono a faccia in su mano a mano che atterrano
     // - Durante una calata semplice (capture.isEmpty()), la carta vola nell'overlay e NON
     //   deve comparire nel tavolo finché l'animazione di volo non finisce (elimina il duplicato)
     // - Durante una presa (capture.isNotEmpty()), le carte catturate restano evidenziate sul tavolo
     //   finché non volano alla pila delle prese
     val visibleTableCards = remember(uiState.tableCards, currentAnim, currentDealAnim) {
-        if (currentDealAnim != null && currentDealAnim.isInitial && currentDealAnim.stage in listOf(
-                DealAnimStage.SHUFFLE,
-                DealAnimStage.DEAL_TABLE_0,
-                DealAnimStage.DEAL_TABLE_1,
-                DealAnimStage.DEAL_TABLE_2,
-                DealAnimStage.DEAL_TABLE_3,
-            )
-        ) {
-            emptyList()
+        val dealAnim = currentDealAnim
+        if (dealAnim != null && dealAnim.isInitial) {
+            when (dealAnim.stage) {
+                DealAnimStage.SHUFFLE, DealAnimStage.DEAL_TABLE_0 -> emptyList()
+                DealAnimStage.DEAL_TABLE_1 -> uiState.tableCards.take(1)
+                DealAnimStage.DEAL_TABLE_2 -> uiState.tableCards.take(2)
+                DealAnimStage.DEAL_TABLE_3 -> uiState.tableCards.take(3)
+                else -> uiState.tableCards
+            }
         } else {
             val anim = currentAnim
             if (anim != null) {
@@ -1613,7 +1637,10 @@ private fun FeltLayout(
 
         // Overlay per l'animazione di smazzata e distribuzione carte dal mazzo
         if (currentDealAnim != null) {
-            DealAnimationOverlay(anim = currentDealAnim)
+            DealAnimationOverlay(
+                anim = currentDealAnim,
+                tableCards = uiState.tableCards,
+            )
         }
 
         // Overlay per l'animazione di volo della carta giocata e presa
