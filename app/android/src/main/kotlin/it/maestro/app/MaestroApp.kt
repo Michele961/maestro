@@ -27,10 +27,12 @@ public class MaestroApp : Application() {
             defaultHandler?.uncaughtException(thread, throwable)
         }
 
-        startKoin {
-            androidLogger()
-            androidContext(this@MaestroApp)
-            modules(appModule)
+        if (org.koin.core.context.GlobalContext.getOrNull() == null) {
+            startKoin {
+                androidLogger()
+                androidContext(this@MaestroApp)
+                modules(appModule)
+            }
         }
     }
 }

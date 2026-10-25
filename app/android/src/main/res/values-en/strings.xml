@@ -170,4 +170,11 @@
     <string name="post_match_maestro_review">I marked the key moments. Let\'s review the mistakes together, move by move.</string>
     <string name="post_match_rematch">Rematch</string>
     <string name="post_match_back_to_menu">Back to menu</string>
+    <string name="game_opponent_last_move">Opponent\'s last move</string>
+    <string name="game_opponent_drop_table">Placed on table</string>
+    <string name="game_opponent_takes">Takes</string>
+    <string name="game_card_drag_hint">Drag to table</string>
+    <string name="game_card_play_confirm">PLAY</string>
+    <string name="game_card_release_to_play">Release to play</string>
+    <string name="game_arrow_symbol">➔</string>
 </resources>

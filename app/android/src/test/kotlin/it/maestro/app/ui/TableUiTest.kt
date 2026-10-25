@@ -141,6 +141,33 @@ class TableUiTest {
     }
 
     @Test
+    fun opponentMoveSummaryIsRecordedOnBotMoveAndPreservedDuringHumanTurn() {
+        val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
+        val state = initial.state
+        val botSeat = Seat.P2
+
+        // Simuliamo una mossa del bot
+        val botLegal = legalMoves(state.scopaState)
+        if (state.scopaState.toMove == botSeat && botLegal.isNotEmpty()) {
+            val botMove = botLegal.first()
+            val botRes = GameReducer.reduce(state, GameIntent.ApplyBotMove(botMove))
+            val uiState = botRes.state.toUiState()
+
+            assertNotNull(uiState.opponentLastMove)
+            assertEquals(botMove.card, uiState.opponentLastMove?.card)
+            assertEquals(botMove.capture, uiState.opponentLastMove?.capture)
+
+            // Il giocatore umano gioca una carta: l'ultima mossa dell'avversario resta visibile
+            if (uiState.isHumanTurn) {
+                val humanCard = uiState.humanHand.first()
+                val humanRes = GameReducer.reduce(botRes.state, GameIntent.PlayCard(humanCard))
+                val humanUiState = humanRes.state.toUiState()
+                assertEquals(uiState.opponentLastMove, humanUiState.opponentLastMove)
+            }
+        }
+    }
+
+    @Test
     fun layoutFitsFiveInchVerticalScreenBudget() {
         // Uno schermo tipico da 5" verticale ha larghezza 360 dp e altezza ~640 dp.
         // Verifichiamo che il modello UI del tavolo rispetti i vincoli di budget visivo:

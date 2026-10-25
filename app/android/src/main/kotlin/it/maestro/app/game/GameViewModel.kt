@@ -34,7 +34,7 @@ public class GameViewModel(
     private val matchRepository: MatchRepository? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
-    private val botThinkDelayMillis: Long = if (ioDispatcher == Dispatchers.Unconfined) 0L else 900L,
+    private val botThinkDelayMillis: Long = if (ioDispatcher == Dispatchers.Unconfined) 0L else 1000L,
 ) : ViewModel() {
 
     private val scope: kotlinx.coroutines.CoroutineScope = coroutineScope ?: viewModelScope
