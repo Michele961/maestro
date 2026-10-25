@@ -178,7 +178,7 @@ public fun MaestroDialogueBox(
 }
 
 /** Lato da cui esce la codina del [MaestroSpeechBubble]. */
-public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END }
+public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START }
 
 /**
  * Fumetto compatto del Maestro come nei mockup (F1-26): carta avorio, testo centrato,
@@ -193,12 +193,39 @@ public fun MaestroSpeechBubble(
     fontSize: TextUnit = 14.sp,
     maxLines: Int = 3,
 ) {
+    val isTop = tail == BubbleTail.TOP_START
     val tailAlign = when (tail) {
-        BubbleTail.BOTTOM_START -> Alignment.Start
+        BubbleTail.BOTTOM_START, BubbleTail.TOP_START -> Alignment.Start
         BubbleTail.BOTTOM_CENTER -> Alignment.CenterHorizontally
         BubbleTail.BOTTOM_END -> Alignment.End
     }
+    val tailCanvas: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit = {
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .align(tailAlign)
+                .padding(horizontal = 22.dp)
+                .size(width = 16.dp, height = 10.dp),
+        ) {
+            val path = androidx.compose.ui.graphics.Path().apply {
+                if (isTop) {
+                    moveTo(size.width * 0.25f, 0f)
+                    lineTo(0f, size.height)
+                    lineTo(size.width, size.height)
+                } else {
+                    moveTo(0f, 0f)
+                    lineTo(size.width, 0f)
+                    lineTo(size.width * 0.25f, size.height)
+                }
+                close()
+            }
+            drawPath(path, BubblePaper)
+        }
+    }
+
     androidx.compose.foundation.layout.Column(modifier = modifier) {
+        if (isTop) {
+            tailCanvas()
+        }
         Surface(
             shape = RoundedCornerShape(10.dp),
             color = BubblePaper,
@@ -218,19 +245,8 @@ public fun MaestroSpeechBubble(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             )
         }
-        androidx.compose.foundation.Canvas(
-            modifier = Modifier
-                .align(tailAlign)
-                .padding(horizontal = 22.dp)
-                .size(width = 16.dp, height = 10.dp),
-        ) {
-            val path = androidx.compose.ui.graphics.Path().apply {
-                moveTo(0f, 0f)
-                lineTo(size.width, 0f)
-                lineTo(size.width * 0.25f, size.height)
-                close()
-            }
-            drawPath(path, BubblePaper)
+        if (!isTop) {
+            tailCanvas()
         }
     }
 }

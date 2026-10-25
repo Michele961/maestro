@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.FramedPortrait
+import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -906,9 +907,9 @@ private fun OpponentLastMovePlaque(
         color = OptionPaper,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
                 text = stringResource(id = R.string.game_opponent_last_move) + ":",
@@ -920,8 +921,8 @@ private fun OpponentLastMovePlaque(
             PlaceholderCardView(
                 card = summary.card,
                 isPlayable = false,
-                width = 28.dp,
-                height = 42.dp,
+                width = 24.dp,
+                height = 36.dp,
             )
             Text(
                 text = stringResource(id = R.string.game_arrow_symbol),
@@ -943,8 +944,8 @@ private fun OpponentLastMovePlaque(
                         PlaceholderCardView(
                             card = taken,
                             isPlayable = false,
-                            width = 28.dp,
-                            height = 42.dp,
+                            width = 24.dp,
+                            height = 36.dp,
                         )
                     }
                 }
@@ -1245,49 +1246,17 @@ private fun FeltLayout(
             }
         }
 
-        // Ritratto del Maestro: ancorato in basso a sinistra (posizione FISSA)
+        // Ritratto del Maestro: posizionato nello spazio in alto a sinistra tra avversario e carte in tavola (sempre visibile)
         Box(
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 8.dp, bottom = 110.dp)
+                .align(Alignment.TopStart)
+                .padding(start = 10.dp, top = 114.dp)
                 .width(135.dp),
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Bottom,
+                verticalArrangement = Arrangement.Top,
             ) {
-                AnimatedVisibility(
-                    visible = showHint || uiState.isHintLoading,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    MaestroSpeechBubble(
-                        message = when {
-                            hint != null -> formatHintMove(hint)
-                            else -> stringResource(id = R.string.game_hint_loading)
-                        },
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .padding(bottom = 6.dp)
-                            .clickable { hintDismissed = true }
-                            .testTag("game_hint_banner"),
-                    )
-                }
-                AnimatedVisibility(
-                    visible = sweeping,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    MaestroPillButton(
-                        text = stringResource(id = R.string.game_event_sweep).uppercase(),
-                        onClick = {},
-                        variant = PillButtonVariant.HERO_RED,
-                        height = 38.dp,
-                        fontSize = 17.sp,
-                        modifier = Modifier.padding(bottom = 6.dp),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
-                    )
-                }
                 AnimatedVisibility(
                     visible = uiState.isSparring,
                     enter = fadeIn(),
@@ -1306,11 +1275,44 @@ private fun FeltLayout(
                                 showHint -> R.drawable.maestro_pleased
                                 else -> R.drawable.maestro_neutral
                             },
-                            size = 64.dp,
+                            size = 56.dp,
                             background = Color(0xFF7D3F19),
                             contentDescription = stringResource(id = R.string.game_hint_button),
                         )
                     }
+                }
+                AnimatedVisibility(
+                    visible = sweeping,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    MaestroPillButton(
+                        text = stringResource(id = R.string.game_event_sweep).uppercase(),
+                        onClick = {},
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 34.dp,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 4.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = showHint || uiState.isHintLoading,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    MaestroSpeechBubble(
+                        message = when {
+                            hint != null -> formatHintMove(hint)
+                            else -> stringResource(id = R.string.game_hint_loading)
+                        },
+                        tail = BubbleTail.TOP_START,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .clickable { hintDismissed = true }
+                            .testTag("game_hint_banner"),
+                    )
                 }
             }
         }
