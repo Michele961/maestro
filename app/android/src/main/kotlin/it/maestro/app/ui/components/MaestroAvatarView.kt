@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import it.maestro.app.R
 
 /**
- * Stati d'animo ed espressioni visive del Maestro (task F1-14).
+ * Stati d'animo ed espressioni visive del Maestro (task F1-14, F1-25).
  */
 public enum class MaestroMood {
     NEUTRAL,
@@ -45,6 +45,10 @@ public enum class MaestroMood {
     PLEASED,
     WARNING,
     CELEBRATING,
+    APPLAUDING,
+    TRIUMPHANT,
+    DESPAIR,
+    ENCOURAGING,
 }
 
 /**
@@ -66,6 +70,10 @@ public fun MaestroAvatarView(
             MaestroMood.PLEASED -> Color(0xFF2A9D8F)
             MaestroMood.WARNING -> Color(0xFFE76F51)
             MaestroMood.CELEBRATING -> Color(0xFFFFD166)
+            MaestroMood.APPLAUDING -> Color(0xFFFFD700)
+            MaestroMood.TRIUMPHANT -> Color(0xFF48BB78)
+            MaestroMood.DESPAIR -> Color(0xFFE53E3E)
+            MaestroMood.ENCOURAGING -> Color(0xFF4299E1)
         },
         animationSpec = tween(durationMillis = 400),
         label = "maestro_aura_color",
@@ -74,7 +82,7 @@ public fun MaestroAvatarView(
     val infiniteTransition = rememberInfiniteTransition(label = "maestro_pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (mood == MaestroMood.THINKING || mood == MaestroMood.CELEBRATING) 1.15f else 1.05f,
+        targetValue = if (mood == MaestroMood.THINKING || mood == MaestroMood.CELEBRATING || mood == MaestroMood.APPLAUDING || mood == MaestroMood.TRIUMPHANT) 1.15f else 1.05f,
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = if (mood == MaestroMood.THINKING) 800 else 1400,

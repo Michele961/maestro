@@ -185,6 +185,7 @@ public object GameReducer {
             opponentLastMove = null,
             dealAnimationId = nextDealAnimId,
             isInitialDeal = isNewDeal,
+            sweepCards = if (isNewDeal) emptyMap() else state.sweepCards,
         )
         val botSeat = state.humanSeat.other()
         val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
@@ -292,7 +293,9 @@ public object GameReducer {
                 for (event in result.events) {
                     when (event) {
                         is GameEvent.Sweep -> {
-                            lastEvent = UiGameEvent.Sweep(event.seat)
+                            val previousSweeps = sweepCards[event.seat]?.size ?: 0
+                            val count = previousSweeps + 1
+                            lastEvent = UiGameEvent.Sweep(event.seat, sweepCountThisDeal = count)
                             sweepCards = sweepCards + (event.seat to sweepCards[event.seat].orEmpty() + move.card)
                         }
                         is GameEvent.DealEnded -> {

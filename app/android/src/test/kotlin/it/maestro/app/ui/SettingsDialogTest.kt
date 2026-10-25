@@ -18,6 +18,10 @@ class SettingsDialogTest {
             MaestroMood.PLEASED,
             MaestroMood.WARNING,
             MaestroMood.CELEBRATING,
+            MaestroMood.APPLAUDING,
+            MaestroMood.TRIUMPHANT,
+            MaestroMood.DESPAIR,
+            MaestroMood.ENCOURAGING,
         )
         assertEquals(expected, MaestroMood.entries.toSet())
     }

@@ -23,6 +23,10 @@ import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.MaestroSpeechBubble
+import it.maestro.app.ui.components.SweepCelebrationOverlay
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.draw.shadow
@@ -352,14 +356,26 @@ public fun TableContent(
             )
         }
 
+        // Overlay celebrativo Scopa (task F1-25)
+        val sweepEvent = uiState.lastEvent as? UiGameEvent.Sweep
+        if (sweepEvent != null) {
+            SweepCelebrationOverlay(
+                event = sweepEvent,
+                isHuman = sweepEvent.seat == uiState.humanSeat,
+                onDismiss = { onIntent(GameIntent.DismissEvent) },
+            )
+        }
+
     }
 }
 
-/** Barra superiore su legno: avversario con espressione e punteggio della partita (F1-21). */
+/** Barra superiore su legno: avversario con espressione e punteggio della partita (F1-21, F1-25). */
 @Composable
 private fun TableTopBar(uiState: GameUiState, onPause: () -> Unit) {
+    val lastEvent = uiState.lastEvent
     val mood = when {
-        uiState.lastEvent is UiGameEvent.Sweep -> MaestroMood.CELEBRATING
+        lastEvent is UiGameEvent.Sweep && lastEvent.seat == uiState.humanSeat -> MaestroMood.APPLAUDING
+        lastEvent is UiGameEvent.Sweep -> MaestroMood.DESPAIR
         uiState.isBotThinking || uiState.isHintLoading -> MaestroMood.THINKING
         uiState.trainingQuestionFeedback?.isCorrect == true -> MaestroMood.PLEASED
         uiState.trainingQuestionFeedback?.isCorrect == false -> MaestroMood.WARNING
@@ -559,6 +575,17 @@ private fun DealSummaryDialog(
         },
     )
 
+    var revealedCount by remember { mutableStateOf(0) }
+    val haptic = LocalHapticFeedback.current
+
+    LaunchedEffect(Unit) {
+        for (i in 1..categories.size) {
+            delay(150L)
+            revealedCount = i
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
+
     MaestroAlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -572,6 +599,11 @@ private fun DealSummaryDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { revealedCount = categories.size },
+                    )
                     .testTag("deal_summary_dialog"),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -604,13 +636,18 @@ private fun DealSummaryDialog(
 
                 HorizontalDivider(color = Color.DarkGray)
 
-                for ((category, labelResId) in categories) {
+                categories.forEachIndexed { i, (category, labelResId) ->
+                    val isRevealed = revealedCount > i
                     val tag = "deal_summary_${category.name.lowercase()}"
                     val p1Pts = score.points(humanSeat, category)
                     val p2Pts = score.points(oppSeat, category)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .graphicsLayer {
+                                alpha = if (isRevealed) 1f else 0.2f
+                                translationX = if (isRevealed) 0f else -12f
+                            }
                             .testTag(tag),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -624,14 +661,14 @@ private fun DealSummaryDialog(
                             text = "$p1Pts",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = DialogGold,
+                            color = if (isRevealed && p1Pts > 0) DialogGold else DialogInkSoft,
                             modifier = Modifier.weight(1f),
                         )
                         Text(
                             text = "$p2Pts",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = DialogInk,
+                            color = if (isRevealed && p2Pts > 0) DialogInk else DialogInkSoft,
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -639,10 +676,14 @@ private fun DealSummaryDialog(
 
                 HorizontalDivider(color = Color.DarkGray)
 
+                val totalsRevealed = revealedCount >= categories.size
                 // Totale smazzata
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .graphicsLayer {
+                            alpha = if (totalsRevealed) 1f else 0.3f
+                        }
                         .testTag("deal_summary_deal_total"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -673,6 +714,9 @@ private fun DealSummaryDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .graphicsLayer {
+                            alpha = if (totalsRevealed) 1f else 0.3f
+                        }
                         .testTag("deal_summary_match_total"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -1078,6 +1122,7 @@ private fun MoveFlightOverlay(
                     PlaceholderCardView(
                         card = capturedCard,
                         isPlayable = false,
+                        showGoldFrame = capturedCard.suit == Suit.DENARI && capturedCard.rank == Rank.SETTE,
                         width = 72.dp,
                         height = 108.dp,
                     )
@@ -1100,6 +1145,7 @@ private fun MoveFlightOverlay(
             PlaceholderCardView(
                 card = anim.card,
                 isPlayable = false,
+                showGoldFrame = anim.card.suit == Suit.DENARI && anim.card.rank == Rank.SETTE,
                 width = 80.dp,
                 height = 120.dp,
                 modifier = if (anim.capture.isNotEmpty() && anim.stage == MoveAnimStage.SHOWING_CAPTURE) {
@@ -1337,12 +1383,21 @@ private fun FeltLayout(
 ) {
     var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
     var activeDealAnim by remember { mutableStateOf<ActiveDealAnimation?>(null) }
+    var lastHandledMoveId by remember { mutableStateOf(uiState.lastMoveId) }
 
     LaunchedEffect(uiState.dealAnimationId) {
         if (uiState.dealAnimationId == 0L) return@LaunchedEffect
-        // Attende che l'eventuale animazione della mossa precedente (volo carta / presa) sia terminata
-        while (activeMoveAnim != null) {
-            delay(40L)
+        // Se non è la smazzata iniziale, la nuova distribuzione delle mani è scaturita dalla giocata
+        // della terza carta (uiState.lastMoveId): attendiamo che tale mossa sia stata
+        // completamente animata e risolta sul tavolo prima di distribuire le nuove carte dal mazzo!
+        if (!uiState.isInitialDeal) {
+            while (lastHandledMoveId < uiState.lastMoveId || activeMoveAnim != null) {
+                delay(40L)
+            }
+        } else {
+            while (activeMoveAnim != null) {
+                delay(40L)
+            }
         }
         try {
             if (uiState.isInitialDeal) {
@@ -1444,6 +1499,7 @@ private fun FeltLayout(
             if (activeMoveAnim?.moveId == uiState.lastMoveId) {
                 activeMoveAnim = null
             }
+            lastHandledMoveId = uiState.lastMoveId
         }
     }
 
@@ -1556,9 +1612,11 @@ private fun FeltLayout(
             val suggested = uiState.suggestedMove?.capture
             for (card in visibleTableCards) {
                 val isBeingCaptured = currentAnim != null && card in currentAnim.capture && currentAnim.stage == MoveAnimStage.SHOWING_CAPTURE
+                val isSettebello = card.suit == Suit.DENARI && card.rank == Rank.SETTE
                 PlaceholderCardView(
                     card = card,
                     isPlayable = false,
+                    showGoldFrame = isBeingCaptured || isSettebello,
                     width = 72.dp,
                     height = 108.dp,
                     modifier = when {
@@ -1594,9 +1652,11 @@ private fun FeltLayout(
                             .clickable(enabled = canAskHint, onClick = onRequestHint)
                             .testTag("game_hint_button"),
                     ) {
+                        val sweepEvent = uiState.lastEvent as? UiGameEvent.Sweep
                         FramedPortrait(
                             portrait = when {
-                                sweeping -> R.drawable.maestro_celebrating
+                                sweepEvent?.seat == uiState.humanSeat -> R.drawable.maestro_applauding
+                                sweepEvent?.seat != null -> R.drawable.maestro_despair
                                 uiState.isBotThinking -> R.drawable.maestro_thinking
                                 showHint -> R.drawable.maestro_pleased
                                 else -> R.drawable.maestro_neutral
@@ -1808,9 +1868,11 @@ private fun HandFan(
                             },
                         ),
                 ) {
+                    val isSettebello = card.suit == Suit.DENARI && card.rank == Rank.SETTE
                     PlaceholderCardView(
                         card = card,
                         isPlayable = canPlay,
+                        showGoldFrame = isSettebello,
                         width = 110.dp,
                         height = 165.dp,
                         modifier = if (isSelected || isOverThreshold) {
