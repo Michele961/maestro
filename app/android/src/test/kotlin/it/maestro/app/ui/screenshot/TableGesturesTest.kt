@@ -127,6 +127,41 @@ class TableGesturesTest {
         composeRule.onNodeWithTag("game_hint_banner").assertDoesNotExist()
     }
 
+    @Test
+    fun dealAnimationDisablesAndHidesHandsUntilFinished() {
+        val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
+        var uiState = initial.state.toUiState()
+        if (!uiState.isHumanTurn) {
+            val botMove = it.maestro.game.scopa.legalMoves(initial.state.scopaState).first()
+            val afterBot = GameReducer.reduce(initial.state, GameIntent.ApplyBotMove(botMove))
+            uiState = afterBot.state.toUiState()
+        }
+
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(
+                    uiState = uiState,
+                    onIntent = {},
+                )
+            }
+        }
+
+        val cardToSelect = uiState.humanHand.first()
+        val cardTag = "card_${cardToSelect.suit.name}_${cardToSelect.rank.name}"
+
+        // Durante la distribuzione pendente o attiva, la mano non è interagibile
+        composeRule.onNodeWithTag(cardTag).performClick()
+        composeRule.onNodeWithTag("confirm_play_button").assertDoesNotExist()
+
+        // Una volta terminata l'animazione di smazzata, la mano diventa attiva e cliccabile
+        composeRule.mainClock.advanceTimeBy(3000L)
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(cardTag).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("confirm_play_button").assertExists()
+    }
+
     @org.junit.After
     fun tearDown() {
         org.koin.core.context.stopKoin()

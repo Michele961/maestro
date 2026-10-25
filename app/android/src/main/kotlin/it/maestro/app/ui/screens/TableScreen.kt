@@ -1383,6 +1383,7 @@ private fun FeltLayout(
 ) {
     var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
     var activeDealAnim by remember { mutableStateOf<ActiveDealAnimation?>(null) }
+    var lastCompletedDealId by remember { mutableStateOf(0L) }
     var lastHandledMoveId by remember { mutableStateOf(uiState.lastMoveId) }
 
     LaunchedEffect(uiState.dealAnimationId) {
@@ -1448,6 +1449,7 @@ private fun FeltLayout(
             if (activeDealAnim?.dealId == uiState.dealAnimationId) {
                 activeDealAnim = null
             }
+            lastCompletedDealId = uiState.dealAnimationId
         }
     }
 
@@ -1505,6 +1507,8 @@ private fun FeltLayout(
 
     val currentAnim = activeMoveAnim
     val currentDealAnim = activeDealAnim
+    val isDealPending = uiState.dealAnimationId > 0L && lastCompletedDealId < uiState.dealAnimationId
+    val hideHands = isDealPending || currentDealAnim != null
 
     // Le carte visibili sul tavolo:
     // - Durante la smazzata iniziale, le carte atterrate compaiono a faccia in su mano a mano che atterrano
@@ -1512,15 +1516,18 @@ private fun FeltLayout(
     //   deve comparire nel tavolo finché l'animazione di volo non finisce (elimina il duplicato)
     // - Durante una presa (capture.isNotEmpty()), le carte catturate restano evidenziate sul tavolo
     //   finché non volano alla pila delle prese
-    val visibleTableCards = remember(uiState.tableCards, currentAnim, currentDealAnim) {
+    val visibleTableCards = remember(uiState.tableCards, currentAnim, currentDealAnim, isDealPending) {
         val dealAnim = currentDealAnim
-        if (dealAnim != null && dealAnim.isInitial) {
-            when (dealAnim.stage) {
-                DealAnimStage.SHUFFLE, DealAnimStage.DEAL_TABLE_0 -> emptyList()
-                DealAnimStage.DEAL_TABLE_1 -> uiState.tableCards.take(1)
-                DealAnimStage.DEAL_TABLE_2 -> uiState.tableCards.take(2)
-                DealAnimStage.DEAL_TABLE_3 -> uiState.tableCards.take(3)
-                else -> uiState.tableCards
+        if ((isDealPending || dealAnim != null) && uiState.isInitialDeal) {
+            if (dealAnim == null || dealAnim.stage in listOf(DealAnimStage.SHUFFLE, DealAnimStage.DEAL_TABLE_0)) {
+                emptyList()
+            } else {
+                when (dealAnim.stage) {
+                    DealAnimStage.DEAL_TABLE_1 -> uiState.tableCards.take(1)
+                    DealAnimStage.DEAL_TABLE_2 -> uiState.tableCards.take(2)
+                    DealAnimStage.DEAL_TABLE_3 -> uiState.tableCards.take(3)
+                    else -> uiState.tableCards
+                }
             }
         } else {
             val anim = currentAnim
@@ -1547,7 +1554,7 @@ private fun FeltLayout(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 4.dp)
-                .alpha(if (currentDealAnim != null) 0f else 1f)
+                .alpha(if (hideHands) 0f else 1f)
                 .testTag("opponent_zone"),
             horizontalArrangement = Arrangement.spacedBy((-26).dp),
         ) {
@@ -1592,7 +1599,7 @@ private fun FeltLayout(
         }
         val showHint = hint != null && !hintDismissed
         val sweeping = uiState.lastEvent is UiGameEvent.Sweep
-        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && currentAnim == null && currentDealAnim == null
+        val canAskHint = uiState.isSparring && uiState.isHumanTurn && !uiState.isBotThinking && !uiState.isHintLoading && currentAnim == null && currentDealAnim == null && !isDealPending
 
         // Carte in tavola, al centro in griglia stabile con margini fissi
         FlowRow(
@@ -1723,13 +1730,13 @@ private fun FeltLayout(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .alpha(if (currentDealAnim != null) 0f else 1f)
+                .alpha(if (hideHands) 0f else 1f)
                 .testTag("player_zone"),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             HandFan(
                 uiState = uiState,
-                enabled = currentAnim == null && currentDealAnim == null,
+                enabled = !hideHands && currentAnim == null,
                 onCardClicked = onCardClicked,
             )
         }
