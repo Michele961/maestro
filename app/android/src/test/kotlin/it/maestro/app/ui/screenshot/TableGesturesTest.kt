@@ -3,6 +3,7 @@ package it.maestro.app.ui.screenshot
 import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import it.maestro.app.game.GameIntent
 import it.maestro.app.game.GameReducer
@@ -160,6 +161,35 @@ class TableGesturesTest {
         composeRule.onNodeWithTag(cardTag).performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("confirm_play_button").assertExists()
+    }
+
+    @Test
+    fun deckCountDecrementsGraduallyDuringDeal() {
+        val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
+        val uiState = initial.state.toUiState()
+
+        composeRule.mainClock.autoAdvance = false
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(
+                    uiState = uiState,
+                    onIntent = {},
+                )
+            }
+        }
+
+        // All'inizio della smazzata, il mazzo mostra tutte le 40 carte
+        composeRule.onNodeWithText("40").assertExists()
+
+        // Avanziamo a metà della distribuzione iniziale (es. dopo 3 carte a terra: 220 + 3*160 = ~700ms)
+        composeRule.mainClock.advanceTimeBy(700L)
+        // 40 non c'è più perché le prime carte sono state distribuite
+        composeRule.onNodeWithText("40").assertDoesNotExist()
+
+        // Avanziamo al termine di tutta la distribuzione iniziale
+        composeRule.mainClock.advanceTimeBy(3000L)
+        composeRule.onNodeWithText("30").assertExists()
+        composeRule.mainClock.autoAdvance = true
     }
 
     @org.junit.After
