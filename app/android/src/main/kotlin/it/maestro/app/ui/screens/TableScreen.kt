@@ -958,15 +958,17 @@ private fun OpponentLastMovePlaque(
                 Surface(
                     color = Color(0xFFC62828),
                     shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.padding(start = 2.dp),
+                    modifier = Modifier.padding(start = 3.dp),
                 ) {
                     Text(
                         text = stringResource(id = R.string.game_event_sweep).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Black,
                         color = Color.White,
                         fontSize = 10.sp,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        maxLines = 1,
+                        softWrap = false,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
             }
@@ -994,6 +996,7 @@ public enum class MoveAnimStage {
     PLAYING_TO_TABLE,
     SHOWING_CAPTURE,
     FLYING_TO_PILE,
+    GLIDING_TO_TABLE,
 }
 
 public data class ActiveMoveAnimation(
@@ -1013,8 +1016,11 @@ private fun MoveFlightOverlay(
     val isHuman = anim.mover == humanSeat
 
     val startOffsetY = if (isHuman) 220f else -200f
-    val pileX = 130f
-    val pileY = if (isHuman) 130f else -130f
+    // Posizione di sosta (staging): sopra le carte per l'avversario (-130f), sotto per il giocatore (+130f).
+    // Non copre mai le carte in tavola al centro (0f, 0f)!
+    val stagingY = if (isHuman) 130f else -130f
+    val pileX = 135f
+    val pileY = if (isHuman) 120f else -120f
 
     val animOffsetX = remember(anim.moveId) { Animatable(0f) }
     val animOffsetY = remember(anim.moveId) { Animatable(startOffsetY) }
@@ -1024,14 +1030,20 @@ private fun MoveFlightOverlay(
     LaunchedEffect(anim.stage) {
         when (anim.stage) {
             MoveAnimStage.PLAYING_TO_TABLE -> {
-                launch { animOffsetY.animateTo(0f, tween(360, easing = FastOutSlowInEasing)) }
-                launch { animScale.animateTo(1.15f, tween(360, easing = FastOutSlowInEasing)) }
+                // Arriva nello spazio aperto di staging (sopra o sotto le carte in tavola)
+                launch { animOffsetY.animateTo(stagingY, tween(320, easing = FastOutSlowInEasing)) }
+                launch { animScale.animateTo(1.08f, tween(320, easing = FastOutSlowInEasing)) }
                 launch { animAlpha.animateTo(1f, tween(200)) }
             }
             MoveAnimStage.SHOWING_CAPTURE -> {
-                animOffsetY.snapTo(0f)
-                animScale.snapTo(1.15f)
+                animOffsetY.snapTo(stagingY)
+                animScale.snapTo(1.08f)
                 animAlpha.snapTo(1f)
+            }
+            MoveAnimStage.GLIDING_TO_TABLE -> {
+                // Calata semplice: scivola dalla posizione di staging al centro del tavolo
+                launch { animOffsetY.animateTo(0f, tween(240, easing = FastOutSlowInEasing)) }
+                launch { animScale.animateTo(1.0f, tween(240, easing = FastOutSlowInEasing)) }
             }
             MoveAnimStage.FLYING_TO_PILE -> {
                 launch { animOffsetX.animateTo(pileX, tween(360, easing = FastOutSlowInEasing)) }
@@ -1088,8 +1100,8 @@ private fun MoveFlightOverlay(
             PlaceholderCardView(
                 card = anim.card,
                 isPlayable = false,
-                width = 82.dp,
-                height = 123.dp,
+                width = 80.dp,
+                height = 120.dp,
                 modifier = if (anim.capture.isNotEmpty() && anim.stage == MoveAnimStage.SHOWING_CAPTURE) {
                     Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(8.dp))
                 } else Modifier,
@@ -1100,8 +1112,16 @@ private fun MoveFlightOverlay(
 
 public enum class DealAnimStage {
     SHUFFLE,
-    DEAL_TABLE,
-    DEAL_HANDS,
+    DEAL_TABLE_0,
+    DEAL_TABLE_1,
+    DEAL_TABLE_2,
+    DEAL_TABLE_3,
+    DEAL_HAND_OPP_0,
+    DEAL_HAND_HUMAN_0,
+    DEAL_HAND_OPP_1,
+    DEAL_HAND_HUMAN_1,
+    DEAL_HAND_OPP_2,
+    DEAL_HAND_HUMAN_2,
 }
 
 public data class ActiveDealAnimation(
@@ -1119,23 +1139,76 @@ private fun DealAnimationOverlay(
     val deckY = 0f
 
     val shuffleOffsetX = remember(anim.dealId) { Animatable(0f) }
-    val tableFlyProgress = remember(anim.dealId, anim.stage) { Animatable(0f) }
-    val handsFlyProgress = remember(anim.dealId, anim.stage) { Animatable(0f) }
+    val flyProgress = remember(anim.dealId, anim.stage) { Animatable(0f) }
 
     LaunchedEffect(anim.stage) {
-        when (anim.stage) {
-            DealAnimStage.SHUFFLE -> {
-                shuffleOffsetX.animateTo(-26f, tween(110, easing = FastOutSlowInEasing))
-                shuffleOffsetX.animateTo(0f, tween(110, easing = FastOutSlowInEasing))
-            }
-            DealAnimStage.DEAL_TABLE -> {
-                tableFlyProgress.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
-            }
-            DealAnimStage.DEAL_HANDS -> {
-                handsFlyProgress.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
-            }
+        if (anim.stage == DealAnimStage.SHUFFLE) {
+            shuffleOffsetX.animateTo(-26f, tween(110, easing = FastOutSlowInEasing))
+            shuffleOffsetX.animateTo(0f, tween(110, easing = FastOutSlowInEasing))
+        } else {
+            flyProgress.animateTo(1f, tween(150, easing = FastOutSlowInEasing))
         }
     }
+
+    val tableTargets = listOf(
+        Pair(-44f, -54f),
+        Pair(44f, -54f),
+        Pair(-44f, 54f),
+        Pair(44f, 54f),
+    )
+    val oppTargets = listOf(
+        Pair(-40f, -240f),
+        Pair(0f, -240f),
+        Pair(40f, -240f),
+    )
+    val humanTargets = listOf(
+        Pair(-48f, 240f),
+        Pair(0f, 240f),
+        Pair(48f, 240f),
+    )
+
+    // Conteggio carte già atterrate sul tavolo e nelle mani
+    val tableLandedCount = when (anim.stage) {
+        DealAnimStage.SHUFFLE, DealAnimStage.DEAL_TABLE_0 -> 0
+        DealAnimStage.DEAL_TABLE_1 -> 1
+        DealAnimStage.DEAL_TABLE_2 -> 2
+        DealAnimStage.DEAL_TABLE_3 -> 3
+        else -> if (anim.isInitial) 4 else 0
+    }
+
+    val oppLandedCount = when (anim.stage) {
+        DealAnimStage.DEAL_HAND_HUMAN_0, DealAnimStage.DEAL_HAND_OPP_1 -> 1
+        DealAnimStage.DEAL_HAND_HUMAN_1, DealAnimStage.DEAL_HAND_OPP_2 -> 2
+        DealAnimStage.DEAL_HAND_HUMAN_2 -> 3
+        else -> 0
+    }
+
+    val humanLandedCount = when (anim.stage) {
+        DealAnimStage.DEAL_HAND_OPP_1, DealAnimStage.DEAL_HAND_HUMAN_1 -> 1
+        DealAnimStage.DEAL_HAND_OPP_2, DealAnimStage.DEAL_HAND_HUMAN_2 -> 2
+        else -> 0
+    }
+
+    // Bersaglio della carta attualmente in volo
+    val currentFlyingTarget: Pair<Float, Float>? = when (anim.stage) {
+        DealAnimStage.DEAL_TABLE_0 -> tableTargets[0]
+        DealAnimStage.DEAL_TABLE_1 -> tableTargets[1]
+        DealAnimStage.DEAL_TABLE_2 -> tableTargets[2]
+        DealAnimStage.DEAL_TABLE_3 -> tableTargets[3]
+        DealAnimStage.DEAL_HAND_OPP_0 -> oppTargets[0]
+        DealAnimStage.DEAL_HAND_HUMAN_0 -> humanTargets[0]
+        DealAnimStage.DEAL_HAND_OPP_1 -> oppTargets[1]
+        DealAnimStage.DEAL_HAND_HUMAN_1 -> humanTargets[1]
+        DealAnimStage.DEAL_HAND_OPP_2 -> oppTargets[2]
+        DealAnimStage.DEAL_HAND_HUMAN_2 -> humanTargets[2]
+        DealAnimStage.SHUFFLE -> null
+    }
+
+    val isFlyingToHuman = anim.stage in listOf(
+        DealAnimStage.DEAL_HAND_HUMAN_0,
+        DealAnimStage.DEAL_HAND_HUMAN_1,
+        DealAnimStage.DEAL_HAND_HUMAN_2,
+    )
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -1156,79 +1229,72 @@ private fun DealAnimationOverlay(
             )
         }
 
-        // Distribuzione carte al tavolo (4 posizioni della griglia centrale)
-        if (anim.stage == DealAnimStage.DEAL_TABLE) {
-            val targets = listOf(
-                Pair(-44f, -54f),
-                Pair(44f, -54f),
-                Pair(-44f, 54f),
-                Pair(44f, 54f),
+        // Carte già atterrate a terra (dorso)
+        for (i in 0 until tableLandedCount) {
+            val (tx, ty) = tableTargets[i]
+            CardBackView(
+                width = 64.dp,
+                height = 96.dp,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = tx.dp.toPx()
+                        translationY = ty.dp.toPx()
+                    }
+                    .shadow(8.dp, RoundedCornerShape(6.dp)),
             )
-            val p = tableFlyProgress.value
-            targets.forEachIndexed { idx, (targetX, targetY) ->
-                val cardX = deckX + (targetX - deckX) * p
-                val cardY = deckY + (targetY - deckY) * p
-                val cardScale = 0.8f + 0.2f * p
-                CardBackView(
-                    width = 64.dp,
-                    height = 96.dp,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            translationX = cardX.dp.toPx()
-                            translationY = cardY.dp.toPx()
-                            scaleX = cardScale
-                            scaleY = cardScale
-                            alpha = p.coerceIn(0.2f, 1f)
-                            rotationZ = (1f - p) * (idx * 5f - 8f)
-                        }
-                        .shadow(8.dp, RoundedCornerShape(6.dp)),
-                )
-            }
         }
 
-        // Distribuzione carte alle mani (avversario in alto, giocatore in basso)
-        if (anim.stage == DealAnimStage.DEAL_HANDS) {
-            val p = handsFlyProgress.value
-            // 3 carte verso l'avversario (y = -240f)
-            val oppTargets = listOf(-40f, 0f, 40f)
-            oppTargets.forEachIndexed { idx, targetX ->
-                val cardX = deckX + (targetX - deckX) * p
-                val cardY = deckY + (-240f - deckY) * p
-                CardBackView(
-                    width = 64.dp,
-                    height = 96.dp,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            translationX = cardX.dp.toPx()
-                            translationY = cardY.dp.toPx()
-                            scaleX = 0.85f + 0.15f * p
-                            scaleY = 0.85f + 0.15f * p
-                            alpha = p.coerceIn(0.2f, 1f)
-                            rotationZ = (1f - p) * ((idx - 1) * 8f)
-                        }
-                        .shadow(6.dp, RoundedCornerShape(6.dp)),
-                )
-            }
-            // 3 carte verso il giocatore (y = 240f)
-            val humanTargets = listOf(-48f, 0f, 48f)
-            humanTargets.forEachIndexed { idx, targetX ->
-                val cardX = deckX + (targetX - deckX) * p
-                val cardY = deckY + (240f - deckY) * p
-                CardBackView(
-                    width = 68.dp,
-                    height = 102.dp,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            translationX = cardX.dp.toPx()
-                            translationY = cardY.dp.toPx()
-                            scaleX = 0.85f + 0.25f * p
-                            scaleY = 0.85f + 0.25f * p
-                            alpha = p.coerceIn(0.2f, 1f)
-                            rotationZ = (1f - p) * ((idx - 1) * 10f)
-                        }
-                        .shadow(8.dp, RoundedCornerShape(6.dp)),
-                )
-            }
+        // Carte già atterrate all'avversario
+        for (i in 0 until oppLandedCount) {
+            val (tx, ty) = oppTargets[i]
+            CardBackView(
+                width = 64.dp,
+                height = 96.dp,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = tx.dp.toPx()
+                        translationY = ty.dp.toPx()
+                    }
+                    .shadow(6.dp, RoundedCornerShape(6.dp)),
+            )
+        }
+
+        // Carte già atterrate al giocatore umano
+        for (i in 0 until humanLandedCount) {
+            val (tx, ty) = humanTargets[i]
+            CardBackView(
+                width = 68.dp,
+                height = 102.dp,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = tx.dp.toPx()
+                        translationY = ty.dp.toPx()
+                    }
+                    .shadow(8.dp, RoundedCornerShape(6.dp)),
+            )
+        }
+
+        // Carta attualmente in volo
+        if (currentFlyingTarget != null) {
+            val p = flyProgress.value
+            val (targetX, targetY) = currentFlyingTarget
+            val cardX = deckX + (targetX - deckX) * p
+            val cardY = deckY + (targetY - deckY) * p
+            val cardScale = if (isFlyingToHuman) 0.85f + 0.25f * p else 0.85f + 0.15f * p
+
+            CardBackView(
+                width = if (isFlyingToHuman) 68.dp else 64.dp,
+                height = if (isFlyingToHuman) 102.dp else 96.dp,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = cardX.dp.toPx()
+                        translationY = cardY.dp.toPx()
+                        scaleX = cardScale
+                        scaleY = cardScale
+                        alpha = p.coerceIn(0.3f, 1f)
+                    }
+                    .shadow(8.dp, RoundedCornerShape(6.dp)),
+            )
         }
     }
 }
@@ -1252,26 +1318,49 @@ private fun FeltLayout(
         if (uiState.dealAnimationId == 0L) return@LaunchedEffect
         try {
             if (uiState.isInitialDeal) {
-                // Smazzata iniziale: shuffle mazzo -> 4 carte a terra
+                // Smazzata iniziale: taglio del mazzo
                 soundManager.play(SoundEffect.CARD_PLAY)
                 activeDealAnim = ActiveDealAnimation(
                     dealId = uiState.dealAnimationId,
                     isInitial = true,
                     stage = DealAnimStage.SHUFFLE,
                 )
-                delay(240L)
-                soundManager.play(SoundEffect.CARD_PLAY)
-                activeDealAnim = activeDealAnim?.copy(stage = DealAnimStage.DEAL_TABLE)
-                delay(340L)
+                delay(220L)
+
+                // 4 Carte a terra una ad una
+                val tableStages = listOf(
+                    DealAnimStage.DEAL_TABLE_0,
+                    DealAnimStage.DEAL_TABLE_1,
+                    DealAnimStage.DEAL_TABLE_2,
+                    DealAnimStage.DEAL_TABLE_3,
+                )
+                for (s in tableStages) {
+                    soundManager.play(SoundEffect.CARD_PLAY)
+                    activeDealAnim = activeDealAnim?.copy(stage = s)
+                    delay(160L)
+                }
             }
-            // Distribuzione carte alle mani
-            soundManager.play(SoundEffect.CARD_PLAY)
-            activeDealAnim = ActiveDealAnimation(
-                dealId = uiState.dealAnimationId,
-                isInitial = uiState.isInitialDeal,
-                stage = DealAnimStage.DEAL_HANDS,
+
+            // Distribuzione alternata 1 a 1 ad ogni giocatore:
+            // Avversario -> Giocatore -> Avversario -> Giocatore -> Avversario -> Giocatore
+            val handStages = listOf(
+                DealAnimStage.DEAL_HAND_OPP_0,
+                DealAnimStage.DEAL_HAND_HUMAN_0,
+                DealAnimStage.DEAL_HAND_OPP_1,
+                DealAnimStage.DEAL_HAND_HUMAN_1,
+                DealAnimStage.DEAL_HAND_OPP_2,
+                DealAnimStage.DEAL_HAND_HUMAN_2,
             )
-            delay(340L)
+            for (s in handStages) {
+                soundManager.play(SoundEffect.CARD_PLAY)
+                activeDealAnim = ActiveDealAnimation(
+                    dealId = uiState.dealAnimationId,
+                    isInitial = uiState.isInitialDeal,
+                    stage = s,
+                )
+                delay(160L)
+            }
+            delay(80L)
         } finally {
             if (activeDealAnim?.dealId == uiState.dealAnimationId) {
                 activeDealAnim = null
@@ -1287,7 +1376,8 @@ private fun FeltLayout(
         val isSweep = uiState.lastEvent is UiGameEvent.Sweep
         val isOpponent = mover != uiState.humanSeat
         try {
-            // 1. Carta parte dalla mano e vola al centro del tavolo
+            // 1. Carta scivola nello spazio aperto di staging (sopra o sotto le carte in tavola)
+            // così le carte sul tavolo restano sempre visibili e mai coperte
             activeMoveAnim = ActiveMoveAnimation(
                 moveId = uiState.lastMoveId,
                 mover = mover,
@@ -1296,24 +1386,27 @@ private fun FeltLayout(
                 isSweep = isSweep,
                 stage = MoveAnimStage.PLAYING_TO_TABLE,
             )
-            delay(if (isOpponent) 400L else 320L)
+            delay(if (isOpponent) 350L else 280L)
             if (isOpponent) {
-                // Pausa con la carta giocata in primo piano al centro prima della presa o calata
-                delay(650L)
+                // Pausa per mostrare la carta giocata dall'avversario in chiaro
+                delay(600L)
             }
 
             if (move.capture.isNotEmpty()) {
-                // 2. Le carte catturate sul tavolo si evidenziano
+                // 2. Le carte catturate sul tavolo si evidenziano mentre la carta giocata resta visibile in staging
                 activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.SHOWING_CAPTURE)
-                delay(if (isOpponent) 950L else 450L)
+                delay(if (isOpponent) 900L else 450L)
 
                 // 3. Volo congiunto verso la pila delle prese
                 activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.FLYING_TO_PILE)
                 soundManager.play(SoundEffect.CARD_CAPTURE)
                 delay(if (isOpponent) 450L else 350L)
             } else {
-                // Calata semplice: tempo per vederla chiaramente posata sul tavolo
-                delay(if (isOpponent) 650L else 150L)
+                // Calata semplice: tempo di sosta in staging, poi scivola al centro del tavolo
+                delay(if (isOpponent) 500L else 180L)
+                activeMoveAnim = activeMoveAnim?.copy(stage = MoveAnimStage.GLIDING_TO_TABLE)
+                soundManager.play(SoundEffect.CARD_PLAY)
+                delay(240L)
             }
         } finally {
             if (activeMoveAnim?.moveId == uiState.lastMoveId) {
@@ -1332,7 +1425,14 @@ private fun FeltLayout(
     // - Durante una presa (capture.isNotEmpty()), le carte catturate restano evidenziate sul tavolo
     //   finché non volano alla pila delle prese
     val visibleTableCards = remember(uiState.tableCards, currentAnim, currentDealAnim) {
-        if (currentDealAnim != null && currentDealAnim.isInitial && currentDealAnim.stage != DealAnimStage.DEAL_HANDS) {
+        if (currentDealAnim != null && currentDealAnim.isInitial && currentDealAnim.stage in listOf(
+                DealAnimStage.SHUFFLE,
+                DealAnimStage.DEAL_TABLE_0,
+                DealAnimStage.DEAL_TABLE_1,
+                DealAnimStage.DEAL_TABLE_2,
+                DealAnimStage.DEAL_TABLE_3,
+            )
+        ) {
             emptyList()
         } else {
             val anim = currentAnim
@@ -1344,7 +1444,7 @@ private fun FeltLayout(
                         uiState.tableCards
                     }
                 } else {
-                    // Calata semplice: esclude la carta in volo dal tavolo
+                    // Calata semplice: esclude la carta in volo dal tavolo finché non atterra
                     uiState.tableCards.filter { it != anim.card }
                 }
             } else {
@@ -1354,9 +1454,13 @@ private fun FeltLayout(
     }
 
     Box(modifier = Modifier.fillMaxSize().padding(10.dp).testTag("felt_layout")) {
-        // Mano dell'avversario, coperta e sovrapposta
+        // Mano dell'avversario, coperta e sovrapposta (invisibile durante la smazzata animata)
         Row(
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 4.dp).testTag("opponent_zone"),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 4.dp)
+                .alpha(if (currentDealAnim != null) 0f else 1f)
+                .testTag("opponent_zone"),
             horizontalArrangement = Arrangement.spacedBy((-26).dp),
         ) {
             repeat(uiState.opponentCardCount) { CardBackView(width = 72.dp, height = 108.dp) }
@@ -1368,7 +1472,7 @@ private fun FeltLayout(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 114.dp, start = 64.dp, end = 60.dp),
+                    .padding(top = 114.dp),
             ) {
                 OpponentLastMovePlaque(summary = opponentLastMove)
             }
@@ -1389,7 +1493,7 @@ private fun FeltLayout(
         }
 
         // Il Maestro a sinistra: fumetto solo quando richiesto dall'utente (consiglio) o per scopa.
-        // Posizione ancorata e stabile nello spazio in alto a sinistra tra avversario e carte in tavola.
+        // Posizionato nello spazio dedicato a sinistra sotto l'HUD dell'ultima giocata, evitando qualsiasi overlap.
         val hint = uiState.suggestedMove
         var hintDismissed by remember(hint) { mutableStateOf(false) }
         LaunchedEffect(hint) {
@@ -1436,11 +1540,11 @@ private fun FeltLayout(
             }
         }
 
-        // Ritratto del Maestro: posizionato nello spazio in alto a sinistra tra avversario e carte in tavola (sempre visibile)
+        // Ritratto del Maestro: posizionato nello spazio a sinistra tra avversario e carte in tavola
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 10.dp, top = 112.dp)
+                .padding(start = 10.dp, top = 156.dp)
                 .width(135.dp),
         ) {
             Column(
@@ -1520,9 +1624,12 @@ private fun FeltLayout(
             )
         }
 
-        // Mano del giocatore a ventaglio con supporto a trascinamento e conferma
+        // Mano del giocatore a ventaglio con supporto a trascinamento e conferma (invisibile durante la smazzata animata)
         Column(
-            modifier = Modifier.align(Alignment.BottomCenter).testTag("player_zone"),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .alpha(if (currentDealAnim != null) 0f else 1f)
+                .testTag("player_zone"),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             HandFan(
