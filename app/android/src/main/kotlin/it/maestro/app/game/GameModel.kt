@@ -106,6 +106,10 @@ public data class GameUiState(
     val lastMoveId: Long = 0L,
     /** Ultima mossa effettuata dall'avversario per il registro visivo a schermo. */
     val opponentLastMove: OpponentMoveSummary? = null,
+    /** ID progressivo per l'animazione di smazzata e distribuzione carte dal mazzo. */
+    val dealAnimationId: Long = 0L,
+    /** True se l'animazione di distribuzione include shuffle e 4 carte a terra (smazzata iniziale). */
+    val isInitialDeal: Boolean = false,
 )
 
 /**
@@ -171,6 +175,8 @@ public data class GameInternalState(
     val lastMover: Seat? = null,
     val lastMoveId: Long = 0L,
     val opponentLastMove: OpponentMoveSummary? = null,
+    val dealAnimationId: Long = 0L,
+    val isInitialDeal: Boolean = false,
 ) {
     public fun toUiState(): GameUiState {
         val view = viewFor(scopaState, humanSeat)
@@ -210,6 +216,8 @@ public data class GameInternalState(
             lastMover = lastMover,
             lastMoveId = lastMoveId,
             opponentLastMove = opponentLastMove,
+            dealAnimationId = dealAnimationId,
+            isInitialDeal = isInitialDeal,
         )
     }
 }

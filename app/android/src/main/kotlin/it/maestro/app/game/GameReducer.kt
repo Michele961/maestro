@@ -41,6 +41,8 @@ public object GameReducer {
             trainingFundamental = intent.trainingFundamental,
             lastError = null,
             lastEvent = null,
+            dealAnimationId = 1L,
+            isInitialDeal = true,
         )
         val effect = if (state.toMove != intent.humanSeat && state.phase == DealPhase.PLAYING) {
             GameEffect.ScheduleBotMove(
@@ -168,12 +170,16 @@ public object GameReducer {
     }
 
     private fun handleDismissDealSummary(state: GameInternalState): GameReducerResult {
+        val isNewDeal = state.scopaState.phase == DealPhase.PLAYING
+        val nextDealAnimId = if (isNewDeal) state.dealAnimationId + 1L else state.dealAnimationId
         val cleared = state.copy(
             pendingDealScore = null,
             hasAskedQuestionThisDeal = false,
             activeTrainingQuestion = null,
             trainingQuestionFeedback = null,
             opponentLastMove = null,
+            dealAnimationId = nextDealAnimId,
+            isInitialDeal = isNewDeal,
         )
         val botSeat = state.humanSeat.other()
         val shouldScheduleBot = cleared.scopaState.phase == DealPhase.PLAYING && cleared.scopaState.toMove == botSeat
@@ -286,6 +292,8 @@ public object GameReducer {
                 val nextPhase = result.state.phase
                 val nextToMove = result.state.toMove
                 val isBotMove = (mover == botSeat)
+                val hadCardsDealt = result.events.any { it is GameEvent.CardsDealt }
+                val nextDealAnimId = if (hadCardsDealt) state.dealAnimationId + 1L else state.dealAnimationId
                 val newOpponentLastMove = if (isBotMove) {
                     OpponentMoveSummary(
                         card = move.card,
@@ -325,6 +333,8 @@ public object GameReducer {
                     lastMover = mover,
                     lastMoveId = nextMoveId,
                     opponentLastMove = newOpponentLastMove,
+                    dealAnimationId = nextDealAnimId,
+                    isInitialDeal = if (hadCardsDealt) false else state.isInitialDeal,
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {

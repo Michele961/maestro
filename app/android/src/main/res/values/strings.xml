@@ -171,7 +171,7 @@
     <string name="post_match_rematch">Rivincita</string>
     <string name="post_match_back_to_menu">Torna al menu</string>
     <string name="game_opponent_last_move">Ultima giocata</string>
-    <string name="game_opponent_drop_table">Calata in tavola</string>
+    <string name="game_opponent_drop_table">Calata</string>
     <string name="game_opponent_takes">Prende</string>
     <string name="game_card_drag_hint">Trascina sul tavolo</string>
     <string name="game_card_play_confirm">GIOCA</string>
