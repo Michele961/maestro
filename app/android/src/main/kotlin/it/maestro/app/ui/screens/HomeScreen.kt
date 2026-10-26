@@ -77,6 +77,7 @@ public fun HomeScreen(
     hasActiveMatch: Boolean = false,
     streakCount: Int = 0,
     credits: Int = 50,
+    avatarId: String = "avatar_default",
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
@@ -84,6 +85,7 @@ public fun HomeScreen(
     onProfileClicked: () -> Unit = {},
     onMissionsClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
+    onShopClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -100,6 +102,7 @@ public fun HomeScreen(
             ) {
                 HomeHeader(
                     credits = credits,
+                    avatarId = avatarId,
                     onSettingsClicked = onSettingsClicked,
                     onProfileClicked = onProfileClicked,
                 )
@@ -221,6 +224,7 @@ public fun HomeScreen(
                 onDailyPuzzleClicked = onDailyPuzzleClicked,
                 onProfileClicked = onProfileClicked,
                 onAcademyClicked = onAcademyClicked,
+                onShopClicked = onShopClicked,
             )
         }
     }
@@ -229,9 +233,16 @@ public fun HomeScreen(
 @Composable
 private fun HomeHeader(
     credits: Int,
+    avatarId: String = "avatar_default",
     onSettingsClicked: () -> Unit,
     onProfileClicked: () -> Unit = {},
 ) {
+    val avatarRes = when (avatarId) {
+        "avatar_alt" -> R.drawable.avatar_player_alt
+        "avatar_expert" -> R.drawable.avatar_expert
+        else -> R.drawable.avatar_player_default
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -241,7 +252,7 @@ private fun HomeHeader(
                 .testTag("home_player_profile")
                 .clickable(onClick = onProfileClicked),
         ) {
-            FramedPortrait(portrait = R.drawable.avatar_player_default, size = 56.dp)
+            FramedPortrait(portrait = avatarRes, size = 56.dp)
             Image(
                 painter = painterResource(R.drawable.icon_shield_fleur),
                 contentDescription = null,
@@ -385,6 +396,7 @@ private fun BottomNavBar(
     onDailyPuzzleClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
+    onShopClicked: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -407,6 +419,12 @@ private fun BottomNavBar(
             onClick = onAcademyClicked,
             modifier = Modifier.testTag("home_nav_academy_button"),
         )
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_pouch,
+            label = stringResource(R.string.home_nav_shop),
+            onClick = onShopClicked,
+            modifier = Modifier.testTag("home_nav_shop_button"),
+        )
     }
 }

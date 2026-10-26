@@ -16,10 +16,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -191,18 +194,41 @@ private fun ProceduralCardContent(card: Card) {
 }
 
 /**
- * Dorso della carta coperta per l'avversario e per il tallone (ADR-0008, task F1-06, F1-13).
+ * CompositionLocal per il tema cosmetico del dorso delle carte (task F2-11).
+ */
+public val LocalCardBackTheme: androidx.compose.runtime.ProvidableCompositionLocal<String> =
+    compositionLocalOf { "back_classic_trevigiano" }
+
+/**
+ * Dorso della carta coperta per l'avversario e per il tallone (ADR-0008, task F1-06, F1-13, F2-11).
  */
 @Composable
 public fun CardBackView(
     modifier: Modifier = Modifier,
     width: Dp = 64.dp,
     height: Dp = 96.dp,
+    cardBackThemeId: String = LocalCardBackTheme.current,
     deckTheme: DeckTheme = NeapolitanDeckTheme,
 ) {
     val context = LocalContext.current
     val customDrawableResId = remember(deckTheme) {
         deckTheme.getCardBackDrawableResId(context)
+    }
+
+    val containerBg = when (cardBackThemeId) {
+        "back_golden_maestro" -> Color(0xFF4A3800)
+        "back_vintage_red" -> Color(0xFF3E0D15)
+        else -> CardBackBackground
+    }
+    val borderCol = when (cardBackThemeId) {
+        "back_golden_maestro" -> Color(0xFFFFD54F)
+        "back_vintage_red" -> Color(0xFFE57373)
+        else -> CardBackBorder
+    }
+    val cardTint = when (cardBackThemeId) {
+        "back_golden_maestro" -> Color(0xFFFFD54F)
+        "back_vintage_red" -> Color(0xFFFF8A80)
+        else -> null
     }
 
     Card(
@@ -211,8 +237,8 @@ public fun CardBackView(
             .height(height)
             .testTag("card_back"),
         shape = RoundedCornerShape(6.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBackBackground),
-        border = BorderStroke(1.5.dp, CardBackBorder),
+        colors = CardDefaults.cardColors(containerColor = containerBg),
+        border = BorderStroke(1.5.dp, borderCol),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         if (customDrawableResId != null) {
@@ -220,6 +246,7 @@ public fun CardBackView(
                 painter = painterResource(id = customDrawableResId),
                 contentDescription = stringResource(id = R.string.game_deck_label),
                 contentScale = ContentScale.Crop,
+                colorFilter = cardTint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
                 modifier = Modifier.fillMaxSize(),
             )
         } else {

@@ -176,7 +176,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-11 — Shop e personalizzazione cosmetica (tavoli e carte)
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §8.3
 - **Obiettivo:** Schermata "La Bottega del Maestro" per visionare, acquistare ed equipaggiare elementi cosmetici:
   - Dorsi di carte alternativi (Classico, Dorato, Vintage);
@@ -184,7 +184,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
   - Avatar e reazioni sonore personalizzate del Maestro.
 - **Perimetro autorizzato:** `app:android` (ShopScreen, persistenza selezione tema in DataStore).
 - **Criteri di accettazione:**
-    - [ ] Il tema del tavolo o del dorso selezionato nello shop si riflette immediatamente nella partita di gioco.
+    - [x] Il tema del tavolo o del dorso selezionato nello shop si riflette immediatamente nella partita di gioco.
 - **Domande aperte:** —
 
 ---

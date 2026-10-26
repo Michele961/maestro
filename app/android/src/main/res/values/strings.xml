@@ -477,4 +477,41 @@
     <string name="academy_l4_3_badge_act">Ultima mano decisiva</string>
     <string name="academy_l4_3_speech_sum">Trionfo assoluto! Hai completato l\'intero percorso dell\'Accademia: sei un vero Maestro del Circolo!</string>
 
+    <!-- La Bottega del Maestro (Shop & Personalizzazione Cosmetica, F2-11) -->
+    <string name="shop_screen_title">LA BOTTEGA DEL MAESTRO</string>
+    <string name="shop_screen_subtitle">Personalizza l\'estetica del Circolo</string>
+    <string name="shop_tab_tables">Tavoli</string>
+    <string name="shop_tab_card_backs">Dorsi Carte</string>
+    <string name="shop_tab_avatars">Stemmi</string>
+    <string name="shop_action_equip">EQUIPAGGIA</string>
+    <string name="shop_action_equipped">EQUIPAGGIATO</string>
+    <string name="shop_action_unlock">SBLOCCA (%1$d)</string>
+    <string name="shop_action_free">GRATIS</string>
+    <string name="shop_action_insufficient_funds">CREDITI INSUFFICIENTI</string>
+    <string name="shop_unlock_success">Elemento sbloccato ed equipaggiato!</string>
+    <string name="shop_credits_label">%1$d Crediti</string>
+
+    <string name="cosmetic_table_green_title">Panno Verde Classico</string>
+    <string name="cosmetic_table_green_desc">Il feltro verde tradizionale del circolo, elegante e rilassante.</string>
+    <string name="cosmetic_table_red_title">Velluto Rosso Nobile</string>
+    <string name="cosmetic_table_red_desc">Il tavolo esclusivo delle grandi sfide serali tra campioni.</string>
+    <string name="cosmetic_table_blue_title">Panno Blu Reale</string>
+    <string name="cosmetic_table_blue_desc">Feltro blu notte con riflessi profondi per veri intenditori.</string>
+    <string name="cosmetic_table_wood_title">Noce Massello</string>
+    <string name="cosmetic_table_wood_desc">Tavolo massiccio intarsiato a mano con venature scure del bosco.</string>
+
+    <string name="cosmetic_card_back_classic_title">Classico del Circolo</string>
+    <string name="cosmetic_card_back_classic_desc">Dorso geometrico blu trevigiano della tradizione.</string>
+    <string name="cosmetic_card_back_gold_title">Oro del Maestro</string>
+    <string name="cosmetic_card_back_gold_desc">Finitura dorata lucida riservata ai veterani del tavolo.</string>
+    <string name="cosmetic_card_back_red_title">Rosso Antico</string>
+    <string name="cosmetic_card_back_red_desc">Trama damascata carminio d\'epoca dei circoli storici.</string>
+
+    <string name="cosmetic_avatar_default_title">Allievo del Circolo</string>
+    <string name="cosmetic_avatar_default_desc">Il ritratto del giovane giocatore ai suoi primi successi.</string>
+    <string name="cosmetic_avatar_alt_title">Giocatore Scelto</string>
+    <string name="cosmetic_avatar_alt_desc">Profilo distinto di chi studia ogni scarto dell\'avversario.</string>
+    <string name="cosmetic_avatar_expert_title">Gran Maestro</string>
+    <string name="cosmetic_avatar_expert_desc">L\'onorificenza suprema dei maestri di carte del Circolo.</string>
+
 </resources>
