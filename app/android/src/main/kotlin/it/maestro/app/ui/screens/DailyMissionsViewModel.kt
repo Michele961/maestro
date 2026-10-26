@@ -3,6 +3,7 @@ package it.maestro.app.ui.screens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.maestro.app.data.local.datastore.RetentionRepository
+import it.maestro.app.data.local.missions.DailyMission
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.local.wallet.TransactionReason
@@ -35,23 +36,6 @@ public class DailyMissionsViewModel(
     private val today: LocalDate
         get() = dateProvider()
 
-    init {
-        viewModelScope.launch {
-            retentionRepository.observeDailyMissions(today).collect { state ->
-                for (mission in state.missions) {
-                    if (mission.isCompleted && walletRepository?.hasClaimed(TransactionReason.DAILY_MISSION_REWARD, mission.id) == false) {
-                        walletRepository.addCredits(
-                            amount = mission.type.rewardCredits,
-                            reason = TransactionReason.DAILY_MISSION_REWARD,
-                            referenceId = mission.id,
-                            description = "Missione completata: ${mission.id}",
-                        )
-                    }
-                }
-            }
-        }
-    }
-
     public val uiState: StateFlow<DailyMissionsUiState> = combine(
         retentionRepository.observeStreak(today),
         retentionRepository.observeDailyMissions(today),
@@ -66,6 +50,22 @@ public class DailyMissionsViewModel(
         started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = DailyMissionsUiState(isLoading = true),
     )
+
+    public fun claimReward(mission: DailyMission) {
+        viewModelScope.launch {
+            if (mission.isCompleted && !mission.isClaimed) {
+                val success = retentionRepository.claimMissionReward(today, mission.type)
+                if (success && walletRepository != null) {
+                    walletRepository.addCredits(
+                        amount = mission.type.rewardCredits,
+                        reason = TransactionReason.DAILY_MISSION_REWARD,
+                        referenceId = mission.id,
+                        description = "Missione completata: ${mission.id}",
+                    )
+                }
+            }
+        }
+    }
 
     public fun recordActivity() {
         viewModelScope.launch {

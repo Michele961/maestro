@@ -102,6 +102,12 @@ public class DataStoreMasteryRepository(
         trainingFundamental: TrainingFundamental,
     ): MasteryProfile {
         val current = getMasteryProfile()
+        val rawHistory = dataStore.data.first()[PreferencesKeys.MATCH_HISTORY].orEmpty()
+        val existingHistory = parseHistory(rawHistory)
+        val encodedLog = matchLog.toText()
+        if (existingHistory.isNotEmpty() && existingHistory.first().matchLogText == encodedLog) {
+            return current
+        }
         val matchAccuracy = matchAnalysis.accuracy(humanSeat)
         val matchRadar = MasteryCalculator.computeMatchRadar(
             matchAnalysis = matchAnalysis,
@@ -118,13 +124,9 @@ public class DataStoreMasteryRepository(
 
         val finalState = (replay(matchLog) as? ReplayResult.Ok)?.state
         val opponentSeat = humanSeat.other()
-        val humanTotal = trainingScore?.first ?: finalState?.totals?.get(humanSeat) ?: 0
-        val opponentTotal = trainingScore?.second ?: finalState?.totals?.get(opponentSeat) ?: 0
-        val isWin = if (trainingScore != null) {
-            trainingScore.first >= trainingScore.second
-        } else {
-            finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
-        }
+        val humanTotal = finalState?.totals?.get(humanSeat) ?: 0
+        val opponentTotal = finalState?.totals?.get(opponentSeat) ?: 0
+        val isWin = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
         val eloDelta = updated.cognitiveElo - current.cognitiveElo
         val entry = MatchHistoryEntry(
             id = "match_${System.currentTimeMillis()}",
@@ -135,7 +137,7 @@ public class DataStoreMasteryRepository(
             humanScore = humanTotal,
             botScore = opponentTotal,
             isWin = isWin,
-            matchLogText = matchLog.toText(),
+            matchLogText = encodedLog,
         )
 
         dataStore.edit { preferences ->
@@ -148,7 +150,6 @@ public class DataStoreMasteryRepository(
             preferences[PreferencesKeys.RADAR_BOARD] = updated.radar.board
             preferences[PreferencesKeys.RADAR_ENDGAME] = updated.radar.endgame
 
-            val existingHistory = parseHistory(preferences[PreferencesKeys.MATCH_HISTORY].orEmpty())
             val newHistory = (listOf(entry) + existingHistory).take(20)
             preferences[PreferencesKeys.MATCH_HISTORY] = serializeHistory(newHistory)
         }
@@ -257,6 +258,11 @@ public class InMemoryMasteryRepository(
         trainingFundamental: TrainingFundamental,
     ): MasteryProfile {
         val current = profileState.value
+        val encodedLog = matchLog.toText()
+        if (historyState.value.isNotEmpty() && historyState.value.first().matchLogText == encodedLog) {
+            return current
+        }
+
         val matchAccuracy = matchAnalysis.accuracy(humanSeat)
         val matchRadar = MasteryCalculator.computeMatchRadar(
             matchAnalysis = matchAnalysis,
@@ -273,13 +279,9 @@ public class InMemoryMasteryRepository(
 
         val finalState = (replay(matchLog) as? ReplayResult.Ok)?.state
         val opponentSeat = humanSeat.other()
-        val humanTotal = trainingScore?.first ?: finalState?.totals?.get(humanSeat) ?: 0
-        val opponentTotal = trainingScore?.second ?: finalState?.totals?.get(opponentSeat) ?: 0
-        val isWin = if (trainingScore != null) {
-            trainingScore.first >= trainingScore.second
-        } else {
-            finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
-        }
+        val humanTotal = finalState?.totals?.get(humanSeat) ?: 0
+        val opponentTotal = finalState?.totals?.get(opponentSeat) ?: 0
+        val isWin = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
         val eloDelta = updated.cognitiveElo - current.cognitiveElo
         val entry = MatchHistoryEntry(
             id = "match_${System.currentTimeMillis()}",
@@ -290,7 +292,7 @@ public class InMemoryMasteryRepository(
             humanScore = humanTotal,
             botScore = opponentTotal,
             isWin = isWin,
-            matchLogText = matchLog.toText(),
+            matchLogText = encodedLog,
         )
 
         profileState.value = updated

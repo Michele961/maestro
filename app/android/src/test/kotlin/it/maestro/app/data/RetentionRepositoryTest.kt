@@ -127,6 +127,17 @@ class RetentionRepositoryTest {
         repo.setMissionCompleted(day1, type)
         val completedState = repo.getDailyMissions(day1)
         assertTrue(completedState.missions.first { it.type == type }.isCompleted)
+        assertFalse(completedState.missions.first { it.type == type }.isClaimed)
+
+        // Riscatta ricompensa
+        val claimed = repo.claimMissionReward(day1, type)
+        assertTrue(claimed)
+        val claimedState = repo.getDailyMissions(day1)
+        assertTrue(claimedState.missions.first { it.type == type }.isClaimed)
+
+        // Un secondo riscatto non va a buon fine
+        val doubleClaim = repo.claimMissionReward(day1, type)
+        assertFalse(doubleClaim)
 
         // Il giorno successivo genera 3 missioni per la nuova data
         val missionsDay2 = repo.getDailyMissions(day2)

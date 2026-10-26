@@ -119,6 +119,15 @@ class MasteryRepositoryTest {
         val p1 = Seat.P1
         val p2 = Seat.P2
 
+        val (state, partialLog) = it.maestro.app.game.TestMatchGenerator.generateEndgameMatch(seed = 101L)
+        val move1 = it.maestro.game.scopa.legalMoves(state).first()
+        val res1 = it.maestro.game.scopa.play(state, move1) as it.maestro.game.scopa.PlayResult.Applied
+        val move2 = it.maestro.game.scopa.legalMoves(res1.state).first()
+        val res2 = it.maestro.game.scopa.play(res1.state, move2) as it.maestro.game.scopa.PlayResult.Applied
+        val log = partialLog.copy(moves = partialLog.moves + listOf(move1, move2))
+        val expectedP1 = res2.state.totals.getValue(p1)
+        val expectedP2 = res2.state.totals.getValue(p2)
+
         val analysis = MatchAnalysis(
             moves = emptyList(),
             accuracyBySeat = mapOf(p1 to 85, p2 to 60),
@@ -129,27 +138,30 @@ class MasteryRepositoryTest {
             ),
         )
 
-        val log = MatchLog(
-            config = ScopaConfig(targetScore = 11),
-            seed = 42L,
-            moves = emptyList(),
-        )
-
         repository.recordMatch(
             matchAnalysis = analysis,
             matchLog = log,
             humanSeat = p1,
-            trainingScore = Pair(11, 7),
+            trainingScore = Pair(3, 5), // Quiz 3 su 5 non deve sovrascrivere il punteggio partita!
         )
 
         val history = repository.observeMatchHistory().first()
         assertEquals(1, history.size)
         val entry = history.first()
         assertEquals(85, entry.accuracy)
-        assertEquals(11, entry.humanScore)
-        assertEquals(7, entry.botScore)
-        assertTrue(entry.isWin)
+        assertEquals(expectedP1, entry.humanScore)
+        assertEquals(expectedP2, entry.botScore)
+        assertEquals(res2.state.winner == p1, entry.isWin)
         org.junit.Assert.assertNotNull(entry.matchLogText)
         assertTrue("Elo delta deve essere positivo per una vittoria ad alta precisione", entry.eloDelta > 0)
+
+        // Verifica idempotenza: una seconda registrazione dello stesso identico match non crea duplicati
+        repository.recordMatch(
+            matchAnalysis = analysis,
+            matchLog = log,
+            humanSeat = p1,
+        )
+        val historyAfterDuplicate = repository.observeMatchHistory().first()
+        assertEquals(1, historyAfterDuplicate.size)
     }
 }

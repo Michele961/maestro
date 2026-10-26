@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -63,6 +64,7 @@ import it.maestro.app.ui.components.ConfettiCelebration
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.MaestroSpeechBubble
+import it.maestro.app.ui.components.NineSliceBox
 import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.theme.BrassRivetGold
@@ -236,13 +238,17 @@ private fun AcademyChapterCard(
                     .testTag("academy_chapter_header_${chapter.number}"),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Stemma del capitolo
+                // Stemma del capitolo con cerchio dorato
                 Box(
                     modifier = Modifier
                         .size(54.dp)
                         .clip(CircleShape)
                         .background(Color(0xFF2A170C))
-                        .border(1.5.dp, ButtonGoldBorder, CircleShape),
+                        .border(
+                            width = if (isCompleted) 2.dp else 1.5.dp,
+                            color = if (isCompleted) BrassRivetGold else ButtonGoldBorder,
+                            shape = CircleShape,
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
@@ -255,74 +261,77 @@ private fun AcademyChapterCard(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.academy_chapter_number, chapter.number).uppercase(),
-                            color = Color(0xFFD4AF37),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = MaestroDisplayFont,
-                        )
-                        // Badge completamento capitolo
-                        if (isCompleted) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFF1E3A1E))
-                                    .border(1.dp, BrassRivetGold, RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    .testTag("academy_chapter_completed_tag_${chapter.number}"),
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.badge_best),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = stringResource(R.string.academy_chapter_completed),
-                                    color = BrassRivetGold,
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                        }
-                    }
+                    Text(
+                        text = stringResource(R.string.academy_chapter_number, chapter.number).uppercase(),
+                        color = BrassRivetGold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        letterSpacing = 0.5.sp,
+                    )
 
                     Text(
                         text = stringResource(chapter.titleRes),
                         color = Color(0xFFFFF8DC),
-                        fontSize = 17.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = MaestroDisplayFont,
+                        lineHeight = 20.sp,
                     )
 
                     Text(
                         text = stringResource(chapter.subtitleRes),
                         color = Color(0xFFE2D9C8),
                         fontSize = 12.sp,
+                        lineHeight = 15.sp,
                     )
                 }
 
-                // Contatore lezioni
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Contatore lezioni o Distintivo Ottone di Completamento Capitolo
                 Column(horizontalAlignment = Alignment.End) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF2A170C))
-                            .border(1.dp, ButtonGoldBorder, RoundedCornerShape(10.dp))
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.academy_chapter_progress, chapterState.completedCount, chapterState.totalCount),
-                            color = BrassRivetGold,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+                    if (isCompleted) {
+                        NineSliceBox(
+                            skin = R.drawable.skin_name_plaque,
+                            slice = 0.35f,
+                            corner = 8.dp,
+                            modifier = Modifier.testTag("academy_chapter_completed_tag_${chapter.number}"),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.badge_correct),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                )
+                                Text(
+                                    text = stringResource(R.string.academy_chapter_progress, chapterState.completedCount, chapterState.totalCount),
+                                    color = BrassRivetGold,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = MaestroDisplayFont,
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFF2A170C))
+                                .border(1.dp, ButtonGoldBorder, RoundedCornerShape(10.dp))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.academy_chapter_progress, chapterState.completedCount, chapterState.totalCount),
+                                color = BrassRivetGold,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
                     }
                 }
             }
@@ -334,6 +343,40 @@ private fun AcademyChapterCard(
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
             )
+
+            // Se il capitolo è completato, mostriamo una nobile targa di encomio del Circolo
+            if (isCompleted) {
+                NineSliceBox(
+                    skin = R.drawable.skin_score_plaque,
+                    slice = 0.4f,
+                    corner = 12.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("academy_chapter_completed_banner_${chapter.number}"),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.badge_correct),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.academy_chapter_completed).uppercase(),
+                            color = BrassRivetGold,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                            letterSpacing = 0.8.sp,
+                        )
+                    }
+                }
+            }
 
             // Sotto-moduli (lezioni pratiche) espandibili
             AnimatedVisibility(

@@ -168,6 +168,7 @@ public data class DailyMission(
     public val progress: Int = 0,
     public val target: Int = type.defaultTarget,
     public val isCompleted: Boolean = progress >= target,
+    public val isClaimed: Boolean = false,
 ) {
     public val progressFraction: Float
         get() = if (target > 0) (progress.toFloat() / target).coerceIn(0f, 1f) else 1f
@@ -185,6 +186,9 @@ public data class DailyMissionsState(
 
     public val completedCount: Int
         get() = missions.count { it.isCompleted }
+
+    public val unclaimedRewardsCount: Int
+        get() = missions.count { it.isCompleted && !it.isClaimed }
 }
 
 /**

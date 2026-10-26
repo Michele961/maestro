@@ -282,6 +282,8 @@
     <string name="retention_missions_title">Daily Missions</string>
     <string name="retention_missions_reward">+%1$d Credits</string>
     <string name="retention_missions_completed_badge">COMPLETED</string>
+    <string name="retention_missions_claim">Claim (+%1$d)</string>
+    <string name="retention_missions_claimed">Claimed</string>
     <string name="retention_maestro_encouragement">Three good habits a day forge the mind of a true Master!</string>
     <string name="home_missions_streak_badge">%1$d d</string>
     <string name="academy_screen_title">MAESTRO\'S ACADEMY</string>

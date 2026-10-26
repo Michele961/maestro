@@ -48,6 +48,7 @@ class DailyMissionsScreenshotTest {
                         progress = 1,
                         target = 1,
                         isCompleted = true,
+                        isClaimed = false,
                     ),
                     DailyMission(
                         id = "sevens_1",
@@ -96,6 +97,7 @@ class DailyMissionsScreenshotTest {
                         progress = 1,
                         target = 1,
                         isCompleted = true,
+                        isClaimed = false,
                     ),
                     DailyMission(
                         id = "sevens_1",

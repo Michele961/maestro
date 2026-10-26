@@ -60,6 +60,7 @@ private val CompletedGreen = Color(0xFF2E7D32)
 public fun DailyMissionsDialog(
     uiState: DailyMissionsUiState,
     onDismissRequest: () -> Unit,
+    onClaimReward: (DailyMission) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Dialog(
@@ -117,6 +118,7 @@ public fun DailyMissionsDialog(
                     uiState.missionsState.missions.forEachIndexed { index, mission ->
                         MissionItemCard(
                             mission = mission,
+                            onClaimReward = onClaimReward,
                             modifier = Modifier.testTag("daily_mission_item_$index"),
                         )
                     }
@@ -259,13 +261,21 @@ private fun StreakBanner(
 @Composable
 private fun MissionItemCard(
     mission: DailyMission,
+    onClaimReward: (DailyMission) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = Color(0xFF26150B),
-        border = BorderStroke(1.dp, if (mission.isCompleted) Color(0xFF4CAF50).copy(alpha = 0.6f) else ButtonGoldBorder.copy(alpha = 0.5f)),
+        border = BorderStroke(
+            1.dp,
+            when {
+                mission.isCompleted && !mission.isClaimed -> BrassRivetGold
+                mission.isCompleted -> Color(0xFF4CAF50).copy(alpha = 0.6f)
+                else -> ButtonGoldBorder.copy(alpha = 0.5f)
+            },
+        ),
     ) {
         Column(
             modifier = Modifier
@@ -294,33 +304,82 @@ private fun MissionItemCard(
                     )
                 }
 
-                if (mission.isCompleted) {
-                    Image(
-                        painter = painterResource(R.drawable.badge_correct),
-                        contentDescription = stringResource(R.string.retention_missions_completed_badge),
-                        modifier = Modifier.size(28.dp),
-                    )
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color(0xFF3E2313))
-                            .border(1.dp, ButtonGoldBorder.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
-                            .padding(horizontal = 7.dp, vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.icon_coin),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                        )
-                        Text(
-                            text = stringResource(R.string.retention_missions_reward, mission.type.rewardCredits),
-                            color = BrassRivetGold,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+                when {
+                    mission.isCompleted && !mission.isClaimed -> {
+                        // Pulsante per riscattare esplicitamente la ricompensa
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF2E7D32))
+                                .border(1.2.dp, BrassRivetGold, RoundedCornerShape(8.dp))
+                                .clickable { onClaimReward(mission) }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                .testTag("mission_claim_button_${mission.id}"),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.icon_coin),
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.retention_missions_claim, mission.type.rewardCredits).uppercase(),
+                                color = Color.White,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = MaestroDisplayFont,
+                            )
+                        }
+                    }
+                    mission.isCompleted && mission.isClaimed -> {
+                        // Badge ricompensa già riscattata
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF1B2E1C))
+                                .border(1.dp, Color(0xFF4CAF50).copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .testTag("mission_claimed_badge_${mission.id}"),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.badge_correct),
+                                contentDescription = stringResource(R.string.retention_missions_completed_badge),
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.retention_missions_claimed).uppercase(),
+                                color = Color(0xFF81C784),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = MaestroDisplayFont,
+                            )
+                        }
+                    }
+                    else -> {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF3E2313))
+                                .border(1.dp, ButtonGoldBorder.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 7.dp, vertical = 3.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.icon_coin),
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.retention_missions_reward, mission.type.rewardCredits),
+                                color = BrassRivetGold,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
                     }
                 }
             }

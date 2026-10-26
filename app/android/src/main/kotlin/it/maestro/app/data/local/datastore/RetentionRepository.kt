@@ -30,6 +30,7 @@ public interface RetentionRepository {
     public suspend fun getDailyMissions(today: LocalDate): DailyMissionsState
     public suspend fun updateMissionProgress(today: LocalDate, type: DailyMissionType, increment: Int = 1)
     public suspend fun setMissionCompleted(today: LocalDate, type: DailyMissionType)
+    public suspend fun claimMissionReward(today: LocalDate, type: DailyMissionType): Boolean
 
     public suspend fun resetRetentionData()
 }
@@ -52,6 +53,7 @@ public class DataStoreRetentionRepository(
         fun missionType(i: Int) = stringPreferencesKey("mission_${i}_type")
         fun missionProgress(i: Int) = intPreferencesKey("mission_${i}_progress")
         fun missionCompleted(i: Int) = booleanPreferencesKey("mission_${i}_completed")
+        fun missionClaimed(i: Int) = booleanPreferencesKey("mission_${i}_claimed")
     }
 
     override fun observeStreak(today: LocalDate): Flow<StreakState> =
@@ -128,6 +130,23 @@ public class DataStoreRetentionRepository(
         persistMissions(state.copy(missions = updatedMissions))
     }
 
+    override suspend fun claimMissionReward(today: LocalDate, type: DailyMissionType): Boolean {
+        val state = getDailyMissions(today)
+        var claimed = false
+        val updatedMissions = state.missions.map { mission ->
+            if (mission.type == type && mission.isCompleted && !mission.isClaimed) {
+                claimed = true
+                mission.copy(isClaimed = true)
+            } else {
+                mission
+            }
+        }
+        if (claimed) {
+            persistMissions(state.copy(missions = updatedMissions))
+        }
+        return claimed
+    }
+
     override suspend fun resetRetentionData() {
         dataStore.edit { preferences ->
             preferences.remove(PreferencesKeys.STREAK_CURRENT)
@@ -140,6 +159,7 @@ public class DataStoreRetentionRepository(
                 preferences.remove(PreferencesKeys.missionType(i))
                 preferences.remove(PreferencesKeys.missionProgress(i))
                 preferences.remove(PreferencesKeys.missionCompleted(i))
+                preferences.remove(PreferencesKeys.missionClaimed(i))
             }
         }
     }
@@ -161,6 +181,7 @@ public class DataStoreRetentionRepository(
                 preferences[PreferencesKeys.missionType(i)] = mission.type.name
                 preferences[PreferencesKeys.missionProgress(i)] = mission.progress
                 preferences[PreferencesKeys.missionCompleted(i)] = mission.isCompleted
+                preferences[PreferencesKeys.missionClaimed(i)] = mission.isClaimed
             }
         }
     }
@@ -193,6 +214,7 @@ public class DataStoreRetentionRepository(
             if (type != null) {
                 val progress = preferences[PreferencesKeys.missionProgress(i)] ?: 0
                 val completed = preferences[PreferencesKeys.missionCompleted(i)] ?: (progress >= type.defaultTarget)
+                val claimed = preferences[PreferencesKeys.missionClaimed(i)] ?: false
                 list.add(
                     DailyMission(
                         id = "${todayStr}_mission_$i",
@@ -200,6 +222,7 @@ public class DataStoreRetentionRepository(
                         progress = progress,
                         target = type.defaultTarget,
                         isCompleted = completed,
+                        isClaimed = claimed,
                     ),
                 )
             }
@@ -287,6 +310,23 @@ public class InMemoryRetentionRepository(
             }
         }
         missionsFlow.value = state.copy(missions = updated)
+    }
+
+    override suspend fun claimMissionReward(today: LocalDate, type: DailyMissionType): Boolean {
+        val state = getDailyMissions(today)
+        var claimed = false
+        val updated = state.missions.map { mission ->
+            if (mission.type == type && mission.isCompleted && !mission.isClaimed) {
+                claimed = true
+                mission.copy(isClaimed = true)
+            } else {
+                mission
+            }
+        }
+        if (claimed) {
+            missionsFlow.value = state.copy(missions = updated)
+        }
+        return claimed
     }
 
     override suspend fun resetRetentionData() {

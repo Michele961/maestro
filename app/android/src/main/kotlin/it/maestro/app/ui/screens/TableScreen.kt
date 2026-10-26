@@ -1823,8 +1823,8 @@ private fun FeltLayout(
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 10.dp, top = 156.dp)
-                .width(135.dp),
+                .padding(start = 8.dp, top = 152.dp)
+                .width(150.dp),
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
@@ -1882,7 +1882,8 @@ private fun FeltLayout(
                             else -> stringResource(id = R.string.game_hint_loading)
                         },
                         tail = BubbleTail.TOP_START,
-                        fontSize = 12.sp,
+                        fontSize = 11.5.sp,
+                        maxLines = 8,
                         modifier = Modifier
                             .padding(top = 4.dp)
                             .clickable { hintDismissed = true }

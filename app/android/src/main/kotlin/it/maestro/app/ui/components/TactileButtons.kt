@@ -207,7 +207,7 @@ public fun MaestroSpeechBubble(
     modifier: Modifier = Modifier,
     tail: BubbleTail = BubbleTail.BOTTOM_START,
     fontSize: TextUnit = 14.sp,
-    maxLines: Int = 6,
+    maxLines: Int = 8,
 ) {
     if (tail == BubbleTail.START) {
         Row(
@@ -237,20 +237,20 @@ public fun MaestroSpeechBubble(
             ) {
                 Box(
                     modifier = Modifier
-                        .heightIn(max = 140.dp)
+                        .heightIn(max = 180.dp)
                         .verticalScroll(rememberScrollState()),
                 ) {
                     Text(
                         text = message,
                         color = WoodSurfaceDark,
                         fontSize = fontSize,
-                        lineHeight = fontSize * 1.22f,
+                        lineHeight = fontSize * 1.20f,
                         fontWeight = FontWeight.Bold,
                         fontFamily = MaestroDisplayFont,
                         textAlign = TextAlign.Center,
                         maxLines = maxLines,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                     )
                 }
             }
@@ -299,20 +299,20 @@ public fun MaestroSpeechBubble(
         ) {
             Box(
                 modifier = Modifier
-                    .heightIn(max = 140.dp)
+                    .heightIn(max = 180.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
                 Text(
                     text = message,
                     color = WoodSurfaceDark,
                     fontSize = fontSize,
-                    lineHeight = fontSize * 1.22f,
+                    lineHeight = fontSize * 1.20f,
                     fontWeight = FontWeight.Bold,
                     fontFamily = MaestroDisplayFont,
                     textAlign = TextAlign.Center,
                     maxLines = maxLines,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                 )
             }
         }

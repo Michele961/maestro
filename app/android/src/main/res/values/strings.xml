@@ -282,6 +282,8 @@
     <string name="retention_missions_title">Missioni del Giorno</string>
     <string name="retention_missions_reward">+%1$d Crediti</string>
     <string name="retention_missions_completed_badge">COMPLETATA</string>
+    <string name="retention_missions_claim">Riscatta (+%1$d)</string>
+    <string name="retention_missions_claimed">Riscattata</string>
     <string name="retention_maestro_encouragement">Tre buone abitudini al giorno forgiano la mente di un vero Maestro!</string>
     <string name="home_missions_streak_badge">%1$d gg</string>
     <string name="academy_screen_title">ACCADEMIA DEL MAESTRO</string>
