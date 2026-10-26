@@ -1,5 +1,6 @@
 package it.maestro.app.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
@@ -73,6 +74,7 @@ public fun HomeScreen(
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
     onDailyPuzzleClicked: () -> Unit = {},
+    onProfileClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -87,7 +89,10 @@ public fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                HomeHeader(onSettingsClicked = onSettingsClicked)
+                HomeHeader(
+                    onSettingsClicked = onSettingsClicked,
+                    onProfileClicked = onProfileClicked,
+                )
                 // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
                 MaestroWelcome(modifier = Modifier.weight(1f))
                 // "Gioca ora" / "Riprendi partita" sul piedistallo di panno ovale, come nel mockup
@@ -174,18 +179,28 @@ public fun HomeScreen(
                     }
                 }
             }
-            BottomNavBar(onDailyPuzzleClicked = onDailyPuzzleClicked)
+            BottomNavBar(
+                onDailyPuzzleClicked = onDailyPuzzleClicked,
+                onProfileClicked = onProfileClicked,
+            )
         }
     }
 }
 
 @Composable
-private fun HomeHeader(onSettingsClicked: () -> Unit) {
+private fun HomeHeader(
+    onSettingsClicked: () -> Unit,
+    onProfileClicked: () -> Unit = {},
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .testTag("home_player_profile")
+                .clickable(onClick = onProfileClicked),
+        ) {
             FramedPortrait(portrait = R.drawable.avatar_player_default, size = 56.dp)
             Image(
                 painter = painterResource(R.drawable.icon_shield_fleur),
@@ -320,6 +335,7 @@ private fun GameTile(
 @Composable
 private fun BottomNavBar(
     onDailyPuzzleClicked: () -> Unit = {},
+    onProfileClicked: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -328,7 +344,13 @@ private fun BottomNavBar(
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_trophy, label = stringResource(R.string.home_nav_leaderboard))
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_trophy,
+            label = stringResource(R.string.home_nav_leaderboard),
+            onClick = onProfileClicked,
+            modifier = Modifier.testTag("home_nav_profile_button"),
+        )
         BrassIconBadge(
             size = 76.dp,
             icon = R.drawable.icon_book_quill,
