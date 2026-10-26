@@ -45,6 +45,7 @@ import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
 import it.maestro.app.ui.dialogs.DailyMissionsDialog
@@ -126,11 +127,13 @@ public class MainActivity : ComponentActivity() {
                 val settingsRepository: SettingsRepository = koinInject()
                 val masteryRepository: MasteryRepository = koinInject()
                 val retentionRepository: RetentionRepository = koinInject()
+                val walletRepository: WalletRepository = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
                 val today = remember { LocalDate.now() }
                 val streakState by retentionRepository.observeStreak(today).collectAsStateWithLifecycle(initialValue = StreakState.INITIAL)
                 val missionsState by retentionRepository.observeDailyMissions(today).collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
+                val credits by walletRepository.observeBalance().collectAsStateWithLifecycle(initialValue = 0)
                 val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
                 var showSettingsDialog by remember { mutableStateOf(false) }
                 var showMissionsDialog by remember { mutableStateOf(false) }
@@ -140,6 +143,9 @@ public class MainActivity : ComponentActivity() {
                 var crashReport by remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(Unit) {
+                    try {
+                        walletRepository.ensureWelcomeBonus(bonusAmount = 50)
+                    } catch (_: Throwable) {}
                     try {
                         val file = filesDir.resolve("last_crash.txt")
                         if (file.exists()) {
@@ -241,6 +247,7 @@ public class MainActivity : ComponentActivity() {
                         onMissionsClicked = { showMissionsDialog = true },
                         onAcademyClicked = { currentScreen = Screen.Academy },
                         streakCount = streakState.currentStreak,
+                        credits = credits,
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->

@@ -5,6 +5,8 @@ import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
+import it.maestro.app.data.local.wallet.InMemoryWalletRepository
+import it.maestro.app.data.local.wallet.TransactionReason
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.screens.DailyPuzzleStatus
 import it.maestro.app.ui.screens.DailyPuzzleViewModel
@@ -191,5 +193,25 @@ class DailyPuzzleViewModelTest {
         assertEquals(2, status.attemptsCount)
         assertEquals(MaestroMood.TRIUMPHANT, state.maestroMood)
         assertEquals(R.string.puzzle_coach_already_solved, state.maestroMessageResId)
+    }
+
+    @Test
+    fun solvingPuzzleAwardsCreditsToWallet() = runTest {
+        val repo = InMemoryDailyPuzzleRepository()
+        val walletRepo = InMemoryWalletRepository()
+        val testDate = LocalDate.of(2026, 10, 26)
+        val viewModel = DailyPuzzleViewModel(
+            repository = repo,
+            walletRepository = walletRepo,
+            customDate = testDate,
+            customPuzzle = samplePuzzle,
+        )
+        advanceUntilIdle()
+
+        viewModel.playCard(testCardWinning)
+        advanceUntilIdle()
+
+        assertEquals(15, walletRepo.getBalance(), "Risolvere la sfida del giorno deve accreditare 15 Crediti Maestro")
+        assertTrue(walletRepo.hasClaimed(TransactionReason.DAILY_PUZZLE_REWARD, "2026-10-26"))
     }
 }

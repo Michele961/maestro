@@ -18,6 +18,8 @@ import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
+import it.maestro.app.data.local.wallet.RoomWalletRepository
+import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.game.GameViewModel
@@ -53,9 +55,14 @@ public val appModule: Module = module {
     }
 
     single { get<MaestroDatabase>().savedMatchDao() }
+    single { get<MaestroDatabase>().walletDao() }
 
     single<MatchRepository> {
         RoomMatchRepository(dao = get())
+    }
+
+    single<WalletRepository> {
+        RoomWalletRepository(dao = get())
     }
 
     single<SettingsRepository> {
@@ -104,6 +111,7 @@ public val appModule: Module = module {
         DailyPuzzleViewModel(
             repository = get(),
             retentionRepository = get(),
+            walletRepository = get(),
         )
     }
 
@@ -116,12 +124,14 @@ public val appModule: Module = module {
     viewModel {
         DailyMissionsViewModel(
             retentionRepository = get(),
+            walletRepository = get(),
         )
     }
 
     viewModel {
         AcademyViewModel(
             academyRepository = get(),
+            walletRepository = get(),
         )
     }
 }

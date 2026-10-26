@@ -121,12 +121,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-07 — Wallet locale "Crediti Maestro" (Room)
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §8.1, ADR-0006
 - **Obiettivo:** Registro transazioni del wallet locale in Room (append-only: ogni movimento ha id, timestamp, causale e importo con segno). Calcolo saldo corrente (`balance = sum(amount)`). Assegnazione crediti gratuiti giornalieri, vincite puzzle/missioni e acquisti. Saldo sempre visibile nella barra superiore dell'app.
 - **Perimetro autorizzato:** `app:android` (estensione entità/DAO Room esistenti).
 - **Criteri di accettazione:**
-    - [ ] Test Room: accrediti, addebiti, verifica saldo, impossibilità di andare in negativo su addebito non consentito.
+    - [x] Test Room: accrediti, addebiti, verifica saldo, impossibilità di andare in negativo su addebito non consentito.
 - **Domande aperte:** —
 
 ---
