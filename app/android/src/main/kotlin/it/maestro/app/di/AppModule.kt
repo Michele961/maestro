@@ -9,7 +9,9 @@ import it.maestro.app.crash.CrashReporter
 import it.maestro.app.crash.DefaultCrashReporter
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
+import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
 import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
+import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
 import it.maestro.app.data.repository.MatchRepository
@@ -17,6 +19,7 @@ import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.game.GameViewModel
 import it.maestro.app.ui.screens.DailyPuzzleViewModel
 import it.maestro.app.ui.screens.GameReviewViewModel
+import it.maestro.app.ui.screens.ProfileViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,6 +30,7 @@ import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
+private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 
 /**
  * Modulo Koin principale per l'iniezione delle dipendenze dell'app Android (ADR-0012, task F1-08, F1-14).
@@ -54,6 +58,10 @@ public val appModule: Module = module {
         DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
     }
 
+    single<MasteryRepository> {
+        DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore)
+    }
+
     single<SoundManager> {
         AndroidSoundManager(
             context = androidContext(),
@@ -79,6 +87,12 @@ public val appModule: Module = module {
     viewModel {
         DailyPuzzleViewModel(
             repository = get(),
+        )
+    }
+
+    viewModel {
+        ProfileViewModel(
+            masteryRepository = get(),
         )
     }
 }

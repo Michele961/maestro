@@ -78,13 +78,13 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-04 — Indice di Maestria & Radar delle Abilità
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §5.A, `learning_coaching_retention_monetization_strategy.md` §3
 - **Obiettivo:** Calcolo e persistenza dell'**Indice di Maestria** (Elo Cognitivo): media mobile ponderata della precisione delle partite giocate, slegata dal semplice vincere o perdere per sfortuna delle carte. Calcolo dei 5 parametri del Radar delle Abilità (Memoria Sette, Controllo Denari, Primiera, Gestione Banco, Endgame) basati sulle scelte della partita e sui Check di allenamento. Grafico radar renderizzato con Canvas Compose nel profilo/home.
 - **Perimetro autorizzato:** `app:android`, `core:ai` (funzioni di aggregazione metriche). Nessuna libreria grafica esterna (Canvas nativo Compose).
 - **Criteri di accettazione:**
-    - [ ] Il profilo utente mostra l'Indice di Maestria numerico e il grafico radar a 5 assi.
-    - [ ] La formula di aggiornamento della precisione è deterministica e coperta da test unitari.
+    - [x] Il profilo utente mostra l'Indice di Maestria numerico e il grafico radar a 5 assi.
+    - [x] La formula di aggiornamento della precisione è deterministica e coperta da test unitari.
 - **Domande aperte:** —
 
 ---

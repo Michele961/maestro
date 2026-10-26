@@ -38,6 +38,7 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.crash.CrashReporter
 import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
@@ -47,6 +48,7 @@ import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
+import it.maestro.app.ui.screens.ProfileScreen
 import it.maestro.app.ui.screens.TableScreen
 import it.maestro.app.ui.theme.MaestroTheme
 import it.maestro.game.model.Seat
@@ -57,7 +59,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 /**
- * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09).
+ * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09, F2-04).
  */
 public sealed interface Screen {
     public data object Home : Screen
@@ -76,6 +78,7 @@ public sealed interface Screen {
         val humanSeat: Seat = Seat.P1,
         /** Check di allenamento: risposte corrette e totali, se ce ne sono stati (F1-12). */
         val trainingScore: Pair<Int, Int>? = null,
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     ) : Screen
     public data class GameReview(
         val matchLog: MatchLog,
@@ -84,6 +87,7 @@ public sealed interface Screen {
         val humanSeat: Seat = Seat.P1,
     ) : Screen
     public data object DailyPuzzle : Screen
+    public data object Profile : Screen
 }
 
 /**
@@ -110,6 +114,7 @@ public class MainActivity : ComponentActivity() {
                 ) {
                 val matchRepository: MatchRepository = koinInject()
                 val settingsRepository: SettingsRepository = koinInject()
+                val masteryRepository: MasteryRepository = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
                 val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
@@ -207,6 +212,7 @@ public class MainActivity : ComponentActivity() {
                         onStartGameClicked = { currentScreen = Screen.PreGame },
                         onSettingsClicked = { showSettingsDialog = true },
                         onDailyPuzzleClicked = { currentScreen = Screen.DailyPuzzle },
+                        onProfileClicked = { currentScreen = Screen.Profile },
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
@@ -231,6 +237,7 @@ public class MainActivity : ComponentActivity() {
                                 matchLog = log,
                                 level = screen.level,
                                 trainingScore = training,
+                                trainingFundamental = screen.trainingFundamental,
                             )
                         },
                     )
@@ -239,6 +246,18 @@ public class MainActivity : ComponentActivity() {
                         level = screen.level,
                         humanSeat = screen.humanSeat,
                         trainingScore = screen.trainingScore,
+                        trainingFundamental = screen.trainingFundamental,
+                        onMatchAnalyzed = { analysis ->
+                            scope.launch {
+                                masteryRepository.recordMatch(
+                                    matchAnalysis = analysis,
+                                    matchLog = screen.matchLog,
+                                    humanSeat = screen.humanSeat,
+                                    trainingScore = screen.trainingScore,
+                                    trainingFundamental = screen.trainingFundamental,
+                                )
+                            }
+                        },
                         onReviewClicked = { analysis ->
                             currentScreen = Screen.GameReview(
                                 matchLog = screen.matchLog,
@@ -254,6 +273,7 @@ public class MainActivity : ComponentActivity() {
                             )
                         },
                         onHomeClicked = { currentScreen = Screen.Home },
+                        onProfileClicked = { currentScreen = Screen.Profile },
                     )
                     is Screen.GameReview -> GameReviewScreen(
                         matchLog = screen.matchLog,
@@ -269,6 +289,9 @@ public class MainActivity : ComponentActivity() {
                     )
                     Screen.DailyPuzzle -> DailyPuzzleScreen(
                         onNavigateHome = { currentScreen = Screen.Home },
+                    )
+                    Screen.Profile -> ProfileScreen(
+                        onBackClicked = { currentScreen = Screen.Home },
                     )
                 }
 

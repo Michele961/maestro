@@ -65,6 +65,7 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
+import it.maestro.game.training.TrainingFundamental
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -87,11 +88,14 @@ public fun PostMatchPreviewScreen(
     modifier: Modifier = Modifier,
     humanSeat: Seat = Seat.P1,
     trainingScore: Pair<Int, Int>? = null,
+    trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     analyzer: MatchAnalyzer = remember { MatchAnalyzer() },
     ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     onReviewClicked: (MatchAnalysis) -> Unit = {},
     onRematchClicked: () -> Unit = {},
     onHomeClicked: () -> Unit = {},
+    onProfileClicked: () -> Unit = {},
+    onMatchAnalyzed: ((MatchAnalysis) -> Unit)? = null,
 ) {
     var isAnalyzing by remember { mutableStateOf(true) }
     var analysisResult by remember { mutableStateOf<MatchAnalysis?>(null) }
@@ -103,6 +107,7 @@ public fun PostMatchPreviewScreen(
         }
         analysisResult = analysis
         isAnalyzing = false
+        onMatchAnalyzed?.invoke(analysis)
     }
 
     // Punteggio finale dal replay della partita (ADR-0003)
@@ -265,6 +270,15 @@ public fun PostMatchPreviewScreen(
                     fontSize = 24.sp,
                     modifier = Modifier.fillMaxWidth(0.85f).padding(top = 8.dp),
                     testTag = "post_match_rematch_button",
+                )
+                MaestroPillButton(
+                    text = stringResource(id = R.string.post_match_view_profile).uppercase(),
+                    onClick = onProfileClicked,
+                    variant = PillButtonVariant.WOOD,
+                    height = 44.dp,
+                    fontSize = 16.sp,
+                    modifier = Modifier.fillMaxWidth(0.85f).padding(top = 6.dp),
+                    testTag = "post_match_profile_button",
                 )
                 MaestroPillButton(
                     text = stringResource(id = R.string.post_match_back_to_menu).uppercase(),
