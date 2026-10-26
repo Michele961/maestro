@@ -47,6 +47,7 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 import it.maestro.app.ui.theme.WoodSurfaceLight
 
 private val BrassShadow = Color(0xFF8C6D1F)
+private const val FLAME_EMOJI: String = "🔥"
 
 /**
  * Sfondo del circolo: legno a tutto schermo e, in basso, il panno verde per [feltFraction] dell'altezza
@@ -235,6 +236,52 @@ public fun CurrencyPill(
             Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = MaestroDisplayFont)
         }
         Image(painterResource(icon), contentDescription = null, modifier = Modifier.size(36.dp))
+    }
+}
+
+/**
+ * Pillola per la Streak ("Fiamma") con conteggio giorni e tocco interattivo (task F2-05).
+ */
+@Composable
+public fun StreakPill(
+    streak: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(50)
+    Box(
+        modifier = modifier
+            .height(36.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 14.dp)
+                .height(30.dp)
+                .clip(shape)
+                .background(Color(0xFF2A170C))
+                .border(2.dp, Color(0xFFFF6D00), shape)
+                .padding(start = 22.dp, end = 10.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = streak.toString(),
+                color = Color(0xFFFFB74D),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black,
+                fontFamily = MaestroDisplayFont,
+            )
+        }
+        Box(
+            modifier = Modifier.size(36.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = FLAME_EMOJI,
+                fontSize = 20.sp,
+            )
+        }
     }
 }
 

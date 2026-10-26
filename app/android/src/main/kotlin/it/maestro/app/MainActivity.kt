@@ -37,12 +37,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.crash.CrashReporter
+import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.MasteryRepository
+import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
+import it.maestro.app.data.local.missions.DailyMissionType
+import it.maestro.app.data.local.missions.DailyMissionsState
+import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.ui.dialogs.DailyMissionsDialog
 import it.maestro.app.ui.dialogs.SettingsDialog
+import it.maestro.app.ui.screens.DailyMissionsUiState
 import it.maestro.app.ui.screens.DailyPuzzleScreen
 import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
@@ -57,6 +64,7 @@ import it.maestro.game.scopa.ScopaState
 import it.maestro.game.training.TrainingFundamental
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import java.time.LocalDate
 
 /**
  * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09, F2-04).
@@ -115,10 +123,15 @@ public class MainActivity : ComponentActivity() {
                 val matchRepository: MatchRepository = koinInject()
                 val settingsRepository: SettingsRepository = koinInject()
                 val masteryRepository: MasteryRepository = koinInject()
+                val retentionRepository: RetentionRepository = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
+                val today = remember { LocalDate.now() }
+                val streakState by retentionRepository.observeStreak(today).collectAsStateWithLifecycle(initialValue = StreakState.INITIAL)
+                val missionsState by retentionRepository.observeDailyMissions(today).collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
                 val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
                 var showSettingsDialog by remember { mutableStateOf(false) }
+                var showMissionsDialog by remember { mutableStateOf(false) }
                 var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
                 var hasActiveMatch by remember { mutableStateOf(false) }
                 var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -183,6 +196,16 @@ public class MainActivity : ComponentActivity() {
                     )
                 }
 
+                if (showMissionsDialog) {
+                    DailyMissionsDialog(
+                        uiState = DailyMissionsUiState(
+                            streak = streakState,
+                            missionsState = missionsState,
+                        ),
+                        onDismissRequest = { showMissionsDialog = false },
+                    )
+                }
+
                 when (val screen = currentScreen) {
                     Screen.Home -> HomeScreen(
                         hasActiveMatch = hasActiveMatch,
@@ -213,6 +236,8 @@ public class MainActivity : ComponentActivity() {
                         onSettingsClicked = { showSettingsDialog = true },
                         onDailyPuzzleClicked = { currentScreen = Screen.DailyPuzzle },
                         onProfileClicked = { currentScreen = Screen.Profile },
+                        onMissionsClicked = { showMissionsDialog = true },
+                        streakCount = streakState.currentStreak,
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
@@ -256,6 +281,28 @@ public class MainActivity : ComponentActivity() {
                                     trainingScore = screen.trainingScore,
                                     trainingFundamental = screen.trainingFundamental,
                                 )
+                                retentionRepository.recordGameActivity(today)
+                                if (analysis.accuracy(screen.humanSeat) >= 80) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80,
+                                    )
+                                }
+                                if (analysis.count(screen.humanSeat, MoveGrade.BLUNDER) == 0) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS,
+                                    )
+                                }
+                                if (screen.trainingFundamental == TrainingFundamental.SEVENS_COUNT &&
+                                    screen.trainingScore != null
+                                ) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.ANSWER_SEVENS_CHECKS,
+                                        screen.trainingScore.first,
+                                    )
+                                }
                             }
                         },
                         onReviewClicked = { analysis ->

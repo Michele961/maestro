@@ -44,6 +44,12 @@ class HomeScreenScreenshotTest {
     }
 
     @Test
+    fun home_screen_with_streak_screenshot() {
+        composeRule.setContent { MaestroTheme { HomeScreen(streakCount = 5) } }
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/home_screen_with_streak.png")
+    }
+
+    @Test
     fun play_now_and_scopa_start_a_new_game() {
         var starts = 0
         composeRule.setContent { MaestroTheme { HomeScreen(onStartGameClicked = { starts++ }) } }

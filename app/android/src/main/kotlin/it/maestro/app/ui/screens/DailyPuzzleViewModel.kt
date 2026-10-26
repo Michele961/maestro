@@ -7,6 +7,8 @@ import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
+import it.maestro.app.data.local.datastore.RetentionRepository
+import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.game.model.Card
 import it.maestro.game.scopa.ScopaView
@@ -46,6 +48,7 @@ public data class DailyPuzzleUiState(
  */
 public class DailyPuzzleViewModel(
     private val repository: DailyPuzzleRepository,
+    private val retentionRepository: RetentionRepository? = null,
     private val customDate: LocalDate? = null,
     private val customPuzzle: TacticalPuzzle? = null,
 ) : ViewModel() {
@@ -137,6 +140,10 @@ public class DailyPuzzleViewModel(
                     attempts = newAttempts,
                     solved = true,
                 )
+                retentionRepository?.let { retention ->
+                    retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
+                    retention.recordGameActivity(effectiveDate)
+                }
             }
         } else {
             val hintLevel = if (newAttempts == 1) 1 else 2

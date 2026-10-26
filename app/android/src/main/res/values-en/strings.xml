@@ -237,4 +237,24 @@
     <string name="profile_view_button">Profile &amp; Mastery</string>
     <string name="post_match_view_profile">VIEW ABILITY RADAR</string>
     <string name="post_match_mastery_updated">Mastery Index: %1$d ELO</string>
+    <string name="mission_daily_puzzle_title">Daily Puzzle</string>
+    <string name="mission_daily_puzzle_desc">Solve the Maestro\'s daily tactical puzzle.</string>
+    <string name="mission_accuracy_80_title">Masterful Accuracy</string>
+    <string name="mission_accuracy_80_desc">Finish a match with at least 80%% accuracy.</string>
+    <string name="mission_sevens_check_title">Eye on Sevens</string>
+    <string name="mission_sevens_check_desc">Correctly answer 2 flash checks on Sevens.</string>
+    <string name="mission_sweeps_title">Clean Sweep</string>
+    <string name="mission_sweeps_desc">Make at least 2 sweeps during matches.</string>
+    <string name="mission_denari_title">Gold Hunter</string>
+    <string name="mission_denari_desc">Capture at least 6 Coins cards in a match.</string>
+    <string name="mission_no_blunders_title">Safe Play</string>
+    <string name="mission_no_blunders_desc">Play a match without committing any Blunder.</string>
+    <string name="retention_streak_title">Streak Flame</string>
+    <string name="retention_streak_days">%1$d consecutive days</string>
+    <string name="retention_streak_freeze_available">Streak Freeze: 1 available</string>
+    <string name="retention_streak_freeze_none">No streak freeze available</string>
+    <string name="retention_missions_title">Daily Missions</string>
+    <string name="retention_missions_reward">+%1$d Credits</string>
+    <string name="retention_missions_completed_badge">COMPLETED</string>
+    <string name="retention_maestro_encouragement">Three good habits a day forge the mind of a true Master!</string>
 </resources>
