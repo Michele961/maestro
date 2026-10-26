@@ -4,10 +4,12 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.maestro.app.R
+import it.maestro.app.data.local.academy.AcademyChapter
+import it.maestro.app.data.local.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyModule
-import it.maestro.app.data.local.academy.AcademyModuleId
-import it.maestro.app.data.local.academy.AcademyProgress
+import it.maestro.app.data.local.academy.AcademyLesson
+import it.maestro.app.data.local.academy.AcademyLessonId
+import it.maestro.app.data.local.academy.AcademyLessonProgress
 import it.maestro.app.data.local.academy.AcademyStep
 import it.maestro.app.data.local.academy.AcademyStepType
 import it.maestro.app.data.local.datastore.AcademyRepository
@@ -21,21 +23,33 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * Stato della card di un singolo modulo nella mappa dell'Accademia.
+ * Stato della card di una singola lezione (sotto-modulo) all'interno di un capitolo.
  */
-public data class AcademyModuleCardState(
-    public val module: AcademyModule,
-    public val progress: AcademyProgress,
+public data class AcademyLessonCardState(
+    public val lesson: AcademyLesson,
+    public val progress: AcademyLessonProgress,
 )
 
 /**
- * Modalità di visualizzazione dell'Accademia: Mappa del percorso oppure Lezione interattiva al tavolo.
+ * Stato della card di un capitolo (macro-modulo) con relative lezioni e progressione complessiva.
+ */
+public data class AcademyChapterCardState(
+    public val chapter: AcademyChapter,
+    public val lessons: List<AcademyLessonCardState>,
+    public val completedCount: Int,
+    public val totalCount: Int,
+    public val isCompleted: Boolean,
+    public val isUnlocked: Boolean,
+)
+
+/**
+ * Modalità di visualizzazione dell'Accademia: Mappa dei capitoli oppure Lezione al tavolo.
  */
 public sealed interface AcademyViewMode {
-    public data object ModuleMap : AcademyViewMode
+    public data object ChapterMap : AcademyViewMode
 
     public data class Lesson(
-        public val module: AcademyModule,
+        public val lesson: AcademyLesson,
         public val currentStepIndex: Int,
         public val selectedOptionId: String? = null,
         public val isAnswerCorrect: Boolean? = null,
@@ -44,7 +58,7 @@ public sealed interface AcademyViewMode {
         public val dynamicMaestroMood: MaestroMood? = null,
     ) : AcademyViewMode {
         public val currentStep: AcademyStep
-            get() = module.steps.getOrElse(currentStepIndex) { module.steps.first() }
+            get() = lesson.steps.getOrElse(currentStepIndex) { lesson.steps.first() }
 
         public val effectiveMaestroMood: MaestroMood
             get() = dynamicMaestroMood ?: currentStep.maestroMood
@@ -58,45 +72,65 @@ public sealed interface AcademyViewMode {
             }
 
         public val isLastStep: Boolean
-            get() = currentStepIndex >= module.steps.size - 1
+            get() = currentStepIndex >= lesson.steps.size - 1
     }
 }
 
 /**
- * Stato complessivo della UI dell'Accademia del Maestro (task F2-06).
+ * Stato complessivo dell'Accademia del Maestro arricchita (task F2-06).
  */
 public data class AcademyUiState(
-    public val modules: List<AcademyModuleCardState> = emptyList(),
-    public val viewMode: AcademyViewMode = AcademyViewMode.ModuleMap,
+    public val chapters: List<AcademyChapterCardState> = emptyList(),
+    public val expandedChapterId: AcademyChapterId? = AcademyChapterId.CHAPTER_1_FONDAMENTI,
+    public val viewMode: AcademyViewMode = AcademyViewMode.ChapterMap,
 )
 
 /**
- * ViewModel che governa la progressione didattica, l'avanzamento dei moduli e i quesiti al tavolo.
+ * ViewModel che governa la progressione didattica a capitoli e lezioni al tavolo del Maestro.
  */
 public class AcademyViewModel(
     private val academyRepository: AcademyRepository,
-    private val availableModules: List<AcademyModule> = AcademyContent.MODULES,
+    private val availableChapters: List<AcademyChapter> = AcademyContent.CHAPTERS,
 ) : ViewModel() {
 
-    private val viewModeState = MutableStateFlow<AcademyViewMode>(AcademyViewMode.ModuleMap)
+    private val viewModeState = MutableStateFlow<AcademyViewMode>(AcademyViewMode.ChapterMap)
+    private val expandedChapterState = MutableStateFlow<AcademyChapterId?>(AcademyChapterId.CHAPTER_1_FONDAMENTI)
 
     public val uiState: StateFlow<AcademyUiState> = combine(
         academyRepository.observeProgress(),
         viewModeState,
-    ) { progressMap, currentViewMode ->
-        val cardStates = availableModules.map { module ->
-            val progress = progressMap[module.id] ?: AcademyProgress(
-                moduleId = module.id,
-                isUnlocked = module.number == 1,
-                isCompleted = false,
-            )
-            AcademyModuleCardState(
-                module = module,
-                progress = progress,
+        expandedChapterState,
+    ) { progressMap, currentViewMode, expandedChapterId ->
+        val chapterStates = availableChapters.map { chapter ->
+            val lessonStates = chapter.lessons.map { lesson ->
+                val progress = progressMap[lesson.id] ?: AcademyLessonProgress(
+                    lessonId = lesson.id,
+                    isUnlocked = chapter.number == 1 && lesson.lessonNumber == 1,
+                    isCompleted = false,
+                )
+                AcademyLessonCardState(
+                    lesson = lesson,
+                    progress = progress,
+                )
+            }
+            val completedCount = lessonStates.count { it.progress.isCompleted }
+            val totalCount = lessonStates.size
+            val isCompleted = completedCount == totalCount && totalCount > 0
+            val isUnlocked = lessonStates.any { it.progress.isUnlocked }
+
+            AcademyChapterCardState(
+                chapter = chapter,
+                lessons = lessonStates,
+                completedCount = completedCount,
+                totalCount = totalCount,
+                isCompleted = isCompleted,
+                isUnlocked = isUnlocked,
             )
         }
+
         AcademyUiState(
-            modules = cardStates,
+            chapters = chapterStates,
+            expandedChapterId = expandedChapterId,
             viewMode = currentViewMode,
         )
     }.stateIn(
@@ -106,21 +140,28 @@ public class AcademyViewModel(
     )
 
     /**
-     * Apre la lezione del modulo specificato, partendo dal primo step.
+     * Espande o chiude la sezione del capitolo nella mappa.
      */
-    public fun openModule(moduleId: AcademyModuleId) {
-        val module = availableModules.firstOrNull { it.id == moduleId } ?: return
+    public fun toggleChapter(chapterId: AcademyChapterId) {
+        expandedChapterState.value = if (expandedChapterState.value == chapterId) null else chapterId
+    }
+
+    /**
+     * Apre la lezione specificata, partendo dal primo step.
+     */
+    public fun openLesson(lessonId: AcademyLessonId) {
+        val lesson = AcademyContent.ALL_LESSONS.firstOrNull { it.id == lessonId } ?: return
         viewModeState.value = AcademyViewMode.Lesson(
-            module = module,
+            lesson = lesson,
             currentStepIndex = 0,
         )
     }
 
     /**
-     * Ritorna alla mappa dell'Accademia.
+     * Ritorna alla mappa dei capitoli.
      */
     public fun backToMap() {
-        viewModeState.value = AcademyViewMode.ModuleMap
+        viewModeState.value = AcademyViewMode.ChapterMap
     }
 
     /**
@@ -166,24 +207,23 @@ public class AcademyViewModel(
     }
 
     /**
-     * Avanza al passo successivo della lezione, oppure conclude il modulo salvando la progressione.
+     * Avanza al passo successivo della lezione, oppure conclude la lezione salvandola nel repository.
      */
     public fun nextStep() {
         val currentLesson = viewModeState.value as? AcademyViewMode.Lesson ?: return
-        val module = currentLesson.module
+        val lesson = currentLesson.lesson
 
         if (currentLesson.isLastStep) {
-            // Completamento del modulo
             viewModelScope.launch {
-                academyRepository.completeModule(module.id)
+                academyRepository.completeLesson(lesson.id)
             }
-            viewModeState.value = AcademyViewMode.ModuleMap
+            viewModeState.value = AcademyViewMode.ChapterMap
         } else {
             val nextIndex = currentLesson.currentStepIndex + 1
             viewModeState.value = AcademyViewMode.Lesson(
-                module = module,
+                lesson = lesson,
                 currentStepIndex = nextIndex,
-                dynamicMaestroMood = module.steps[nextIndex].maestroMood,
+                dynamicMaestroMood = lesson.steps[nextIndex].maestroMood,
             )
         }
     }

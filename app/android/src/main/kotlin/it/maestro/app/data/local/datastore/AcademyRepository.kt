@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import it.maestro.app.data.local.academy.AcademyModuleId
-import it.maestro.app.data.local.academy.AcademyProgress
+import it.maestro.app.data.local.academy.AcademyLessonId
+import it.maestro.app.data.local.academy.AcademyLessonProgress
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /**
- * Repository per la progressione a tappe e il salvataggio dei moduli dell'Accademia (task F2-06).
+ * Repository per la progressione a tappe e il salvataggio dei moduli e sotto-moduli dell'Accademia.
  */
 public interface AcademyRepository {
-    public fun observeProgress(): Flow<Map<AcademyModuleId, AcademyProgress>>
-    public suspend fun getProgress(): Map<AcademyModuleId, AcademyProgress>
-    public suspend fun completeModule(moduleId: AcademyModuleId)
+    public fun observeProgress(): Flow<Map<AcademyLessonId, AcademyLessonProgress>>
+    public suspend fun getProgress(): Map<AcademyLessonId, AcademyLessonProgress>
+    public suspend fun completeLesson(lessonId: AcademyLessonId)
     public suspend fun resetProgress()
 }
 
@@ -30,66 +30,57 @@ public class DataStoreAcademyRepository(
     private val dataStore: DataStore<Preferences>,
 ) : AcademyRepository {
 
-    private fun completedKey(id: AcademyModuleId) = booleanPreferencesKey("academy_completed_${id.name}")
-    private fun timestampKey(id: AcademyModuleId) = longPreferencesKey("academy_completed_at_${id.name}")
+    private fun completedKey(id: AcademyLessonId) = booleanPreferencesKey("academy_lesson_completed_${id.name}")
+    private fun timestampKey(id: AcademyLessonId) = longPreferencesKey("academy_lesson_completed_at_${id.name}")
 
-    override fun observeProgress(): Flow<Map<AcademyModuleId, AcademyProgress>> =
+    override fun observeProgress(): Flow<Map<AcademyLessonId, AcademyLessonProgress>> =
         dataStore.data.map { preferences ->
             mapPreferencesToProgress(preferences)
         }
 
-    override suspend fun getProgress(): Map<AcademyModuleId, AcademyProgress> {
+    override suspend fun getProgress(): Map<AcademyLessonId, AcademyLessonProgress> {
         val preferences = dataStore.data.first()
         return mapPreferencesToProgress(preferences)
     }
 
-    override suspend fun completeModule(moduleId: AcademyModuleId) {
+    override suspend fun completeLesson(lessonId: AcademyLessonId) {
         val now = System.currentTimeMillis()
         dataStore.edit { prefs ->
-            prefs[completedKey(moduleId)] = true
-            prefs[timestampKey(moduleId)] = now
+            prefs[completedKey(lessonId)] = true
+            prefs[timestampKey(lessonId)] = now
         }
     }
 
     override suspend fun resetProgress() {
         dataStore.edit { prefs ->
-            AcademyModuleId.entries.forEach { id ->
+            AcademyLessonId.entries.forEach { id ->
                 prefs.remove(completedKey(id))
                 prefs.remove(timestampKey(id))
             }
         }
     }
 
-    private fun mapPreferencesToProgress(preferences: Preferences): Map<AcademyModuleId, AcademyProgress> {
-        val mod1Completed = preferences[completedKey(AcademyModuleId.MODULE_1_ABBECEDARIO)] ?: false
-        val mod1Time = preferences[timestampKey(AcademyModuleId.MODULE_1_ABBECEDARIO)] ?: 0L
+    private fun mapPreferencesToProgress(preferences: Preferences): Map<AcademyLessonId, AcademyLessonProgress> {
+        val entries = AcademyLessonId.entries
+        val result = mutableMapOf<AcademyLessonId, AcademyLessonProgress>()
+        var previousCompleted = true // La primissima lezione è sempre sbloccata
 
-        val mod2Completed = preferences[completedKey(AcademyModuleId.MODULE_2_PRIMIERA)] ?: false
-        val mod2Time = preferences[timestampKey(AcademyModuleId.MODULE_2_PRIMIERA)] ?: 0L
+        entries.forEachIndexed { index, lessonId ->
+            val isCompleted = preferences[completedKey(lessonId)] ?: false
+            val completedAt = preferences[timestampKey(lessonId)] ?: 0L
+            val isUnlocked = index == 0 || previousCompleted
 
-        val mod3Completed = preferences[completedKey(AcademyModuleId.MODULE_3_DISPARI)] ?: false
-        val mod3Time = preferences[timestampKey(AcademyModuleId.MODULE_3_DISPARI)] ?: 0L
+            result[lessonId] = AcademyLessonProgress(
+                lessonId = lessonId,
+                isUnlocked = isUnlocked,
+                isCompleted = isCompleted,
+                completedAt = completedAt,
+            )
 
-        return mapOf(
-            AcademyModuleId.MODULE_1_ABBECEDARIO to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_1_ABBECEDARIO,
-                isUnlocked = true, // Il primo modulo è sempre sbloccato
-                isCompleted = mod1Completed,
-                completedAt = mod1Time,
-            ),
-            AcademyModuleId.MODULE_2_PRIMIERA to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_2_PRIMIERA,
-                isUnlocked = mod1Completed, // Sbloccato se il modulo 1 è completato
-                isCompleted = mod2Completed,
-                completedAt = mod2Time,
-            ),
-            AcademyModuleId.MODULE_3_DISPARI to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_3_DISPARI,
-                isUnlocked = mod2Completed, // Sbloccato se il modulo 2 è completato
-                isCompleted = mod3Completed,
-                completedAt = mod3Time,
-            ),
-        )
+            previousCompleted = isCompleted
+        }
+
+        return result
     }
 }
 
@@ -97,54 +88,49 @@ public class DataStoreAcademyRepository(
  * Implementazione in-memory per test unitari veloci e isolati.
  */
 public class InMemoryAcademyRepository(
-    initialCompleted: Set<AcademyModuleId> = emptySet(),
+    initialCompleted: Set<AcademyLessonId> = emptySet(),
 ) : AcademyRepository {
 
-    private val completedModules = MutableStateFlow(initialCompleted)
-    private val completedTimes = mutableMapOf<AcademyModuleId, Long>()
+    private val completedLessons = MutableStateFlow(initialCompleted)
+    private val completedTimes = mutableMapOf<AcademyLessonId, Long>()
 
-    override fun observeProgress(): Flow<Map<AcademyModuleId, AcademyProgress>> =
-        completedModules.asStateFlow().map { completed ->
+    override fun observeProgress(): Flow<Map<AcademyLessonId, AcademyLessonProgress>> =
+        completedLessons.asStateFlow().map { completed ->
             buildProgressMap(completed)
         }
 
-    override suspend fun getProgress(): Map<AcademyModuleId, AcademyProgress> =
-        buildProgressMap(completedModules.value)
+    override suspend fun getProgress(): Map<AcademyLessonId, AcademyLessonProgress> =
+        buildProgressMap(completedLessons.value)
 
-    override suspend fun completeModule(moduleId: AcademyModuleId) {
-        completedTimes[moduleId] = System.currentTimeMillis()
-        completedModules.value = completedModules.value + moduleId
+    override suspend fun completeLesson(lessonId: AcademyLessonId) {
+        completedTimes[lessonId] = System.currentTimeMillis()
+        completedLessons.value = completedLessons.value + lessonId
     }
 
     override suspend fun resetProgress() {
         completedTimes.clear()
-        completedModules.value = emptySet()
+        completedLessons.value = emptySet()
     }
 
-    private fun buildProgressMap(completed: Set<AcademyModuleId>): Map<AcademyModuleId, AcademyProgress> {
-        val mod1Completed = completed.contains(AcademyModuleId.MODULE_1_ABBECEDARIO)
-        val mod2Completed = completed.contains(AcademyModuleId.MODULE_2_PRIMIERA)
-        val mod3Completed = completed.contains(AcademyModuleId.MODULE_3_DISPARI)
+    private fun buildProgressMap(completed: Set<AcademyLessonId>): Map<AcademyLessonId, AcademyLessonProgress> {
+        val entries = AcademyLessonId.entries
+        val result = mutableMapOf<AcademyLessonId, AcademyLessonProgress>()
+        var previousCompleted = true
 
-        return mapOf(
-            AcademyModuleId.MODULE_1_ABBECEDARIO to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_1_ABBECEDARIO,
-                isUnlocked = true,
-                isCompleted = mod1Completed,
-                completedAt = completedTimes[AcademyModuleId.MODULE_1_ABBECEDARIO] ?: 0L,
-            ),
-            AcademyModuleId.MODULE_2_PRIMIERA to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_2_PRIMIERA,
-                isUnlocked = mod1Completed,
-                isCompleted = mod2Completed,
-                completedAt = completedTimes[AcademyModuleId.MODULE_2_PRIMIERA] ?: 0L,
-            ),
-            AcademyModuleId.MODULE_3_DISPARI to AcademyProgress(
-                moduleId = AcademyModuleId.MODULE_3_DISPARI,
-                isUnlocked = mod2Completed,
-                isCompleted = mod3Completed,
-                completedAt = completedTimes[AcademyModuleId.MODULE_3_DISPARI] ?: 0L,
-            ),
-        )
+        entries.forEachIndexed { index, lessonId ->
+            val isCompleted = completed.contains(lessonId)
+            val isUnlocked = index == 0 || previousCompleted
+
+            result[lessonId] = AcademyLessonProgress(
+                lessonId = lessonId,
+                isUnlocked = isUnlocked,
+                isCompleted = isCompleted,
+                completedAt = completedTimes[lessonId] ?: 0L,
+            )
+
+            previousCompleted = isCompleted
+        }
+
+        return result
     }
 }
