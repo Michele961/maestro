@@ -1,6 +1,7 @@
 package it.maestro.app.ui.screenshot
 
 import android.app.Application
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -88,5 +89,48 @@ class HomeScreenScreenshotTest {
         composeRule.setContent { MaestroTheme { HomeScreen(credits = 125) } }
         composeRule.onNodeWithTag("home_credits_pill").assertExists()
         composeRule.onNodeWithText("125").assertExists()
+    }
+
+    @Test
+    fun navigation_buttons_invoke_callbacks() {
+        var dailyPuzzle = 0
+        var profile = 0
+        var missions = 0
+        var academy = 0
+        var shop = 0
+
+        composeRule.setContent {
+            MaestroTheme {
+                HomeScreen(
+                    onDailyPuzzleClicked = { dailyPuzzle++ },
+                    onProfileClicked = { profile++ },
+                    onMissionsClicked = { missions++ },
+                    onAcademyClicked = { academy++ },
+                    onShopClicked = { shop++ },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("home_daily_puzzle_tile").performClick()
+        assertEquals(1, dailyPuzzle)
+
+        composeRule.onNodeWithTag("home_missions_tile").performClick()
+        assertEquals(1, missions)
+
+        composeRule.onNodeWithTag("home_nav_profile_button").assertIsDisplayed().performClick()
+        assertEquals(1, profile)
+
+        composeRule.onNodeWithTag("home_nav_academy_button").assertIsDisplayed().performClick()
+        assertEquals(1, academy)
+
+        composeRule.onNodeWithTag("home_nav_shop_button").assertIsDisplayed().performClick()
+        assertEquals(1, shop)
+    }
+
+    @Test
+    @Config(qualifiers = "it-w390dp-h780dp-xxhdpi")
+    fun navigation_buttons_are_displayed_on_standard_phone() {
+        composeRule.setContent { MaestroTheme { HomeScreen() } }
+        composeRule.onNodeWithTag("home_nav_shop_button").assertIsDisplayed()
     }
 }
