@@ -250,12 +250,16 @@
     <string name="mission_denari_desc">Cattura almeno 6 carte di Denari in una partita.</string>
     <string name="mission_no_blunders_title">Calata Sicura</string>
     <string name="mission_no_blunders_desc">Gioca una partita senza commettere nessun Blunder.</string>
-    <string name="retention_streak_title">Fiamma della Streak</string>
+    <string name="retention_streak_title">Serie di gioco</string>
     <string name="retention_streak_days">%1$d giorni consecutivi</string>
-    <string name="retention_streak_freeze_available">Gettone Riposo: 1 disponibile</string>
-    <string name="retention_streak_freeze_none">Nessun gettone riposo</string>
+    <string name="retention_streak_record">Record: %1$d giorni</string>
+    <string name="retention_streak_freeze_available">Gettone Riposo attivo</string>
+    <string name="retention_streak_freeze_desc">Protegge la tua serie se salti un giorno</string>
+    <string name="retention_streak_freeze_none">Nessun Gettone Riposo</string>
+    <string name="retention_streak_freeze_none_desc">Gioca ogni giorno per non spezzare la serie</string>
     <string name="retention_missions_title">Missioni del Giorno</string>
     <string name="retention_missions_reward">+%1$d Crediti</string>
     <string name="retention_missions_completed_badge">COMPLETATA</string>
     <string name="retention_maestro_encouragement">Tre buone abitudini al giorno forgiano la mente di un vero Maestro!</string>
+    <string name="home_missions_streak_badge">%1$d gg</string>
 </resources>

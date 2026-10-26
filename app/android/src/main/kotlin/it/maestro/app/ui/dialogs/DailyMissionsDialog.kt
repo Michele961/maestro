@@ -2,6 +2,7 @@ package it.maestro.app.ui.dialogs
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,11 +43,10 @@ import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.screens.DailyMissionsUiState
 import it.maestro.app.ui.theme.BrassRivetGold
+import it.maestro.app.ui.theme.ButtonGoldBorder
 import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.WoodSurfaceDark
 
-private val FlameOrange = Color(0xFFFF6D00)
-private val FreezeIceBlue = Color(0xFF4ECDC4)
 private val CompletedGreen = Color(0xFF2E7D32)
 
 /**
@@ -101,6 +101,7 @@ public fun DailyMissionsDialog(
                     // 1. Fiamma della Streak e Gettone Riposo
                     StreakBanner(
                         currentStreak = uiState.streak.currentStreak,
+                        bestStreak = uiState.streak.bestStreak,
                         freezeTokens = uiState.streak.freezeTokens,
                     )
 
@@ -143,6 +144,7 @@ public fun DailyMissionsDialog(
 @Composable
 private fun StreakBanner(
     currentStreak: Int,
+    bestStreak: Int,
     freezeTokens: Int,
 ) {
     NineSliceBox(
@@ -154,54 +156,93 @@ private fun StreakBanner(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Image(
                     painter = painterResource(R.drawable.icon_flame),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(26.dp)
-                        .padding(end = 6.dp),
+                    modifier = Modifier.size(44.dp),
                 )
-                Text(
-                    text = stringResource(R.string.retention_streak_days, currentStreak).uppercase(),
-                    color = FlameOrange,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Black,
-                    fontFamily = MaestroDisplayFont,
-                    modifier = Modifier.testTag("missions_streak_text"),
-                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.retention_streak_title).uppercase(),
+                        color = BrassRivetGold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        letterSpacing = 0.5.sp,
+                    )
+                    Text(
+                        text = stringResource(R.string.retention_streak_days, currentStreak),
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        modifier = Modifier.testTag("missions_streak_text"),
+                    )
+                    if (bestStreak > 0) {
+                        Text(
+                            text = stringResource(R.string.retention_streak_record, bestStreak),
+                            color = BrassRivetGold.copy(alpha = 0.85f),
+                            fontSize = 11.sp,
+                        )
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(2.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF24150B))
+                    .border(1.dp, ButtonGoldBorder.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
             ) {
-                Image(
-                    painter = painterResource(R.drawable.icon_freeze),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .padding(end = 4.dp),
-                )
-                Text(
-                    text = stringResource(
-                        if (freezeTokens > 0) {
-                            R.string.retention_streak_freeze_available
-                        } else {
-                            R.string.retention_streak_freeze_none
-                        },
-                    ),
-                    color = FreezeIceBlue,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.testTag("missions_freeze_text"),
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.icon_freeze),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(
+                                if (freezeTokens > 0) {
+                                    R.string.retention_streak_freeze_available
+                                } else {
+                                    R.string.retention_streak_freeze_none
+                                },
+                            ),
+                            color = BrassRivetGold,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.testTag("missions_freeze_text"),
+                        )
+                        Text(
+                            text = stringResource(
+                                if (freezeTokens > 0) {
+                                    R.string.retention_streak_freeze_desc
+                                } else {
+                                    R.string.retention_streak_freeze_none_desc
+                                },
+                            ),
+                            color = Color(0xFFC7B198),
+                            fontSize = 10.sp,
+                            lineHeight = 13.sp,
+                        )
+                    }
+                }
             }
         }
     }

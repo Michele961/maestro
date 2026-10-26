@@ -260,13 +260,13 @@ public fun StreakPill(
                 .height(30.dp)
                 .clip(shape)
                 .background(Color(0xFF2A170C))
-                .border(2.dp, Color(0xFFFF6D00), shape)
+                .border(2.dp, ButtonGoldBorder, shape)
                 .padding(start = 22.dp, end = 10.dp),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = streak.toString(),
-                color = Color(0xFFFFB74D),
+                color = BrassRivetGold,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Black,
                 fontFamily = MaestroDisplayFont,
@@ -320,6 +320,7 @@ public fun WoodRowTile(
     modifier: Modifier = Modifier,
     iconSize: Dp = 40.dp,
     onClick: (() -> Unit)? = null,
+    trailingBadge: (@Composable () -> Unit)? = null,
 ) {
     WoodPanel(
         modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
@@ -334,13 +335,16 @@ public fun WoodRowTile(
             Text(
                 text = title.uppercase(),
                 color = BrassRivetGold,
-                fontSize = 14.sp,
-                lineHeight = 16.sp,
+                fontSize = 13.sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f).padding(start = 4.dp),
+                textAlign = if (trailingBadge != null) TextAlign.Start else TextAlign.Center,
+                modifier = Modifier.weight(1f).padding(start = 6.dp),
             )
+            if (trailingBadge != null) {
+                trailingBadge()
+            }
         }
     }
 }

@@ -1,16 +1,13 @@
 package it.maestro.app.ui.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
-import it.maestro.app.ui.components.BubbleTail
-import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,17 +17,23 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import it.maestro.app.ui.components.BubbleTail
+import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -57,6 +60,7 @@ import it.maestro.app.ui.components.WoodRowTile
 import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.BrassRivetGold
 import it.maestro.app.ui.theme.ButtonAmberBottom
+import it.maestro.app.ui.theme.ButtonGoldBorder
 import it.maestro.app.ui.theme.WoodSurfaceDark
 
 /**
@@ -93,10 +97,8 @@ public fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HomeHeader(
-                    streakCount = streakCount,
                     onSettingsClicked = onSettingsClicked,
                     onProfileClicked = onProfileClicked,
-                    onMissionsClicked = onMissionsClicked,
                 )
                 // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
                 MaestroWelcome(modifier = Modifier.weight(1f))
@@ -162,6 +164,33 @@ public fun HomeScreen(
                         iconSize = 52.dp,
                         modifier = Modifier.weight(1f).height(72.dp).testTag("home_missions_tile"),
                         onClick = onMissionsClicked,
+                        trailingBadge = if (streakCount > 0) {
+                            {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFF2A170C))
+                                        .border(1.dp, ButtonGoldBorder, RoundedCornerShape(12.dp))
+                                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                                        .testTag("home_missions_streak_badge"),
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.icon_flame),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = stringResource(R.string.home_missions_streak_badge, streakCount),
+                                        color = BrassRivetGold,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaestroDisplayFont,
+                                    )
+                                }
+                            }
+                        } else null,
                     )
                     WoodPanel(modifier = Modifier.weight(1f).height(72.dp)) {
                         Row(
@@ -195,10 +224,8 @@ public fun HomeScreen(
 
 @Composable
 private fun HomeHeader(
-    streakCount: Int = 0,
     onSettingsClicked: () -> Unit,
     onProfileClicked: () -> Unit = {},
-    onMissionsClicked: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -224,14 +251,9 @@ private fun HomeHeader(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CurrencyPill(icon = R.drawable.icon_coin, value = stringResource(R.string.home_coins_placeholder))
                 CurrencyPill(icon = R.drawable.icon_gem, value = stringResource(R.string.home_gems_placeholder))
-                StreakPill(
-                    streak = streakCount,
-                    onClick = onMissionsClicked,
-                    modifier = Modifier.testTag("home_streak_pill"),
-                )
             }
         }
         WoodIconButton(

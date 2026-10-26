@@ -250,12 +250,16 @@
     <string name="mission_denari_desc">Capture at least 6 Coins cards in a match.</string>
     <string name="mission_no_blunders_title">Safe Play</string>
     <string name="mission_no_blunders_desc">Play a match without committing any Blunder.</string>
-    <string name="retention_streak_title">Streak Flame</string>
+    <string name="retention_streak_title">Game streak</string>
     <string name="retention_streak_days">%1$d consecutive days</string>
-    <string name="retention_streak_freeze_available">Streak Freeze: 1 available</string>
-    <string name="retention_streak_freeze_none">No streak freeze available</string>
+    <string name="retention_streak_record">Record: %1$d days</string>
+    <string name="retention_streak_freeze_available">Streak Freeze active</string>
+    <string name="retention_streak_freeze_desc">Protects your streak if you miss a day</string>
+    <string name="retention_streak_freeze_none">No Streak Freeze</string>
+    <string name="retention_streak_freeze_none_desc">Play daily to keep your streak alive</string>
     <string name="retention_missions_title">Daily Missions</string>
     <string name="retention_missions_reward">+%1$d Credits</string>
     <string name="retention_missions_completed_badge">COMPLETED</string>
     <string name="retention_maestro_encouragement">Three good habits a day forge the mind of a true Master!</string>
+    <string name="home_missions_streak_badge">%1$d d</string>
 </resources>
