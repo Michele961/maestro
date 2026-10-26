@@ -1,9 +1,14 @@
 package it.maestro.app.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,18 +33,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
@@ -119,13 +129,9 @@ public fun ShopScreenContent(
                         .padding(horizontal = 10.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.button_close),
-                        contentDescription = stringResource(R.string.puzzle_button_home),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clickable(onClick = onNavigateHome)
-                            .testTag("shop_back_button"),
+                    ShopBackButton(
+                        onClick = onNavigateHome,
+                        modifier = Modifier.testTag("shop_back_button"),
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
@@ -203,7 +209,112 @@ public fun ShopScreenContent(
 }
 
 /**
+ * Pulsante circolare di ritorno in legno di noce e ottone inciso.
+ */
+@Composable
+private fun ShopBackButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(targetValue = if (isPressed) 0.94f else 1f, label = "shop_back_press")
+
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .graphicsLayer {
+                scaleX = pressScale
+                scaleY = pressScale
+            }
+            .clip(CircleShape)
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(
+                        Color(0xFF543319),
+                        Color(0xFF291508),
+                    ),
+                ),
+            )
+            .border(
+                border = BorderStroke(
+                    width = 1.5.dp,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFFE082),
+                            Color(0xFF8C6418),
+                        ),
+                    ),
+                ),
+                shape = CircleShape,
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(modifier = Modifier.size(18.dp)) {
+            val strokeWidth = 2.4.dp.toPx()
+            val w = size.width
+            val h = size.height
+
+            // Ombra incisa per profondità tattile
+            val shadowY = 1.dp.toPx()
+            val shadowColor = Color(0x99000000)
+            drawLine(
+                color = shadowColor,
+                start = Offset(w * 0.22f, h * 0.5f + shadowY),
+                end = Offset(w * 0.78f, h * 0.5f + shadowY),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+            drawLine(
+                color = shadowColor,
+                start = Offset(w * 0.22f, h * 0.5f + shadowY),
+                end = Offset(w * 0.52f, h * 0.22f + shadowY),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+            drawLine(
+                color = shadowColor,
+                start = Offset(w * 0.22f, h * 0.5f + shadowY),
+                end = Offset(w * 0.52f, h * 0.78f + shadowY),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+
+            // Freccia in ottone dorato lucido
+            val brassColor = BrassRivetGold
+            drawLine(
+                color = brassColor,
+                start = Offset(w * 0.22f, h * 0.5f),
+                end = Offset(w * 0.78f, h * 0.5f),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+            drawLine(
+                color = brassColor,
+                start = Offset(w * 0.22f, h * 0.5f),
+                end = Offset(w * 0.52f, h * 0.22f),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+            drawLine(
+                color = brassColor,
+                start = Offset(w * 0.22f, h * 0.5f),
+                end = Offset(w * 0.52f, h * 0.78f),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+        }
+    }
+}
+
+/**
  * Pulsante per la selezione della categoria cosmetica nello Shop.
+ * Finitura noce e ottone caldo, senza rosso acceso.
  */
 @Composable
 private fun ShopTabButton(
@@ -218,18 +329,35 @@ private fun ShopTabButton(
         modifier = modifier
             .height(38.dp)
             .clip(shape)
-            .background(if (isSelected) Color(0xFF6B1D2F) else Color(0xFF2A170C))
-            .border(1.5.dp, if (isSelected) BrassRivetGold else ButtonGoldBorder, shape)
+            .then(
+                if (isSelected) {
+                    Modifier
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color(0xFF8A531E),
+                                    Color(0xFF56300E),
+                                ),
+                            ),
+                        )
+                        .border(1.5.dp, BrassRivetGold, shape)
+                } else {
+                    Modifier
+                        .background(Color(0xFF24150A))
+                        .border(1.dp, Color(0x66B8860B), shape)
+                },
+            )
             .clickable(onClick = onClick)
             .testTag(testTag),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text.uppercase(),
-            color = if (isSelected) Color(0xFFFFF8DC) else Color(0xFFD4AF37),
+            color = if (isSelected) Color(0xFFFFFBE8) else Color(0xFFC0A67E),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = MaestroDisplayFont,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -284,25 +412,19 @@ private fun ShopItemRow(
             // Azione: Equipaggiato / Equipaggia / Sblocca
             when {
                 card.isEquipped -> {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF1E3A1E))
                             .border(1.dp, BrassRivetGold, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 8.dp, vertical = 6.dp)
+                            .padding(horizontal = 10.dp, vertical = 7.dp)
                             .testTag("shop_equipped_badge_${item.id}"),
-                        verticalAlignment = Alignment.CenterVertically,
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.badge_best),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(R.string.shop_action_equipped),
                             color = BrassRivetGold,
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                         )
                     }
