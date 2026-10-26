@@ -38,6 +38,8 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.crash.CrashReporter
 import it.maestro.ai.analysis.MoveGrade
+import it.maestro.app.audio.SoundEffect
+import it.maestro.app.audio.SoundManager
 import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
@@ -46,6 +48,7 @@ import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.MatchMissionStatsExtractor
 import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.data.local.wallet.TransactionReason
 import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
@@ -134,6 +137,7 @@ public class MainActivity : ComponentActivity() {
                 val masteryRepository: MasteryRepository = koinInject()
                 val retentionRepository: RetentionRepository = koinInject()
                 val walletRepository: WalletRepository = koinInject()
+                val soundManager: SoundManager = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
                 val today = remember { LocalDate.now() }
@@ -228,6 +232,20 @@ public class MainActivity : ComponentActivity() {
                             missionsState = missionsState,
                         ),
                         onDismissRequest = { showMissionsDialog = false },
+                        onClaimReward = { mission ->
+                            scope.launch {
+                                val claimed = retentionRepository.claimMissionReward(today, mission.type)
+                                if (claimed) {
+                                    walletRepository.addCredits(
+                                        amount = mission.type.rewardCredits,
+                                        reason = TransactionReason.DAILY_MISSION_REWARD,
+                                        referenceId = mission.id,
+                                        description = "Ricompensa missione: ${mission.id}",
+                                    )
+                                    soundManager.play(SoundEffect.CHECK_CORRECT)
+                                }
+                            }
+                        },
                     )
                 }
 
@@ -381,6 +399,7 @@ public class MainActivity : ComponentActivity() {
                                 matchLog = screen.matchLog,
                                 level = screen.level,
                                 humanSeat = screen.humanSeat,
+                                isFromHistory = true,
                             )
                         },
                     )

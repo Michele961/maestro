@@ -99,15 +99,19 @@ public fun PostMatchPreviewScreen(
 ) {
     var isAnalyzing by remember { mutableStateOf(true) }
     var analysisResult by remember { mutableStateOf<MatchAnalysis?>(null) }
+    var hasNotifiedAnalysis by remember(matchLog) { mutableStateOf(false) }
 
     LaunchedEffect(matchLog) {
-        isAnalyzing = true
-        val analysis = withContext(ioDispatcher) {
-            analyzer.analyze(matchLog)
+        if (!hasNotifiedAnalysis) {
+            isAnalyzing = true
+            val analysis = withContext(ioDispatcher) {
+                analyzer.analyze(matchLog)
+            }
+            analysisResult = analysis
+            isAnalyzing = false
+            hasNotifiedAnalysis = true
+            onMatchAnalyzed?.invoke(analysis)
         }
-        analysisResult = analysis
-        isAnalyzing = false
-        onMatchAnalyzed?.invoke(analysis)
     }
 
     // Punteggio finale dal replay della partita (ADR-0003)

@@ -84,7 +84,7 @@ class DailyMissionsViewModelTest {
     }
 
     @Test
-    fun completedMissions_areCreditedToWallet() = runTest(testDispatcher) {
+    fun completedMissions_canBeClaimedAndCreditedToWallet() = runTest(testDispatcher) {
         val repo = InMemoryRetentionRepository()
         val walletRepo = InMemoryWalletRepository()
         val viewModel = DailyMissionsViewModel(
@@ -100,6 +100,14 @@ class DailyMissionsViewModelTest {
         val initialMissions = repo.getDailyMissions(testDate)
         val firstMission = initialMissions.missions.first()
         repo.updateMissionProgress(testDate, firstMission.type, firstMission.target)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Prima del riscatto esplicito, il saldo è ancora 0
+        assertEquals(0, walletRepo.getBalance())
+
+        // Riscatta esplicitamente
+        val completedMission = repo.getDailyMissions(testDate).missions.first()
+        viewModel.claimReward(completedMission)
         testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(firstMission.type.rewardCredits, walletRepo.getBalance())
