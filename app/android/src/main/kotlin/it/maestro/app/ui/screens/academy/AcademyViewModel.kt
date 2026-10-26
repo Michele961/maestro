@@ -196,7 +196,7 @@ public class AcademyViewModel(
             viewModeState.value = currentLesson.copy(
                 isCardActionCompleted = true,
                 isAnswerCorrect = true,
-                feedbackRes = null,
+                feedbackRes = R.string.academy_action_correct_card,
                 dynamicMaestroMood = MaestroMood.APPLAUDING,
             )
         } else {

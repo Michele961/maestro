@@ -130,6 +130,9 @@ class DailyPuzzleScreenshotTest {
             maestroMood = MaestroMood.TRIUMPHANT,
             maestroMessageResId = R.string.puzzle_coach_solved,
             shareText = "Maestro Scopa #14 — Risolto al 1° tentativo!",
+            solvedTiers = setOf(0),
+            logicalConcept = it.maestro.app.data.local.DailyPuzzleProvider.getLogicalConcept(samplePuzzle),
+            goldenRule = it.maestro.app.data.local.DailyPuzzleProvider.getGoldenRule(samplePuzzle),
         )
 
         composeRule.setContent {

@@ -1,10 +1,12 @@
 package it.maestro.app.ui.screens.academy
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +32,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -518,6 +521,8 @@ public fun AcademyLessonContent(
             LessonCoachArea(
                 step = step,
                 mood = lesson.effectiveMaestroMood,
+                feedbackRes = lesson.feedbackRes,
+                isAnswerCorrect = lesson.isAnswerCorrect,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 14.dp, vertical = 4.dp),
@@ -670,8 +675,16 @@ private fun LessonHeader(
 private fun LessonCoachArea(
     step: AcademyStep,
     mood: it.maestro.app.ui.components.MaestroMood,
+    @StringRes feedbackRes: Int? = null,
+    isAnswerCorrect: Boolean? = null,
     modifier: Modifier = Modifier,
 ) {
+    val messageText = if (feedbackRes != null) {
+        stringResource(feedbackRes)
+    } else {
+        stringResource(step.maestroSpeechRes)
+    }
+
     WoodPanel(modifier = modifier.heightIn(min = 112.dp)) {
         Row(
             modifier = Modifier
@@ -699,7 +712,7 @@ private fun LessonCoachArea(
                 contentAlignment = Alignment.Center,
             ) {
                 MaestroSpeechBubble(
-                    message = stringResource(step.maestroSpeechRes),
+                    message = messageText,
                     tail = BubbleTail.START,
                     fontSize = 11.5.sp,
                     maxLines = 6,
@@ -993,6 +1006,35 @@ private fun LessonSummarySection(
                 fontFamily = MaestroDisplayFont,
                 textAlign = TextAlign.Center,
             )
+
+            // Il consiglio del Maestro
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFF2A170C),
+                border = BorderStroke(1.dp, BrassRivetGold.copy(alpha = 0.5f)),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.academy_advice_header),
+                        color = BrassRivetGold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                    Text(
+                        text = stringResource(step.maestroSpeechRes),
+                        color = Color(0xFFFFF8DC),
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 17.sp,
+                    )
+                }
+            }
 
             Box(
                 modifier = Modifier

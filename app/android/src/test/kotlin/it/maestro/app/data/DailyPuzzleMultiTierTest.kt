@@ -59,4 +59,19 @@ class DailyPuzzleMultiTierTest {
         val concept2 = DailyPuzzleProvider.getLogicalConcept(tier2)
         assertTrue(concept2.isNotBlank(), "Il concetto logico del puzzle tier 2 non deve essere vuoto")
     }
+
+    @Test
+    fun dailyPuzzle_goldenRule_returnsStrategicTakeaway() {
+        val tier0 = DailyPuzzleProvider.getDailyPuzzle(testDate, 0)
+        val rule0 = DailyPuzzleProvider.getGoldenRule(tier0)
+        assertTrue(rule0.isNotBlank(), "La regola d'oro del puzzle tier 0 non deve essere vuota")
+
+        val tier1 = DailyPuzzleProvider.getDailyPuzzle(testDate, 1)
+        val rule1 = DailyPuzzleProvider.getGoldenRule(tier1)
+        assertTrue(rule1.isNotBlank(), "La regola d'oro del puzzle tier 1 non deve essere vuota")
+
+        val tier2 = DailyPuzzleProvider.getDailyPuzzle(testDate, 2)
+        val rule2 = DailyPuzzleProvider.getGoldenRule(tier2)
+        assertTrue(rule2.isNotBlank(), "La regola d'oro del puzzle tier 2 non deve essere vuota")
+    }
 }

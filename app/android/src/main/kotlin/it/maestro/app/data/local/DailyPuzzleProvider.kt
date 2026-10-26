@@ -120,4 +120,38 @@ public object DailyPuzzleProvider {
                 "Ottimizzare il saldo delle prese massimizza il bottino di carte e impedisce all'avversario di realizzare combinazioni facili di Scopa."
         }
     }
+
+    /**
+     * Fornisce la regola d'oro e massima strategica del Maestro per il puzzle risolto.
+     */
+    public fun getGoldenRule(puzzle: TacticalPuzzle): String {
+        val first = puzzle.firstMove
+        val card = first.card
+        val capture = first.capture
+        val table = puzzle.initialView.table
+
+        val isSweep = table.isNotEmpty() && capture.containsAll(table) && table.containsAll(capture)
+        val settebello = Card(Rank.SETTE, Suit.DENARI)
+        val takesSettebello = capture.contains(settebello) || (card == settebello && capture.isNotEmpty())
+
+        return when {
+            isSweep || puzzle.goal == PuzzleGoal.MAKE_SWEEP ->
+                "Quando puoi ripulire il banco con una Scopa, fallo sempre: costringi l'avversario a calare a vuoto nel turno dopo."
+
+            takesSettebello ->
+                "Il Settebello non si regala e non si lascia a terra: è la carta più preziosa del mazzo e assegna un punto secco."
+
+            capture.any { it.rank == Rank.SETTE || it.rank == Rank.SEI } ->
+                "In Primiera un 7 o un 6 valgono più di due Figure: dai sempre la precedenza a 7 e 6 rispetto a Re e Cavalli."
+
+            capture.count { it.suit == Suit.DENARI } >= 2 ->
+                "Chi governa i Denari governa la partita: punta dritto alla soglia di 6 ori per blindare il punto di mazzo."
+
+            puzzle.goal == PuzzleGoal.WIN_MATCH ->
+                "All'ultima mano conta le prese prima dello stile: fai la giocata che ti assicura il traguardo matematico."
+
+            else ->
+                "Valuta sempre il saldo delle carte e nega all'avversario combinazioni facili di presa."
+        }
+    }
 }
