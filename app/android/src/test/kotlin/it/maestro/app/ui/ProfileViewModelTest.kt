@@ -4,6 +4,7 @@ import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
+import it.maestro.app.ui.screens.ProfileTab
 import it.maestro.app.ui.screens.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -100,5 +101,21 @@ class ProfileViewModelTest {
         assertEquals(customProfile, state.profile)
         assertEquals(R.string.mastery_rank_avanzato, state.rankTitleRes)
         assertEquals(R.string.profile_advice_board, state.maestroAdviceRes)
+    }
+
+    @Test
+    fun selectTab_updatesSelectedTab() = runTest(testDispatcher) {
+        val repository = InMemoryMasteryRepository()
+        val viewModel = ProfileViewModel(repository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val initialState = viewModel.uiState.first { !it.isLoading }
+        assertEquals(ProfileTab.MASTERY, initialState.selectedTab)
+
+        viewModel.selectTab(ProfileTab.HISTORY)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val historyState = viewModel.uiState.first { it.selectedTab == ProfileTab.HISTORY }
+        assertEquals(ProfileTab.HISTORY, historyState.selectedTab)
     }
 }

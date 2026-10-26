@@ -1,5 +1,6 @@
 package it.maestro.app.ui.dialogs
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -260,13 +261,17 @@ private fun MissionItemCard(
     mission: DailyMission,
     modifier: Modifier = Modifier,
 ) {
-    ParchmentPanel(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFF26150B),
+        border = BorderStroke(1.dp, if (mission.isCompleted) Color(0xFF4CAF50).copy(alpha = 0.6f) else ButtonGoldBorder.copy(alpha = 0.5f)),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(3.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -276,14 +281,14 @@ private fun MissionItemCard(
                 Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(mission.type.titleRes).uppercase(),
-                        color = WoodSurfaceDark,
+                        color = BrassRivetGold,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = MaestroDisplayFont,
                     )
                     Text(
                         text = stringResource(mission.type.descriptionRes),
-                        color = Color(0xFF4A3525),
+                        color = Color(0xFFE2D6C6),
                         fontSize = 11.sp,
                         lineHeight = 14.sp,
                     )
@@ -299,8 +304,9 @@ private fun MissionItemCard(
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(Color(0xFF8B5E34))
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                            .background(Color(0xFF3E2313))
+                            .border(1.dp, ButtonGoldBorder.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 7.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
@@ -311,8 +317,8 @@ private fun MissionItemCard(
                         )
                         Text(
                             text = stringResource(R.string.retention_missions_reward, mission.type.rewardCredits),
-                            color = Color(0xFFFFD54F),
-                            fontSize = 10.sp,
+                            color = BrassRivetGold,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -321,7 +327,7 @@ private fun MissionItemCard(
 
             // Barra di avanzamento
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -329,14 +335,14 @@ private fun MissionItemCard(
                     progress = { mission.progressFraction },
                     modifier = Modifier
                         .weight(1f)
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
                     color = if (mission.isCompleted) CompletedGreen else Color(0xFFD4AF37),
-                    trackColor = Color(0xFFD7CCC8),
+                    trackColor = Color(0xFF150A05),
                 )
                 Text(
                     text = "${mission.progress} / ${mission.target}",
-                    color = WoodSurfaceDark,
+                    color = if (mission.isCompleted) Color(0xFF81C784) else Color(0xFFC7B198),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                 )

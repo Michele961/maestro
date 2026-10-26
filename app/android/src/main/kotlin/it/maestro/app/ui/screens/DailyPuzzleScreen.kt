@@ -1,6 +1,7 @@
 package it.maestro.app.ui.screens
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
+import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.CardBackView
 import it.maestro.app.ui.components.CardView
@@ -78,6 +80,8 @@ public fun DailyPuzzleScreen(
         onPlayCard = { viewModel.playCard(it) },
         onRetry = { viewModel.retryAttempt() },
         onShare = { PuzzleShareFormatter.shareViaIntent(context, uiState.shareText) },
+        onSelectTier = { viewModel.selectTier(it) },
+        onNextTier = { viewModel.nextTier() },
         onNavigateHome = onNavigateHome,
     )
 }
@@ -92,6 +96,8 @@ public fun DailyPuzzleScreenContent(
     onPlayCard: (Card) -> Unit = {},
     onRetry: () -> Unit = {},
     onShare: () -> Unit = {},
+    onSelectTier: (Int) -> Unit = {},
+    onNextTier: () -> Unit = {},
     onNavigateHome: () -> Unit = {},
 ) {
     val puzzle = uiState.puzzle
@@ -108,6 +114,14 @@ public fun DailyPuzzleScreenContent(
             PuzzleHeader(
                 puzzleNumber = uiState.puzzleNumber,
                 onNavigateHome = onNavigateHome,
+            )
+
+            // Selettore livelli di difficoltà progressivi
+            PuzzleTierSelector(
+                tiers = uiState.availableTiers,
+                currentTierIndex = uiState.currentTierIndex,
+                solvedTiers = uiState.solvedTiers,
+                onSelectTier = onSelectTier,
             )
 
             // Area del Maestro con avatar e fumetto maieutico
@@ -209,6 +223,9 @@ public fun DailyPuzzleScreenContent(
                 is DailyPuzzleStatus.Solved -> {
                     SolvedCelebrationBanner(
                         attemptsCount = status.attemptsCount,
+                        logicalConcept = uiState.logicalConcept,
+                        hasNextTier = uiState.currentTierIndex + 1 < uiState.availableTiers.size,
+                        onNextTier = onNextTier,
                         onShare = onShare,
                         onNavigateHome = onNavigateHome,
                     )
@@ -384,19 +401,98 @@ private fun WrongAttemptBanner(
 }
 
 @Composable
+private fun PuzzleTierSelector(
+    tiers: List<DailyPuzzleTier>,
+    currentTierIndex: Int,
+    solvedTiers: Set<Int>,
+    onSelectTier: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 4.dp)
+            .testTag("puzzle_tier_selector"),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        tiers.forEach { tier ->
+            val isSelected = tier.index == currentTierIndex
+            val isSolved = solvedTiers.contains(tier.index)
+            val backgroundColor = when {
+                isSelected -> Color(0xFF3E2313)
+                isSolved -> Color(0xFF1E3A24)
+                else -> Color(0xFF221610)
+            }
+            val borderColor = when {
+                isSelected -> BrassRivetGold
+                isSolved -> Color(0xFF4CAF50)
+                else -> Color(0xFF4E3629)
+            }
+
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onSelectTier(tier.index) }
+                    .testTag("puzzle_tier_tab_${tier.index}"),
+                shape = RoundedCornerShape(8.dp),
+                color = backgroundColor,
+                border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, borderColor),
+            ) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        if (isSolved) {
+                            Text(
+                                text = "✓",
+                                color = Color(0xFF81C784),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                        Text(
+                            text = stringResource(tier.titleRes),
+                            color = if (isSelected) BrassRivetGold else Color.White.copy(alpha = 0.85f),
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            fontFamily = MaestroDisplayFont,
+                            maxLines = 1,
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.puzzle_tier_reward, tier.rewardCredits),
+                        color = BrassRivetGold.copy(alpha = 0.85f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SolvedCelebrationBanner(
     attemptsCount: Int,
+    logicalConcept: String,
+    hasNextTier: Boolean,
+    onNextTier: () -> Unit,
     onShare: () -> Unit,
     onNavigateHome: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
             .testTag("puzzle_solved_banner"),
         shape = RoundedCornerShape(14.dp),
         color = Color(0xFF1E3A24),
-        border = androidx.compose.foundation.BorderStroke(2.dp, BrassRivetGold),
+        border = BorderStroke(2.dp, BrassRivetGold),
         shadowElevation = 8.dp,
     ) {
         Column(
@@ -425,7 +521,51 @@ private fun SolvedCelebrationBanner(
                 fontFamily = MaestroDisplayFont,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+
+            if (logicalConcept.isNotBlank()) {
+                Surface(
+                    color = Color(0xFF122316),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, BrassRivetGold.copy(alpha = 0.4f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("puzzle_logical_concept_box"),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.puzzle_concept_label),
+                            color = BrassRivetGold,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                        )
+                        Text(
+                            text = logicalConcept,
+                            color = Color.White.copy(alpha = 0.95f),
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            if (hasNextTier) {
+                MaestroPillButton(
+                    text = stringResource(R.string.puzzle_button_next).uppercase(),
+                    onClick = onNextTier,
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 44.dp,
+                    fontSize = 13.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "puzzle_next_tier_button",
+                )
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -433,9 +573,9 @@ private fun SolvedCelebrationBanner(
                 MaestroPillButton(
                     text = stringResource(R.string.puzzle_button_share).uppercase(),
                     onClick = onShare,
-                    variant = PillButtonVariant.PRIMARY_GREEN,
-                    height = 46.dp,
-                    fontSize = 14.sp,
+                    variant = if (hasNextTier) PillButtonVariant.WOOD else PillButtonVariant.PRIMARY_GREEN,
+                    height = 42.dp,
+                    fontSize = 13.sp,
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),
                     testTag = "puzzle_share_button",
@@ -444,7 +584,7 @@ private fun SolvedCelebrationBanner(
                     text = stringResource(R.string.puzzle_button_home).uppercase(),
                     onClick = onNavigateHome,
                     variant = PillButtonVariant.SECONDARY_AMBER,
-                    height = 46.dp,
+                    height = 42.dp,
                     fontSize = 13.sp,
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),

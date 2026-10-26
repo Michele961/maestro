@@ -25,6 +25,7 @@ public data class DailyPuzzleRecord(
     val isSolvedToday: Boolean = false,
     val attemptsToday: Int = 0,
     val streak: Int = 0,
+    val solvedTiersToday: Set<Int> = emptySet(),
 )
 
 /**
@@ -37,6 +38,7 @@ public interface DailyPuzzleRepository {
         todayDate: String,
         attempts: Int,
         solved: Boolean,
+        tierIndex: Int = 0,
     )
 }
 
@@ -53,6 +55,7 @@ public class DataStoreDailyPuzzleRepository(
         val IS_SOLVED = booleanPreferencesKey("daily_puzzle_is_solved")
         val ATTEMPTS_COUNT = intPreferencesKey("daily_puzzle_attempts_count")
         val STREAK = intPreferencesKey("daily_puzzle_streak")
+        val SOLVED_TIERS = stringPreferencesKey("daily_puzzle_solved_tiers")
     }
 
     override fun observeDailyPuzzle(todayDate: String): Flow<DailyPuzzleRecord> =
@@ -69,6 +72,7 @@ public class DataStoreDailyPuzzleRepository(
         todayDate: String,
         attempts: Int,
         solved: Boolean,
+        tierIndex: Int,
     ) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.LAST_PLAYED_DATE] = todayDate
@@ -76,6 +80,18 @@ public class DataStoreDailyPuzzleRepository(
 
             if (solved) {
                 val previousCompleted = preferences[PreferencesKeys.LAST_COMPLETED_DATE].orEmpty()
+                val existingTiers = if (previousCompleted == todayDate) {
+                    preferences[PreferencesKeys.SOLVED_TIERS].orEmpty()
+                        .split(",")
+                        .filter { it.isNotBlank() }
+                        .mapNotNull { it.toIntOrNull() }
+                        .toSet()
+                } else {
+                    emptySet()
+                }
+                val newTiers = existingTiers + tierIndex
+                preferences[PreferencesKeys.SOLVED_TIERS] = newTiers.joinToString(",")
+
                 if (previousCompleted != todayDate) {
                     preferences[PreferencesKeys.LAST_COMPLETED_DATE] = todayDate
                     preferences[PreferencesKeys.IS_SOLVED] = true
@@ -97,12 +113,23 @@ public class DataStoreDailyPuzzleRepository(
             0
         }
         val streak = preferences[PreferencesKeys.STREAK] ?: 0
+        val storedTiers = if (lastCompleted == todayDate) {
+            preferences[PreferencesKeys.SOLVED_TIERS].orEmpty()
+                .split(",")
+                .filter { it.isNotBlank() }
+                .mapNotNull { it.toIntOrNull() }
+                .toSet()
+        } else {
+            emptySet()
+        }
+        val solvedTiersToday = if (isSolvedToday && storedTiers.isEmpty()) setOf(0) else storedTiers
 
         return DailyPuzzleRecord(
             lastCompletedDate = lastCompleted,
             isSolvedToday = isSolvedToday,
             attemptsToday = attempts,
             streak = streak,
+            solvedTiersToday = solvedTiersToday,
         )
     }
 }
@@ -126,15 +153,22 @@ public class InMemoryDailyPuzzleRepository(
         todayDate: String,
         attempts: Int,
         solved: Boolean,
+        tierIndex: Int,
     ) {
         val current = _recordFlow.value
         val isFirstSolveToday = solved && current.lastCompletedDate != todayDate
         val newStreak = if (isFirstSolveToday) current.streak + 1 else current.streak
+        val newTiers = if (solved) {
+            if (current.lastCompletedDate == todayDate) current.solvedTiersToday + tierIndex else setOf(tierIndex)
+        } else {
+            current.solvedTiersToday
+        }
         _recordFlow.value = current.copy(
             lastCompletedDate = if (solved) todayDate else current.lastCompletedDate,
             isSolvedToday = solved || current.isSolvedToday,
             attemptsToday = attempts,
             streak = newStreak,
+            solvedTiersToday = newTiers,
         )
     }
 }
