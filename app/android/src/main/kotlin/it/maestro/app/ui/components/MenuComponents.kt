@@ -277,8 +277,11 @@ public fun WoodRowTile(
     title: String,
     modifier: Modifier = Modifier,
     iconSize: Dp = 40.dp,
+    onClick: (() -> Unit)? = null,
 ) {
-    WoodPanel(modifier = modifier) {
+    WoodPanel(
+        modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+    ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
