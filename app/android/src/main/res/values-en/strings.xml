@@ -545,6 +545,20 @@
     <string name="puzzle_goal_win_desc">Goal: decisive hand for victory! Find the play that seals the win.</string>
     <string name="puzzle_goal_points_desc">Goal: maximize hand points! Target crucial cards among Sevens, Coins, and Primiera.</string>
 
+    <!-- Socratic Coaching Style Daily Puzzle -->
+    <string name="puzzle_coach_initial_sweep">Look at the board and your hand: there is a combination to make a Sweep and clear the table. Which card do you play?</string>
+    <string name="puzzle_coach_initial_points">Target the most valuable points between Sevens and Coins. Which capture gives you the greatest advantage?</string>
+    <string name="puzzle_coach_initial_win">We are at the deciding hand for the match! Calculate the captures carefully and seal the win: what do you play?</string>
+    <string name="puzzle_coach_hint_sweep_lvl1">Hint: Calculate the sum of the cards on the board. Do you hold a card matching that exact sum?</string>
+    <string name="puzzle_coach_hint_points_lvl1">Hint: Look at the Coins and Sevens on the table. Which of your cards captures the most valuable point?</string>
+    <string name="puzzle_coach_hint_win_lvl1">Hint: Count the points needed to win. There is a capture that mathematically guarantees the finish line.</string>
+    <string name="puzzle_golden_rule_header">Maestro\'s Golden Rule</string>
+    <string name="puzzle_explanation_header">The Maestro\'s Advice</string>
+
+    <!-- Socratic Coaching Style Academy -->
+    <string name="academy_advice_header">The Maestro\'s Advice</string>
+    <string name="academy_action_correct_card">Brilliant! Masterful capture executed with the correct card: you applied the principle to perfection!</string>
+
     <!-- Chess.com Style Game Review -->
     <string name="review_find_better_prompt">Can you find the better move?</string>
     <string name="review_show_solution_button">Reveal solution</string>

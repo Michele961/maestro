@@ -108,7 +108,7 @@ public fun DailyPuzzleScreenContent(
     val initialView = puzzle?.initialView
     val isSolved = uiState.status is DailyPuzzleStatus.Solved
 
-    ClubBackground(modifier = modifier.testTag("daily_puzzle_screen"), feltFraction = 0.5f) {
+    ClubBackground(modifier = modifier.testTag("daily_puzzle_screen"), feltFraction = 0.72f) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,69 +145,82 @@ public fun DailyPuzzleScreenContent(
                     .padding(horizontal = 14.dp, vertical = 4.dp),
             )
 
-            // Tavolo da gioco: carte dell'avversario coperte e carte a terra
-            Box(
+            // Tavolo da gioco: carte dell'avversario coperte e carte a terra su panno verde
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 14.dp),
-                contentAlignment = Alignment.Center,
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = Color(0xFF13361E),
+                border = BorderStroke(2.dp, Color(0xFF5D4037)),
+                shadowElevation = 4.dp,
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    // Carte coperte dell'avversario
-                    val opponentCardsCount = initialView?.opponentHandSize ?: 3
-                    Row(
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(R.drawable.table_felt_bg),
+                        contentDescription = null,
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .testTag("opponent_hand_area"),
-                        horizontalArrangement = Arrangement.Center,
+                            .fillMaxSize()
+                            .padding(vertical = 8.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        repeat(opponentCardsCount) {
-                            CardBackView(
-                                width = 56.dp,
-                                height = 84.dp,
-                                modifier = Modifier.padding(horizontal = 4.dp),
-                            )
-                        }
-                    }
-
-                    // Carte scoperte sul tavolo
-                    val tableCards = initialView?.table.orEmpty()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                            .testTag("puzzle_table_cards"),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        if (tableCards.isEmpty()) {
-                            Text(
-                                text = stringResource(R.string.puzzle_table_empty),
-                                color = BrassRivetGold.copy(alpha = 0.6f),
-                                fontFamily = MaestroDisplayFont,
-                                fontSize = 14.sp,
-                            )
-                        } else {
-                            tableCards.forEach { card ->
-                                CardView(
-                                    card = card,
-                                    width = 68.dp,
-                                    height = 102.dp,
-                                    isPlayable = false,
-                                    modifier = Modifier
-                                        .padding(horizontal = 4.dp)
-                                        .testTag("puzzle_table_card_${card.rank.name}_${card.suit.name}"),
+                        // Carte coperte dell'avversario
+                        val opponentCardsCount = initialView?.opponentHandSize ?: 3
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 6.dp)
+                                .testTag("opponent_hand_area"),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            repeat(opponentCardsCount) {
+                                CardBackView(
+                                    width = 54.dp,
+                                    height = 80.dp,
+                                    modifier = Modifier.padding(horizontal = 4.dp),
                                 )
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        // Carte scoperte sul tavolo
+                        val tableCards = initialView?.table.orEmpty()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .testTag("puzzle_table_cards"),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            if (tableCards.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.puzzle_table_empty),
+                                    color = BrassRivetGold.copy(alpha = 0.6f),
+                                    fontFamily = MaestroDisplayFont,
+                                    fontSize = 14.sp,
+                                )
+                            } else {
+                                tableCards.forEach { card ->
+                                    CardView(
+                                        card = card,
+                                        width = 66.dp,
+                                        height = 98.dp,
+                                        isPlayable = false,
+                                        modifier = Modifier
+                                            .padding(horizontal = 4.dp)
+                                            .testTag("puzzle_table_card_${card.rank.name}_${card.suit.name}"),
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                 }
             }
 
@@ -237,6 +250,7 @@ public fun DailyPuzzleScreenContent(
                     SolvedCelebrationBanner(
                         attemptsCount = status.attemptsCount,
                         logicalConcept = uiState.logicalConcept,
+                        goldenRule = uiState.goldenRule,
                         hasNextTier = uiState.currentTierIndex + 1 < uiState.availableTiers.size,
                         onNextTier = onNextTier,
                         onReplay = onReplay,
@@ -337,11 +351,11 @@ private fun PuzzleCoachArea(
 ) {
     val isSolved = uiState.status is DailyPuzzleStatus.Solved
 
-    WoodPanel(modifier = modifier.heightIn(min = 106.dp)) {
+    WoodPanel(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -360,7 +374,7 @@ private fun PuzzleCoachArea(
             )
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 MaestroSpeechBubble(
                     message = stringResource(uiState.maestroMessageResId),
@@ -378,9 +392,9 @@ private fun PuzzleCoachArea(
                             text = stringResource(R.string.puzzle_button_hint).uppercase(),
                             onClick = onRequestHint,
                             variant = PillButtonVariant.WOOD,
-                            height = 24.dp,
-                            fontSize = 10.sp,
-                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            height = 26.dp,
+                            fontSize = 11.sp,
+                            contentPadding = PaddingValues(horizontal = 10.dp),
                             testTag = "puzzle_coach_hint_button",
                         )
                     }
@@ -480,15 +494,18 @@ private fun PuzzleTierSelector(
             val isSelected = tier.index == currentTierIndex
             val isSolved = solvedTiers.contains(tier.index)
             val backgroundColor = when {
-                isSelected -> Color(0xFF3E2313)
+                isSolved && isSelected -> Color(0xFF264A2E)
                 isSolved -> Color(0xFF1E3A24)
+                isSelected -> Color(0xFF3E2313)
                 else -> Color(0xFF221610)
             }
             val borderColor = when {
+                isSolved && isSelected -> BrassRivetGold
                 isSelected -> BrassRivetGold
                 isSolved -> Color(0xFF4CAF50)
                 else -> Color(0xFF4E3629)
             }
+            val borderWidth = if (isSelected) 2.dp else 1.dp
 
             Surface(
                 modifier = Modifier
@@ -497,7 +514,7 @@ private fun PuzzleTierSelector(
                     .testTag("puzzle_tier_tab_${tier.index}"),
                 shape = RoundedCornerShape(8.dp),
                 color = backgroundColor,
-                border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, borderColor),
+                border = BorderStroke(borderWidth, borderColor),
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
@@ -541,6 +558,7 @@ private fun PuzzleTierSelector(
 private fun SolvedCelebrationBanner(
     attemptsCount: Int,
     logicalConcept: String,
+    goldenRule: String = "",
     hasNextTier: Boolean,
     onNextTier: () -> Unit,
     onReplay: () -> Unit,
@@ -588,7 +606,7 @@ private fun SolvedCelebrationBanner(
                 Surface(
                     color = Color(0xFF122316),
                     shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.dp, BrassRivetGold.copy(alpha = 0.4f)),
+                    border = BorderStroke(1.dp, BrassRivetGold.copy(alpha = 0.5f)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("puzzle_logical_concept_box"),
@@ -598,7 +616,7 @@ private fun SolvedCelebrationBanner(
                         verticalArrangement = Arrangement.spacedBy(3.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.puzzle_concept_label),
+                            text = stringResource(R.string.puzzle_explanation_header),
                             color = BrassRivetGold,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -609,6 +627,38 @@ private fun SolvedCelebrationBanner(
                             color = Color.White.copy(alpha = 0.95f),
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
+                            modifier = Modifier.testTag("puzzle_logical_concept"),
+                        )
+                    }
+                }
+            }
+
+            if (goldenRule.isNotBlank()) {
+                Surface(
+                    color = Color(0xFF2A170C),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, Color(0xFFD4AF37)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("puzzle_golden_rule_box"),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.puzzle_golden_rule_header),
+                            color = Color(0xFFD4AF37),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                        )
+                        Text(
+                            text = goldenRule,
+                            color = Color(0xFFFFF8DC),
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            modifier = Modifier.testTag("puzzle_golden_rule"),
                         )
                     }
                 }

@@ -545,6 +545,20 @@
     <string name="puzzle_goal_win_desc">Obiettivo: mano decisiva per la vittoria! Trova la giocata che assicura il punto decisivo per vincere la partita.</string>
     <string name="puzzle_goal_points_desc">Obiettivo: massimizza i punti di smazzata! Punta alle carte decisive tra Sette, Denari e Primiera.</string>
 
+    <!-- Stile Comunicativo Socratico Sfida del Giorno -->
+    <string name="puzzle_coach_initial_sweep">Osserva il tavolo e la tua mano: c\'è una combinazione per fare Scopa e azzerare il banco. Quale carta giochi?</string>
+    <string name="puzzle_coach_initial_points">Punta ai punti più pesanti della smazzata tra Sette e Denari. Quale presa ti assicura il bottino più ricco?</string>
+    <string name="puzzle_coach_initial_win">Siamo alla stretta finale per la vittoria! Calcola bene le prese e chiudi la partita a tuo favore: cosa cali?</string>
+    <string name="puzzle_coach_hint_sweep_lvl1">Indizio: Calcola la somma delle carte sul banco. Hai in mano una carta che corrisponde esattamente a quella somma?</string>
+    <string name="puzzle_coach_hint_points_lvl1">Indizio: Guarda i Denari e i Sette sul tavolo. Quale delle tue carte ti permette di catturarli?</string>
+    <string name="puzzle_coach_hint_win_lvl1">Indizio: Conta i punti che ti separano dalla vittoria. C\'è una presa che ti garantisce il traguardo.</string>
+    <string name="puzzle_golden_rule_header">Regola d\'oro del Maestro</string>
+    <string name="puzzle_explanation_header">Il consiglio del Maestro</string>
+
+    <!-- Stile Comunicativo Socratico Accademia -->
+    <string name="academy_advice_header">Il consiglio del Maestro</string>
+    <string name="academy_action_correct_card">Bravissimo! Presa magistrale eseguita con la carta corretta: hai applicato il principio alla perfezione!</string>
+
     <!-- Chess.com Style Game Review -->
     <string name="review_find_better_prompt">Riesci a trovare la mossa migliore?</string>
     <string name="review_show_solution_button">Svela soluzione</string>
