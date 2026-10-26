@@ -26,6 +26,9 @@ import it.maestro.app.audio.SoundManager
 import it.maestro.app.audio.NoOpSoundManager
 import it.maestro.app.game.GameViewModel
 import it.maestro.app.ui.screens.TableScreen
+import it.maestro.game.training.TrainingFundamental
+import it.maestro.game.training.TrainingOption
+import it.maestro.game.training.TrainingQuestion
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.junit.Rule
@@ -234,5 +237,46 @@ class TableScreenScreenshotTest {
             org.koin.core.context.stopKoin()
             testDb.close()
         }
+    }
+
+    @Test
+    fun training_question_waits_for_move_animation_and_shows_opponent_move() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SEVENS_COUNT,
+            options = listOf(0, 1, 2, 3).map { count -> TrainingOption.IntCount(count) },
+            correctIndex = 1,
+        )
+        val opponentMove = OpponentMoveSummary(
+            card = Card(Rank.SETTE, Suit.DENARI),
+            capture = setOf(Card(Rank.SETTE, Suit.SPADE)),
+            isSweep = false,
+        )
+        val state = midDeal.copy(
+            lastMoveId = 10L,
+            lastMove = it.maestro.game.scopa.ScopaMove(Card(Rank.SETTE, Suit.DENARI), setOf(Card(Rank.SETTE, Suit.SPADE))),
+            lastMover = Seat.P2,
+            opponentLastMove = opponentMove,
+            activeTrainingQuestion = question,
+        )
+
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(
+                    uiState = state,
+                    onIntent = {},
+                )
+            }
+        }
+
+        // All'inizio dell'animazione della mossa, la domanda non deve ancora coprire il tavolo
+        composeRule.onNodeWithTag("training_question_dialog").assertDoesNotExist()
+
+        // Avanziamo l'orologio oltre l'animazione della mossa e il tempo di respiro (800ms)
+        composeRule.mainClock.advanceTimeBy(3500L)
+        composeRule.waitForIdle()
+
+        // Ora il dialogo della domanda deve essere visibile e contenere il testo
+        composeRule.onNodeWithTag("training_question_dialog").assertExists()
+        composeRule.onNodeWithTag("training_question_text").assertExists()
     }
 }
