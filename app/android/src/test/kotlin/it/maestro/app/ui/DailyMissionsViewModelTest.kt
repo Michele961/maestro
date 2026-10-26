@@ -2,6 +2,8 @@ package it.maestro.app.ui
 
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.data.local.wallet.InMemoryWalletRepository
+import it.maestro.app.data.local.wallet.TransactionReason
 import it.maestro.app.ui.screens.DailyMissionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -79,5 +81,28 @@ class DailyMissionsViewModelTest {
         val streakAfter = repo.getStreak(testDate)
         assertEquals(5, streakAfter.currentStreak)
         assertEquals(5, streakAfter.bestStreak)
+    }
+
+    @Test
+    fun completedMissions_areCreditedToWallet() = runTest(testDispatcher) {
+        val repo = InMemoryRetentionRepository()
+        val walletRepo = InMemoryWalletRepository()
+        val viewModel = DailyMissionsViewModel(
+            retentionRepository = repo,
+            walletRepository = walletRepo,
+            dateProvider = { testDate },
+        )
+
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(0, walletRepo.getBalance())
+
+        // Avanza una missione a compimento
+        val initialMissions = repo.getDailyMissions(testDate)
+        val firstMission = initialMissions.missions.first()
+        repo.updateMissionProgress(testDate, firstMission.type, firstMission.target)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(firstMission.type.rewardCredits, walletRepo.getBalance())
+        org.junit.Assert.assertTrue(walletRepo.hasClaimed(TransactionReason.DAILY_MISSION_REWARD, firstMission.id))
     }
 }

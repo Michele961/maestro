@@ -4,6 +4,8 @@ import it.maestro.app.data.local.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
 import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
+import it.maestro.app.data.local.wallet.InMemoryWalletRepository
+import it.maestro.app.data.local.wallet.TransactionReason
 import it.maestro.app.ui.screens.academy.AcademyViewMode
 import it.maestro.app.ui.screens.academy.AcademyViewModel
 import it.maestro.game.model.Card
@@ -185,5 +187,31 @@ class AcademyViewModelTest {
         lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
         assertTrue(lesson.isCardActionCompleted)
         assertTrue(lesson.isStepCompleted)
+    }
+
+    @Test
+    fun completingLessonAwardsCreditsToWallet() = runTest {
+        val repo = InMemoryAcademyRepository()
+        val walletRepo = InMemoryWalletRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            walletRepository = walletRepo,
+            availableChapters = AcademyContent.CHAPTERS,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+        advanceUntilIdle()
+        viewModel.openLesson(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA)
+        advanceUntilIdle()
+
+        viewModel.selectOption("c1_l1_opt1")
+        advanceUntilIdle()
+        viewModel.nextStep() // To Step 2 (summary step)
+        advanceUntilIdle()
+        viewModel.nextStep() // Complete lesson
+        advanceUntilIdle()
+
+        assertEquals(5, walletRepo.getBalance(), "Completare una lezione dell'Accademia deve accreditare 5 crediti")
+        assertTrue(walletRepo.hasClaimed(TransactionReason.ACADEMY_LESSON_REWARD, AcademyLessonId.LESSON_1_1_PRESA_SINGOLA.name))
     }
 }

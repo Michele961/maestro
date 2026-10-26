@@ -82,4 +82,11 @@ class HomeScreenScreenshotTest {
         composeRule.onNodeWithTag("home_settings_button").performClick()
         assertEquals(1, opened)
     }
+
+    @Test
+    fun home_screen_displays_dynamic_credits() {
+        composeRule.setContent { MaestroTheme { HomeScreen(credits = 125) } }
+        composeRule.onNodeWithTag("home_credits_pill").assertExists()
+        composeRule.onNodeWithText("125").assertExists()
+    }
 }

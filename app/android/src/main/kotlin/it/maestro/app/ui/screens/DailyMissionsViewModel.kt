@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.data.local.wallet.WalletRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -26,11 +28,29 @@ public data class DailyMissionsUiState(
  */
 public class DailyMissionsViewModel(
     private val retentionRepository: RetentionRepository,
+    private val walletRepository: WalletRepository? = null,
     private val dateProvider: () -> LocalDate = { LocalDate.now() },
 ) : ViewModel() {
 
     private val today: LocalDate
         get() = dateProvider()
+
+    init {
+        viewModelScope.launch {
+            retentionRepository.observeDailyMissions(today).collect { state ->
+                for (mission in state.missions) {
+                    if (mission.isCompleted && walletRepository?.hasClaimed(TransactionReason.DAILY_MISSION_REWARD, mission.id) == false) {
+                        walletRepository.addCredits(
+                            amount = mission.type.rewardCredits,
+                            reason = TransactionReason.DAILY_MISSION_REWARD,
+                            referenceId = mission.id,
+                            description = "Missione completata: ${mission.id}",
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     public val uiState: StateFlow<DailyMissionsUiState> = combine(
         retentionRepository.observeStreak(today),

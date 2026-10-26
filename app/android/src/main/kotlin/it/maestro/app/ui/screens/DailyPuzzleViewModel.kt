@@ -9,6 +9,8 @@ import it.maestro.app.data.local.DailyPuzzleProvider
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.missions.DailyMissionType
+import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.ui.components.MaestroMood
 import it.maestro.game.model.Card
 import it.maestro.game.scopa.ScopaView
@@ -49,6 +51,7 @@ public data class DailyPuzzleUiState(
 public class DailyPuzzleViewModel(
     private val repository: DailyPuzzleRepository,
     private val retentionRepository: RetentionRepository? = null,
+    private val walletRepository: WalletRepository? = null,
     private val customDate: LocalDate? = null,
     private val customPuzzle: TacticalPuzzle? = null,
 ) : ViewModel() {
@@ -144,6 +147,12 @@ public class DailyPuzzleViewModel(
                     retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
                     retention.recordGameActivity(effectiveDate)
                 }
+                walletRepository?.addCredits(
+                    amount = 15,
+                    reason = TransactionReason.DAILY_PUZZLE_REWARD,
+                    referenceId = dateString,
+                    description = "Sfida del Giorno completata",
+                )
             }
         } else {
             val hintLevel = if (newAttempts == 1) 1 else 2

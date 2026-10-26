@@ -76,6 +76,7 @@ public fun HomeScreen(
     modifier: Modifier = Modifier,
     hasActiveMatch: Boolean = false,
     streakCount: Int = 0,
+    credits: Int = 50,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
@@ -98,6 +99,7 @@ public fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HomeHeader(
+                    credits = credits,
                     onSettingsClicked = onSettingsClicked,
                     onProfileClicked = onProfileClicked,
                 )
@@ -226,6 +228,7 @@ public fun HomeScreen(
 
 @Composable
 private fun HomeHeader(
+    credits: Int,
     onSettingsClicked: () -> Unit,
     onProfileClicked: () -> Unit = {},
 ) {
@@ -254,8 +257,16 @@ private fun HomeHeader(
                 fontFamily = MaestroDisplayFont,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CurrencyPill(icon = R.drawable.icon_coin, value = stringResource(R.string.home_coins_placeholder))
-                CurrencyPill(icon = R.drawable.icon_gem, value = stringResource(R.string.home_gems_placeholder))
+                CurrencyPill(
+                    icon = R.drawable.icon_coin,
+                    value = credits.toString(),
+                    modifier = Modifier.testTag("home_credits_pill"),
+                )
+                CurrencyPill(
+                    icon = R.drawable.icon_gem,
+                    value = stringResource(R.string.home_gems_placeholder),
+                    modifier = Modifier.testTag("home_gems_pill"),
+                )
             }
         }
         WoodIconButton(
