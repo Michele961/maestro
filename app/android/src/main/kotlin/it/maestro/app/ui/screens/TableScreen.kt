@@ -9,8 +9,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import it.maestro.app.ui.components.LocalCardBackTheme
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
@@ -144,6 +148,8 @@ public fun TableScreen(
     seed: Long = 42L,
     restoreState: ScopaState? = null,
     restoreLog: MatchLog? = null,
+    tableThemeId: String = "felt_classic_green",
+    cardBackThemeId: String = "back_classic_trevigiano",
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     onNavigateHome: () -> Unit = {},
@@ -177,6 +183,8 @@ public fun TableScreen(
         onIntent = viewModel::onIntent,
         modifier = modifier,
         soundManager = soundManager,
+        tableThemeId = tableThemeId,
+        cardBackThemeId = cardBackThemeId,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -203,6 +211,8 @@ public fun TableContent(
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
     soundManager: SoundManager = NoOpSoundManager(),
+    tableThemeId: String = "felt_classic_green",
+    cardBackThemeId: String = "back_classic_trevigiano",
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
@@ -247,57 +257,97 @@ public fun TableContent(
     }
 
     val context = LocalContext.current
-    val tableFeltResId = remember {
-        val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
-        if (id != 0) id else null
+    val tableFeltResId = remember(tableThemeId) {
+        if (tableThemeId == "felt_walnut_wood") {
+            R.drawable.texture_wood
+        } else {
+            val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
+            if (id != 0) id else null
+        }
     }
 
-    val feltBrush = remember {
-        Brush.radialGradient(
-            colors = listOf(
-                Color(0xFF225740),
-                Color(0xFF1B4332),
-                Color(0xFF0D281E),
-                Color(0xFF081C15),
-            ),
-        )
+    val feltTint = remember(tableThemeId) {
+        when (tableThemeId) {
+            "felt_royal_red" -> Color(0xFFE57373)
+            "felt_noble_blue" -> Color(0xFF64B5F6)
+            else -> null
+        }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(feltBrush)
-            .testTag("table_screen"),
-    ) {
-        // Cornice in legno attorno al panno, come in reference_table_screen.jpg (F1-21)
-        Image(
-            painter = painterResource(R.drawable.texture_wood),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Column(modifier = Modifier.fillMaxSize()) {
-            TableTopBar(uiState = uiState, onPause = { showPause = true })
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
-            ) {
-                if (tableFeltResId != null) {
-                    Image(
-                        painter = painterResource(id = tableFeltResId),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                } else {
-                    Box(modifier = Modifier.fillMaxSize().background(feltBrush))
-                }
-                FeltLayout(
+    val feltBrush = remember(tableThemeId) {
+        when (tableThemeId) {
+            "felt_royal_red" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF8B1E2B),
+                    Color(0xFF5E121C),
+                    Color(0xFF38080F),
+                    Color(0xFF1E0307),
+                ),
+            )
+            "felt_noble_blue" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF1F487E),
+                    Color(0xFF14325C),
+                    Color(0xFF0C1F3B),
+                    Color(0xFF06101F),
+                ),
+            )
+            "felt_walnut_wood" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF4A2810),
+                    Color(0xFF331808),
+                    Color(0xFF220E04),
+                    Color(0xFF120702),
+                ),
+            )
+            else -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF225740),
+                    Color(0xFF1B4332),
+                    Color(0xFF0D281E),
+                    Color(0xFF081C15),
+                ),
+            )
+        }
+    }
+
+    CompositionLocalProvider(LocalCardBackTheme provides cardBackThemeId) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(feltBrush)
+                .testTag("table_screen"),
+        ) {
+            // Cornice in legno attorno al panno, come in reference_table_screen.jpg (F1-21)
+            Image(
+                painter = painterResource(R.drawable.texture_wood),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Column(modifier = Modifier.fillMaxSize()) {
+                TableTopBar(uiState = uiState, onPause = { showPause = true })
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
+                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
+                ) {
+                    if (tableFeltResId != null) {
+                        Image(
+                            painter = painterResource(id = tableFeltResId),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            colorFilter = feltTint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize().background(feltBrush))
+                    }
+                    FeltLayout(
                     uiState = uiState,
                     soundManager = soundManager,
                     onCardClicked = { card ->
@@ -366,6 +416,7 @@ public fun TableContent(
             )
         }
 
+    }
     }
 }
 

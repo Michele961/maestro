@@ -57,6 +57,8 @@ import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
 import it.maestro.app.ui.screens.ProfileScreen
+import it.maestro.app.ui.screens.ShopScreen
+import it.maestro.app.ui.screens.ShopViewModel
 import it.maestro.app.ui.screens.TableScreen
 import it.maestro.app.ui.screens.academy.AcademyScreen
 import it.maestro.app.ui.theme.MaestroTheme
@@ -99,6 +101,7 @@ public sealed interface Screen {
     public data object DailyPuzzle : Screen
     public data object Profile : Screen
     public data object Academy : Screen
+    public data object Shop : Screen
 }
 
 /**
@@ -246,8 +249,10 @@ public class MainActivity : ComponentActivity() {
                         onProfileClicked = { currentScreen = Screen.Profile },
                         onMissionsClicked = { showMissionsDialog = true },
                         onAcademyClicked = { currentScreen = Screen.Academy },
+                        onShopClicked = { currentScreen = Screen.Shop },
                         streakCount = streakState.currentStreak,
                         credits = credits,
+                        avatarId = settings.selectedAvatar,
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
@@ -266,6 +271,8 @@ public class MainActivity : ComponentActivity() {
                         seed = screen.seed,
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
+                        tableThemeId = settings.selectedTableTheme,
+                        cardBackThemeId = settings.selectedCardBackTheme,
                         onNavigateHome = { currentScreen = Screen.Home },
                         onViewAnalysis = { log, training ->
                             currentScreen = Screen.PostMatchPreview(
@@ -351,6 +358,9 @@ public class MainActivity : ComponentActivity() {
                         onBackClicked = { currentScreen = Screen.Home },
                     )
                     Screen.Academy -> AcademyScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
+                    )
+                    Screen.Shop -> ShopScreen(
                         onNavigateHome = { currentScreen = Screen.Home },
                     )
                 }

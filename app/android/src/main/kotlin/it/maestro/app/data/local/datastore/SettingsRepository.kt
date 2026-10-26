@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.data.local.cosmetics.CosmeticCatalog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,10 @@ public data class AppSettings(
     val soundEnabled: Boolean = true,
     val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     val preferredTargetScore: Int = 11,
+    val selectedTableTheme: String = "felt_classic_green",
+    val selectedCardBackTheme: String = "back_classic_trevigiano",
+    val selectedAvatar: String = "avatar_default",
+    val unlockedCosmetics: Set<String> = CosmeticCatalog.DEFAULT_UNLOCKED_IDS,
 )
 
 /**
@@ -31,6 +37,10 @@ public interface SettingsRepository {
     public suspend fun updateSoundEnabled(enabled: Boolean)
     public suspend fun updatePreferredLevel(level: DifficultyLevel)
     public suspend fun updatePreferredTargetScore(targetScore: Int)
+    public suspend fun updateSelectedTableTheme(tableThemeId: String)
+    public suspend fun updateSelectedCardBackTheme(cardBackThemeId: String)
+    public suspend fun updateSelectedAvatar(avatarId: String)
+    public suspend fun unlockCosmetic(cosmeticId: String)
 }
 
 /**
@@ -45,6 +55,10 @@ public class DataStoreSettingsRepository(
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
         val PREFERRED_LEVEL = stringPreferencesKey("preferred_level")
         val PREFERRED_TARGET_SCORE = intPreferencesKey("preferred_target_score")
+        val SELECTED_TABLE_THEME = stringPreferencesKey("selected_table_theme")
+        val SELECTED_CARD_BACK_THEME = stringPreferencesKey("selected_card_back_theme")
+        val SELECTED_AVATAR = stringPreferencesKey("selected_avatar")
+        val UNLOCKED_COSMETICS = stringSetPreferencesKey("unlocked_cosmetics")
     }
 
     override val settingsFlow: Flow<AppSettings> = dataStore.data.map { preferences ->
@@ -57,12 +71,20 @@ public class DataStoreSettingsRepository(
             DifficultyLevel.INTERMEDIO
         }
         val targetScore = preferences[PreferencesKeys.PREFERRED_TARGET_SCORE] ?: 11
+        val tableTheme = preferences[PreferencesKeys.SELECTED_TABLE_THEME] ?: "felt_classic_green"
+        val cardBackTheme = preferences[PreferencesKeys.SELECTED_CARD_BACK_THEME] ?: "back_classic_trevigiano"
+        val avatar = preferences[PreferencesKeys.SELECTED_AVATAR] ?: "avatar_default"
+        val unlocked = preferences[PreferencesKeys.UNLOCKED_COSMETICS] ?: CosmeticCatalog.DEFAULT_UNLOCKED_IDS
 
         AppSettings(
             language = lang,
             soundEnabled = sound,
             preferredLevel = level,
             preferredTargetScore = targetScore,
+            selectedTableTheme = tableTheme,
+            selectedCardBackTheme = cardBackTheme,
+            selectedAvatar = avatar,
+            unlockedCosmetics = unlocked + CosmeticCatalog.DEFAULT_UNLOCKED_IDS,
         )
     }
 
@@ -87,6 +109,31 @@ public class DataStoreSettingsRepository(
     override suspend fun updatePreferredTargetScore(targetScore: Int) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.PREFERRED_TARGET_SCORE] = targetScore
+        }
+    }
+
+    override suspend fun updateSelectedTableTheme(tableThemeId: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SELECTED_TABLE_THEME] = tableThemeId
+        }
+    }
+
+    override suspend fun updateSelectedCardBackTheme(cardBackThemeId: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SELECTED_CARD_BACK_THEME] = cardBackThemeId
+        }
+    }
+
+    override suspend fun updateSelectedAvatar(avatarId: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SELECTED_AVATAR] = avatarId
+        }
+    }
+
+    override suspend fun unlockCosmetic(cosmeticId: String) {
+        dataStore.edit { preferences ->
+            val current = preferences[PreferencesKeys.UNLOCKED_COSMETICS] ?: CosmeticCatalog.DEFAULT_UNLOCKED_IDS
+            preferences[PreferencesKeys.UNLOCKED_COSMETICS] = current + cosmeticId
         }
     }
 }
@@ -114,5 +161,21 @@ public class InMemorySettingsRepository(
 
     override suspend fun updatePreferredTargetScore(targetScore: Int) {
         _state.value = _state.value.copy(preferredTargetScore = targetScore)
+    }
+
+    override suspend fun updateSelectedTableTheme(tableThemeId: String) {
+        _state.value = _state.value.copy(selectedTableTheme = tableThemeId)
+    }
+
+    override suspend fun updateSelectedCardBackTheme(cardBackThemeId: String) {
+        _state.value = _state.value.copy(selectedCardBackTheme = cardBackThemeId)
+    }
+
+    override suspend fun updateSelectedAvatar(avatarId: String) {
+        _state.value = _state.value.copy(selectedAvatar = avatarId)
+    }
+
+    override suspend fun unlockCosmetic(cosmeticId: String) {
+        _state.value = _state.value.copy(unlockedCosmetics = _state.value.unlockedCosmetics + cosmeticId)
     }
 }

@@ -27,6 +27,7 @@ import it.maestro.app.ui.screens.DailyMissionsViewModel
 import it.maestro.app.ui.screens.DailyPuzzleViewModel
 import it.maestro.app.ui.screens.GameReviewViewModel
 import it.maestro.app.ui.screens.ProfileViewModel
+import it.maestro.app.ui.screens.ShopViewModel
 import it.maestro.app.ui.screens.academy.AcademyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,6 +132,13 @@ public val appModule: Module = module {
     viewModel {
         AcademyViewModel(
             academyRepository = get(),
+            walletRepository = get(),
+        )
+    }
+
+    viewModel {
+        ShopViewModel(
+            settingsRepository = get(),
             walletRepository = get(),
         )
     }
