@@ -88,6 +88,20 @@
     <string name="review_capture">Presa: %1$s</string>
     <string name="review_no_moves">Nessuna mossa registrata</string>
     <string name="review_table_empty">Tavolo vuoto</string>
+    <string name="review_retry_button">Riprova la mano</string>
+    <string name="review_retry_title">Riprova la mano</string>
+    <string name="review_retry_prompt">Quale carta giocheresti al posto del tuo errore?</string>
+    <string name="review_retry_correct">Ottima mossa! Hai trovato la giocata migliore!</string>
+    <string name="review_retry_imperfect">Mossa ancora imperfetta: c\'è una giocata più vantaggiosa. Riprova!</string>
+    <string name="review_retry_exit">Torna alla review</string>
+    <string name="review_retry_solved_badge">Risolto</string>
+    <string name="review_hint_capture_available">C\'è una presa possibile sul tavolo con una delle tue carte.</string>
+    <string name="review_hint_scopa">Attento: c\'è una Scopa a portata di mano!</string>
+    <string name="review_hint_settebello">Attenzione al Settebello sul tavolo o in mano!</string>
+    <string name="review_hint_denari">Punta al controllo dei Denari.</string>
+    <string name="review_hint_primiera_sette">I Sette sono fondamentali per il punto di Primiera.</string>
+    <string name="review_hint_safe_discard">A volte la giocata migliore è una calata sicura.</string>
+    <string name="review_hint_generic">Valuta attentamente il valore di presa e la sicurezza della carta.</string>
     <string name="game_hint_button">Chiedi al Maestro</string>
     <string name="game_hint_loading">Il Maestro riflette…</string>
     <string name="game_hint_banner">Il Maestro consiglia: %1$s</string>
@@ -138,6 +152,7 @@
     <string name="home_gems_placeholder">280</string>
     <string name="home_news">Notizie dal circolo</string>
     <string name="home_daily_rewards">Premi giornalieri</string>
+    <string name="home_daily_missions">Missioni del giorno</string>
     <string name="home_friends">Amici</string>
     <string name="home_nav_leaderboard">Classifica</string>
     <string name="home_nav_training">Palestra</string>
@@ -177,4 +192,326 @@
     <string name="game_card_play_confirm">GIOCA</string>
     <string name="game_card_release_to_play">Rilascia per giocare</string>
     <string name="game_arrow_symbol">➔</string>
+    <string name="puzzle_screen_title">SFIDA DEL GIORNO</string>
+    <string name="puzzle_number_format">Puzzle #%1$d</string>
+    <string name="puzzle_coach_initial">Ecco la sfida di oggi: osserva bene la mano e il tavolo. Trova la mossa vincente!</string>
+    <string name="puzzle_coach_hint_level1">Mossa insidiosa, ma c\'è di meglio sul tavolo: riguarda bene le carte a terra!</string>
+    <string name="puzzle_coach_hint_sweep">Attento: c\'è aria di Scopa, basta calcolare bene la combinazione.</string>
+    <string name="puzzle_coach_hint_win">È l\'ultima mano decisiva: conta bene i punti che ti separano dalla vittoria.</string>
+    <string name="puzzle_coach_hint_points">I Denari e i Sette decidono la smazzata: guarda dove si nasconde il vero punto.</string>
+    <string name="puzzle_coach_solved">Magnifico! Presa magistrale e punto conquistato: così ragiona un vero giocatore!</string>
+    <string name="puzzle_coach_already_solved">Hai già trionfato nella Sfida di oggi! Torna domani per un nuovo puzzle.</string>
+    <string name="puzzle_solved_title">SFIDA COMPLETATA!</string>
+    <string name="puzzle_solved_subtitle_first_try">Risolto al primo tentativo!</string>
+    <string name="puzzle_solved_subtitle_other_tries">Risolto in %1$d tentativi!</string>
+    <string name="puzzle_button_share">CONDIVIDI</string>
+    <string name="puzzle_button_home">TORNA ALLA HOME</string>
+    <string name="puzzle_button_retry">RIPROVA</string>
+    <string name="puzzle_table_empty">Tavolo vuoto</string>
+    <string name="puzzle_attempt_failed_banner">Tentativo #%1$d non riuscito. Leggi l\'indizio!</string>
+    <string name="home_daily_puzzle_button">Sfida del giorno</string>
+    <string name="profile_title">Profilo &amp; Maestria</string>
+    <string name="profile_elo_badge">%1$d ELO</string>
+    <string name="profile_accuracy_label">Precisione media: %1$d%%</string>
+    <string name="profile_elo_explanation">Indice di Maestria calcolato sulla precisione matematica delle tue scelte, indipendente dalla fortuna delle carte.</string>
+    <string name="profile_radar_title">Radar delle Abilità</string>
+    <string name="profile_radar_subtitle">Valutazione strategica su 5 assi</string>
+    <string name="profile_matches_played">Partite analizzate: %1$d</string>
+    <string name="profile_stats_title">Statistiche del Giocatore</string>
+    <string name="radar_axis_sevens">Sette</string>
+    <string name="radar_axis_denari">Denari</string>
+    <string name="radar_axis_primiera">Primiera</string>
+    <string name="radar_axis_board">Banco</string>
+    <string name="radar_axis_endgame">Endgame</string>
+    <string name="mastery_rank_principiante">Principiante</string>
+    <string name="mastery_rank_dilettante">Dilettante</string>
+    <string name="mastery_rank_intermedio">Intermedio</string>
+    <string name="mastery_rank_avanzato">Avanzato</string>
+    <string name="mastery_rank_maestro">Maestro del Circolo</string>
+    <string name="profile_advice_default">Gioca regolarmente e affronta i check del Maestro per calibrare il tuo Radar delle Abilità.</string>
+    <string name="profile_advice_master">Una visione tattica da vero Maestro del circolo. Continua così!</string>
+    <string name="profile_advice_sevens">Allena la memoria dei Sette nei check lampo: chi non conta i 7 regala la Primiera.</string>
+    <string name="profile_advice_denari">Attento all\'oro: tieni i Denari coperti e difendi il Settebello a tutti i costi.</string>
+    <string name="profile_advice_primiera">I Sette e i Sei sono i pilastri della Primiera: non sprecarli per prese ordinarie.</string>
+    <string name="profile_advice_board">Cura le calate difensive: non lasciare mai somme facili che regalano una Scopa.</string>
+    <string name="profile_advice_endgame">Nel finale a mazzo vuoto conta le carte avversarie per dedurre la sua ultima presa.</string>
+    <string name="profile_view_button">Profilo &amp; Maestria</string>
+    <string name="post_match_view_profile">VEDI RADAR ABILITÀ</string>
+    <string name="post_match_mastery_updated">Indice di Maestria: %1$d ELO</string>
+    <string name="mission_daily_puzzle_title">Sfida del Giorno</string>
+    <string name="mission_daily_puzzle_desc">Risolvi il puzzle tattico del giorno del Maestro.</string>
+    <string name="mission_accuracy_80_title">Precisione Magistrale</string>
+    <string name="mission_accuracy_80_desc">Concludi una partita con precisione almeno dell\'80%%.</string>
+    <string name="mission_sevens_check_title">Occhio ai Sette</string>
+    <string name="mission_sevens_check_desc">Rispondi correttamente a 2 check lampo sui Sette.</string>
+    <string name="mission_sweeps_title">Piazza Pulita</string>
+    <string name="mission_sweeps_desc">Metti a segno almeno 2 scope durante le partite.</string>
+    <string name="mission_denari_title">Cacciatore d\'Oro</string>
+    <string name="mission_denari_desc">Cattura almeno 6 carte di Denari in una partita.</string>
+    <string name="mission_no_blunders_title">Calata Sicura</string>
+    <string name="mission_no_blunders_desc">Gioca una partita senza commettere nessun Blunder.</string>
+    <string name="retention_streak_title">Serie di gioco</string>
+    <string name="retention_streak_days">%1$d giorni consecutivi</string>
+    <string name="retention_streak_record">Record: %1$d giorni</string>
+    <string name="retention_streak_freeze_available">Gettone Riposo attivo</string>
+    <string name="retention_streak_freeze_desc">Protegge la tua serie se salti un giorno</string>
+    <string name="retention_streak_freeze_none">Nessun Gettone Riposo</string>
+    <string name="retention_streak_freeze_none_desc">Gioca ogni giorno per non spezzare la serie</string>
+    <string name="retention_missions_title">Missioni del Giorno</string>
+    <string name="retention_missions_reward">+%1$d Crediti</string>
+    <string name="retention_missions_completed_badge">COMPLETATA</string>
+    <string name="retention_maestro_encouragement">Tre buone abitudini al giorno forgiano la mente di un vero Maestro!</string>
+    <string name="home_missions_streak_badge">%1$d gg</string>
+    <string name="academy_screen_title">ACCADEMIA DEL MAESTRO</string>
+    <string name="academy_screen_subtitle">Il percorso didattico del Circolo</string>
+    <string name="academy_nav_title">Accademia</string>
+    <string name="academy_chapter_number">Capitolo %1$d</string>
+    <string name="academy_chapter_progress">%1$d/%2$d Lezioni</string>
+    <string name="academy_chapter_completed">CAPITOLO COMPLETATO</string>
+    <string name="academy_lesson_number">Lezione %1$d.%2$d</string>
+    <string name="academy_lesson_locked">Completa la lezione precedente per sbloccare</string>
+    <string name="academy_module_number">Modulo %1$d</string>
+    <string name="academy_module_locked">Completa il modulo precedente per sbloccare</string>
+    <string name="academy_module_completed_badge">COMPLETATO</string>
+    <string name="academy_button_start">INIZIA LEZIONE</string>
+    <string name="academy_button_review">RIGIOCA LEZIONE</string>
+    <string name="academy_button_locked">BLOCCATA</string>
+    <string name="academy_button_next_step">PROSSIMO PASSO</string>
+    <string name="academy_button_complete">CONQUISTA DISTINTIVO</string>
+    <string name="academy_button_back_map">TORNA ALL\'ACCADEMIA</string>
+    <string name="academy_golden_rule_header">REGOLA FERREA DEL CIRCOLO</string>
+    <string name="academy_table_title">Il Tavolo del Maestro</string>
+    <string name="academy_your_hand">La Tua Mano</string>
+    <string name="academy_question_prompt">Cosa dice la legge del gioco?</string>
+    <string name="academy_card_action_hint">Tocca la carta corretta per giocarla sul tavolo</string>
+    <string name="academy_action_wrong_card">Mossa non ottimale. Segui il consiglio del Maestro e scegli la carta indicata!</string>
+    <string name="academy_badge_plus_3_points">+3 Punti</string>
+    <string name="academy_badge_king_10_pt">Re = 10 pt</string>
+    <string name="academy_badge_six_18_pt">Sei = 18 pt</string>
+    <string name="academy_badge_plus_15_pt">+15 pt (4° Seme!)</string>
+    <string name="academy_badge_plus_10_pt">+10 pt</string>
+    <string name="academy_badge_sum_15_safe">Somma 15 (Sicura)</string>
+    <string name="academy_badge_sum_8_risk">Somma 8 (Rischio Scopa!)</string>
+
+    <!-- CAPITOLO 1 -->
+    <string name="academy_ch1_title">I Fondamenti del Circolo</string>
+    <string name="academy_ch1_subtitle">Le Regole Formali e i Punti di Mazzo</string>
+    <string name="academy_ch1_desc">Padroneggia la presa singola obbligatoria, il valore del Settebello e l\'economia dei punti di mazzo.</string>
+
+    <string name="academy_l1_1_title">La Presa Singola</string>
+    <string name="academy_l1_1_subtitle">La Regola Ferrea dell\'Articolo 3</string>
+    <string name="academy_l1_1_desc">La carta sola comanda sul mucchio: la priorità assoluta sulla carta singola.</string>
+    <string name="academy_l1_1_rule">La carta singola ha sempre la precedenza assoluta su qualsiasi somma a terra.</string>
+    <string name="academy_l1_1_speech_q">Al circolo vige una legge ferrea: sul tavolo ci sono un 7 di Spade, un 4 di Coppe e un 3 di Bastoni. In mano hai il 7 di Denari. Puoi scegliere di prendere 4 e 3 lasciando il 7?</string>
+    <string name="academy_l1_1_badge_q">Presa singola obbligatoria</string>
+    <string name="academy_l1_1_opt1">No, la legge impone la presa sulla carta singola</string>
+    <string name="academy_l1_1_fb1">Esatto! Articolo 3 del regolamento: la carta singola comanda sempre sul mucchio!</string>
+    <string name="academy_l1_1_opt2">Sì, posso scegliere liberamente cosa prendere</string>
+    <string name="academy_l1_1_fb2">Errore comune! Se c\'è una carta di valore pari, la presa singola è obbligatoria per legge.</string>
+    <string name="academy_l1_1_speech_sum">Regola fondamentale imparata! Ricorda sempre: la carta pari a terra ha precedenza assoluta su qualsiasi somma.</string>
+
+    <string name="academy_l1_2_title">I Quattro Punti di Mazzo</string>
+    <string name="academy_l1_2_subtitle">L\'Economia della Smazzata</string>
+    <string name="academy_l1_2_desc">Carte, Denari, Settebello e Primiera: come si decide il punteggio di una mano.</string>
+    <string name="academy_l1_2_rule">Ogni smazzata assegna 4 punti di base: Carte (21+), Denari (6+), Settebello e Primiera.</string>
+    <string name="academy_l1_2_speech_q">Ogni smazzata assegna 4 punti fissi. Quante carte di Denari servono per assicurarsi il punto dei Denari?</string>
+    <string name="academy_l1_2_badge_q">Punti di mazzo</string>
+    <string name="academy_l1_2_opt1">Almeno 6 carte su 10 (la maggioranza assoluta)</string>
+    <string name="academy_l1_2_fb1">Perfetto! 6 denari su 10 garantiscono il punto in modo matematico.</string>
+    <string name="academy_l1_2_opt2">Bastano 5 carte su 10</string>
+    <string name="academy_l1_2_fb2">Attento: con 5 e 5 il punto è pari e non viene assegnato a nessuno!</string>
+    <string name="academy_l1_2_speech_sum">Eccellente! Conoscere le soglie numeriche permette di calcolare i sacrifici necessari per conquistare l\'oro.</string>
+
+    <string name="academy_l1_3_title">Il Re dei Denari</string>
+    <string name="academy_l1_3_subtitle">Il Triplo Valore del Settebello</string>
+    <string name="academy_l1_3_desc">Perché il 7 di Denari da solo può ribaltare fino a 3 punti su 4.</string>
+    <string name="academy_l1_3_rule">Il Settebello vale 1 punto secco, 1 denaro e 21 punti di Primiera: difendilo sempre.</string>
+    <string name="academy_l1_3_speech_act">Il Settebello vale da solo fino a 3 punti di mazzo su 4: punto secco, oro per i Denari e 21 per la Primiera. Catturalo subito con il tuo 7 di Bastoni!</string>
+    <string name="academy_l1_3_badge_act">Cattura il Settebello!</string>
+    <string name="academy_l1_3_speech_sum">Bravissimo! Presa magistrale: il Settebello è al sicuro nella tua cassa!</string>
+
+    <string name="academy_l1_4_title">La Scelta tra Somme</string>
+    <string name="academy_l1_4_subtitle">Quando la Singola Manca</string>
+    <string name="academy_l1_4_desc">Libertà sovrana di scelta: privilegiare sempre l\'oro e i semi forti.</string>
+    <string name="academy_l1_4_rule">Se non c\'è la carta singola, scegli sempre la combinazione con Denari o carte alte per la Primiera.</string>
+    <string name="academy_l1_4_speech_q">Sul tavolo ci sono 5 e 2 di Spade, e 4 e 3 di Denari. In mano hai un 7. Non c\'è alcun 7 singolo. Quale coppia conviene prendere?</string>
+    <string name="academy_l1_4_badge_q">Due combinazioni possibili</string>
+    <string name="academy_l1_4_opt1">Prendo il 4 e il 3 di Denari per fare bottino d\'oro</string>
+    <string name="academy_l1_4_fb1">Perfetto! Quando non c\'è la singola scegli tu: incassa sempre i Denari e le carte utili!</string>
+    <string name="academy_l1_4_opt2">Prendo il 5 e il 2 di Spade indifferentemente</string>
+    <string name="academy_l1_4_fb2">Attento: lasciando i Denari sul tavolo regali punti facili all\'avversario!</string>
+    <string name="academy_l1_4_speech_sum">Primo Capitolo completato con onore! Ora possiedi i fondamentali del circolo.</string>
+
+    <!-- CAPITOLO 2 -->
+    <string name="academy_ch2_title">La Scienza della Primiera</string>
+    <string name="academy_ch2_subtitle">La Matematica Nascosta dei 4 Semi</string>
+    <string name="academy_ch2_desc">Scopri la scala numerica rinascimentale (7=21, 6=18), la trappola del seme vuoto e il conteggio rapido.</string>
+
+    <string name="academy_l2_1_title">Il Paradosso del Re</string>
+    <string name="academy_l2_1_subtitle">La Scala dei Valori Rinascimentale</string>
+    <string name="academy_l2_1_desc">In Primiera le figure sono deboli: scopri i veri sovrani del mazzo.</string>
+    <string name="academy_l2_1_rule">Nella Primiera le Figure valgono solo 10 punti; il Sette vale 21 e il Sei vale 18.</string>
+    <string name="academy_l2_1_speech_q">Molti pensano che le Figure valgano tanto. In Primiera la scala è invertita: 7 vale 21, 6 vale 18, Asso vale 16. Quanto vale un Re in Primiera?</string>
+    <string name="academy_l2_1_badge_q">Scala: 7=21, 6=18, Asso=16, 5=15, Fig=10</string>
+    <string name="academy_l2_1_opt1">Soltanto 10 punti, meno perfino di un Due (12 pt)</string>
+    <string name="academy_l2_1_fb1">Esatto! I Re e i Fanti valgono appena 10 punti. I veri sovrani della Primiera sono i Sette e i Sei!</string>
+    <string name="academy_l2_1_opt2">20 punti, perché è la carta più alta del mazzo</string>
+    <string name="academy_l2_1_fb2">No! Non farti ingannare dalla corona: tutte le Figure valgono solo 10 punti in Primiera!</string>
+    <string name="academy_l2_1_speech_sum">Ottimo! Mai sacrificare un 6 o un 7 per salvare una figura in Primiera.</string>
+
+    <string name="academy_l2_2_title">La Formula dei 4 Semi</string>
+    <string name="academy_l2_2_subtitle">Il Valore della Copertura Completa</string>
+    <string name="academy_l2_2_desc">La Primiera somma la migliore carta di ciascun seme: non lasciare buchi.</string>
+    <string name="academy_l2_2_rule">La Primiera si calcola sommando la miglior carta per ciascun seme: Spade + Coppe + Denari + Bastoni.</string>
+    <string name="academy_l2_2_speech_q">Come si calcola il punteggio della Primiera a fine smazzata?</string>
+    <string name="academy_l2_2_badge_q">I 4 semi del mazzo</string>
+    <string name="academy_l2_2_opt1">Sommando la carta più alta per ciascuno dei 4 semi</string>
+    <string name="academy_l2_2_fb1">Esatto! È fondamentale avere almeno una carta per ogni seme per non azzerare il punteggio.</string>
+    <string name="academy_l2_2_opt2">Sommando tutte le carte di valore 7 prese</string>
+    <string name="academy_l2_2_fb2">Sbagliato: i 7 sono preziosi, ma se manca un seme il loro valore viene sprecato!</string>
+    <string name="academy_l2_2_speech_sum">Regola preziosa: una Primiera con tutti i 4 semi coperti è una fortezza inespugnabile.</string>
+
+    <string name="academy_l2_3_title">La Trappola del Seme Vuoto</string>
+    <string name="academy_l2_3_subtitle">Evitare lo Zero Fatale</string>
+    <string name="academy_l2_3_desc">Perché avere tre 7 e zero Bastoni fa perdere la Primiera contro carte modeste.</string>
+    <string name="academy_l2_3_rule">Un seme vuoto assegna 0 punti: chiudere tutti i 4 semi ha priorità assoluta su qualsiasi presa ordinaria.</string>
+    <string name="academy_l2_3_speech_act">Hai già preso tre Sette (Spade, Coppe e Denari), ma zero Bastoni! Sul tavolo c\'è il 5 di Bastoni. Catturalo subito con il 5 di Spade per chiudere il quarto seme!</string>
+    <string name="academy_l2_3_badge_act">Proteggi i 4 semi</string>
+    <string name="academy_l2_3_speech_sum">Bravissimo! Con il 5 di Bastoni hai chiuso la Primiera a 78 punti ed evitato la disfatta!</string>
+
+    <string name="academy_l2_4_title">La Conta dei Sette e dei Sei</string>
+    <string name="academy_l2_4_subtitle">Il Calcolo Rapido della Primiera</string>
+    <string name="academy_l2_4_desc">Impara a calcolare al volo i punteggi vincenti (84, 81, 78 pt).</string>
+    <string name="academy_l2_4_rule">A 4 semi coperti, chi vanta 3 Sette e un Sei totalizza 81 punti ed è quasi imbattibile.</string>
+    <string name="academy_l2_4_speech_q">Entrambi avete coperto tutti e 4 i semi. Tu hai catturato 3 Sette e un Sei (81 pt). L\'avversario ha 1 Sette e tre Sei (75 pt). Chi vince la Primiera?</string>
+    <string name="academy_l2_4_badge_q">Calcolo: 21+21+21+18 = 81 pt</string>
+    <string name="academy_l2_4_opt1">Vinci tu: 81 punti contro 75 punti dell\'avversario</string>
+    <string name="academy_l2_4_fb1">Matematica impeccabile! Chi ha più Sette con i semi coperti domina il conteggio.</string>
+    <string name="academy_l2_4_opt2">È pareggio perché entrambi avete carte alte</string>
+    <string name="academy_l2_4_fb2">No: la Primiera si calcola sommando i punti esatti di ciascun seme (81 a 75)!</string>
+    <string name="academy_l2_4_speech_sum">Secondo Capitolo dominato! Ora padroneggi i segreti più oscuri della Primiera.</string>
+
+    <!-- CAPITOLO 3 -->
+    <string name="academy_ch3_title">Difesa del Banco &amp; Antiscopa</string>
+    <string name="academy_ch3_subtitle">Controllo del Rischio e Calate Protette</string>
+    <string name="academy_ch3_desc">Impara la soglia critica del 10, come blindare il tavolo dalle Scope avversarie e il privilegio dell\'ultima mano.</string>
+
+    <string name="academy_l3_1_title">La Soglia del Dieci</string>
+    <string name="academy_l3_1_subtitle">La Matematica dell\'Antiscopa</string>
+    <string name="academy_l3_1_desc">Nessuna carta singola vale 11 o più: la somma superiore a 10 è al sicuro.</string>
+    <string name="academy_l3_1_rule">Se la somma totale delle carte a terra supera 10, nessuna carta singola può fare Scopa.</string>
+    <string name="academy_l3_1_speech_q">Sul tavolo c\'è un 4. Non puoi prendere. In mano hai un 3 e un Re (10). Se giochi il 3 la somma fa 7; se giochi il Re fa 14. Quale calata ti protegge dalla Scopa?</string>
+    <string name="academy_l3_1_badge_q">Somma > 10 = Zero rischio Scopa</string>
+    <string name="academy_l3_1_opt1">Il Re: portando la somma a 14 è impossibile fare Scopa con una carta</string>
+    <string name="academy_l3_1_fb1">Chapeau! Nessuna carta singola vale 14: con la somma sopra al 10 il banco è al sicuro!</string>
+    <string name="academy_l3_1_opt2">Il 3: è una carta più bassa e fa meno gola all\'avversario</string>
+    <string name="academy_l3_1_fb2">Pericolo! Con 4+3=7 l\'avversario con un 7 ti fa Scopa secca e pulisce il tavolo!</string>
+    <string name="academy_l3_1_speech_sum">Regola fondamentale: supera sempre quota 10 quando non hai prese a disposizione.</string>
+
+    <string name="academy_l3_2_title">Blindare il Banco</string>
+    <string name="academy_l3_2_subtitle">L\'Arte della Calata Sicura</string>
+    <string name="academy_l3_2_desc">Come scegliere la carta alta da posare per evitare sorprese.</string>
+    <string name="academy_l3_2_rule">Cala una figura su una carta media per blindare il banco e togliere ogni speranza di Scopa.</string>
+    <string name="academy_l3_2_speech_act">A terra c\'è un 6 di Bastoni. Non hai prese possibili. Gioca il Cavallo (9) per portare il banco a 15 ed evitare di regalare una Scopa all\'avversario!</string>
+    <string name="academy_l3_2_badge_act">Supera quota 10</string>
+    <string name="academy_l3_2_speech_sum">Manovra perfetta! Somma 15: il tavolo è blindato e l\'avversario non può fare Scopa.</string>
+
+    <string name="academy_l3_3_title">La Regola del Dispari</string>
+    <string name="academy_l3_3_subtitle">I Numeri Ciechi del Circolo</string>
+    <string name="academy_l3_3_desc">Creare somme che l\'avversario non può combinare con le carte rimaste.</string>
+    <string name="academy_l3_3_rule">Nelle calate difensive sacrifica semi neutri già persi, proteggendo Denari e semi di Primiera.</string>
+    <string name="academy_l3_3_speech_q">Devi calare una carta a terra senza fare prese. Hai in mano il 2 di Spade e il 6 di Denari. Quale carta è più saggio sacrificare?</string>
+    <string name="academy_l3_3_badge_q">Calata difensiva</string>
+    <string name="academy_l3_3_opt1">Il 2 di Spade: carta neutra e di scarso valore per Denari e Primiera</string>
+    <string name="academy_l3_3_fb1">Perfetto! Il 2 di Spade non regala oro e non sposta la Primiera.</string>
+    <string name="academy_l3_3_opt2">Il 6 di Denari: vale poco per la presa</string>
+    <string name="academy_l3_3_fb2">Follia! Il 6 di Denari vale 18 pt di Primiera e un Denaro fondamentale!</string>
+    <string name="academy_l3_3_speech_sum">Grande visione difensiva! Mai regalare oro e Primiera per distrazione.</string>
+
+    <string name="academy_l3_4_title">L\'Ultima Mano del Mazziere</string>
+    <string name="academy_l3_4_subtitle">Il Privilegio del Finale</string>
+    <string name="academy_l3_4_desc">La Scopa non è consentita all\'ultima giocata: come massimizzare il bottino.</string>
+    <string name="academy_l3_4_rule">All\'ultima giocata della smazzata la Scopa è vietata per legge: l\'ultima presa raccoglie tutte le carte rimaste.</string>
+    <string name="academy_l3_4_speech_q">Siamo all\'ultimissima giocata della smazzata. L\'avversario o tu prendete tutte le carte a terra. Conta come Scopa?</string>
+    <string name="academy_l3_4_badge_q">Ultima presa della smazzata</string>
+    <string name="academy_l3_4_opt1">No, per legge l\'ultima presa non vale mai come Scopa</string>
+    <string name="academy_l3_4_fb1">Regola fondamentale del circolo! All\'ultima mano non si assegnano mai Scope: le carte a terra vanno a chi fa l\'ultima presa.</string>
+    <string name="academy_l3_4_opt2">Sì, se il tavolo viene svuotato è sempre Scopa</string>
+    <string name="academy_l3_4_fb2">Falso! L\'articolo finale del regolamento vieta espressamente la Scopa sull\'ultima giocata.</string>
+    <string name="academy_l3_4_speech_sum">Terzo Capitolo conquistato! Sei ormai uno stratega difensivo del circolo.</string>
+
+    <!-- CAPITOLO 4 -->
+    <string name="academy_ch4_title">Visione da Maestro</string>
+    <string name="academy_ch4_subtitle">Memoria del Tavolo e Fine Partita</string>
+    <string name="academy_ch4_desc">Allena la memoria lampo sui Sette caduti, deduci le carte avversarie e domina il finale a mazzo vuoto.</string>
+
+    <string name="academy_l4_1_title">La Memoria dei Sette</string>
+    <string name="academy_l4_1_subtitle">Il Check Lampo del Circolo</string>
+    <string name="academy_l4_1_desc">Contare a mente i quattro 7 per sapere esattamente dove si trova il Settebello.</string>
+    <string name="academy_l4_1_rule">Chi controlla il flusso dei Sette sa sempre se il Settebello è nel mazzo, a terra o nella mano nemica.</string>
+    <string name="academy_l4_1_speech_q">Sono già stati giocati il 7 di Spade, il 7 di Coppe e il 7 di Bastoni. A terra c\'è un 4 e un 3. L\'avversario cala un Asso. Cosa puoi dedurre con certezza?</string>
+    <string name="academy_l4_1_badge_q">Tre Sette già caduti</string>
+    <string name="academy_l4_1_opt1">L\'avversario NON ha il Settebello in mano, altrimenti avrebbe fatto Scopa su 4+3</string>
+    <string name="academy_l4_1_fb1">Deduzione magistrale! Avendo rifiutato la Scopa su 7, il Settebello è ancora nel mazzo o in mano tua!</string>
+    <string name="academy_l4_1_opt2">L\'avversario ha il Settebello e lo sta nascondendo</string>
+    <string name="academy_l4_1_fb2">Impossibile: a Scopa nessuno rinuncia a una Scopa secca garantita!</string>
+    <string name="academy_l4_1_speech_sum">Occhio acuto! Questa è la vera deduzione che separa i principianti dai Maestri.</string>
+
+    <string name="academy_l4_2_title">La Lettura delle Carte Nascoste</string>
+    <string name="academy_l4_2_subtitle">Deduci la Mano dell\'Avversario</string>
+    <string name="academy_l4_2_desc">Ogni presa mancata ti dice cosa l\'avversario non possiede.</string>
+    <string name="academy_l4_2_rule">Le carte che l\'avversario non gioca quando ci sono combinazioni facili rivelano la sua intera mano.</string>
+    <string name="academy_l4_2_speech_q">Sul tavolo ci sono un 6 e un 2. L\'avversario non prende né il 6 né il 2 e posa un Re. Cosa puoi dedurre?</string>
+    <string name="academy_l4_2_badge_q">Prese mancate</string>
+    <string name="academy_l4_2_opt1">Non ha in mano né un 6, né un 2, né un 8 (6+2)</string>
+    <string name="academy_l4_2_fb1">Esatto! Se avesse avuto una di quelle carte avrebbe preso: la sua mano è priva di 2, 6 e 8!</string>
+    <string name="academy_l4_2_opt2">Ha una mano piena di carte basse</string>
+    <string name="academy_l4_2_fb2">No: ha dimostrato di non avere proprio le carte corrispondenti al tavolo.</string>
+    <string name="academy_l4_2_speech_sum">Mente limpida! Giocare conoscendo le carte nemiche trasforma la Scopa in pura maestria.</string>
+
+    <string name="academy_l4_3_title">Il Finale a Mazzo Vuoto</string>
+    <string name="academy_l4_3_subtitle">La Lotta per l\'Ultima Presa</string>
+    <string name="academy_l4_3_desc">Nelle ultime tre mani a mazzo esaurito, mantieni l\'iniziativa e svuota il tavolo.</string>
+    <string name="academy_l4_3_rule">Nel finale a mazzo vuoto, fare l\'ultima presa raccoglie tutte le carte rimaste e decide Carte e Denari.</string>
+    <string name="academy_l4_3_speech_act">Mazzo vuoto, ultime carte: a terra c\'è un Fante (8 di Bastoni) e un Asso di Denari. In mano hai il Fante di Coppe. Giocalo ora per assicurarti l\'ultima presa e incassare tutte le carte rimaste!</string>
+    <string name="academy_l4_3_badge_act">Ultima mano decisiva</string>
+    <string name="academy_l4_3_speech_sum">Trionfo assoluto! Hai completato l\'intero percorso dell\'Accademia: sei un vero Maestro del Circolo!</string>
+
+    <!-- La Bottega del Maestro (Shop & Personalizzazione Cosmetica, F2-11) -->
+    <string name="shop_screen_title">LA BOTTEGA DEL MAESTRO</string>
+    <string name="shop_screen_subtitle">Personalizza l\'estetica del Circolo</string>
+    <string name="shop_tab_tables">Tavoli</string>
+    <string name="shop_tab_card_backs">Dorsi Carte</string>
+    <string name="shop_tab_avatars">Stemmi</string>
+    <string name="shop_action_equip">EQUIPAGGIA</string>
+    <string name="shop_action_equipped">EQUIPAGGIATO</string>
+    <string name="shop_action_unlock">SBLOCCA (%1$d)</string>
+    <string name="shop_action_free">GRATIS</string>
+    <string name="shop_action_insufficient_funds">CREDITI INSUFFICIENTI</string>
+    <string name="shop_unlock_success">Elemento sbloccato ed equipaggiato!</string>
+    <string name="shop_credits_label">%1$d Crediti</string>
+
+    <string name="cosmetic_table_green_title">Panno Verde Classico</string>
+    <string name="cosmetic_table_green_desc">Il feltro verde tradizionale del circolo, elegante e rilassante.</string>
+    <string name="cosmetic_table_red_title">Velluto Rosso Nobile</string>
+    <string name="cosmetic_table_red_desc">Il tavolo esclusivo delle grandi sfide serali tra campioni.</string>
+    <string name="cosmetic_table_blue_title">Panno Blu Reale</string>
+    <string name="cosmetic_table_blue_desc">Feltro blu notte con riflessi profondi per veri intenditori.</string>
+    <string name="cosmetic_table_wood_title">Noce Massello</string>
+    <string name="cosmetic_table_wood_desc">Tavolo massiccio intarsiato a mano con venature scure del bosco.</string>
+
+    <string name="cosmetic_card_back_classic_title">Classico del Circolo</string>
+    <string name="cosmetic_card_back_classic_desc">Dorso geometrico blu trevigiano della tradizione.</string>
+    <string name="cosmetic_card_back_gold_title">Oro del Maestro</string>
+    <string name="cosmetic_card_back_gold_desc">Finitura dorata lucida riservata ai veterani del tavolo.</string>
+    <string name="cosmetic_card_back_red_title">Rosso Antico</string>
+    <string name="cosmetic_card_back_red_desc">Trama damascata carminio d\'epoca dei circoli storici.</string>
+
+    <string name="cosmetic_avatar_default_title">Allievo del Circolo</string>
+    <string name="cosmetic_avatar_default_desc">Il ritratto del giovane giocatore ai suoi primi successi.</string>
+    <string name="cosmetic_avatar_alt_title">Giocatore Scelto</string>
+    <string name="cosmetic_avatar_alt_desc">Profilo distinto di chi studia ogni scarto dell\'avversario.</string>
+    <string name="cosmetic_avatar_expert_title">Gran Maestro</string>
+    <string name="cosmetic_avatar_expert_desc">L\'onorificenza suprema dei maestri di carte del Circolo.</string>
+
 </resources>

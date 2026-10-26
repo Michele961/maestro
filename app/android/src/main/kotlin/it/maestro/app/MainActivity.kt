@@ -37,16 +37,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.crash.CrashReporter
+import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.data.local.datastore.MasteryRepository
+import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
+import it.maestro.app.data.local.missions.DailyMissionType
+import it.maestro.app.data.local.missions.DailyMissionsState
+import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.ui.dialogs.DailyMissionsDialog
 import it.maestro.app.ui.dialogs.SettingsDialog
+import it.maestro.app.ui.screens.DailyMissionsUiState
+import it.maestro.app.ui.screens.DailyPuzzleScreen
 import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
+import it.maestro.app.ui.screens.ProfileScreen
+import it.maestro.app.ui.screens.ShopScreen
+import it.maestro.app.ui.screens.ShopViewModel
 import it.maestro.app.ui.screens.TableScreen
+import it.maestro.app.ui.screens.academy.AcademyScreen
 import it.maestro.app.ui.theme.MaestroTheme
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
@@ -54,9 +68,10 @@ import it.maestro.game.scopa.ScopaState
 import it.maestro.game.training.TrainingFundamental
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import java.time.LocalDate
 
 /**
- * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09).
+ * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09, F2-04).
  */
 public sealed interface Screen {
     public data object Home : Screen
@@ -75,6 +90,7 @@ public sealed interface Screen {
         val humanSeat: Seat = Seat.P1,
         /** Check di allenamento: risposte corrette e totali, se ce ne sono stati (F1-12). */
         val trainingScore: Pair<Int, Int>? = null,
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     ) : Screen
     public data class GameReview(
         val matchLog: MatchLog,
@@ -82,6 +98,10 @@ public sealed interface Screen {
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
     ) : Screen
+    public data object DailyPuzzle : Screen
+    public data object Profile : Screen
+    public data object Academy : Screen
+    public data object Shop : Screen
 }
 
 /**
@@ -108,16 +128,27 @@ public class MainActivity : ComponentActivity() {
                 ) {
                 val matchRepository: MatchRepository = koinInject()
                 val settingsRepository: SettingsRepository = koinInject()
+                val masteryRepository: MasteryRepository = koinInject()
+                val retentionRepository: RetentionRepository = koinInject()
+                val walletRepository: WalletRepository = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
+                val today = remember { LocalDate.now() }
+                val streakState by retentionRepository.observeStreak(today).collectAsStateWithLifecycle(initialValue = StreakState.INITIAL)
+                val missionsState by retentionRepository.observeDailyMissions(today).collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
+                val credits by walletRepository.observeBalance().collectAsStateWithLifecycle(initialValue = 0)
                 val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
                 var showSettingsDialog by remember { mutableStateOf(false) }
+                var showMissionsDialog by remember { mutableStateOf(false) }
                 var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
                 var hasActiveMatch by remember { mutableStateOf(false) }
                 var errorMessage by remember { mutableStateOf<String?>(null) }
                 var crashReport by remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(Unit) {
+                    try {
+                        walletRepository.ensureWelcomeBonus(bonusAmount = 50)
+                    } catch (_: Throwable) {}
                     try {
                         val file = filesDir.resolve("last_crash.txt")
                         if (file.exists()) {
@@ -176,6 +207,16 @@ public class MainActivity : ComponentActivity() {
                     )
                 }
 
+                if (showMissionsDialog) {
+                    DailyMissionsDialog(
+                        uiState = DailyMissionsUiState(
+                            streak = streakState,
+                            missionsState = missionsState,
+                        ),
+                        onDismissRequest = { showMissionsDialog = false },
+                    )
+                }
+
                 when (val screen = currentScreen) {
                     Screen.Home -> HomeScreen(
                         hasActiveMatch = hasActiveMatch,
@@ -204,6 +245,14 @@ public class MainActivity : ComponentActivity() {
                         },
                         onStartGameClicked = { currentScreen = Screen.PreGame },
                         onSettingsClicked = { showSettingsDialog = true },
+                        onDailyPuzzleClicked = { currentScreen = Screen.DailyPuzzle },
+                        onProfileClicked = { currentScreen = Screen.Profile },
+                        onMissionsClicked = { showMissionsDialog = true },
+                        onAcademyClicked = { currentScreen = Screen.Academy },
+                        onShopClicked = { currentScreen = Screen.Shop },
+                        streakCount = streakState.currentStreak,
+                        credits = credits,
+                        avatarId = settings.selectedAvatar,
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
@@ -222,12 +271,15 @@ public class MainActivity : ComponentActivity() {
                         seed = screen.seed,
                         restoreState = screen.restoredState,
                         restoreLog = screen.restoredLog,
+                        tableThemeId = settings.selectedTableTheme,
+                        cardBackThemeId = settings.selectedCardBackTheme,
                         onNavigateHome = { currentScreen = Screen.Home },
                         onViewAnalysis = { log, training ->
                             currentScreen = Screen.PostMatchPreview(
                                 matchLog = log,
                                 level = screen.level,
                                 trainingScore = training,
+                                trainingFundamental = screen.trainingFundamental,
                             )
                         },
                     )
@@ -236,6 +288,40 @@ public class MainActivity : ComponentActivity() {
                         level = screen.level,
                         humanSeat = screen.humanSeat,
                         trainingScore = screen.trainingScore,
+                        trainingFundamental = screen.trainingFundamental,
+                        onMatchAnalyzed = { analysis ->
+                            scope.launch {
+                                masteryRepository.recordMatch(
+                                    matchAnalysis = analysis,
+                                    matchLog = screen.matchLog,
+                                    humanSeat = screen.humanSeat,
+                                    trainingScore = screen.trainingScore,
+                                    trainingFundamental = screen.trainingFundamental,
+                                )
+                                retentionRepository.recordGameActivity(today)
+                                if (analysis.accuracy(screen.humanSeat) >= 80) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80,
+                                    )
+                                }
+                                if (analysis.count(screen.humanSeat, MoveGrade.BLUNDER) == 0) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS,
+                                    )
+                                }
+                                if (screen.trainingFundamental == TrainingFundamental.SEVENS_COUNT &&
+                                    screen.trainingScore != null
+                                ) {
+                                    retentionRepository.updateMissionProgress(
+                                        today,
+                                        DailyMissionType.ANSWER_SEVENS_CHECKS,
+                                        screen.trainingScore.first,
+                                    )
+                                }
+                            }
+                        },
                         onReviewClicked = { analysis ->
                             currentScreen = Screen.GameReview(
                                 matchLog = screen.matchLog,
@@ -251,6 +337,7 @@ public class MainActivity : ComponentActivity() {
                             )
                         },
                         onHomeClicked = { currentScreen = Screen.Home },
+                        onProfileClicked = { currentScreen = Screen.Profile },
                     )
                     is Screen.GameReview -> GameReviewScreen(
                         matchLog = screen.matchLog,
@@ -263,6 +350,18 @@ public class MainActivity : ComponentActivity() {
                                 humanSeat = screen.humanSeat,
                             )
                         },
+                    )
+                    Screen.DailyPuzzle -> DailyPuzzleScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
+                    )
+                    Screen.Profile -> ProfileScreen(
+                        onBackClicked = { currentScreen = Screen.Home },
+                    )
+                    Screen.Academy -> AcademyScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
+                    )
+                    Screen.Shop -> ShopScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
                     )
                 }
 

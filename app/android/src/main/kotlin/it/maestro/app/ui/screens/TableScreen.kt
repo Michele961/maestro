@@ -9,8 +9,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import it.maestro.app.ui.components.LocalCardBackTheme
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
@@ -144,6 +148,8 @@ public fun TableScreen(
     seed: Long = 42L,
     restoreState: ScopaState? = null,
     restoreLog: MatchLog? = null,
+    tableThemeId: String = "felt_classic_green",
+    cardBackThemeId: String = "back_classic_trevigiano",
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     onNavigateHome: () -> Unit = {},
@@ -177,6 +183,8 @@ public fun TableScreen(
         onIntent = viewModel::onIntent,
         modifier = modifier,
         soundManager = soundManager,
+        tableThemeId = tableThemeId,
+        cardBackThemeId = cardBackThemeId,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -203,12 +211,33 @@ public fun TableContent(
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
     soundManager: SoundManager = NoOpSoundManager(),
+    tableThemeId: String = "felt_classic_green",
+    cardBackThemeId: String = "back_classic_trevigiano",
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var showPause by remember { mutableStateOf(false) }
+    var isTableAnimating by remember { mutableStateOf(false) }
+
+    // Dialog Check di allenamento del Maestro (task F1-12)
+    // Non andiamo a coprire la giocata dell'avversario a metà animazione: attendiamo che
+    // l'animazione di calata/presa sia terminata e lasciamo un breve respiro per registrare la mossa.
+    val question = uiState.activeTrainingQuestion
+    var canShowQuestion by remember { mutableStateOf(question != null && uiState.lastMoveId == 0L) }
+    LaunchedEffect(question, isTableAnimating) {
+        if (question == null) {
+            canShowQuestion = false
+        } else if (!isTableAnimating) {
+            if (uiState.lastMoveId > 0L) {
+                delay(800L)
+            }
+            canShowQuestion = true
+        } else {
+            canShowQuestion = false
+        }
+    }
 
     LaunchedEffect(uiState.lastEvent) {
         when (uiState.lastEvent) {
@@ -247,68 +276,109 @@ public fun TableContent(
     }
 
     val context = LocalContext.current
-    val tableFeltResId = remember {
-        val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
-        if (id != 0) id else null
+    val tableFeltResId = remember(tableThemeId) {
+        if (tableThemeId == "felt_walnut_wood") {
+            R.drawable.texture_wood
+        } else {
+            val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
+            if (id != 0) id else null
+        }
     }
 
-    val feltBrush = remember {
-        Brush.radialGradient(
-            colors = listOf(
-                Color(0xFF225740),
-                Color(0xFF1B4332),
-                Color(0xFF0D281E),
-                Color(0xFF081C15),
-            ),
-        )
+    val feltTint = remember(tableThemeId) {
+        when (tableThemeId) {
+            "felt_royal_red" -> Color(0xFFE57373)
+            "felt_noble_blue" -> Color(0xFF64B5F6)
+            else -> null
+        }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(feltBrush)
-            .testTag("table_screen"),
-    ) {
-        // Cornice in legno attorno al panno, come in reference_table_screen.jpg (F1-21)
-        Image(
-            painter = painterResource(R.drawable.texture_wood),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Column(modifier = Modifier.fillMaxSize()) {
-            TableTopBar(uiState = uiState, onPause = { showPause = true })
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
-            ) {
-                if (tableFeltResId != null) {
-                    Image(
-                        painter = painterResource(id = tableFeltResId),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
+    val feltBrush = remember(tableThemeId) {
+        when (tableThemeId) {
+            "felt_royal_red" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF8B1E2B),
+                    Color(0xFF5E121C),
+                    Color(0xFF38080F),
+                    Color(0xFF1E0307),
+                ),
+            )
+            "felt_noble_blue" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF1F487E),
+                    Color(0xFF14325C),
+                    Color(0xFF0C1F3B),
+                    Color(0xFF06101F),
+                ),
+            )
+            "felt_walnut_wood" -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF4A2810),
+                    Color(0xFF331808),
+                    Color(0xFF220E04),
+                    Color(0xFF120702),
+                ),
+            )
+            else -> Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF225740),
+                    Color(0xFF1B4332),
+                    Color(0xFF0D281E),
+                    Color(0xFF081C15),
+                ),
+            )
+        }
+    }
+
+    CompositionLocalProvider(LocalCardBackTheme provides cardBackThemeId) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(feltBrush)
+                .testTag("table_screen"),
+        ) {
+            // Cornice in legno attorno al panno, come in reference_table_screen.jpg (F1-21)
+            Image(
+                painter = painterResource(R.drawable.texture_wood),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Column(modifier = Modifier.fillMaxSize()) {
+                TableTopBar(uiState = uiState, onPause = { showPause = true })
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
+                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .border(3.dp, GoldAccentColor, RoundedCornerShape(14.dp)),
+                ) {
+                    if (tableFeltResId != null) {
+                        Image(
+                            painter = painterResource(id = tableFeltResId),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            colorFilter = feltTint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize().background(feltBrush))
+                    }
+                    FeltLayout(
+                        uiState = uiState,
+                        soundManager = soundManager,
+                        onCardClicked = { card ->
+                            soundManager.play(SoundEffect.CARD_PLAY)
+                            onIntent(GameIntent.PlayCard(card))
+                        },
+                        onRequestHint = {
+                            soundManager.play(SoundEffect.BUTTON_CLICK)
+                            onIntent(GameIntent.RequestHint)
+                        },
+                        onAnimationRunningChanged = { isTableAnimating = it },
                     )
-                } else {
-                    Box(modifier = Modifier.fillMaxSize().background(feltBrush))
-                }
-                FeltLayout(
-                    uiState = uiState,
-                    soundManager = soundManager,
-                    onCardClicked = { card ->
-                        soundManager.play(SoundEffect.CARD_PLAY)
-                        onIntent(GameIntent.PlayCard(card))
-                    },
-                    onRequestHint = {
-                        soundManager.play(SoundEffect.BUTTON_CLICK)
-                        onIntent(GameIntent.RequestHint)
-                    },
-                )
             }
         }
 
@@ -323,11 +393,11 @@ public fun TableContent(
         )
 
         // Dialog Check di allenamento del Maestro (task F1-12)
-        val question = uiState.activeTrainingQuestion
-        if (question != null) {
+        if (question != null && canShowQuestion) {
             TrainingQuestionDialog(
                 question = question,
                 feedback = uiState.trainingQuestionFeedback,
+                opponentLastMove = uiState.opponentLastMove,
                 soundManager = soundManager,
                 onAnswer = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
                 onContinue = {
@@ -366,6 +436,7 @@ public fun TableContent(
             )
         }
 
+    }
     }
 }
 
@@ -775,6 +846,7 @@ private fun DealSummaryDialog(
 private fun TrainingQuestionDialog(
     question: TrainingQuestion,
     feedback: TrainingAnswerFeedback?,
+    opponentLastMove: OpponentMoveSummary? = null,
     soundManager: SoundManager = NoOpSoundManager(),
     onAnswer: (Int) -> Unit,
     onContinue: () -> Unit,
@@ -822,6 +894,65 @@ private fun TrainingQuestionDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (opponentLastMove != null) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, GoldAccentColor.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0x123B2213),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.game_opponent_last_move) + ":",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = DialogInk,
+                                fontSize = 11.sp,
+                            )
+                            PlaceholderCardView(
+                                card = opponentLastMove.card,
+                                isPlayable = false,
+                                width = 24.dp,
+                                height = 36.dp,
+                            )
+                            if (opponentLastMove.capture.isNotEmpty()) {
+                                Text(
+                                    text = stringResource(id = R.string.game_arrow_symbol),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = DialogInkSoft,
+                                    fontSize = 11.sp,
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    for (taken in opponentLastMove.capture) {
+                                        PlaceholderCardView(
+                                            card = taken,
+                                            isPlayable = false,
+                                            width = 24.dp,
+                                            height = 36.dp,
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = "(${stringResource(id = R.string.game_opponent_drop_table)})",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = DialogInkSoft,
+                                    fontSize = 11.sp,
+                                )
+                            }
+                        }
+                    }
+                }
+
                 Text(
                     text = stringResource(id = questionTitleResId),
                     style = MaterialTheme.typography.bodyLarge,
@@ -1380,11 +1511,17 @@ private fun FeltLayout(
     soundManager: SoundManager,
     onCardClicked: (Card) -> Unit,
     onRequestHint: () -> Unit,
+    onAnimationRunningChanged: (Boolean) -> Unit = {},
 ) {
     var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
     var activeDealAnim by remember { mutableStateOf<ActiveDealAnimation?>(null) }
     var lastCompletedDealId by remember { mutableStateOf(0L) }
     var lastHandledMoveId by remember { mutableStateOf(uiState.lastMoveId) }
+
+    val isAnimating = activeMoveAnim != null || lastHandledMoveId < uiState.lastMoveId || activeDealAnim != null
+    LaunchedEffect(isAnimating) {
+        onAnimationRunningChanged(isAnimating)
+    }
 
     LaunchedEffect(uiState.dealAnimationId) {
         if (uiState.dealAnimationId == 0L) return@LaunchedEffect

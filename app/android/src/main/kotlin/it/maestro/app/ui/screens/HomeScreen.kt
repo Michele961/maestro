@@ -1,15 +1,13 @@
 package it.maestro.app.ui.screens
 
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
-import it.maestro.app.ui.components.BubbleTail
-import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,17 +17,23 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import it.maestro.app.ui.components.BubbleTail
+import it.maestro.app.ui.components.MaestroSpeechBubble
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,12 +53,14 @@ import it.maestro.app.ui.components.MaestroDialogueBox
 import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.PillButtonVariant
+import it.maestro.app.ui.components.StreakPill
 import it.maestro.app.ui.components.WoodIconButton
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.components.WoodRowTile
 import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.BrassRivetGold
 import it.maestro.app.ui.theme.ButtonAmberBottom
+import it.maestro.app.ui.theme.ButtonGoldBorder
 import it.maestro.app.ui.theme.WoodSurfaceDark
 
 /**
@@ -69,9 +75,17 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 public fun HomeScreen(
     modifier: Modifier = Modifier,
     hasActiveMatch: Boolean = false,
+    streakCount: Int = 0,
+    credits: Int = 50,
+    avatarId: String = "avatar_default",
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
+    onDailyPuzzleClicked: () -> Unit = {},
+    onProfileClicked: () -> Unit = {},
+    onMissionsClicked: () -> Unit = {},
+    onAcademyClicked: () -> Unit = {},
+    onShopClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -86,7 +100,12 @@ public fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                HomeHeader(onSettingsClicked = onSettingsClicked)
+                HomeHeader(
+                    credits = credits,
+                    avatarId = avatarId,
+                    onSettingsClicked = onSettingsClicked,
+                    onProfileClicked = onProfileClicked,
+                )
                 // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
                 MaestroWelcome(modifier = Modifier.weight(1f))
                 // "Gioca ora" / "Riprendi partita" sul piedistallo di panno ovale, come nel mockup
@@ -139,16 +158,45 @@ public fun HomeScreen(
                     )
                 }
                 WoodRowTile(
-                    icon = R.drawable.icon_newspaper,
-                    title = stringResource(R.string.home_news),
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    icon = R.drawable.icon_book_quill,
+                    title = stringResource(R.string.home_daily_puzzle_button),
+                    modifier = Modifier.fillMaxWidth().height(50.dp).testTag("home_daily_puzzle_tile"),
+                    onClick = onDailyPuzzleClicked,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     WoodRowTile(
-                        icon = R.drawable.icon_gift,
-                        title = stringResource(R.string.home_daily_rewards),
+                        icon = R.drawable.icon_missions,
+                        title = stringResource(R.string.home_daily_missions),
                         iconSize = 52.dp,
-                        modifier = Modifier.weight(1f).height(72.dp),
+                        modifier = Modifier.weight(1f).height(72.dp).testTag("home_missions_tile"),
+                        onClick = onMissionsClicked,
+                        trailingBadge = if (streakCount > 0) {
+                            {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFF2A170C))
+                                        .border(1.dp, ButtonGoldBorder, RoundedCornerShape(12.dp))
+                                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                                        .testTag("home_missions_streak_badge"),
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.icon_flame),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = stringResource(R.string.home_missions_streak_badge, streakCount),
+                                        color = BrassRivetGold,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaestroDisplayFont,
+                                    )
+                                }
+                            }
+                        } else null,
                     )
                     WoodPanel(modifier = Modifier.weight(1f).height(72.dp)) {
                         Row(
@@ -172,19 +220,39 @@ public fun HomeScreen(
                     }
                 }
             }
-            BottomNavBar()
+            BottomNavBar(
+                onDailyPuzzleClicked = onDailyPuzzleClicked,
+                onProfileClicked = onProfileClicked,
+                onAcademyClicked = onAcademyClicked,
+                onShopClicked = onShopClicked,
+            )
         }
     }
 }
 
 @Composable
-private fun HomeHeader(onSettingsClicked: () -> Unit) {
+private fun HomeHeader(
+    credits: Int,
+    avatarId: String = "avatar_default",
+    onSettingsClicked: () -> Unit,
+    onProfileClicked: () -> Unit = {},
+) {
+    val avatarRes = when (avatarId) {
+        "avatar_alt" -> R.drawable.avatar_player_alt
+        "avatar_expert" -> R.drawable.avatar_expert
+        else -> R.drawable.avatar_player_default
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box {
-            FramedPortrait(portrait = R.drawable.avatar_player_default, size = 56.dp)
+        Box(
+            modifier = Modifier
+                .testTag("home_player_profile")
+                .clickable(onClick = onProfileClicked),
+        ) {
+            FramedPortrait(portrait = avatarRes, size = 56.dp)
             Image(
                 painter = painterResource(R.drawable.icon_shield_fleur),
                 contentDescription = null,
@@ -199,9 +267,17 @@ private fun HomeHeader(onSettingsClicked: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                CurrencyPill(icon = R.drawable.icon_coin, value = stringResource(R.string.home_coins_placeholder))
-                CurrencyPill(icon = R.drawable.icon_gem, value = stringResource(R.string.home_gems_placeholder))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CurrencyPill(
+                    icon = R.drawable.icon_coin,
+                    value = credits.toString(),
+                    modifier = Modifier.testTag("home_credits_pill"),
+                )
+                CurrencyPill(
+                    icon = R.drawable.icon_gem,
+                    value = stringResource(R.string.home_gems_placeholder),
+                    modifier = Modifier.testTag("home_gems_pill"),
+                )
             }
         }
         WoodIconButton(
@@ -316,7 +392,12 @@ private fun GameTile(
 }
 
 @Composable
-private fun BottomNavBar() {
+private fun BottomNavBar(
+    onDailyPuzzleClicked: () -> Unit = {},
+    onProfileClicked: () -> Unit = {},
+    onAcademyClicked: () -> Unit = {},
+    onShopClicked: () -> Unit = {},
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -324,8 +405,26 @@ private fun BottomNavBar() {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_trophy, label = stringResource(R.string.home_nav_leaderboard))
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_book_quill, label = stringResource(R.string.home_nav_training))
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_trophy,
+            label = stringResource(R.string.home_nav_leaderboard),
+            onClick = onProfileClicked,
+            modifier = Modifier.testTag("home_nav_profile_button"),
+        )
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_book_quill,
+            label = stringResource(R.string.academy_nav_title),
+            onClick = onAcademyClicked,
+            modifier = Modifier.testTag("home_nav_academy_button"),
+        )
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_pouch,
+            label = stringResource(R.string.home_nav_shop),
+            onClick = onShopClicked,
+            modifier = Modifier.testTag("home_nav_shop_button"),
+        )
     }
 }

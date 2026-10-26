@@ -88,6 +88,20 @@
     <string name="review_capture">Captures: %1$s</string>
     <string name="review_no_moves">No moves recorded</string>
     <string name="review_table_empty">Empty table</string>
+    <string name="review_retry_button">Retry Hand</string>
+    <string name="review_retry_title">Retry Hand</string>
+    <string name="review_retry_prompt">Which card would you play instead?</string>
+    <string name="review_retry_correct">Excellent move! You found the best play!</string>
+    <string name="review_retry_imperfect">Still imperfect: there is a better play. Try again!</string>
+    <string name="review_retry_exit">Back to review</string>
+    <string name="review_retry_solved_badge">Solved</string>
+    <string name="review_hint_capture_available">There is a possible capture on the table with one of your cards.</string>
+    <string name="review_hint_scopa">Watch out: there is a Scopa within reach!</string>
+    <string name="review_hint_settebello">Watch out for the Settebello on the table or in hand!</string>
+    <string name="review_hint_denari">Focus on controlling Denari cards.</string>
+    <string name="review_hint_primiera_sette">Sevens are crucial for the Primiera point.</string>
+    <string name="review_hint_safe_discard">Sometimes the best play is a safe discard.</string>
+    <string name="review_hint_generic">Weigh your capture options and safety carefully.</string>
     <string name="game_hint_button">Ask the Master</string>
     <string name="game_hint_loading">The Master is thinking…</string>
     <string name="game_hint_banner">The Master suggests: %1$s</string>
@@ -138,6 +152,7 @@
     <string name="home_gems_placeholder">280</string>
     <string name="home_news">Club news</string>
     <string name="home_daily_rewards">Daily rewards</string>
+    <string name="home_daily_missions">Daily missions</string>
     <string name="home_friends">Friends</string>
     <string name="home_nav_leaderboard">Leaderboard</string>
     <string name="home_nav_training">Training</string>
@@ -177,4 +192,326 @@
     <string name="game_card_play_confirm">PLAY</string>
     <string name="game_card_release_to_play">Release to play</string>
     <string name="game_arrow_symbol">➔</string>
+    <string name="puzzle_screen_title">DAILY PUZZLE</string>
+    <string name="puzzle_number_format">Puzzle #%1$d</string>
+    <string name="puzzle_coach_initial">Here is today\'s puzzle: look closely at the table and your hand. Find the winning play!</string>
+    <string name="puzzle_coach_hint_level1">Tricky move, but there is something better on the board: take another look at the table!</string>
+    <string name="puzzle_coach_hint_sweep">Careful: there is a sweep in the air, just calculate the combination correctly.</string>
+    <string name="puzzle_coach_hint_win">This is the deciding trick: count carefully the points separating you from victory.</string>
+    <string name="puzzle_coach_hint_points">Coins and Sevens decide the deal: look where the real points lie.</string>
+    <string name="puzzle_coach_solved">Magnificent! Masterful capture and point won: that\'s how a true player thinks!</string>
+    <string name="puzzle_coach_already_solved">You have already completed today\'s challenge! Come back tomorrow for a new puzzle.</string>
+    <string name="puzzle_solved_title">CHALLENGE SOLVED!</string>
+    <string name="puzzle_solved_subtitle_first_try">Solved on the first attempt!</string>
+    <string name="puzzle_solved_subtitle_other_tries">Solved in %1$d attempts!</string>
+    <string name="puzzle_button_share">SHARE</string>
+    <string name="puzzle_button_home">BACK TO HOME</string>
+    <string name="puzzle_button_retry">TRY AGAIN</string>
+    <string name="puzzle_table_empty">Empty table</string>
+    <string name="puzzle_attempt_failed_banner">Attempt #%1$d failed. Read the hint!</string>
+    <string name="home_daily_puzzle_button">Daily puzzle</string>
+    <string name="profile_title">Profile &amp; Mastery</string>
+    <string name="profile_elo_badge">%1$d ELO</string>
+    <string name="profile_accuracy_label">Average accuracy: %1$d%%</string>
+    <string name="profile_elo_explanation">Mastery Index calculated on the mathematical precision of your choices, independent of card luck.</string>
+    <string name="profile_radar_title">Ability Radar</string>
+    <string name="profile_radar_subtitle">Strategic evaluation on 5 axes</string>
+    <string name="profile_matches_played">Analyzed matches: %1$d</string>
+    <string name="profile_stats_title">Player Statistics</string>
+    <string name="radar_axis_sevens">Sevens</string>
+    <string name="radar_axis_denari">Coins</string>
+    <string name="radar_axis_primiera">Primiera</string>
+    <string name="radar_axis_board">Board</string>
+    <string name="radar_axis_endgame">Endgame</string>
+    <string name="mastery_rank_principiante">Novice</string>
+    <string name="mastery_rank_dilettante">Amateur</string>
+    <string name="mastery_rank_intermedio">Intermediate</string>
+    <string name="mastery_rank_avanzato">Advanced</string>
+    <string name="mastery_rank_maestro">Club Master</string>
+    <string name="profile_advice_default">Play regularly and complete the Maestro\'s checks to calibrate your Ability Radar.</string>
+    <string name="profile_advice_master">A tactical vision of a true Club Master. Keep it up!</string>
+    <string name="profile_advice_sevens">Train your Sevens memory in flash checks: forgetting the 7s gives away the Primiera.</string>
+    <string name="profile_advice_denari">Watch the coins: keep Coins covered and protect the Settebello at all costs.</string>
+    <string name="profile_advice_primiera">Sevens and Sixes are the pillars of Primiera: don\'t waste them on ordinary captures.</string>
+    <string name="profile_advice_board">Mind your defensive drops: never leave easy sums that gift a Sweep.</string>
+    <string name="profile_advice_endgame">In the endgame with an empty deck, count opponent cards to deduce their final capture.</string>
+    <string name="profile_view_button">Profile &amp; Mastery</string>
+    <string name="post_match_view_profile">VIEW ABILITY RADAR</string>
+    <string name="post_match_mastery_updated">Mastery Index: %1$d ELO</string>
+    <string name="mission_daily_puzzle_title">Daily Puzzle</string>
+    <string name="mission_daily_puzzle_desc">Solve the Maestro\'s daily tactical puzzle.</string>
+    <string name="mission_accuracy_80_title">Masterful Accuracy</string>
+    <string name="mission_accuracy_80_desc">Finish a match with at least 80%% accuracy.</string>
+    <string name="mission_sevens_check_title">Eye on Sevens</string>
+    <string name="mission_sevens_check_desc">Correctly answer 2 flash checks on Sevens.</string>
+    <string name="mission_sweeps_title">Clean Sweep</string>
+    <string name="mission_sweeps_desc">Make at least 2 sweeps during matches.</string>
+    <string name="mission_denari_title">Gold Hunter</string>
+    <string name="mission_denari_desc">Capture at least 6 Coins cards in a match.</string>
+    <string name="mission_no_blunders_title">Safe Play</string>
+    <string name="mission_no_blunders_desc">Play a match without committing any Blunder.</string>
+    <string name="retention_streak_title">Game streak</string>
+    <string name="retention_streak_days">%1$d consecutive days</string>
+    <string name="retention_streak_record">Record: %1$d days</string>
+    <string name="retention_streak_freeze_available">Streak Freeze active</string>
+    <string name="retention_streak_freeze_desc">Protects your streak if you miss a day</string>
+    <string name="retention_streak_freeze_none">No Streak Freeze</string>
+    <string name="retention_streak_freeze_none_desc">Play daily to keep your streak alive</string>
+    <string name="retention_missions_title">Daily Missions</string>
+    <string name="retention_missions_reward">+%1$d Credits</string>
+    <string name="retention_missions_completed_badge">COMPLETED</string>
+    <string name="retention_maestro_encouragement">Three good habits a day forge the mind of a true Master!</string>
+    <string name="home_missions_streak_badge">%1$d d</string>
+    <string name="academy_screen_title">MAESTRO\'S ACADEMY</string>
+    <string name="academy_screen_subtitle">The Club\'s Educational Path</string>
+    <string name="academy_nav_title">Academy</string>
+    <string name="academy_chapter_number">Chapter %1$d</string>
+    <string name="academy_chapter_progress">%1$d/%2$d Lessons</string>
+    <string name="academy_chapter_completed">CHAPTER COMPLETED</string>
+    <string name="academy_lesson_number">Lesson %1$d.%2$d</string>
+    <string name="academy_lesson_locked">Complete the previous lesson to unlock</string>
+    <string name="academy_module_number">Module %1$d</string>
+    <string name="academy_module_locked">Complete the previous module to unlock</string>
+    <string name="academy_module_completed_badge">COMPLETED</string>
+    <string name="academy_button_start">START LESSON</string>
+    <string name="academy_button_review">REPLAY LESSON</string>
+    <string name="academy_button_locked">LOCKED</string>
+    <string name="academy_button_next_step">NEXT STEP</string>
+    <string name="academy_button_complete">CLAIM BADGE</string>
+    <string name="academy_button_back_map">BACK TO ACADEMY</string>
+    <string name="academy_golden_rule_header">IRON RULE OF THE CLUB</string>
+    <string name="academy_table_title">The Maestro\'s Table</string>
+    <string name="academy_your_hand">Your Hand</string>
+    <string name="academy_question_prompt">What do the rules say?</string>
+    <string name="academy_card_action_hint">Tap the correct card to play it on the table</string>
+    <string name="academy_action_wrong_card">Suboptimal play. Follow the Maestro\'s advice and choose the designated card!</string>
+    <string name="academy_badge_plus_3_points">+3 Points</string>
+    <string name="academy_badge_king_10_pt">King = 10 pt</string>
+    <string name="academy_badge_six_18_pt">Six = 18 pt</string>
+    <string name="academy_badge_plus_15_pt">+15 pt (4th Suit!)</string>
+    <string name="academy_badge_plus_10_pt">+10 pt</string>
+    <string name="academy_badge_sum_15_safe">Sum 15 (Safe)</string>
+    <string name="academy_badge_sum_8_risk">Sum 8 (Sweep Risk!)</string>
+
+    <!-- CHAPTER 1 -->
+    <string name="academy_ch1_title">The Club Foundations</string>
+    <string name="academy_ch1_subtitle">Formal Rules and Deck Points</string>
+    <string name="academy_ch1_desc">Master mandatory single captures, the value of Settebello, and deck point economics.</string>
+
+    <string name="academy_l1_1_title">The Single Capture</string>
+    <string name="academy_l1_1_subtitle">The Iron Rule of Article 3</string>
+    <string name="academy_l1_1_desc">The lone card commands over the pile: absolute priority on single matching cards.</string>
+    <string name="academy_l1_1_rule">A single matching card always takes absolute precedence over any sum on the table.</string>
+    <string name="academy_l1_1_speech_q">A strict rule applies at the club: on the table lie a 7 of Swords, a 4 of Cups, and a 3 of Batons. In hand you hold the 7 of Coins. May you choose to take 4 and 3, leaving the 7?</string>
+    <string name="academy_l1_1_badge_q">Mandatory single capture</string>
+    <string name="academy_l1_1_opt1">No, the rules require capturing the single card</string>
+    <string name="academy_l1_1_fb1">Correct! Rule 3: the single card always commands over any combination!</string>
+    <string name="academy_l1_1_opt2">Yes, I can freely choose what to take</string>
+    <string name="academy_l1_1_fb2">Common mistake! If a matching single card is present, capturing it is mandatory by law.</string>
+    <string name="academy_l1_1_speech_sum">Fundamental rule learned! Always remember: a matching single card on board takes precedence over any sum.</string>
+
+    <string name="academy_l1_2_title">The Four Deck Points</string>
+    <string name="academy_l1_2_subtitle">The Deal Economics</string>
+    <string name="academy_l1_2_desc">Cards, Coins, Settebello, and Primiera: how a hand is decided.</string>
+    <string name="academy_l1_2_rule">Each deal awards 4 basic points: Cards (21+), Coins (6+), Settebello, and Primiera.</string>
+    <string name="academy_l1_2_speech_q">Each deal awards 4 fixed points. How many Coins cards are required to secure the Coins point?</string>
+    <string name="academy_l1_2_badge_q">Deck points</string>
+    <string name="academy_l1_2_opt1">At least 6 cards out of 10 (absolute majority)</string>
+    <string name="academy_l1_2_fb1">Perfect! 6 coins out of 10 mathematically guarantees the point.</string>
+    <string name="academy_l1_2_opt2">5 cards out of 10 are enough</string>
+    <string name="academy_l1_2_fb2">Careful: with 5 and 5 the point is tied and awarded to no one!</string>
+    <string name="academy_l1_2_speech_sum">Excellent! Knowing the numerical thresholds allows calculating sacrifices needed to win the gold.</string>
+
+    <string name="academy_l1_3_title">The King of Coins</string>
+    <string name="academy_l1_3_subtitle">The Triple Value of Settebello</string>
+    <string name="academy_l1_3_desc">Why the 7 of Coins alone can flip up to 3 points out of 4.</string>
+    <string name="academy_l1_3_rule">The Settebello is worth 1 clean point, 1 coin, and 21 Primiera points: always protect it.</string>
+    <string name="academy_l1_3_speech_act">The Settebello alone is worth up to 3 deck points out of 4: clean point, gold for Coins, and 21 for Primiera. Capture it now with your 7 of Batons!</string>
+    <string name="academy_l1_3_badge_act">Capture the Settebello!</string>
+    <string name="academy_l1_3_speech_sum">Well done! Masterful capture: the Settebello is secure in your treasury!</string>
+
+    <string name="academy_l1_4_title">Choosing Between Sums</string>
+    <string name="academy_l1_4_subtitle">When No Single Card Exists</string>
+    <string name="academy_l1_4_desc">Sovereign freedom of choice: always favor gold and strong suits.</string>
+    <string name="academy_l1_4_rule">If no single matching card exists, always select the combination holding Coins or high Primiera cards.</string>
+    <string name="academy_l1_4_speech_q">On the table are 5 and 2 of Swords, and 4 and 3 of Coins. You hold a 7. There is no single 7. Which pair should you capture?</string>
+    <string name="academy_l1_4_badge_q">Two valid combinations</string>
+    <string name="academy_l1_4_opt1">Take the 4 and 3 of Coins to secure gold points</string>
+    <string name="academy_l1_4_fb1">Perfect! When no single card exists, the choice is yours: always bag Coins and useful cards!</string>
+    <string name="academy_l1_4_opt2">Take the 5 and 2 of Swords indifferently</string>
+    <string name="academy_l1_4_fb2">Careful: leaving Coins on the board gifts easy points to your opponent!</string>
+    <string name="academy_l1_4_speech_sum">First Chapter completed with honor! You now possess the club fundamentals.</string>
+
+    <!-- CHAPTER 2 -->
+    <string name="academy_ch2_title">The Science of Primiera</string>
+    <string name="academy_ch2_subtitle">The Hidden Mathematics of the 4 Suits</string>
+    <string name="academy_ch2_desc">Discover the Renaissance scoring scale (7=21, 6=18), the empty suit trap, and rapid counting.</string>
+
+    <string name="academy_l2_1_title">The Paradox of the King</string>
+    <string name="academy_l2_1_subtitle">The Renaissance Point Scale</string>
+    <string name="academy_l2_1_desc">In Primiera face cards are weak: discover the true rulers of the deck.</string>
+    <string name="academy_l2_1_rule">In Primiera Face cards are worth only 10 points; Sevens equal 21 and Sixes equal 18.</string>
+    <string name="academy_l2_1_speech_q">Many think face cards are worth a lot. In Primiera the scale is inverted: 7 is 21, 6 is 18, Ace is 16. How much is a King worth in Primiera?</string>
+    <string name="academy_l2_1_badge_q">Scale: 7=21, 6=18, Ace=16, 5=15, Face=10</string>
+    <string name="academy_l2_1_opt1">Only 10 points, even less than a Two (12 pt)</string>
+    <string name="academy_l2_1_fb1">Exactly! Kings and Jacks are only worth 10 points. The true rulers of Primiera are Sevens and Sixes!</string>
+    <string name="academy_l2_1_opt2">20 points, because it is the highest card in the deck</string>
+    <string name="academy_l2_1_fb2">No! Don\'t let the crown fool you: all face cards are only worth 10 points in Primiera!</string>
+    <string name="academy_l2_1_speech_sum">Great! Never sacrifice a 6 or 7 to save a face card in Primiera.</string>
+
+    <string name="academy_l2_2_title">The Four Suits Formula</string>
+    <string name="academy_l2_2_subtitle">The Value of Complete Coverage</string>
+    <string name="academy_l2_2_desc">Primiera sums the top card of each suit: leave no empty holes.</string>
+    <string name="academy_l2_2_rule">Primiera is calculated by summing the best card per suit: Swords + Cups + Coins + Batons.</string>
+    <string name="academy_l2_2_speech_q">How is the Primiera score calculated at the end of the deal?</string>
+    <string name="academy_l2_2_badge_q">The 4 suits of the deck</string>
+    <string name="academy_l2_2_opt1">By summing the highest card for each of the 4 suits</string>
+    <string name="academy_l2_2_fb1">Exactly! Having at least one card in every suit is essential to avoid a zero score.</string>
+    <string name="academy_l2_2_opt2">By summing all captured cards of rank 7</string>
+    <string name="academy_l2_2_fb2">Wrong: Sevens are valuable, but if a suit is missing, their value is wasted!</string>
+    <string name="academy_l2_2_speech_sum">Golden rule: a Primiera with all 4 suits covered is an impregnable fortress.</string>
+
+    <string name="academy_l2_3_title">The Empty Suit Trap</string>
+    <string name="academy_l2_3_subtitle">Avoiding the Fatal Zero</string>
+    <string name="academy_l2_3_desc">Why three 7s and zero Batons loses Primiera against modest cards.</string>
+    <string name="academy_l2_3_rule">An empty suit awards 0 points: covering all 4 suits takes absolute priority over ordinary captures.</string>
+    <string name="academy_l2_3_speech_act">You already captured three Sevens (Swords, Cups, and Coins), but zero Batons! On the table lies the 5 of Batons. Capture it immediately with your 5 of Swords to cover the fourth suit!</string>
+    <string name="academy_l2_3_badge_act">Protect all 4 suits</string>
+    <string name="academy_l2_3_speech_sum">Well done! With the 5 of Batons you locked Primiera at 78 points and avoided defeat!</string>
+
+    <string name="academy_l2_4_title">Counting Sevens and Sixes</string>
+    <string name="academy_l2_4_subtitle">Rapid Primiera Calculation</string>
+    <string name="academy_l2_4_desc">Learn to calculate winning scores at a glance (84, 81, 78 pt).</string>
+    <string name="academy_l2_4_rule">With 4 suits covered, 3 Sevens and a Six score 81 points and are almost unbeatable.</string>
+    <string name="academy_l2_4_speech_q">Both players have covered all 4 suits. You captured 3 Sevens and a Six (81 pt). Your opponent has 1 Seven and three Sixes (75 pt). Who wins Primiera?</string>
+    <string name="academy_l2_4_badge_q">Calculation: 21+21+21+18 = 81 pt</string>
+    <string name="academy_l2_4_opt1">You win: 81 points against your opponent\'s 75 points</string>
+    <string name="academy_l2_4_fb1">Flawless mathematics! Whoever has more Sevens with all suits covered dominates the count.</string>
+    <string name="academy_l2_4_opt2">It\'s a tie because both have high cards</string>
+    <string name="academy_l2_4_fb2">No: Primiera is calculated by summing the exact values of each suit (81 to 75)!</string>
+    <string name="academy_l2_4_speech_sum">Second Chapter mastered! You now command the deepest secrets of Primiera.</string>
+
+    <!-- CHAPTER 3 -->
+    <string name="academy_ch3_title">Board Defense &amp; Anti-Sweep</string>
+    <string name="academy_ch3_subtitle">Risk Control and Protected Drops</string>
+    <string name="academy_ch3_desc">Learn the critical threshold of 10, how to fortify the board against Sweeps, and the dealer\'s endgame.</string>
+
+    <string name="academy_l3_1_title">The Threshold of Ten</string>
+    <string name="academy_l3_1_subtitle">Anti-Sweep Mathematics</string>
+    <string name="academy_l3_1_desc">No single card equals 11 or higher: a sum above 10 is completely safe.</string>
+    <string name="academy_l3_1_rule">If the total sum of board cards exceeds 10, no single card can make a Sweep.</string>
+    <string name="academy_l3_1_speech_q">On the table lies a 4. You cannot capture. In hand you hold a 3 and a King (10). Playing 3 makes the sum 7; playing King makes 14. Which play protects you from a Sweep?</string>
+    <string name="academy_l3_1_badge_q">Sum > 10 = Zero Sweep risk</string>
+    <string name="academy_l3_1_opt1">The King: raising the sum to 14 makes a single-card Sweep impossible</string>
+    <string name="academy_l3_1_fb1">Hats off! No single card equals 14: when the sum exceeds 10, the board is completely safe!</string>
+    <string name="academy_l3_1_opt2">The 3: it\'s a lower card and less appealing to the opponent</string>
+    <string name="academy_l3_1_fb2">Danger! With 4+3=7 any opponent holding a 7 lands an immediate Sweep and cleans the board!</string>
+    <string name="academy_l3_1_speech_sum">Fundamental rule: always exceed 10 when you have no captures available.</string>
+
+    <string name="academy_l3_2_title">Fortifying the Board</string>
+    <string name="academy_l3_2_subtitle">The Art of Safe Drops</string>
+    <string name="academy_l3_2_desc">How to select a high card to avoid unpleasant surprises.</string>
+    <string name="academy_l3_2_rule">Drop a face card on a medium card to fortify the board and extinguish any Sweep hopes.</string>
+    <string name="academy_l3_2_speech_act">On the board lies a 6 of Batons. You have no valid captures. Play the Horse (9) to push the total to 15 and prevent gifting a Sweep!</string>
+    <string name="academy_l3_2_badge_act">Exceed 10</string>
+    <string name="academy_l3_2_speech_sum">Flawless maneuver! Sum 15: the board is fortified and the opponent cannot make a Sweep.</string>
+
+    <string name="academy_l3_3_title">The Odd Rule</string>
+    <string name="academy_l3_3_subtitle">Blind Numbers of the Club</string>
+    <string name="academy_l3_3_desc">Creating sums that the opponent cannot combine with remaining cards.</string>
+    <string name="academy_l3_3_rule">In defensive drops sacrifice lost neutral suits, protecting Coins and Primiera suits.</string>
+    <string name="academy_l3_3_speech_q">You must drop a card without capturing. In hand you have 2 of Swords and 6 of Coins. Which is wiser to sacrifice?</string>
+    <string name="academy_l3_3_badge_q">Defensive drop</string>
+    <string name="academy_l3_3_opt1">The 2 of Swords: neutral card with minimal value for Coins and Primiera</string>
+    <string name="academy_l3_3_fb1">Perfect! The 2 of Swords gives away no gold and doesn\'t shift Primiera.</string>
+    <string name="academy_l3_3_opt2">The 6 of Coins: it has low capture power</string>
+    <string name="academy_l3_3_fb2">Madness! The 6 of Coins is worth 18 Primiera points and a crucial Coin!</string>
+    <string name="academy_l3_3_speech_sum">Great defensive vision! Never surrender gold and Primiera out of carelessness.</string>
+
+    <string name="academy_l3_4_title">The Dealer\'s Final Hand</string>
+    <string name="academy_l3_4_subtitle">The Endgame Privilege</string>
+    <string name="academy_l3_4_desc">Sweeps are not allowed on the final trick: how to maximize your haul.</string>
+    <string name="academy_l3_4_rule">On the final trick of the deal Sweeps are forbidden by law: the last capture sweeps up all remaining cards.</string>
+    <string name="academy_l3_4_speech_q">We are at the very last play of the deal. Either you or your opponent captures all cards on the table. Does it count as a Sweep?</string>
+    <string name="academy_l3_4_badge_q">Final capture of the deal</string>
+    <string name="academy_l3_4_opt1">No, by law the last capture of the deal never counts as a Sweep</string>
+    <string name="academy_l3_4_fb1">Fundamental club rule! On the final trick, Sweeps are never awarded: remaining cards go to whoever made the last capture.</string>
+    <string name="academy_l3_4_opt2">Yes, emptying the table is always a Sweep</string>
+    <string name="academy_l3_4_fb2">False! The final rule expressly forbids awarding a Sweep on the last play.</string>
+    <string name="academy_l3_4_speech_sum">Third Chapter conquered! You are now a seasoned defensive strategist.</string>
+
+    <!-- CHAPTER 4 -->
+    <string name="academy_ch4_title">The Master\'s Vision</string>
+    <string name="academy_ch4_subtitle">Table Memory and Endgame</string>
+    <string name="academy_ch4_desc">Train your flash memory on played Sevens, deduce hidden cards, and master the empty deck finale.</string>
+
+    <string name="academy_l4_1_title">Memory of the Sevens</string>
+    <string name="academy_l4_1_subtitle">The Club\'s Flash Check</string>
+    <string name="academy_l4_1_desc">Mentally counting the four Sevens to know exactly where the Settebello lies.</string>
+    <string name="academy_l4_1_rule">Whoever tracks the flow of Sevens always knows if the Settebello is in the deck, on board, or in enemy hands.</string>
+    <string name="academy_l4_1_speech_q">The 7 of Swords, 7 of Cups, and 7 of Batons have already been played. On board lie a 4 and a 3. The opponent plays an Ace. What can you deduce with certainty?</string>
+    <string name="academy_l4_1_badge_q">Three Sevens already played</string>
+    <string name="academy_l4_1_opt1">The opponent does NOT hold the Settebello, or they would have scored a Sweep on 4+3</string>
+    <string name="academy_l4_1_fb1">Masterful deduction! Having declined a Sweep on 7, the Settebello is still in the deck or in your hand!</string>
+    <string name="academy_l4_1_opt2">The opponent holds the Settebello and is hiding it</string>
+    <string name="academy_l4_1_fb2">Impossible: in Scopa no one turns down a guaranteed clean Sweep!</string>
+    <string name="academy_l4_1_speech_sum">Sharp eye! This true deduction separates beginners from Club Masters.</string>
+
+    <string name="academy_l4_2_title">Reading Hidden Cards</string>
+    <string name="academy_l4_2_subtitle">Deduce the Opponent\'s Hand</string>
+    <string name="academy_l4_2_desc">Every missed capture tells you what the opponent does not possess.</string>
+    <string name="academy_l4_2_rule">Cards the opponent does not play when easy combinations exist reveal their entire hand.</string>
+    <string name="academy_l4_2_speech_q">On the board lie a 6 and a 2. The opponent captures neither 6 nor 2 and drops a King. What can you deduce?</string>
+    <string name="academy_l4_2_badge_q">Missed captures</string>
+    <string name="academy_l4_2_opt1">They hold neither a 6, nor a 2, nor an 8 (6+2)</string>
+    <string name="academy_l4_2_fb1">Exactly! Had they held any of those cards they would have captured: their hand lacks 2, 6, and 8!</string>
+    <string name="academy_l4_2_opt2">They have a hand full of low cards</string>
+    <string name="academy_l4_2_fb2">No: they proved they lack the cards corresponding to the board.</string>
+    <string name="academy_l4_2_speech_sum">Clear mind! Playing with knowledge of enemy cards transforms Scopa into pure mastery.</string>
+
+    <string name="academy_l4_3_title">The Empty Deck Finale</string>
+    <string name="academy_l4_3_subtitle">The Battle for the Final Capture</string>
+    <string name="academy_l4_3_desc">In the final three hands with an exhausted deck, keep initiative and clear the board.</string>
+    <string name="academy_l4_3_rule">In the empty deck endgame, making the last capture collects all remaining cards and decides Cards and Coins.</string>
+    <string name="academy_l4_3_speech_act">Empty deck, final cards: on board lie a Jack (8 of Batons) and an Ace of Coins. You hold the Jack of Cups. Play it now to secure the last capture and collect all remaining cards!</string>
+    <string name="academy_l4_3_badge_act">Deciding final hand</string>
+    <string name="academy_l4_3_speech_sum">Absolute triumph! You completed the entire Academy curriculum: you are a true Club Master!</string>
+
+    <!-- La Bottega del Maestro (Shop & Cosmetic Customization, F2-11) -->
+    <string name="shop_screen_title">MAESTRO\'S SHOP</string>
+    <string name="shop_screen_subtitle">Customize Club aesthetics</string>
+    <string name="shop_tab_tables">Tables</string>
+    <string name="shop_tab_card_backs">Card Backs</string>
+    <string name="shop_tab_avatars">Crests</string>
+    <string name="shop_action_equip">EQUIP</string>
+    <string name="shop_action_equipped">EQUIPPED</string>
+    <string name="shop_action_unlock">UNLOCK (%1$d)</string>
+    <string name="shop_action_free">FREE</string>
+    <string name="shop_action_insufficient_funds">INSUFFICIENT CREDITS</string>
+    <string name="shop_unlock_success">Item unlocked and equipped!</string>
+    <string name="shop_credits_label">%1$d Credits</string>
+
+    <string name="cosmetic_table_green_title">Classic Green Felt</string>
+    <string name="cosmetic_table_green_desc">The traditional club green felt, elegant and relaxing.</string>
+    <string name="cosmetic_table_red_title">Noble Red Velvet</string>
+    <string name="cosmetic_table_red_desc">The exclusive table for grand evening showdowns among masters.</string>
+    <string name="cosmetic_table_blue_title">Royal Blue Felt</string>
+    <string name="cosmetic_table_blue_desc">Midnight blue felt with deep reflections for true connoisseurs.</string>
+    <string name="cosmetic_table_wood_title">Solid Walnut</string>
+    <string name="cosmetic_table_wood_desc">Solid hand-inlaid table with dark forest grain.</string>
+
+    <string name="cosmetic_card_back_classic_title">Club Classic</string>
+    <string name="cosmetic_card_back_classic_desc">Traditional geometric blue Treviso card back.</string>
+    <string name="cosmetic_card_back_gold_title">Maestro\'s Gold</string>
+    <string name="cosmetic_card_back_gold_desc">Polished gold finish reserved for table veterans.</string>
+    <string name="cosmetic_card_back_red_title">Antique Crimson</string>
+    <string name="cosmetic_card_back_red_desc">Vintage damask crimson pattern from historic clubs.</string>
+
+    <string name="cosmetic_avatar_default_title">Club Apprentice</string>
+    <string name="cosmetic_avatar_default_desc">Portrait of the beginning player taking their first steps.</string>
+    <string name="cosmetic_avatar_alt_title">Chosen Player</string>
+    <string name="cosmetic_avatar_alt_desc">Refined profile for players who calculate every opponent discard.</string>
+    <string name="cosmetic_avatar_expert_title">Grand Master</string>
+    <string name="cosmetic_avatar_expert_desc">The supreme honor of Club card masters.</string>
+
 </resources>

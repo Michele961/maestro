@@ -7,12 +7,28 @@ import it.maestro.app.audio.AndroidSoundManager
 import it.maestro.app.audio.SoundManager
 import it.maestro.app.crash.CrashReporter
 import it.maestro.app.crash.DefaultCrashReporter
+import it.maestro.app.data.local.datastore.AcademyRepository
+import it.maestro.app.data.local.datastore.DailyPuzzleRepository
+import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
+import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
+import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
+import it.maestro.app.data.local.datastore.DataStoreRetentionRepository
 import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
+import it.maestro.app.data.local.datastore.MasteryRepository
+import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
+import it.maestro.app.data.local.wallet.RoomWalletRepository
+import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.game.GameViewModel
+import it.maestro.app.ui.screens.DailyMissionsViewModel
+import it.maestro.app.ui.screens.DailyPuzzleViewModel
+import it.maestro.app.ui.screens.GameReviewViewModel
+import it.maestro.app.ui.screens.ProfileViewModel
+import it.maestro.app.ui.screens.ShopViewModel
+import it.maestro.app.ui.screens.academy.AcademyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +38,10 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
+private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
+private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
+private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
+private val Context.academyDataStore by preferencesDataStore(name = "maestro_academy")
 
 /**
  * Modulo Koin principale per l'iniezione delle dipendenze dell'app Android (ADR-0012, task F1-08, F1-14).
@@ -36,13 +56,34 @@ public val appModule: Module = module {
     }
 
     single { get<MaestroDatabase>().savedMatchDao() }
+    single { get<MaestroDatabase>().walletDao() }
 
     single<MatchRepository> {
         RoomMatchRepository(dao = get())
     }
 
+    single<WalletRepository> {
+        RoomWalletRepository(dao = get())
+    }
+
     single<SettingsRepository> {
         DataStoreSettingsRepository(dataStore = androidContext().dataStore)
+    }
+
+    single<DailyPuzzleRepository> {
+        DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
+    }
+
+    single<MasteryRepository> {
+        DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore)
+    }
+
+    single<RetentionRepository> {
+        DataStoreRetentionRepository(dataStore = androidContext().retentionDataStore)
+    }
+
+    single<AcademyRepository> {
+        DataStoreAcademyRepository(dataStore = androidContext().academyDataStore)
     }
 
     single<SoundManager> {
@@ -60,6 +101,45 @@ public val appModule: Module = module {
     viewModel {
         GameViewModel(
             matchRepository = get(),
+        )
+    }
+
+    viewModel {
+        GameReviewViewModel()
+    }
+
+    viewModel {
+        DailyPuzzleViewModel(
+            repository = get(),
+            retentionRepository = get(),
+            walletRepository = get(),
+        )
+    }
+
+    viewModel {
+        ProfileViewModel(
+            masteryRepository = get(),
+        )
+    }
+
+    viewModel {
+        DailyMissionsViewModel(
+            retentionRepository = get(),
+            walletRepository = get(),
+        )
+    }
+
+    viewModel {
+        AcademyViewModel(
+            academyRepository = get(),
+            walletRepository = get(),
+        )
+    }
+
+    viewModel {
+        ShopViewModel(
+            settingsRepository = get(),
+            walletRepository = get(),
         )
     }
 }

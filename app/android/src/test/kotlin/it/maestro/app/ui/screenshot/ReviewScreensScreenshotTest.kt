@@ -82,4 +82,36 @@ class ReviewScreensScreenshotTest {
         composeRule.onNodeWithTag("review_next_mistake").performClick()
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review.png")
     }
+
+    @Test
+    fun game_review_retry_mode_screenshot() {
+        val analysis = analyzer.analyze(log)
+        composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
+        composeRule.onNodeWithTag("review_next_mistake").performClick()
+        composeRule.onNodeWithTag("review_retry_button").performClick()
+        composeRule.waitForIdle()
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review_retry.png")
+    }
+
+    @Test
+    fun game_review_retry_solved_screenshot() {
+        val analysis = analyzer.analyze(log)
+        val viewModel = it.maestro.app.ui.screens.GameReviewViewModel()
+        composeRule.setContent {
+            MaestroTheme {
+                GameReviewScreen(
+                    matchLog = log,
+                    analysis = analysis,
+                    viewModel = viewModel,
+                )
+            }
+        }
+        composeRule.onNodeWithTag("review_next_mistake").performClick()
+        composeRule.onNodeWithTag("review_retry_button").performClick()
+        val currentStep = viewModel.uiState.value.currentStep!!
+        val bestCard = currentStep.analysis.bestMove.card
+        composeRule.onNodeWithTag("review_retry_card_${bestCard.suit.name}_${bestCard.rank.name}").performClick()
+        composeRule.waitForIdle()
+        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review_retry_solved.png")
+    }
 }

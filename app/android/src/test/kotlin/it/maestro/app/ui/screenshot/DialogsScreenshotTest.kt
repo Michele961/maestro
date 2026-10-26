@@ -8,7 +8,10 @@ import it.maestro.app.game.GameUiState
 import it.maestro.app.ui.dialogs.SettingsDialog
 import it.maestro.app.ui.screens.TableContent
 import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.game.model.Card
+import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
+import it.maestro.game.model.Suit
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.ScoreCategory
@@ -79,8 +82,22 @@ class DialogsScreenshotTest {
             options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
             correctIndex = 2,
         )
+        val opponentMove = it.maestro.app.game.OpponentMoveSummary(
+            card = Card(Rank.SETTE, Suit.DENARI),
+            capture = setOf(Card(Rank.SETTE, Suit.SPADE)),
+            isSweep = false,
+        )
         composeRule.setContent {
-            MaestroTheme { TableContent(uiState = base.copy(phase = DealPhase.PLAYING, activeTrainingQuestion = question), onIntent = {}) }
+            MaestroTheme {
+                TableContent(
+                    uiState = base.copy(
+                        phase = DealPhase.PLAYING,
+                        activeTrainingQuestion = question,
+                        opponentLastMove = opponentMove,
+                    ),
+                    onIntent = {},
+                )
+            }
         }
         captureScreenRoboImage("build/outputs/roborazzi/dialog_training_question.png")
     }

@@ -239,6 +239,48 @@ public fun CurrencyPill(
 }
 
 /**
+ * Pillola per la Streak ("Fiamma") con conteggio giorni e tocco interattivo (task F2-05).
+ */
+@Composable
+public fun StreakPill(
+    streak: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(50)
+    Box(
+        modifier = modifier
+            .height(36.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 14.dp)
+                .height(30.dp)
+                .clip(shape)
+                .background(Color(0xFF2A170C))
+                .border(2.dp, ButtonGoldBorder, shape)
+                .padding(start = 22.dp, end = 10.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = streak.toString(),
+                color = BrassRivetGold,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black,
+                fontFamily = MaestroDisplayFont,
+            )
+        }
+        Image(
+            painter = painterResource(R.drawable.icon_flame),
+            contentDescription = null,
+            modifier = Modifier.size(36.dp),
+        )
+    }
+}
+
+/**
  * Pulsante quadrato in legno e ottone con un'icona illustrata (messaggi, impostazioni).
  */
 @Composable
@@ -277,8 +319,12 @@ public fun WoodRowTile(
     title: String,
     modifier: Modifier = Modifier,
     iconSize: Dp = 40.dp,
+    onClick: (() -> Unit)? = null,
+    trailingBadge: (@Composable () -> Unit)? = null,
 ) {
-    WoodPanel(modifier = modifier) {
+    WoodPanel(
+        modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+    ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -289,13 +335,16 @@ public fun WoodRowTile(
             Text(
                 text = title.uppercase(),
                 color = BrassRivetGold,
-                fontSize = 14.sp,
-                lineHeight = 16.sp,
+                fontSize = 13.sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f).padding(start = 4.dp),
+                textAlign = if (trailingBadge != null) TextAlign.Start else TextAlign.Center,
+                modifier = Modifier.weight(1f).padding(start = 6.dp),
             )
+            if (trailingBadge != null) {
+                trailingBadge()
+            }
         }
     }
 }
