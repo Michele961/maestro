@@ -219,6 +219,25 @@ public fun TableContent(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var showPause by remember { mutableStateOf(false) }
+    var isTableAnimating by remember { mutableStateOf(false) }
+
+    // Dialog Check di allenamento del Maestro (task F1-12)
+    // Non andiamo a coprire la giocata dell'avversario a metà animazione: attendiamo che
+    // l'animazione di calata/presa sia terminata e lasciamo un breve respiro per registrare la mossa.
+    val question = uiState.activeTrainingQuestion
+    var canShowQuestion by remember { mutableStateOf(question != null && uiState.lastMoveId == 0L) }
+    LaunchedEffect(question, isTableAnimating) {
+        if (question == null) {
+            canShowQuestion = false
+        } else if (!isTableAnimating) {
+            if (uiState.lastMoveId > 0L) {
+                delay(800L)
+            }
+            canShowQuestion = true
+        } else {
+            canShowQuestion = false
+        }
+    }
 
     LaunchedEffect(uiState.lastEvent) {
         when (uiState.lastEvent) {
@@ -348,17 +367,18 @@ public fun TableContent(
                         Box(modifier = Modifier.fillMaxSize().background(feltBrush))
                     }
                     FeltLayout(
-                    uiState = uiState,
-                    soundManager = soundManager,
-                    onCardClicked = { card ->
-                        soundManager.play(SoundEffect.CARD_PLAY)
-                        onIntent(GameIntent.PlayCard(card))
-                    },
-                    onRequestHint = {
-                        soundManager.play(SoundEffect.BUTTON_CLICK)
-                        onIntent(GameIntent.RequestHint)
-                    },
-                )
+                        uiState = uiState,
+                        soundManager = soundManager,
+                        onCardClicked = { card ->
+                            soundManager.play(SoundEffect.CARD_PLAY)
+                            onIntent(GameIntent.PlayCard(card))
+                        },
+                        onRequestHint = {
+                            soundManager.play(SoundEffect.BUTTON_CLICK)
+                            onIntent(GameIntent.RequestHint)
+                        },
+                        onAnimationRunningChanged = { isTableAnimating = it },
+                    )
             }
         }
 
@@ -373,11 +393,11 @@ public fun TableContent(
         )
 
         // Dialog Check di allenamento del Maestro (task F1-12)
-        val question = uiState.activeTrainingQuestion
-        if (question != null) {
+        if (question != null && canShowQuestion) {
             TrainingQuestionDialog(
                 question = question,
                 feedback = uiState.trainingQuestionFeedback,
+                opponentLastMove = uiState.opponentLastMove,
                 soundManager = soundManager,
                 onAnswer = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
                 onContinue = {
@@ -826,6 +846,7 @@ private fun DealSummaryDialog(
 private fun TrainingQuestionDialog(
     question: TrainingQuestion,
     feedback: TrainingAnswerFeedback?,
+    opponentLastMove: OpponentMoveSummary? = null,
     soundManager: SoundManager = NoOpSoundManager(),
     onAnswer: (Int) -> Unit,
     onContinue: () -> Unit,
@@ -873,6 +894,65 @@ private fun TrainingQuestionDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (opponentLastMove != null) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, GoldAccentColor.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0x123B2213),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.game_opponent_last_move) + ":",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = DialogInk,
+                                fontSize = 11.sp,
+                            )
+                            PlaceholderCardView(
+                                card = opponentLastMove.card,
+                                isPlayable = false,
+                                width = 24.dp,
+                                height = 36.dp,
+                            )
+                            if (opponentLastMove.capture.isNotEmpty()) {
+                                Text(
+                                    text = stringResource(id = R.string.game_arrow_symbol),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = DialogInkSoft,
+                                    fontSize = 11.sp,
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    for (taken in opponentLastMove.capture) {
+                                        PlaceholderCardView(
+                                            card = taken,
+                                            isPlayable = false,
+                                            width = 24.dp,
+                                            height = 36.dp,
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = "(${stringResource(id = R.string.game_opponent_drop_table)})",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = DialogInkSoft,
+                                    fontSize = 11.sp,
+                                )
+                            }
+                        }
+                    }
+                }
+
                 Text(
                     text = stringResource(id = questionTitleResId),
                     style = MaterialTheme.typography.bodyLarge,
@@ -1431,11 +1511,17 @@ private fun FeltLayout(
     soundManager: SoundManager,
     onCardClicked: (Card) -> Unit,
     onRequestHint: () -> Unit,
+    onAnimationRunningChanged: (Boolean) -> Unit = {},
 ) {
     var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
     var activeDealAnim by remember { mutableStateOf<ActiveDealAnimation?>(null) }
     var lastCompletedDealId by remember { mutableStateOf(0L) }
     var lastHandledMoveId by remember { mutableStateOf(uiState.lastMoveId) }
+
+    val isAnimating = activeMoveAnim != null || lastHandledMoveId < uiState.lastMoveId || activeDealAnim != null
+    LaunchedEffect(isAnimating) {
+        onAnimationRunningChanged(isAnimating)
+    }
 
     LaunchedEffect(uiState.dealAnimationId) {
         if (uiState.dealAnimationId == 0L) return@LaunchedEffect
