@@ -44,10 +44,12 @@ import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.data.local.missions.DailyMissionsState
+import it.maestro.app.data.local.missions.MatchMissionStatsExtractor
 import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.game.TestMatchGenerator
 import it.maestro.app.ui.dialogs.DailyMissionsDialog
 import it.maestro.app.ui.dialogs.SettingsDialog
 import it.maestro.app.ui.screens.DailyMissionsUiState
@@ -91,6 +93,7 @@ public sealed interface Screen {
         /** Check di allenamento: risposte corrette e totali, se ce ne sono stati (F1-12). */
         val trainingScore: Pair<Int, Int>? = null,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+        val isFromHistory: Boolean = false,
     ) : Screen
     public data class GameReview(
         val matchLog: MatchLog,
@@ -204,6 +207,17 @@ public class MainActivity : ComponentActivity() {
                         },
                         onTriggerTestCrash = { crashReporter.triggerTestCrash() },
                         onDismiss = { showSettingsDialog = false },
+                        onStartTestEndgameMatch = {
+                            val (testState, testLog) = TestMatchGenerator.generateEndgameMatch()
+                            showSettingsDialog = false
+                            currentScreen = Screen.Table(
+                                level = DifficultyLevel.INTERMEDIO,
+                                targetScore = 11,
+                                seed = testLog.seed,
+                                restoredState = testState,
+                                restoredLog = testLog,
+                            )
+                        },
                     )
                 }
 
@@ -290,35 +304,52 @@ public class MainActivity : ComponentActivity() {
                         trainingScore = screen.trainingScore,
                         trainingFundamental = screen.trainingFundamental,
                         onMatchAnalyzed = { analysis ->
-                            scope.launch {
-                                masteryRepository.recordMatch(
-                                    matchAnalysis = analysis,
-                                    matchLog = screen.matchLog,
-                                    humanSeat = screen.humanSeat,
-                                    trainingScore = screen.trainingScore,
-                                    trainingFundamental = screen.trainingFundamental,
-                                )
-                                retentionRepository.recordGameActivity(today)
-                                if (analysis.accuracy(screen.humanSeat) >= 80) {
-                                    retentionRepository.updateMissionProgress(
-                                        today,
-                                        DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80,
+                            if (!screen.isFromHistory) {
+                                scope.launch {
+                                    masteryRepository.recordMatch(
+                                        matchAnalysis = analysis,
+                                        matchLog = screen.matchLog,
+                                        humanSeat = screen.humanSeat,
+                                        trainingScore = screen.trainingScore,
+                                        trainingFundamental = screen.trainingFundamental,
                                     )
-                                }
-                                if (analysis.count(screen.humanSeat, MoveGrade.BLUNDER) == 0) {
-                                    retentionRepository.updateMissionProgress(
-                                        today,
-                                        DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS,
-                                    )
-                                }
-                                if (screen.trainingFundamental == TrainingFundamental.SEVENS_COUNT &&
-                                    screen.trainingScore != null
-                                ) {
-                                    retentionRepository.updateMissionProgress(
-                                        today,
-                                        DailyMissionType.ANSWER_SEVENS_CHECKS,
-                                        screen.trainingScore.first,
-                                    )
+                                    retentionRepository.recordGameActivity(today)
+                                    val missionStats = MatchMissionStatsExtractor.extract(screen.matchLog, screen.humanSeat)
+                                    if (missionStats.sweepsCount > 0) {
+                                        retentionRepository.updateMissionProgress(
+                                            today,
+                                            DailyMissionType.MAKE_SWEEPS,
+                                            missionStats.sweepsCount,
+                                        )
+                                    }
+                                    if (missionStats.denariCount > 0) {
+                                        retentionRepository.updateMissionProgress(
+                                            today,
+                                            DailyMissionType.CAPTURE_DENARI,
+                                            missionStats.denariCount,
+                                        )
+                                    }
+                                    if (analysis.accuracy(screen.humanSeat) >= 80) {
+                                        retentionRepository.updateMissionProgress(
+                                            today,
+                                            DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80,
+                                        )
+                                    }
+                                    if (analysis.count(screen.humanSeat, MoveGrade.BLUNDER) == 0) {
+                                        retentionRepository.updateMissionProgress(
+                                            today,
+                                            DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS,
+                                        )
+                                    }
+                                    if (screen.trainingFundamental == TrainingFundamental.SEVENS_COUNT &&
+                                        screen.trainingScore != null
+                                    ) {
+                                        retentionRepository.updateMissionProgress(
+                                            today,
+                                            DailyMissionType.ANSWER_SEVENS_CHECKS,
+                                            screen.trainingScore.first,
+                                        )
+                                    }
                                 }
                             }
                         },
@@ -336,7 +367,9 @@ public class MainActivity : ComponentActivity() {
                                 targetScore = screen.matchLog.config.targetScore,
                             )
                         },
-                        onHomeClicked = { currentScreen = Screen.Home },
+                        onHomeClicked = {
+                            currentScreen = if (screen.isFromHistory) Screen.Profile else Screen.Home
+                        },
                         onProfileClicked = { currentScreen = Screen.Profile },
                     )
                     is Screen.GameReview -> GameReviewScreen(
@@ -356,6 +389,13 @@ public class MainActivity : ComponentActivity() {
                     )
                     Screen.Profile -> ProfileScreen(
                         onBackClicked = { currentScreen = Screen.Home },
+                        onReviewMatch = { log ->
+                            currentScreen = Screen.PostMatchPreview(
+                                matchLog = log,
+                                level = DifficultyLevel.INTERMEDIO,
+                                isFromHistory = true,
+                            )
+                        },
                     )
                     Screen.Academy -> AcademyScreen(
                         onNavigateHome = { currentScreen = Screen.Home },

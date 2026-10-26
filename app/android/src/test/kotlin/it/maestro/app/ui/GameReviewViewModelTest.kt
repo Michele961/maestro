@@ -151,4 +151,22 @@ class GameReviewViewModelTest {
         viewModel.selectStep(firstMistakeIndex)
         assertTrue(viewModel.uiState.value.isCurrentStepSolved)
     }
+
+    @Test
+    fun revealSolution_marksCurrentStepAsRevealed() {
+        val (log, analysis) = generateTestMatch(seed = 7L)
+        val viewModel = GameReviewViewModel()
+        viewModel.initialize(log, analysis, Seat.P1)
+
+        val firstMistakeIndex = viewModel.uiState.value.steps.indexOfFirst {
+            it.mover == Seat.P1 && it.analysis.grade != MoveGrade.BEST
+        }
+        assertTrue(firstMistakeIndex >= 0)
+        viewModel.selectStep(firstMistakeIndex)
+
+        assertFalse(viewModel.uiState.value.isCurrentStepRevealed)
+        viewModel.revealSolution()
+        assertTrue(viewModel.uiState.value.isCurrentStepRevealed)
+        assertTrue(viewModel.uiState.value.revealedStepIndices.contains(firstMistakeIndex))
+    }
 }

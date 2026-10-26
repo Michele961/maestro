@@ -79,6 +79,8 @@ public fun DailyPuzzleScreen(
         modifier = modifier,
         onPlayCard = { viewModel.playCard(it) },
         onRetry = { viewModel.retryAttempt() },
+        onRequestHint = { viewModel.requestHint() },
+        onReplay = { viewModel.replayPuzzle() },
         onShare = { PuzzleShareFormatter.shareViaIntent(context, uiState.shareText) },
         onSelectTier = { viewModel.selectTier(it) },
         onNextTier = { viewModel.nextTier() },
@@ -95,6 +97,8 @@ public fun DailyPuzzleScreenContent(
     modifier: Modifier = Modifier,
     onPlayCard: (Card) -> Unit = {},
     onRetry: () -> Unit = {},
+    onRequestHint: () -> Unit = {},
+    onReplay: () -> Unit = {},
     onShare: () -> Unit = {},
     onSelectTier: (Int) -> Unit = {},
     onNextTier: () -> Unit = {},
@@ -124,12 +128,21 @@ public fun DailyPuzzleScreenContent(
                 onSelectTier = onSelectTier,
             )
 
+            // Banner con spiegazione chiara dell'obiettivo
+            PuzzleGoalBanner(
+                goalDescriptionResId = uiState.goalDescriptionResId,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 2.dp),
+            )
+
             // Area del Maestro con avatar e fumetto maieutico
             PuzzleCoachArea(
                 uiState = uiState,
+                onRequestHint = onRequestHint,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 6.dp),
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
             )
 
             // Tavolo da gioco: carte dell'avversario coperte e carte a terra
@@ -226,6 +239,7 @@ public fun DailyPuzzleScreenContent(
                         logicalConcept = uiState.logicalConcept,
                         hasNextTier = uiState.currentTierIndex + 1 < uiState.availableTiers.size,
                         onNextTier = onNextTier,
+                        onReplay = onReplay,
                         onShare = onShare,
                         onNavigateHome = onNavigateHome,
                     )
@@ -288,10 +302,41 @@ private fun PuzzleHeader(
 }
 
 @Composable
-private fun PuzzleCoachArea(
-    uiState: DailyPuzzleUiState,
+private fun PuzzleGoalBanner(
+    goalDescriptionResId: Int,
     modifier: Modifier = Modifier,
 ) {
+    Surface(
+        modifier = modifier.testTag("puzzle_goal_banner"),
+        shape = RoundedCornerShape(8.dp),
+        color = Color(0xFF2A1C14),
+        border = BorderStroke(1.dp, BrassRivetGold.copy(alpha = 0.5f)),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(goalDescriptionResId),
+                color = BrassRivetGold,
+                fontSize = 12.sp,
+                fontFamily = MaestroDisplayFont,
+                lineHeight = 16.sp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PuzzleCoachArea(
+    uiState: DailyPuzzleUiState,
+    onRequestHint: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    val isSolved = uiState.status is DailyPuzzleStatus.Solved
+
     WoodPanel(modifier = modifier.heightIn(min = 106.dp)) {
         Row(
             modifier = Modifier
@@ -313,9 +358,9 @@ private fun PuzzleCoachArea(
                 contentDescription = stringResource(R.string.maestro_avatar_description),
                 modifier = Modifier.testTag("puzzle_maestro_avatar"),
             )
-            Box(
+            Column(
                 modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 MaestroSpeechBubble(
                     message = stringResource(uiState.maestroMessageResId),
@@ -324,6 +369,22 @@ private fun PuzzleCoachArea(
                     maxLines = 6,
                     modifier = Modifier.fillMaxWidth().testTag("puzzle_coach_bubble"),
                 )
+                if (!isSolved) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        MaestroPillButton(
+                            text = stringResource(R.string.puzzle_button_hint).uppercase(),
+                            onClick = onRequestHint,
+                            variant = PillButtonVariant.WOOD,
+                            height = 24.dp,
+                            fontSize = 10.sp,
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            testTag = "puzzle_coach_hint_button",
+                        )
+                    }
+                }
             }
         }
     }
@@ -482,6 +543,7 @@ private fun SolvedCelebrationBanner(
     logicalConcept: String,
     hasNextTier: Boolean,
     onNextTier: () -> Unit,
+    onReplay: () -> Unit,
     onShare: () -> Unit,
     onNavigateHome: () -> Unit,
 ) {
@@ -568,15 +630,25 @@ private fun SolvedCelebrationBanner(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                MaestroPillButton(
+                    text = stringResource(R.string.puzzle_button_replay).uppercase(),
+                    onClick = onReplay,
+                    variant = PillButtonVariant.WOOD,
+                    height = 42.dp,
+                    fontSize = 12.sp,
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+                    modifier = Modifier.weight(1f),
+                    testTag = "puzzle_replay_button",
+                )
                 MaestroPillButton(
                     text = stringResource(R.string.puzzle_button_share).uppercase(),
                     onClick = onShare,
                     variant = if (hasNextTier) PillButtonVariant.WOOD else PillButtonVariant.PRIMARY_GREEN,
                     height = 42.dp,
-                    fontSize = 13.sp,
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    fontSize = 12.sp,
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),
                     testTag = "puzzle_share_button",
                 )
@@ -585,8 +657,8 @@ private fun SolvedCelebrationBanner(
                     onClick = onNavigateHome,
                     variant = PillButtonVariant.SECONDARY_AMBER,
                     height = 42.dp,
-                    fontSize = 13.sp,
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    fontSize = 12.sp,
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),
                     testTag = "puzzle_home_button",
                 )

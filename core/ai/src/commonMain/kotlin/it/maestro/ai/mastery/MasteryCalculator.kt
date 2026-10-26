@@ -6,6 +6,8 @@ import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
 import it.maestro.game.model.Suit
 import it.maestro.game.scopa.MatchLog
+import it.maestro.game.scopa.ReplayResult
+import it.maestro.game.scopa.replay
 import it.maestro.game.training.TrainingFundamental
 import kotlin.math.exp
 import kotlin.math.roundToInt
@@ -121,50 +123,86 @@ public object MasteryCalculator {
             )
         }
 
-        // 1. Memoria Sette: mosse con un 7 giocato, preso o sul tavolo
+        val replayState = (replay(matchLog) as? ReplayResult.Ok)?.state
+        val humanCaptured = replayState?.capturedBy?.get(humanSeat).orEmpty()
+        val opponentCaptured = replayState?.capturedBy?.get(humanSeat.other()).orEmpty()
+        val humanSweeps = replayState?.sweeps?.get(humanSeat) ?: 0
+        val opponentSweeps = replayState?.sweeps?.get(humanSeat.other()) ?: 0
+
+        // 1. Memoria Sette: mosse con un 7 giocato, preso o sul tavolo + cattura oggettiva dei Sette
         val sevensMoves = playerMoves.filter { move ->
             move.playedMove.card.rank == Rank.SETTE ||
                 move.playedMove.capture.any { it.rank == Rank.SETTE } ||
                 move.alternatives.any { it.move.card.rank == Rank.SETTE }
         }
         val sevensMoveAcc = accuracyForMoves(sevensMoves, overallAccuracy)
+        val sevensCaptured = humanCaptured.count { it.rank == Rank.SETTE }
+        val sevensTotalCaptured = sevensCaptured + opponentCaptured.count { it.rank == Rank.SETTE }
+        val sevensWithObjective = if (replayState != null && sevensTotalCaptured > 0) {
+            val objective = (sevensCaptured * 25).coerceIn(0, 100)
+            (sevensMoveAcc * 0.70 + objective * 0.30).roundToInt().coerceIn(0, 100)
+        } else {
+            sevensMoveAcc
+        }
         val sevensFinal = blendWithTrainingCheck(
-            baseAccuracy = sevensMoveAcc,
+            baseAccuracy = sevensWithObjective,
             trainingScore = trainingScore,
             isRelevantCheck = trainingFundamental == TrainingFundamental.SEVENS_COUNT,
         )
 
-        // 2. Controllo Denari: mosse con carte di Denari (inclusa speciale attenzione al Settebello)
+        // 2. Controllo Denari: mosse con carte di Denari (inclusa speciale attenzione al Settebello) + Denari catturati
         val denariMoves = playerMoves.filter { move ->
             move.playedMove.card.suit == Suit.DENARI ||
                 move.playedMove.capture.any { it.suit == Suit.DENARI }
         }
         val denariMoveAcc = accuracyForMoves(denariMoves, overallAccuracy)
+        val denariCaptured = humanCaptured.count { it.suit == Suit.DENARI }
+        val hasSettebello = humanCaptured.any { it.suit == Suit.DENARI && it.rank == Rank.SETTE }
+        val denariWithObjective = if (replayState != null && (denariCaptured > 0 || opponentCaptured.isNotEmpty())) {
+            val objective = (denariCaptured * 8 + if (hasSettebello) 20 else 0).coerceIn(0, 100)
+            (denariMoveAcc * 0.70 + objective * 0.30).roundToInt().coerceIn(0, 100)
+        } else {
+            denariMoveAcc
+        }
         val denariFinal = blendWithTrainingCheck(
-            baseAccuracy = denariMoveAcc,
+            baseAccuracy = denariWithObjective,
             trainingScore = trainingScore,
             isRelevantCheck = trainingFundamental == TrainingFundamental.DENARI_COUNT ||
                 trainingFundamental == TrainingFundamental.SETTEBELLO_LOCATION,
         )
 
-        // 3. Primiera: mosse con Sette, Sei o Assi (carte decisive per la Primiera)
+        // 3. Primiera: mosse con Sette, Sei o Assi (carte decisive per la Primiera) + Primiera catturata
         val primieraRanks = setOf(Rank.SETTE, Rank.SEI, Rank.ASSO)
         val primieraMoves = playerMoves.filter { move ->
             move.playedMove.card.rank in primieraRanks ||
                 move.playedMove.capture.any { it.rank in primieraRanks }
         }
         val primieraMoveAcc = accuracyForMoves(primieraMoves, overallAccuracy)
+        val primieraCardsCaptured = humanCaptured.count { it.rank in primieraRanks }
+        val primieraWithObjective = if (replayState != null && (primieraCardsCaptured > 0 || opponentCaptured.isNotEmpty())) {
+            val objective = (primieraCardsCaptured * 10).coerceIn(0, 100)
+            (primieraMoveAcc * 0.70 + objective * 0.30).roundToInt().coerceIn(0, 100)
+        } else {
+            primieraMoveAcc
+        }
         val primieraFinal = blendWithTrainingCheck(
-            baseAccuracy = primieraMoveAcc,
+            baseAccuracy = primieraWithObjective,
             trainingScore = trainingScore,
             isRelevantCheck = trainingFundamental == TrainingFundamental.PRIMIERA_LEAD,
         )
 
-        // 4. Gestione Banco: accuratezza sulle calate (giocate senza presa) e sulle scope
+        // 4. Gestione Banco: accuratezza sulle calate (giocate senza presa) e differenziale scope
         val boardMoves = playerMoves.filter { move ->
             move.playedMove.capture.isEmpty() || move.playedMove.capture.size > 1
         }
-        val boardFinal = accuracyForMoves(boardMoves, overallAccuracy)
+        val boardMoveAcc = accuracyForMoves(boardMoves, overallAccuracy)
+        val boardFinal = if (replayState != null && (humanSweeps > 0 || opponentSweeps > 0)) {
+            val sweepDiff = humanSweeps - opponentSweeps
+            val objective = (50 + sweepDiff * 25).coerceIn(0, 100)
+            (boardMoveAcc * 0.70 + objective * 0.30).roundToInt().coerceIn(0, 100)
+        } else {
+            boardMoveAcc
+        }
 
         // 5. Endgame: mosse giocate nell'ultima distribuzione di 3 carte a mazzo vuoto
         val totalMovesCount = matchLog.moves.size

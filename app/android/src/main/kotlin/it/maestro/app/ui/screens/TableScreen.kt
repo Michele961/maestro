@@ -528,6 +528,27 @@ private fun rememberCardFormatter(): (Card) -> String {
     }
 }
 
+private fun determineLogicalHintRes(
+    move: ScopaMove,
+    tableCards: List<Card>,
+): Int {
+    val captures = move.capture
+    val isSweep = captures.isNotEmpty() && captures.size == tableCards.size
+    val involvesSettebello = (move.card.suit == Suit.DENARI && move.card.rank == Rank.SETTE) ||
+        captures.any { it.suit == Suit.DENARI && it.rank == Rank.SETTE }
+    val capturesDenari = captures.any { it.suit == Suit.DENARI } || move.card.suit == Suit.DENARI
+    val capturesPrimiera = captures.any { it.rank == Rank.SETTE || it.rank == Rank.SEI }
+
+    return when {
+        isSweep -> R.string.hint_sweep_opportunity
+        involvesSettebello -> R.string.hint_settebello_priority
+        capturesDenari -> R.string.hint_denari_priority
+        capturesPrimiera -> R.string.hint_primiera_priority
+        captures.isEmpty() -> R.string.hint_safe_discard
+        else -> R.string.review_hint_generic
+    }
+}
+
 @Composable
 private fun formatHintMove(move: ScopaMove): String {
     val assoStr = stringResource(id = R.string.game_card_rank_asso).take(1)
@@ -1857,7 +1878,7 @@ private fun FeltLayout(
                 ) {
                     MaestroSpeechBubble(
                         message = when {
-                            hint != null -> formatHintMove(hint)
+                            hint != null -> stringResource(id = determineLogicalHintRes(hint, uiState.tableCards))
                             else -> stringResource(id = R.string.game_hint_loading)
                         },
                         tail = BubbleTail.TOP_START,

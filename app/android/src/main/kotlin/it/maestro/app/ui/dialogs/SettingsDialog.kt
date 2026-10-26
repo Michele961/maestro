@@ -39,6 +39,7 @@ public fun SettingsDialog(
     onSoundToggled: (Boolean) -> Unit,
     onTriggerTestCrash: () -> Unit,
     onDismiss: () -> Unit,
+    onStartTestEndgameMatch: () -> Unit = {},
 ) {
     MaestroAlertDialog(
         onDismissRequest = onDismiss,
@@ -108,6 +109,34 @@ public fun SettingsDialog(
                         fontSize = 15.sp,
                         modifier = Modifier.fillMaxWidth(),
                         testTag = "trigger_test_crash_button",
+                    )
+                }
+
+                HorizontalDivider(color = Color(0xFF8C6D1F))
+
+                // Sezione Sviluppo e Collaudo rapido
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.settings_test_match_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = stringResource(id = R.string.settings_test_match_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF6D5A48),
+                    )
+                    MaestroPillButton(
+                        text = stringResource(id = R.string.settings_test_match_button),
+                        onClick = onStartTestEndgameMatch,
+                        variant = PillButtonVariant.WOOD,
+                        height = 46.dp,
+                        fontSize = 15.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        testTag = "start_test_match_button",
                     )
                 }
             }

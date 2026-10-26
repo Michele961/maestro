@@ -232,6 +232,7 @@
     <string name="profile_history_accuracy">%1$d%% accuracy</string>
     <string name="profile_history_elo_delta_plus">+%1$d ELO</string>
     <string name="profile_history_elo_delta_minus">%1$d ELO</string>
+    <string name="profile_history_review_button">Review analysis</string>
     <string name="profile_elo_badge">%1$d ELO</string>
     <string name="profile_accuracy_label">Average accuracy: %1$d%%</string>
     <string name="profile_elo_explanation">Mastery Index calculated on the mathematical precision of your choices, independent of card luck.</string>
@@ -534,5 +535,34 @@
     <string name="cosmetic_avatar_alt_desc">Refined profile for players who calculate every opponent discard.</string>
     <string name="cosmetic_avatar_expert_title">Grand Master</string>
     <string name="cosmetic_avatar_expert_desc">The supreme honor of Club card masters.</string>
+
+    <!-- Replay Daily Puzzle -->
+    <string name="puzzle_button_replay">Replay challenge</string>
+    <string name="puzzle_button_hint">Hint</string>
+
+    <!-- Clear Goals Daily Puzzle -->
+    <string name="puzzle_goal_sweep_desc">Goal: sweep the table clean! Calculate the sums carefully to empty the board.</string>
+    <string name="puzzle_goal_win_desc">Goal: decisive hand for victory! Find the play that seals the win.</string>
+    <string name="puzzle_goal_points_desc">Goal: maximize hand points! Target crucial cards among Sevens, Coins, and Primiera.</string>
+
+    <!-- Chess.com Style Game Review -->
+    <string name="review_find_better_prompt">Can you find the better move?</string>
+    <string name="review_show_solution_button">Reveal solution</string>
+    <string name="review_solution_found_title">Excellent move found!</string>
+    <string name="review_solution_revealed_title">Solution revealed</string>
+    <string name="review_try_again_prompt">Imperfect choice. Try another card or reveal the solution.</string>
+
+    <!-- Socratic In-game Hints -->
+    <string name="hint_sweep_opportunity">Look at the cards on the table: you have a card in hand that can sweep the board clean!</string>
+    <string name="hint_settebello_priority">Watch the Settebello: there is a 7 of Coins to protect or capture, queen card of Scopa.</string>
+    <string name="hint_denari_priority">Aim to secure Coins: there is an advantageous capture that boosts your coin count.</string>
+    <string name="hint_primiera_priority">For Primiera, Sevens and Sixes matter most: prioritize the capture with highest Primiera value.</string>
+    <string name="hint_safe_discard">No direct capture on table: discard a card that avoids leaving an easy sum from 1 to 10 for the opponent.</string>
+    <string name="hint_endgame_focus">Final turns: keep track of the opponent\'s remaining cards and avoid gifting easy combinations.</string>
+
+    <!-- Settings Debug Quick Test Match -->
+    <string name="settings_test_match_title">Development and Testing</string>
+    <string name="settings_test_match_subtitle">Start a match directly at the final hand to test endgame, Elo, missions, and review.</string>
+    <string name="settings_test_match_button">Quick Match at Final Hand</string>
 
 </resources>

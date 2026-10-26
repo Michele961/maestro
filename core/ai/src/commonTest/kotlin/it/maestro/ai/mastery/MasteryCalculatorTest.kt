@@ -188,4 +188,65 @@ class MasteryCalculatorTest {
         assertEquals(100, radar.board) // calata sicura
         assertEquals(100, radar.endgame) // mossa 34 perfetta
     }
+
+    @Test
+    fun computeMatchRadar_withReplayedMatch_incorporatesObjectiveOutcomes() {
+        val p1 = Seat.P1
+        val config = ScopaConfig(targetScore = 11)
+        var state = it.maestro.game.scopa.newMatch(config = config, seed = 42L)
+        val moves = mutableListOf<ScopaMove>()
+
+        for (i in 0 until 36) {
+            val legal = it.maestro.game.scopa.legalMoves(state)
+            if (legal.isEmpty()) break
+            val move = legal.first()
+            val result = it.maestro.game.scopa.play(state, move) as it.maestro.game.scopa.PlayResult.Applied
+            moves.add(move)
+            state = result.state
+        }
+
+        val log = MatchLog(
+            rulesVersion = it.maestro.game.CoreGame.RULES_VERSION,
+            config = config,
+            seed = 42L,
+            moves = moves,
+        )
+
+        val moveAnalyses = moves.mapIndexed { index, move ->
+            val seat = if (index % 2 == 0) Seat.P1 else Seat.P2
+            MoveAnalysis(
+                moveIndex = index,
+                seat = seat,
+                playedMove = move,
+                playedValue = 0.5,
+                bestMove = move,
+                bestValue = 0.5,
+                loss = 0.0,
+                grade = MoveGrade.BEST,
+                alternatives = listOf(MoveValue(move, 0.5)),
+            )
+        }
+
+        val analysis = MatchAnalysis(
+            moves = moveAnalyses,
+            accuracyBySeat = mapOf(Seat.P1 to 85, Seat.P2 to 75),
+            meanLossBySeat = mapOf(Seat.P1 to 0.05, Seat.P2 to 0.10),
+            countsBySeatAndGrade = mapOf(
+                Seat.P1 to mapOf(MoveGrade.BEST to 18),
+                Seat.P2 to mapOf(MoveGrade.BEST to 18),
+            ),
+        )
+
+        val radar = MasteryCalculator.computeMatchRadar(
+            matchAnalysis = analysis,
+            matchLog = log,
+            humanSeat = p1,
+        )
+
+        assertTrue(radar.sevens in 0..100)
+        assertTrue(radar.denari in 0..100)
+        assertTrue(radar.primiera in 0..100)
+        assertTrue(radar.board in 0..100)
+        assertTrue(radar.endgame in 0..100)
+    }
 }

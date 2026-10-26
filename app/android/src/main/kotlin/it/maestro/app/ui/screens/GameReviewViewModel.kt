@@ -54,7 +54,9 @@ public data class GameReviewUiState(
     val isRetryMode: Boolean = false,
     val retryFeedback: RetryFeedback? = null,
     val solvedStepIndices: Set<Int> = emptySet(),
+    val revealedStepIndices: Set<Int> = emptySet(),
     val selectedRetryCard: Card? = null,
+    val humanSeat: Seat = Seat.P1,
     val matchSeed: Long = 0L,
 ) {
     public val currentStep: ReviewStep?
@@ -62,6 +64,9 @@ public data class GameReviewUiState(
 
     public val isCurrentStepSolved: Boolean
         get() = currentStepIndex in solvedStepIndices
+
+    public val isCurrentStepRevealed: Boolean
+        get() = currentStepIndex in revealedStepIndices
 }
 
 /**
@@ -91,9 +96,22 @@ public class GameReviewViewModel : ViewModel() {
             isRetryMode = false,
             retryFeedback = null,
             solvedStepIndices = emptySet(),
+            revealedStepIndices = emptySet(),
             selectedRetryCard = null,
+            humanSeat = humanSeat,
             matchSeed = matchLog.seed,
         )
+    }
+
+    /**
+     * Svela la soluzione e l'analisi per lo step corrente.
+     */
+    public fun revealSolution() {
+        _uiState.update { current ->
+            current.copy(
+                revealedStepIndices = current.revealedStepIndices + current.currentStepIndex,
+            )
+        }
     }
 
     /**
@@ -209,7 +227,8 @@ public class GameReviewViewModel : ViewModel() {
     public fun playRetryCard(card: Card) {
         _uiState.update { current ->
             val step = current.currentStep ?: return@update current
-            if (!current.isRetryMode) return@update current
+            val isHumanMistake = step.mover == current.humanSeat && step.analysis.grade != MoveGrade.BEST
+            if (!current.isRetryMode && !isHumanMistake) return@update current
 
             val bestValue = step.analysis.bestValue
             val bestMove = step.analysis.bestMove
@@ -222,7 +241,9 @@ public class GameReviewViewModel : ViewModel() {
 
             if (isOptimal) {
                 current.copy(
+                    isRetryMode = true,
                     solvedStepIndices = current.solvedStepIndices + current.currentStepIndex,
+                    revealedStepIndices = current.revealedStepIndices + current.currentStepIndex,
                     retryFeedback = RetryFeedback.Correct(
                         messageRes = R.string.review_retry_correct,
                         bestMove = bestMove,
@@ -232,6 +253,7 @@ public class GameReviewViewModel : ViewModel() {
             } else {
                 val hintRes = determineHint(step, card)
                 current.copy(
+                    isRetryMode = true,
                     retryFeedback = RetryFeedback.Imperfect(
                         messageRes = R.string.review_retry_imperfect,
                         hintRes = hintRes,
