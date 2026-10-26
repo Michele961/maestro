@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -84,6 +85,7 @@ public fun ClubBackground(
 @Composable
 public fun ParchmentPanel(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 22.dp, vertical = 22.dp),
     showTopOrnament: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -95,7 +97,7 @@ public fun ParchmentPanel(
             corner = 44.dp,
             modifier = Modifier.matchParentSize(),
         )
-        Column(modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp), content = content)
+        Column(modifier = Modifier.padding(contentPadding), content = content)
         if (showTopOrnament) {
             Image(
                 painter = painterResource(R.drawable.ornament_top),
@@ -221,20 +223,27 @@ public fun CurrencyPill(
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(50)
-    Box(modifier = modifier.height(36.dp), contentAlignment = Alignment.CenterStart) {
+    Box(modifier = modifier.height(34.dp), contentAlignment = Alignment.CenterStart) {
         Box(
             modifier = Modifier
-                .padding(start = 14.dp)
-                .height(30.dp)
+                .padding(start = 12.dp)
+                .height(28.dp)
                 .clip(shape)
                 .background(Color(0xFF2A170C))
                 .border(2.dp, ButtonGoldBorder, shape)
-                .padding(start = 26.dp, end = 12.dp),
+                .padding(start = 22.dp, end = 10.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = MaestroDisplayFont)
+            Text(
+                text = value,
+                color = Color.White,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
+                maxLines = 1,
+            )
         }
-        Image(painterResource(icon), contentDescription = null, modifier = Modifier.size(36.dp))
+        Image(painterResource(icon), contentDescription = null, modifier = Modifier.size(34.dp))
     }
 }
 
@@ -340,6 +349,8 @@ public fun WoodRowTile(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
                 textAlign = if (trailingBadge != null) TextAlign.Start else TextAlign.Center,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(start = 6.dp),
             )
             if (trailingBadge != null) {

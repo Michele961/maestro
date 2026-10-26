@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -138,36 +139,38 @@ public fun AcademyChapterMapContent(
             WoodPanel(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(72.dp)
                     .padding(horizontal = 14.dp, vertical = 4.dp),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Image(
                         painter = painterResource(R.drawable.button_close),
                         contentDescription = stringResource(R.string.puzzle_button_home),
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(38.dp)
                             .clickable(onClick = onNavigateHome)
                             .testTag("academy_back_button"),
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
                         Text(
                             text = stringResource(R.string.academy_screen_title),
                             color = BrassRivetGold,
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = MaestroDisplayFont,
+                            maxLines = 1,
                         )
                         Text(
                             text = stringResource(R.string.academy_screen_subtitle),
                             color = Color(0xFFD4AF37),
                             fontSize = 11.sp,
+                            maxLines = 1,
                         )
                     }
                 }
@@ -614,13 +617,13 @@ private fun LessonHeader(
     WoodPanel(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(72.dp)
             .padding(horizontal = 14.dp, vertical = 4.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 10.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
@@ -632,18 +635,20 @@ private fun LessonHeader(
                     .testTag("academy_lesson_back_button"),
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
                 Text(
                     text = stringResource(lesson.titleRes),
                     color = BrassRivetGold,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = MaestroDisplayFont,
+                    maxLines = 1,
                 )
                 Text(
                     text = stringResource(currentStep.titleRes),
                     color = Color(0xFFD4AF37),
                     fontSize = 11.sp,
+                    maxLines = 1,
                 )
             }
             Text(
@@ -667,11 +672,11 @@ private fun LessonCoachArea(
     mood: it.maestro.app.ui.components.MaestroMood,
     modifier: Modifier = Modifier,
 ) {
-    WoodPanel(modifier = modifier.height(112.dp)) {
+    WoodPanel(modifier = modifier.heightIn(min = 112.dp)) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 10.dp, vertical = 6.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -696,8 +701,8 @@ private fun LessonCoachArea(
                 MaestroSpeechBubble(
                     message = stringResource(step.maestroSpeechRes),
                     tail = BubbleTail.START,
-                    fontSize = 12.sp,
-                    maxLines = 4,
+                    fontSize = 11.5.sp,
+                    maxLines = 6,
                     modifier = Modifier.fillMaxWidth().testTag("academy_coach_bubble"),
                 )
             }

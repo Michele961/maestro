@@ -7,10 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import it.maestro.app.R
 import it.maestro.app.data.local.missions.DailyMission
 import it.maestro.app.ui.components.BubbleTail
@@ -58,10 +61,14 @@ public fun DailyMissionsDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
         Surface(
             modifier = modifier
-                .fillMaxWidth()
+                .fillMaxWidth(0.92f)
+                .heightIn(max = 660.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .testTag("daily_missions_dialog"),
             color = Color.Transparent,
@@ -70,10 +77,10 @@ public fun DailyMissionsDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(14.dp)
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     // Header con Titolo e tasto di chiusura
                     Row(
@@ -117,13 +124,13 @@ public fun DailyMissionsDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 4.dp),
+                            .padding(top = 2.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         FramedPortrait(
                             portrait = R.drawable.maestro_pleased,
-                            size = 54.dp,
+                            size = 50.dp,
                             contentDescription = stringResource(R.string.maestro_avatar_description),
                         )
                         Box(modifier = Modifier.weight(1f)) {
@@ -131,7 +138,7 @@ public fun DailyMissionsDialog(
                                 message = stringResource(R.string.retention_maestro_encouragement),
                                 tail = BubbleTail.START,
                                 fontSize = 11.sp,
-                                maxLines = 3,
+                                maxLines = 4,
                             )
                         }
                     }
@@ -253,18 +260,20 @@ private fun MissionItemCard(
     mission: DailyMission,
     modifier: Modifier = Modifier,
 ) {
-    ParchmentPanel(modifier = modifier.fillMaxWidth()) {
+    ParchmentPanel(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(mission.type.titleRes).uppercase(),
                         color = WoodSurfaceDark,
@@ -284,7 +293,7 @@ private fun MissionItemCard(
                     Image(
                         painter = painterResource(R.drawable.badge_correct),
                         contentDescription = stringResource(R.string.retention_missions_completed_badge),
-                        modifier = Modifier.size(28.dp).padding(start = 6.dp),
+                        modifier = Modifier.size(28.dp),
                     )
                 } else {
                     Row(

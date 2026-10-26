@@ -153,6 +153,8 @@
     <string name="home_news">Club news</string>
     <string name="home_daily_rewards">Daily rewards</string>
     <string name="home_daily_missions">Daily missions</string>
+    <string name="home_missions_title">Missions</string>
+    <string name="home_missions_subtitle">Daily</string>
     <string name="home_friends">Friends</string>
     <string name="home_nav_leaderboard">Leaderboard</string>
     <string name="home_nav_training">Training</string>
@@ -205,7 +207,7 @@
     <string name="puzzle_solved_subtitle_first_try">Solved on the first attempt!</string>
     <string name="puzzle_solved_subtitle_other_tries">Solved in %1$d attempts!</string>
     <string name="puzzle_button_share">SHARE</string>
-    <string name="puzzle_button_home">BACK TO HOME</string>
+    <string name="puzzle_button_home">Back to Club</string>
     <string name="puzzle_button_retry">TRY AGAIN</string>
     <string name="puzzle_table_empty">Empty table</string>
     <string name="puzzle_attempt_failed_banner">Attempt #%1$d failed. Read the hint!</string>
