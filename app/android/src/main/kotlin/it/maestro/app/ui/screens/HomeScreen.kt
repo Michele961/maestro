@@ -157,8 +157,8 @@ public fun HomeScreen(
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     WoodRowTile(
-                        icon = R.drawable.icon_gift,
-                        title = stringResource(R.string.home_daily_rewards),
+                        icon = R.drawable.icon_missions,
+                        title = stringResource(R.string.home_daily_missions),
                         iconSize = 52.dp,
                         modifier = Modifier.weight(1f).height(72.dp).testTag("home_missions_tile"),
                         onClick = onMissionsClicked,

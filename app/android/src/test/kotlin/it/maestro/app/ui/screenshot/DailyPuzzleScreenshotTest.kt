@@ -129,7 +129,7 @@ class DailyPuzzleScreenshotTest {
             attemptsCount = 1,
             maestroMood = MaestroMood.TRIUMPHANT,
             maestroMessageResId = R.string.puzzle_coach_solved,
-            shareText = "Maestro Scopa #14 — Risolto al 1° tentativo! 🧠✨",
+            shareText = "Maestro Scopa #14 — Risolto al 1° tentativo!",
         )
 
         composeRule.setContent {

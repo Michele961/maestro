@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Fiamma esterna (arancione/rosso fuoco) -->
+    <path
+        android:fillColor="#FF6D00"
+        android:pathData="M24,4 C22.8,9 19,13 15,16 C11,19 7,24 7,30 C7,38.8 14.6,44 24,44 C33.4,44 41,38.8 41,30 C41,24 37,19 33,16 C29,13 25.2,9 24,4 Z" />
+    <!-- Cuore interno della fiamma (giallo oro brillante) -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M24,20 C23.2,23 21,25 19,27 C17,29 15,32 15,35 C15,40 19,42.5 24,42.5 C29,42.5 33,40 33,35 C33,32 31,29 29,27 C27,25 24.8,23 24,20 Z" />
+</vector>

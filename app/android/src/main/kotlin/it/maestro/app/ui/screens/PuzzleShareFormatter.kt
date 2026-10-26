@@ -8,7 +8,7 @@ import android.content.Intent
 /**
  * Formattatore e gestore della condivisione social per la "Sfida del Giorno" (task F2-03).
  *
- * Genera stringhe formattate senza spoiler in stile Wordle ("Maestro Scopa #14 — Risolto al 1° tentativo! 🧠✨")
+ * Genera stringhe formattate senza spoiler in stile Wordle ("Maestro Scopa #14 — Risolto al 1° tentativo!")
  * e attiva l'Intent standard di Android [Intent.ACTION_SEND].
  */
 public object PuzzleShareFormatter {
@@ -28,9 +28,9 @@ public object PuzzleShareFormatter {
                 3 -> "3°"
                 else -> "${attemptsCount}°"
             }
-            "Maestro Scopa #$puzzleNumber — Risolto al $attemptSuffix tentativo! 🧠✨"
+            "Maestro Scopa #$puzzleNumber — Risolto al $attemptSuffix tentativo!"
         } else {
-            "Maestro Scopa #$puzzleNumber — Ho provato la Sfida del Giorno! 🃏"
+            "Maestro Scopa #$puzzleNumber — Ho giocato la Sfida del Giorno!"
         }
     }
 

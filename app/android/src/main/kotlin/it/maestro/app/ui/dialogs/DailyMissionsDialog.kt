@@ -49,9 +49,6 @@ private val FlameOrange = Color(0xFFFF6D00)
 private val FreezeIceBlue = Color(0xFF4ECDC4)
 private val CompletedGreen = Color(0xFF2E7D32)
 
-private const val FLAME_EMOJI: String = "🔥"
-private const val FREEZE_EMOJI: String = "❄️"
-
 /**
  * Dialog/Pannello delle Missioni Didattiche quotidiane e della Streak ("Fiamma") (task F2-05).
  */
@@ -164,10 +161,12 @@ private fun StreakBanner(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                Text(
-                    text = FLAME_EMOJI,
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(end = 6.dp),
+                Image(
+                    painter = painterResource(R.drawable.icon_flame),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(26.dp)
+                        .padding(end = 6.dp),
                 )
                 Text(
                     text = stringResource(R.string.retention_streak_days, currentStreak).uppercase(),
@@ -183,10 +182,12 @@ private fun StreakBanner(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                Text(
-                    text = FREEZE_EMOJI,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(end = 4.dp),
+                Image(
+                    painter = painterResource(R.drawable.icon_freeze),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(end = 4.dp),
                 )
                 Text(
                     text = stringResource(
@@ -245,12 +246,19 @@ private fun MissionItemCard(
                         modifier = Modifier.size(28.dp).padding(start = 6.dp),
                     )
                 } else {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
                             .background(Color(0xFF8B5E34))
                             .padding(horizontal = 6.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
+                        Image(
+                            painter = painterResource(R.drawable.icon_coin),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
                         Text(
                             text = stringResource(R.string.retention_missions_reward, mission.type.rewardCredits),
                             color = Color(0xFFFFD54F),

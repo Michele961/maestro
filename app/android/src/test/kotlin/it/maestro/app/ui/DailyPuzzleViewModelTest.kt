@@ -155,7 +155,7 @@ class DailyPuzzleViewModelTest {
             "Il testo di share deve contenere l'hashtag del puzzle",
         )
         assertTrue(
-            state.shareText.contains("Risolto al 1° tentativo! 🧠✨"),
+            state.shareText.contains("Risolto al 1° tentativo!"),
             "Il testo di share deve celebrare il primo tentativo",
         )
 

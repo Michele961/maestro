@@ -152,6 +152,7 @@
     <string name="home_gems_placeholder">280</string>
     <string name="home_news">Club news</string>
     <string name="home_daily_rewards">Daily rewards</string>
+    <string name="home_daily_missions">Daily missions</string>
     <string name="home_friends">Friends</string>
     <string name="home_nav_leaderboard">Leaderboard</string>
     <string name="home_nav_training">Training</string>
@@ -201,7 +202,7 @@
     <string name="puzzle_coach_solved">Magnificent! Masterful capture and point won: that\'s how a true player thinks!</string>
     <string name="puzzle_coach_already_solved">You have already completed today\'s challenge! Come back tomorrow for a new puzzle.</string>
     <string name="puzzle_solved_title">CHALLENGE SOLVED!</string>
-    <string name="puzzle_solved_subtitle_first_try">Solved on the 1st attempt! 🧠✨</string>
+    <string name="puzzle_solved_subtitle_first_try">Solved on the first attempt!</string>
     <string name="puzzle_solved_subtitle_other_tries">Solved in %1$d attempts!</string>
     <string name="puzzle_button_share">SHARE</string>
     <string name="puzzle_button_home">BACK TO HOME</string>

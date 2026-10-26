@@ -47,7 +47,6 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 import it.maestro.app.ui.theme.WoodSurfaceLight
 
 private val BrassShadow = Color(0xFF8C6D1F)
-private const val FLAME_EMOJI: String = "🔥"
 
 /**
  * Sfondo del circolo: legno a tutto schermo e, in basso, il panno verde per [feltFraction] dell'altezza
@@ -273,15 +272,11 @@ public fun StreakPill(
                 fontFamily = MaestroDisplayFont,
             )
         }
-        Box(
+        Image(
+            painter = painterResource(R.drawable.icon_flame),
+            contentDescription = null,
             modifier = Modifier.size(36.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = FLAME_EMOJI,
-                fontSize = 20.sp,
-            )
-        }
+        )
     }
 }
 
