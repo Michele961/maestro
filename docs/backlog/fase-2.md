@@ -105,7 +105,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-06 — L'Accademia del Maestro: primi 3 moduli interattivi
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §5.C, `learning_coaching_retention_monetization_strategy.md` §2
 - **Obiettivo:** Schermata "Accademia del Maestro" con percorso a tappe. Ogni modulo è una breve lezione interattiva (2 minuti): testo sintetico del Maestro + tavolo interattivo con 2-3 quesiti pratici per sbloccare la spilla del modulo:
   - Modulo 1: *L'Abbecedario del Circolo* (Regole formali, presa obbligatoria con carta singola vs somma, valore delle combinazioni).
@@ -113,8 +113,8 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
   - Modulo 3: *La Regola del Dispari* (Come contare le carte a terra e mantenere l'iniziativa).
 - **Perimetro autorizzato:** `app:android` (AcademyScreen, AcademyViewModel, dati lezioni).
 - **Criteri di accettazione:**
-    - [ ] Navigazione progressiva: il modulo successivo si sblocca solo superando il precedente.
-    - [ ] Salvare il completamento delle lezioni in Room o DataStore.
+    - [x] Navigazione progressiva: il modulo successivo si sblocca solo superando il precedente.
+    - [x] Salvare il completamento delle lezioni in Room o DataStore.
 - **Domande aperte:** —
 
 ---

@@ -57,6 +57,7 @@ import it.maestro.app.ui.screens.PostMatchPreviewScreen
 import it.maestro.app.ui.screens.PreGameScreen
 import it.maestro.app.ui.screens.ProfileScreen
 import it.maestro.app.ui.screens.TableScreen
+import it.maestro.app.ui.screens.academy.AcademyScreen
 import it.maestro.app.ui.theme.MaestroTheme
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
@@ -96,6 +97,7 @@ public sealed interface Screen {
     ) : Screen
     public data object DailyPuzzle : Screen
     public data object Profile : Screen
+    public data object Academy : Screen
 }
 
 /**
@@ -237,6 +239,7 @@ public class MainActivity : ComponentActivity() {
                         onDailyPuzzleClicked = { currentScreen = Screen.DailyPuzzle },
                         onProfileClicked = { currentScreen = Screen.Profile },
                         onMissionsClicked = { showMissionsDialog = true },
+                        onAcademyClicked = { currentScreen = Screen.Academy },
                         streakCount = streakState.currentStreak,
                     )
                     Screen.PreGame -> PreGameScreen(
@@ -339,6 +342,9 @@ public class MainActivity : ComponentActivity() {
                     )
                     Screen.Profile -> ProfileScreen(
                         onBackClicked = { currentScreen = Screen.Home },
+                    )
+                    Screen.Academy -> AcademyScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
                     )
                 }
 

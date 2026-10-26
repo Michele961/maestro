@@ -82,6 +82,7 @@ public fun HomeScreen(
     onDailyPuzzleClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
     onMissionsClicked: () -> Unit = {},
+    onAcademyClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -217,6 +218,7 @@ public fun HomeScreen(
             BottomNavBar(
                 onDailyPuzzleClicked = onDailyPuzzleClicked,
                 onProfileClicked = onProfileClicked,
+                onAcademyClicked = onAcademyClicked,
             )
         }
     }
@@ -371,6 +373,7 @@ private fun GameTile(
 private fun BottomNavBar(
     onDailyPuzzleClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
+    onAcademyClicked: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -389,9 +392,9 @@ private fun BottomNavBar(
         BrassIconBadge(
             size = 76.dp,
             icon = R.drawable.icon_book_quill,
-            label = stringResource(R.string.home_daily_puzzle_button),
-            onClick = onDailyPuzzleClicked,
-            modifier = Modifier.testTag("home_nav_puzzle_button"),
+            label = stringResource(R.string.academy_nav_title),
+            onClick = onAcademyClicked,
+            modifier = Modifier.testTag("home_nav_academy_button"),
         )
         BrassIconBadge(size = 76.dp, icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
     }
