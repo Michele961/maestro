@@ -7,18 +7,31 @@ import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
 import it.maestro.app.data.local.datastore.MasteryRepository
+import it.maestro.app.data.local.datastore.MatchHistoryEntry
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+
+/**
+ * Tab selezionabile nella schermata Profilo.
+ */
+public enum class ProfileTab {
+    MASTERY,
+    HISTORY,
+}
 
 /**
  * Stato della UI per la schermata Profilo & Radar delle Abilità (task F2-04).
  */
 public data class ProfileUiState(
     val profile: MasteryProfile = MasteryProfile.INITIAL,
-    @StringRes val rankTitleRes: Int = R.string.mastery_rank_principiante,
-    @StringRes val maestroAdviceRes: Int = R.string.profile_advice_default,
+    @get:StringRes val rankTitleRes: Int = R.string.mastery_rank_principiante,
+    @get:StringRes val maestroAdviceRes: Int = R.string.profile_advice_default,
+    val matchHistory: List<MatchHistoryEntry> = emptyList(),
+    val selectedTab: ProfileTab = ProfileTab.MASTERY,
     val isLoading: Boolean = false,
 )
 
@@ -29,21 +42,30 @@ public class ProfileViewModel(
     private val masteryRepository: MasteryRepository,
 ) : ViewModel() {
 
-    public val uiState: StateFlow<ProfileUiState> = masteryRepository
-        .observeMasteryProfile()
-        .map { profile ->
-            ProfileUiState(
-                profile = profile,
-                rankTitleRes = mapEloToRankTitle(profile.cognitiveElo),
-                maestroAdviceRes = computeMaestroAdvice(profile.radar, profile.matchesPlayed),
-                isLoading = false,
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = ProfileUiState(isLoading = true),
+    private val _selectedTab = MutableStateFlow(ProfileTab.MASTERY)
+
+    public val uiState: StateFlow<ProfileUiState> = combine(
+        masteryRepository.observeMasteryProfile(),
+        masteryRepository.observeMatchHistory(),
+        _selectedTab,
+    ) { profile, history, tab ->
+        ProfileUiState(
+            profile = profile,
+            rankTitleRes = mapEloToRankTitle(profile.cognitiveElo),
+            maestroAdviceRes = computeMaestroAdvice(profile.radar, profile.matchesPlayed),
+            matchHistory = history,
+            selectedTab = tab,
+            isLoading = false,
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = ProfileUiState(isLoading = true),
+    )
+
+    public fun selectTab(tab: ProfileTab) {
+        _selectedTab.value = tab
+    }
 
     public companion object {
         @StringRes

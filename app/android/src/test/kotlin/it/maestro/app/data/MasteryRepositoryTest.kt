@@ -112,4 +112,43 @@ class MasteryRepositoryTest {
         repository.resetProfile()
         assertEquals(MasteryProfile.INITIAL, repository.getMasteryProfile())
     }
+
+    @Test
+    fun recordMatch_appendsToHistoryAndCalculatesEloDelta() = runTest {
+        val repository = InMemoryMasteryRepository()
+        val p1 = Seat.P1
+        val p2 = Seat.P2
+
+        val analysis = MatchAnalysis(
+            moves = emptyList(),
+            accuracyBySeat = mapOf(p1 to 85, p2 to 60),
+            meanLossBySeat = mapOf(p1 to 0.05, p2 to 0.2),
+            countsBySeatAndGrade = mapOf(
+                p1 to mapOf(MoveGrade.BEST to 1, MoveGrade.INACCURACY to 0, MoveGrade.BLUNDER to 0),
+                p2 to mapOf(MoveGrade.BEST to 0, MoveGrade.INACCURACY to 0, MoveGrade.BLUNDER to 0),
+            ),
+        )
+
+        val log = MatchLog(
+            config = ScopaConfig(targetScore = 11),
+            seed = 42L,
+            moves = emptyList(),
+        )
+
+        repository.recordMatch(
+            matchAnalysis = analysis,
+            matchLog = log,
+            humanSeat = p1,
+            trainingScore = Pair(11, 7),
+        )
+
+        val history = repository.observeMatchHistory().first()
+        assertEquals(1, history.size)
+        val entry = history.first()
+        assertEquals(85, entry.accuracy)
+        assertEquals(11, entry.humanScore)
+        assertEquals(7, entry.botScore)
+        assertTrue(entry.isWin)
+        assertTrue("Elo delta deve essere positivo per una vittoria ad alta precisione", entry.eloDelta > 0)
+    }
 }

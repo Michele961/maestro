@@ -250,6 +250,7 @@ public fun GameReviewScreen(
             } else {
                 MoveEvaluationBanner(
                     analysis = moveAnalysis,
+                    playerView = currentStep.playerView,
                     isHumanMove = isHumanMove,
                     isSolved = isCurrentSolved,
                     onStartRetry = viewModel::startRetry,
@@ -296,6 +297,7 @@ public fun GameReviewScreen(
 @Composable
 private fun MoveEvaluationBanner(
     analysis: MoveAnalysis,
+    playerView: ScopaView?,
     isHumanMove: Boolean,
     isSolved: Boolean,
     onStartRetry: () -> Unit,
@@ -314,79 +316,139 @@ private fun MoveEvaluationBanner(
         else -> R.drawable.badge_wrong
     }
 
+    val explanation = remember(analysis, playerView) {
+        if (playerView != null && analysis.grade != MoveGrade.BEST) {
+            ReviewExplanationEngine.explain(
+                playedMove = analysis.playedMove,
+                bestMove = analysis.bestMove,
+                playerView = playerView,
+            )
+        } else {
+            null
+        }
+    }
+
     ParchmentPanel(modifier = modifier.fillMaxWidth().testTag("review_evaluation_banner")) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(40.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(
-                modifier = Modifier.weight(1f).padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(3.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(40.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(
+                    modifier = Modifier.weight(1f).padding(vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
-                    Surface(
-                        color = if (isSolved) BestBadgeColor else badgeColor,
-                        shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.testTag("review_grade_badge"),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = if (isSolved) {
-                                stringResource(id = R.string.review_retry_solved_badge)
-                            } else {
-                                stringResource(id = gradeStringRes)
-                            },
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            maxLines = 1,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        )
+                        Surface(
+                            color = if (isSolved) BestBadgeColor else badgeColor,
+                            shape = RoundedCornerShape(6.dp),
+                            modifier = Modifier.testTag("review_grade_badge"),
+                        ) {
+                            Text(
+                                text = if (isSolved) {
+                                    stringResource(id = R.string.review_retry_solved_badge)
+                                } else {
+                                    stringResource(id = gradeStringRes)
+                                },
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                maxLines = 1,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (isHumanMove && analysis.grade != MoveGrade.BEST) {
+                            MaestroPillButton(
+                                text = stringResource(id = R.string.review_retry_button),
+                                onClick = onStartRetry,
+                                variant = if (isSolved) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.SECONDARY_AMBER,
+                                height = 32.dp,
+                                fontSize = 11.sp,
+                                contentPadding = PaddingValues(horizontal = 8.dp),
+                                testTag = "review_retry_button",
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                        }
+                        if (analysis.grade != MoveGrade.BEST && analysis.loss > 0.0) {
+                            Text(
+                                text = stringResource(id = R.string.review_value_diff, analysis.loss),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = BlunderBadgeColor,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                modifier = Modifier.testTag("review_loss_label"),
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (isHumanMove && analysis.grade != MoveGrade.BEST) {
-                        MaestroPillButton(
-                            text = stringResource(id = R.string.review_retry_button),
-                            onClick = onStartRetry,
-                            variant = if (isSolved) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.SECONDARY_AMBER,
-                            height = 32.dp,
-                            fontSize = 11.sp,
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            testTag = "review_retry_button",
+                    MoveLine(
+                        label = stringResource(id = R.string.review_played_label),
+                        move = formatMoveDescription(analysis.playedMove),
+                        color = InkColor,
+                        tag = "review_played_move",
+                    )
+                    if (analysis.grade != MoveGrade.BEST) {
+                        MoveLine(
+                            label = stringResource(id = R.string.review_best_label),
+                            move = formatMoveDescription(analysis.bestMove),
+                            color = Color(0xFF1F683D),
+                            tag = "review_best_move",
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                    }
-                    if (analysis.grade != MoveGrade.BEST && analysis.loss > 0.0) {
                         Text(
-                            text = stringResource(id = R.string.review_value_diff, analysis.loss),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = BlunderBadgeColor,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            modifier = Modifier.testTag("review_loss_label"),
+                            text = stringResource(id = R.string.review_expected_value, analysis.bestValue),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = InkColor.copy(alpha = 0.7f),
+                            modifier = Modifier.testTag("review_best_value"),
                         )
                     }
                 }
-                MoveLine(
-                    label = stringResource(id = R.string.review_played_label),
-                    move = formatMoveDescription(analysis.playedMove),
-                    color = InkColor,
-                    tag = "review_played_move",
-                )
-                if (analysis.grade != MoveGrade.BEST) {
-                    MoveLine(
-                        label = stringResource(id = R.string.review_best_label),
-                        move = formatMoveDescription(analysis.bestMove),
-                        color = Color(0xFF1F683D),
-                        tag = "review_best_move",
-                    )
-                    Text(
-                        text = stringResource(id = R.string.review_expected_value, analysis.bestValue),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = InkColor.copy(alpha = 0.7f),
-                        modifier = Modifier.testTag("review_best_value"),
-                    )
+            }
+
+            if (explanation != null) {
+                Surface(
+                    color = Color(0xFFF6F0E2),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, ButtonGoldBorder.copy(alpha = 0.6f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("review_explanation_card"),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        MaestroAvatarView(
+                            mood = if (analysis.grade == MoveGrade.BLUNDER) MaestroMood.WARNING else MaestroMood.THINKING,
+                            size = 36.dp,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(3.dp),
+                        ) {
+                            Text(
+                                text = "${stringResource(id = R.string.review_explanation_header)}: ${explanation.title}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF5C2D16),
+                            )
+                            Text(
+                                text = explanation.explanation,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = InkColor.copy(alpha = 0.95f),
+                                lineHeight = 16.sp,
+                            )
+                            Text(
+                                text = "Regola d'oro: ${explanation.keyConcept}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF8B4513),
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -6,6 +6,8 @@ import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
+import it.maestro.app.data.local.DailyPuzzleTier
+import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.missions.DailyMissionType
@@ -43,6 +45,10 @@ public data class DailyPuzzleUiState(
     val maestroMessageResId: Int = R.string.puzzle_coach_initial,
     val shareText: String = "",
     val isAlreadySolvedToday: Boolean = false,
+    val currentTierIndex: Int = 0,
+    val availableTiers: List<DailyPuzzleTier> = DailyPuzzleProvider.TIERS,
+    val solvedTiers: Set<Int> = emptySet(),
+    val logicalConcept: String = "",
 )
 
 /**
@@ -69,16 +75,41 @@ public class DailyPuzzleViewModel(
     public val uiState: StateFlow<DailyPuzzleUiState> = _uiState.asStateFlow()
 
     init {
-        loadDailyPuzzle()
+        loadTier(0)
     }
 
-    private fun loadDailyPuzzle() {
-        val puzzle = customPuzzle ?: DailyPuzzleProvider.getDailyPuzzle(effectiveDate)
+    /**
+     * Seleziona uno dei 3 livelli progressivi del giorno (0: Riscaldamento, 1: Tattica, 2: Maestro).
+     */
+    public fun selectTier(tierIndex: Int) {
+        if (tierIndex !in DailyPuzzleProvider.TIERS.indices) return
+        loadTier(tierIndex)
+    }
+
+    /**
+     * Passa al livello successivo se disponibile.
+     */
+    public fun nextTier() {
+        val nextIndex = _uiState.value.currentTierIndex + 1
+        if (nextIndex in DailyPuzzleProvider.TIERS.indices) {
+            selectTier(nextIndex)
+        }
+    }
+
+    private fun loadTier(tierIndex: Int) {
+        val puzzle = if (customPuzzle != null && tierIndex == 0) {
+            customPuzzle
+        } else {
+            DailyPuzzleProvider.getDailyPuzzle(effectiveDate, tierIndex)
+        }
+        val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
 
         viewModelScope.launch {
             val record = repository.getDailyPuzzleRecord(dateString)
-            if (record.isSolvedToday) {
-                _uiState.value = DailyPuzzleUiState(
+            val isTierSolved = record.solvedTiersToday.contains(tierIndex) || (tierIndex == 0 && record.isSolvedToday)
+
+            if (isTierSolved) {
+                _uiState.value = _uiState.value.copy(
                     puzzleNumber = puzzleNumber,
                     dateString = dateString,
                     puzzle = puzzle,
@@ -93,9 +124,12 @@ public class DailyPuzzleViewModel(
                         solved = true,
                     ),
                     isAlreadySolvedToday = true,
+                    currentTierIndex = tierIndex,
+                    solvedTiers = record.solvedTiersToday,
+                    logicalConcept = concept,
                 )
             } else {
-                _uiState.value = DailyPuzzleUiState(
+                _uiState.value = _uiState.value.copy(
                     puzzleNumber = puzzleNumber,
                     dateString = dateString,
                     puzzle = puzzle,
@@ -105,6 +139,9 @@ public class DailyPuzzleViewModel(
                     maestroMood = MaestroMood.THINKING,
                     maestroMessageResId = R.string.puzzle_coach_initial,
                     isAlreadySolvedToday = false,
+                    currentTierIndex = tierIndex,
+                    solvedTiers = record.solvedTiersToday,
+                    logicalConcept = concept,
                 )
             }
         }
@@ -130,28 +167,37 @@ public class DailyPuzzleViewModel(
                 attemptsCount = newAttempts,
                 solved = true,
             )
+            val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
+            val updatedSolvedTiers = currentState.solvedTiers + currentState.currentTierIndex
+            val currentTier = DailyPuzzleProvider.TIERS.getOrNull(currentState.currentTierIndex)
+                ?: DailyPuzzleProvider.TIERS[0]
+
             _uiState.value = currentState.copy(
                 status = DailyPuzzleStatus.Solved(newAttempts),
                 attemptsCount = newAttempts,
                 maestroMood = MaestroMood.TRIUMPHANT,
                 maestroMessageResId = R.string.puzzle_coach_solved,
                 shareText = shareText,
+                solvedTiers = updatedSolvedTiers,
+                logicalConcept = concept,
             )
             viewModelScope.launch {
                 repository.recordPuzzleCompletion(
                     todayDate = dateString,
                     attempts = newAttempts,
                     solved = true,
+                    tierIndex = currentState.currentTierIndex,
                 )
                 retentionRepository?.let { retention ->
                     retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
                     retention.recordGameActivity(effectiveDate)
                 }
+                val refId = if (currentState.currentTierIndex == 0) dateString else "$dateString-tier-${currentState.currentTierIndex}"
                 walletRepository?.addCredits(
-                    amount = 15,
+                    amount = currentTier.rewardCredits,
                     reason = TransactionReason.DAILY_PUZZLE_REWARD,
-                    referenceId = dateString,
-                    description = "Sfida del Giorno completata",
+                    referenceId = refId,
+                    description = "Sfida del Giorno completata: ${currentTier.index + 1}",
                 )
             }
         } else {

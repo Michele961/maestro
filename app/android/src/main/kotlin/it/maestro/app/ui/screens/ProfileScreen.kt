@@ -1,5 +1,6 @@
 package it.maestro.app.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,10 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
+import it.maestro.app.data.local.datastore.MatchHistoryEntry
 import it.maestro.app.ui.components.AbilityRadarChart
 import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.ClubBackground
 import it.maestro.app.ui.components.FramedPortrait
+import it.maestro.app.ui.components.MaestroAvatarView
+import it.maestro.app.ui.components.MaestroMood
 import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.MaestroSpeechBubble
 import it.maestro.app.ui.components.NineSliceBox
@@ -47,6 +53,7 @@ import it.maestro.app.ui.components.PillButtonVariant
 import it.maestro.app.ui.components.WoodIconButton
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.theme.BrassRivetGold
+import it.maestro.app.ui.theme.ButtonGoldBorder
 import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.WoodSurfaceDark
 import org.koin.androidx.compose.koinViewModel
@@ -66,6 +73,7 @@ public fun ProfileScreen(
     ProfileContent(
         uiState = uiState,
         onBackClicked = onBackClicked,
+        onSelectTab = { viewModel.selectTab(it) },
         modifier = modifier,
     )
 }
@@ -75,6 +83,7 @@ public fun ProfileContent(
     uiState: ProfileUiState,
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    onSelectTab: (ProfileTab) -> Unit = {},
 ) {
     val profile = uiState.profile
 
@@ -89,6 +98,28 @@ public fun ProfileContent(
             // Header con tasto Indietro e Titolo
             ProfileHeader(onBackClicked = onBackClicked)
 
+            // Switcher Tab [ Maestria & Radar ] / [ Cronologia Partite ]
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 4.dp)
+                    .testTag("profile_tabs"),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ProfileTabChip(
+                    title = stringResource(R.string.profile_tab_mastery),
+                    isSelected = uiState.selectedTab == ProfileTab.MASTERY,
+                    onClick = { onSelectTab(ProfileTab.MASTERY) },
+                    modifier = Modifier.weight(1f).testTag("profile_tab_mastery"),
+                )
+                ProfileTabChip(
+                    title = stringResource(R.string.profile_tab_history),
+                    isSelected = uiState.selectedTab == ProfileTab.HISTORY,
+                    onClick = { onSelectTab(ProfileTab.HISTORY) },
+                    modifier = Modifier.weight(1f).testTag("profile_tab_history"),
+                )
+            }
+
             // Contenuto scrollabile del profilo
             Column(
                 modifier = Modifier
@@ -98,30 +129,202 @@ public fun ProfileContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                // 1. Scheda Giocatore con Avatar, Nome e Livello di Maestria
-                PlayerIdentityCard(
-                    rankTitleRes = uiState.rankTitleRes,
+                if (uiState.selectedTab == ProfileTab.MASTERY) {
+                    // 1. Scheda Giocatore con Avatar, Nome e Livello di Maestria
+                    PlayerIdentityCard(
+                        rankTitleRes = uiState.rankTitleRes,
+                    )
+
+                    // 2. Indice di Maestria (Elo Cognitivo)
+                    MasteryIndexCard(
+                        cognitiveElo = profile.cognitiveElo,
+                        accuracyPercentage = profile.accuracyPercentage,
+                    )
+
+                    // 3. Radar delle Abilità a 5 assi
+                    RadarCard(radar = profile.radar)
+
+                    // 4. Consiglio Socratico del Maestro
+                    MaestroAdviceCard(adviceRes = uiState.maestroAdviceRes)
+
+                    // 5. Statistiche complessive
+                    PlayerStatsCard(
+                        matchesPlayed = profile.matchesPlayed,
+                        accuracyPercentage = profile.accuracyPercentage,
+                    )
+                } else {
+                    // Cronologia Partite e Impatto ELO
+                    MatchHistorySection(entries = uiState.matchHistory)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileTabChip(
+    title: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val bg = if (isSelected) Color(0xFF3E2313) else Color(0xFF221610)
+    val border = if (isSelected) BrassRivetGold else Color(0xFF4E3629)
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(10.dp),
+        color = bg,
+        border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, border),
+    ) {
+        Text(
+            text = title.uppercase(),
+            color = if (isSelected) BrassRivetGold else Color.White.copy(alpha = 0.8f),
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            fontFamily = MaestroDisplayFont,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+        )
+    }
+}
+
+@Composable
+private fun MatchHistorySection(entries: List<MatchHistoryEntry>) {
+    if (entries.isEmpty()) {
+        ParchmentPanel(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+                .testTag("profile_history_empty_card"),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                MaestroAvatarView(mood = MaestroMood.THINKING, size = 52.dp)
+                Text(
+                    text = stringResource(R.string.profile_history_empty),
+                    color = WoodSurfaceDark,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    textAlign = TextAlign.Center,
                 )
-
-                // 2. Indice di Maestria (Elo Cognitivo)
-                MasteryIndexCard(
-                    cognitiveElo = profile.cognitiveElo,
-                    accuracyPercentage = profile.accuracyPercentage,
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("profile_history_list"),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            entries.forEachIndexed { index, entry ->
+                MatchHistoryCard(
+                    entry = entry,
+                    modifier = Modifier.testTag("profile_history_card_$index"),
                 )
+            }
+        }
+    }
+}
 
-                // 3. Radar delle Abilità a 5 assi
-                RadarCard(radar = profile.radar)
+@Composable
+private fun MatchHistoryCard(
+    entry: MatchHistoryEntry,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFF24150B),
+        border = BorderStroke(1.dp, if (entry.isWin) Color(0xFF4CAF50).copy(alpha = 0.6f) else ButtonGoldBorder.copy(alpha = 0.4f)),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            // Risultato e Punteggio
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Surface(
+                        color = if (entry.isWin) Color(0xFF1E3A24) else Color(0xFF4A1818),
+                        shape = RoundedCornerShape(6.dp),
+                        border = BorderStroke(1.dp, if (entry.isWin) Color(0xFF81C784) else Color(0xFFE57373)),
+                    ) {
+                        Text(
+                            text = stringResource(if (entry.isWin) R.string.profile_history_win else R.string.profile_history_loss).uppercase(),
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.profile_history_vs_bot),
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
 
-                // 4. Consiglio Socratico del Maestro
-                MaestroAdviceCard(adviceRes = uiState.maestroAdviceRes)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "${entry.humanScore} - ${entry.botScore}",
+                        color = BrassRivetGold,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                    Text(
+                        text = "•",
+                        color = Color.White.copy(alpha = 0.4f),
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        text = stringResource(R.string.profile_history_accuracy, entry.accuracy),
+                        color = Color(0xFFE2D6C6),
+                        fontSize = 12.sp,
+                    )
+                }
+            }
 
-                // 5. Statistiche complessive
-                PlayerStatsCard(
-                    matchesPlayed = profile.matchesPlayed,
-                    accuracyPercentage = profile.accuracyPercentage,
+            // Impatto Elo (+X / -Y)
+            Surface(
+                color = if (entry.eloDelta >= 0) Color(0xFF1B3D22) else Color(0xFF3E1E1E),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, if (entry.eloDelta >= 0) Color(0xFF4CAF50) else Color(0xFFE57373)),
+            ) {
+                Text(
+                    text = if (entry.eloDelta >= 0) {
+                        stringResource(R.string.profile_history_elo_delta_plus, entry.eloDelta)
+                    } else {
+                        stringResource(R.string.profile_history_elo_delta_minus, entry.eloDelta)
+                    },
+                    color = if (entry.eloDelta >= 0) Color(0xFF81C784) else Color(0xFFFF8A80),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
@@ -182,14 +385,21 @@ private fun PlayerIdentityCard(rankTitleRes: Int) {
                     fontFamily = MaestroDisplayFont,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                MaestroPillButton(
-                    text = stringResource(rankTitleRes).uppercase(),
-                    onClick = {},
-                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
-                    height = 28.dp,
-                    fontSize = 11.sp,
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFF1E3A5F),
+                    border = BorderStroke(1.dp, Color(0xFF64B5F6)),
                     modifier = Modifier.testTag("profile_rank_badge"),
-                )
+                ) {
+                    Text(
+                        text = stringResource(rankTitleRes).uppercase(),
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                    )
+                }
             }
         }
     }
