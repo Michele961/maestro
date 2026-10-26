@@ -7,7 +7,9 @@ import it.maestro.app.audio.AndroidSoundManager
 import it.maestro.app.audio.SoundManager
 import it.maestro.app.crash.CrashReporter
 import it.maestro.app.crash.DefaultCrashReporter
+import it.maestro.app.data.local.datastore.AcademyRepository
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
+import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
 import it.maestro.app.data.local.datastore.DataStoreRetentionRepository
@@ -23,6 +25,7 @@ import it.maestro.app.ui.screens.DailyMissionsViewModel
 import it.maestro.app.ui.screens.DailyPuzzleViewModel
 import it.maestro.app.ui.screens.GameReviewViewModel
 import it.maestro.app.ui.screens.ProfileViewModel
+import it.maestro.app.ui.screens.academy.AcademyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,6 +38,7 @@ private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
 private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
+private val Context.academyDataStore by preferencesDataStore(name = "maestro_academy")
 
 /**
  * Modulo Koin principale per l'iniezione delle dipendenze dell'app Android (ADR-0012, task F1-08, F1-14).
@@ -68,6 +72,10 @@ public val appModule: Module = module {
 
     single<RetentionRepository> {
         DataStoreRetentionRepository(dataStore = androidContext().retentionDataStore)
+    }
+
+    single<AcademyRepository> {
+        DataStoreAcademyRepository(dataStore = androidContext().academyDataStore)
     }
 
     single<SoundManager> {
@@ -108,6 +116,12 @@ public val appModule: Module = module {
     viewModel {
         DailyMissionsViewModel(
             retentionRepository = get(),
+        )
+    }
+
+    viewModel {
+        AcademyViewModel(
+            academyRepository = get(),
         )
     }
 }

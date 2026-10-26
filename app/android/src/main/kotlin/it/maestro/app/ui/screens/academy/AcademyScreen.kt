@@ -1,0 +1,874 @@
+package it.maestro.app.ui.screens.academy
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.maestro.app.R
+import it.maestro.app.data.local.academy.AcademyModule
+import it.maestro.app.data.local.academy.AcademyModuleId
+import it.maestro.app.data.local.academy.AcademyStep
+import it.maestro.app.data.local.academy.AcademyStepType
+import it.maestro.app.ui.components.BubbleTail
+import it.maestro.app.ui.components.CardView
+import it.maestro.app.ui.components.ClubBackground
+import it.maestro.app.ui.components.ConfettiCelebration
+import it.maestro.app.ui.components.FramedPortrait
+import it.maestro.app.ui.components.MaestroPillButton
+import it.maestro.app.ui.components.MaestroSpeechBubble
+import it.maestro.app.ui.components.PillButtonVariant
+import it.maestro.app.ui.components.WoodPanel
+import it.maestro.app.ui.theme.BrassRivetGold
+import it.maestro.app.ui.theme.ButtonAmberBottom
+import it.maestro.app.ui.theme.ButtonGoldBorder
+import it.maestro.app.ui.theme.MaestroDisplayFont
+import it.maestro.app.ui.theme.WoodSurfaceDark
+import it.maestro.game.model.Card
+import org.koin.androidx.compose.koinViewModel
+
+/**
+ * Schermata principale dell'Accademia del Maestro con navigazione a moduli e lezioni al tavolo (task F2-06).
+ */
+@Composable
+public fun AcademyScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AcademyViewModel = koinViewModel(),
+    onNavigateHome: () -> Unit = {},
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ClubBackground(modifier = modifier.testTag("academy_screen"), feltFraction = 0.5f) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)),
+        ) {
+            when (val mode = uiState.viewMode) {
+                is AcademyViewMode.ModuleMap -> {
+                    AcademyModuleMapContent(
+                        modules = uiState.modules,
+                        onOpenModule = { viewModel.openModule(it) },
+                        onNavigateHome = onNavigateHome,
+                    )
+                }
+                is AcademyViewMode.Lesson -> {
+                    AcademyLessonContent(
+                        lesson = mode,
+                        onSelectOption = { viewModel.selectOption(it) },
+                        onPlayCard = { viewModel.playCard(it) },
+                        onNextStep = { viewModel.nextStep() },
+                        onBackToMap = { viewModel.backToMap() },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Mappa dei moduli dell'Accademia con progressione a tappe.
+ */
+@Composable
+public fun AcademyModuleMapContent(
+    modules: List<AcademyModuleCardState>,
+    onOpenModule: (AcademyModuleId) -> Unit,
+    onNavigateHome: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("academy_module_map_content"),
+    ) {
+        // Intestazione con pulsante di chiusura per tornare alla Home
+        WoodPanel(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .padding(horizontal = 14.dp, vertical = 4.dp),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.button_close),
+                    contentDescription = stringResource(R.string.puzzle_button_home),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(onClick = onNavigateHome)
+                        .testTag("academy_back_button"),
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.academy_screen_title),
+                        color = BrassRivetGold,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                    Text(
+                        text = stringResource(R.string.academy_screen_subtitle),
+                        color = Color(0xFFD4AF37),
+                        fontSize = 11.sp,
+                    )
+                }
+            }
+        }
+
+        // Elenco a scorrimento dei moduli
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            modules.forEach { cardState ->
+                AcademyModuleCard(
+                    cardState = cardState,
+                    onOpenModule = { onOpenModule(cardState.module.id) },
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+/**
+ * Singola card del modulo all'interno della mappa formativa.
+ */
+@Composable
+private fun AcademyModuleCard(
+    cardState: AcademyModuleCardState,
+    onOpenModule: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val module = cardState.module
+    val progress = cardState.progress
+    val isUnlocked = progress.isUnlocked
+    val isCompleted = progress.isCompleted
+
+    WoodPanel(
+        modifier = modifier
+            .fillMaxWidth()
+            .alpha(if (isUnlocked) 1f else 0.55f)
+            .testTag("academy_module_card_${module.number}"),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Icona decorativa del modulo
+                Box(
+                    modifier = Modifier
+                        .size(54.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2A170C))
+                        .border(1.5.dp, ButtonGoldBorder, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(module.iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(34.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.academy_module_number, module.number).uppercase(),
+                            color = Color(0xFFD4AF37),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                        )
+                        if (isCompleted) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFF1E3A1E))
+                                    .border(1.dp, BrassRivetGold, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    .testTag("academy_module_completed_tag_${module.number}"),
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.badge_best),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = stringResource(R.string.academy_module_completed_badge),
+                                    color = BrassRivetGold,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = stringResource(module.titleRes),
+                        color = Color(0xFFFFF8DC),
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+
+                    Text(
+                        text = stringResource(module.subtitleRes),
+                        color = Color(0xFFE2D9C8),
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+
+            // Descrizione didattica
+            Text(
+                text = stringResource(module.descriptionRes),
+                color = Color(0xFFE2D9C8),
+                fontSize = 13.sp,
+                lineHeight = 17.sp,
+            )
+
+            // Blocco sblocco o pulsante azione
+            if (!isUnlocked) {
+                Text(
+                    text = stringResource(R.string.academy_module_locked),
+                    color = Color(0xFFE57373),
+                    fontSize = 11.sp,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                )
+                MaestroPillButton(
+                    text = stringResource(R.string.academy_button_locked),
+                    onClick = {},
+                    enabled = false,
+                    variant = PillButtonVariant.WOOD,
+                    height = 42.dp,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "academy_module_action_${module.number}",
+                )
+            } else if (isCompleted) {
+                MaestroPillButton(
+                    text = stringResource(R.string.academy_button_review),
+                    onClick = onOpenModule,
+                    enabled = true,
+                    variant = PillButtonVariant.SECONDARY_AMBER,
+                    height = 44.dp,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "academy_module_action_${module.number}",
+                )
+            } else {
+                MaestroPillButton(
+                    text = stringResource(R.string.academy_button_start),
+                    onClick = onOpenModule,
+                    enabled = true,
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 46.dp,
+                    fontSize = 15.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "academy_module_action_${module.number}",
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Schermata interattiva di una lezione al tavolo del Maestro.
+ */
+@Composable
+public fun AcademyLessonContent(
+    lesson: AcademyViewMode.Lesson,
+    onSelectOption: (String) -> Unit,
+    onPlayCard: (Card) -> Unit,
+    onNextStep: () -> Unit,
+    onBackToMap: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val step = lesson.currentStep
+    val isSummary = step.type == AcademyStepType.SUMMARY_AND_BADGE
+
+    Box(modifier = modifier.fillMaxSize().testTag("academy_lesson_content")) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 12.dp),
+        ) {
+            // Intestazione lezione
+            LessonHeader(
+                module = lesson.module,
+                currentStep = step,
+                totalSteps = lesson.module.steps.size,
+                onBackToMap = onBackToMap,
+            )
+
+            // Area del Maestro con avatar e fumetto didattico
+            LessonCoachArea(
+                step = step,
+                mood = lesson.effectiveMaestroMood,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+            )
+
+            // Contenuto centrale: Tavolo e interazione
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                if (!isSummary) {
+                    // Tavolo con feltro e carte a terra
+                    LessonTableArea(step = step)
+
+                    // Area di interazione specifica per tipo di step
+                    when (step.type) {
+                        AcademyStepType.INTERACTIVE_QUESTION -> {
+                            InteractiveQuestionSection(
+                                step = step,
+                                selectedOptionId = lesson.selectedOptionId,
+                                isAnswerCorrect = lesson.isAnswerCorrect,
+                                feedbackRes = lesson.feedbackRes,
+                                onSelectOption = onSelectOption,
+                            )
+                        }
+                        AcademyStepType.CARD_ACTION -> {
+                            CardActionSection(
+                                step = step,
+                                isCompleted = lesson.isCardActionCompleted,
+                                feedbackRes = lesson.feedbackRes,
+                                onPlayCard = onPlayCard,
+                            )
+                        }
+                        else -> Unit
+                    }
+                } else {
+                    // Schermata di riepilogo con spilla d'oro e regola ferrea
+                    LessonSummarySection(
+                        module = lesson.module,
+                        step = step,
+                    )
+                }
+            }
+
+            // Pulsante d'azione inferiore per avanzare o completare
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+            ) {
+                if (lesson.isLastStep) {
+                    MaestroPillButton(
+                        text = stringResource(R.string.academy_button_complete),
+                        onClick = onNextStep,
+                        enabled = lesson.isStepCompleted,
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 54.dp,
+                        fontSize = 18.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        testTag = "academy_complete_module_button",
+                    )
+                } else {
+                    MaestroPillButton(
+                        text = stringResource(R.string.academy_button_next_step),
+                        onClick = onNextStep,
+                        enabled = lesson.isStepCompleted,
+                        variant = PillButtonVariant.PRIMARY_GREEN,
+                        height = 50.dp,
+                        fontSize = 16.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        testTag = "academy_next_step_button",
+                    )
+                }
+            }
+        }
+
+        // Coriandoli celebrativi all'ultimo step
+        if (isSummary) {
+            ConfettiCelebration(modifier = Modifier.fillMaxSize())
+        }
+    }
+}
+
+/**
+ * Intestazione della lezione con titolo e contatore step.
+ */
+@Composable
+private fun LessonHeader(
+    module: AcademyModule,
+    currentStep: AcademyStep,
+    totalSteps: Int,
+    onBackToMap: () -> Unit,
+) {
+    WoodPanel(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(horizontal = 14.dp, vertical = 4.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.button_close),
+                contentDescription = stringResource(R.string.academy_button_back_map),
+                modifier = Modifier
+                    .size(38.dp)
+                    .clickable(onClick = onBackToMap)
+                    .testTag("academy_lesson_back_button"),
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(module.titleRes),
+                    color = BrassRivetGold,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
+                )
+                Text(
+                    text = stringResource(currentStep.titleRes),
+                    color = Color(0xFFD4AF37),
+                    fontSize = 11.sp,
+                )
+            }
+            Text(
+                text = "${currentStep.stepNumber}/$totalSteps",
+                color = BrassRivetGold,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
+                modifier = Modifier.testTag("academy_step_indicator"),
+            )
+        }
+    }
+}
+
+/**
+ * Area del Maestro con avatar e fumetto maieutico parlante.
+ */
+@Composable
+private fun LessonCoachArea(
+    step: AcademyStep,
+    mood: it.maestro.app.ui.components.MaestroMood,
+    modifier: Modifier = Modifier,
+) {
+    WoodPanel(modifier = modifier.height(112.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            FramedPortrait(
+                portrait = when (mood) {
+                    it.maestro.app.ui.components.MaestroMood.TRIUMPHANT,
+                    it.maestro.app.ui.components.MaestroMood.CELEBRATING,
+                    it.maestro.app.ui.components.MaestroMood.APPLAUDING -> R.drawable.maestro_pleased
+                    it.maestro.app.ui.components.MaestroMood.WARNING,
+                    it.maestro.app.ui.components.MaestroMood.DESPAIR -> R.drawable.maestro_warning
+                    else -> R.drawable.maestro_thinking
+                },
+                size = 72.dp,
+                background = ButtonAmberBottom,
+                contentDescription = stringResource(R.string.maestro_avatar_description),
+                modifier = Modifier.testTag("academy_coach_avatar"),
+            )
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center,
+            ) {
+                MaestroSpeechBubble(
+                    message = stringResource(step.maestroSpeechRes),
+                    tail = BubbleTail.START,
+                    fontSize = 12.sp,
+                    maxLines = 4,
+                    modifier = Modifier.fillMaxWidth().testTag("academy_coach_bubble"),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Il tavolo da gioco in feltro verde con carte a terra e cartigli esplicativi.
+ */
+@Composable
+private fun LessonTableArea(
+    step: AcademyStep,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFF13361E))
+            .border(2.dp, Color(0xFF5D4037), RoundedCornerShape(12.dp))
+            .padding(10.dp)
+            .testTag("academy_table_area"),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Cartiglio esplicativo in testa al tavolo
+            step.tableBadgeRes?.let { badgeRes ->
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF2A170C))
+                        .border(1.dp, ButtonGoldBorder, RoundedCornerShape(8.dp))
+                        .padding(horizontal = 10.dp, vertical = 3.dp)
+                        .testTag("academy_table_badge"),
+                ) {
+                    Text(
+                        text = stringResource(badgeRes),
+                        color = BrassRivetGold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                }
+            }
+
+            // Carte disposte sul tavolo
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                step.tableCards.forEach { card ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        step.cardBadges[card]?.let { badgeResId ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFF2A170C))
+                                    .border(1.dp, BrassRivetGold, RoundedCornerShape(6.dp))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(badgeResId),
+                                    color = BrassRivetGold,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
+                        CardView(
+                            card = card,
+                            width = 62.dp,
+                            height = 92.dp,
+                            isPlayable = false,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Sezione didattica a scelta multipla con risposte interattive.
+ */
+@Composable
+private fun InteractiveQuestionSection(
+    step: AcademyStep,
+    selectedOptionId: String?,
+    isAnswerCorrect: Boolean?,
+    feedbackRes: Int?,
+    onSelectOption: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("academy_question_section"),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.academy_question_prompt),
+            color = BrassRivetGold,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
+        )
+
+        step.options.forEach { option ->
+            val isSelected = selectedOptionId == option.id
+            val borderColor = when {
+                isSelected && option.isCorrect -> Color(0xFF48BB78)
+                isSelected && !option.isCorrect -> Color(0xFFE53E3E)
+                else -> ButtonGoldBorder
+            }
+            val bgColor = when {
+                isSelected && option.isCorrect -> Color(0xFF1E3A1E)
+                isSelected && !option.isCorrect -> Color(0xFF3A1E1E)
+                else -> Color(0xFF2B1810)
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(bgColor)
+                    .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
+                    .clickable { onSelectOption(option.id) }
+                    .padding(12.dp)
+                    .testTag("academy_option_${option.id}"),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(option.textRes),
+                        color = Color(0xFFFFF8DC),
+                        fontSize = 13.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+
+        feedbackRes?.let { fbRes ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF2A170C))
+                    .border(1.dp, if (isAnswerCorrect == true) Color(0xFF48BB78) else Color(0xFFE57373), RoundedCornerShape(8.dp))
+                    .padding(10.dp)
+                    .testTag("academy_question_feedback"),
+            ) {
+                Text(
+                    text = stringResource(fbRes),
+                    color = if (isAnswerCorrect == true) Color(0xFFC6F6D5) else Color(0xFFFED7D7),
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Sezione didattica con azione pratica sulla carta corretta.
+ */
+@Composable
+private fun CardActionSection(
+    step: AcademyStep,
+    isCompleted: Boolean,
+    feedbackRes: Int?,
+    onPlayCard: (Card) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("academy_card_action_section"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.academy_card_action_hint),
+            color = BrassRivetGold,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            step.handCards.forEach { card ->
+                val isTarget = card == step.targetCard
+                val showFrame = isCompleted && isTarget
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    step.cardBadges[card]?.let { badgeResId ->
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF2A170C))
+                                .border(1.dp, BrassRivetGold, RoundedCornerShape(6.dp))
+                                .padding(horizontal = 4.dp, vertical = 1.dp),
+                        ) {
+                            Text(
+                                text = stringResource(badgeResId),
+                                color = BrassRivetGold,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                    CardView(
+                        card = card,
+                        width = 72.dp,
+                        height = 106.dp,
+                        isPlayable = !isCompleted,
+                        showGoldFrame = showFrame,
+                        onClick = { onPlayCard(card) },
+                        modifier = Modifier.testTag("academy_hand_card_${card.rank.name}_${card.suit.name}"),
+                    )
+                }
+            }
+        }
+
+        feedbackRes?.let { fbRes ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF3A1E1E))
+                    .border(1.dp, Color(0xFFE57373), RoundedCornerShape(8.dp))
+                    .padding(10.dp)
+                    .testTag("academy_card_action_feedback"),
+            ) {
+                Text(
+                    text = stringResource(fbRes),
+                    color = Color(0xFFFED7D7),
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Sezione conclusiva dello step 4 con distintivo d'oro e proclamazione della regola ferrea del circolo.
+ */
+@Composable
+private fun LessonSummarySection(
+    module: AcademyModule,
+    step: AcademyStep,
+) {
+    WoodPanel(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("academy_summary_section"),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Image(
+                painter = painterResource(R.drawable.badge_best),
+                contentDescription = null,
+                modifier = Modifier.size(76.dp),
+            )
+
+            Text(
+                text = stringResource(step.titleRes),
+                color = BrassRivetGold,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaestroDisplayFont,
+                textAlign = TextAlign.Center,
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFF2A170C))
+                    .border(1.5.dp, ButtonGoldBorder, RoundedCornerShape(10.dp))
+                    .padding(14.dp),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.academy_golden_rule_header),
+                        color = Color(0xFFD4AF37),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                    Text(
+                        text = stringResource(step.goldenRuleRes ?: module.goldenRuleRes),
+                        color = Color(0xFFFFF8DC),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 18.sp,
+                    )
+                }
+            }
+        }
+    }
+}
