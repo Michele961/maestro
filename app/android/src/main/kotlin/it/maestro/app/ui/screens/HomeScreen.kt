@@ -50,6 +50,7 @@ import it.maestro.app.ui.components.MaestroDialogueBox
 import it.maestro.app.ui.components.MaestroPillButton
 import it.maestro.app.ui.components.ParchmentPanel
 import it.maestro.app.ui.components.PillButtonVariant
+import it.maestro.app.ui.components.StreakPill
 import it.maestro.app.ui.components.WoodIconButton
 import it.maestro.app.ui.components.WoodPanel
 import it.maestro.app.ui.components.WoodRowTile
@@ -70,11 +71,13 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 public fun HomeScreen(
     modifier: Modifier = Modifier,
     hasActiveMatch: Boolean = false,
+    streakCount: Int = 0,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
     onDailyPuzzleClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
+    onMissionsClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -90,8 +93,10 @@ public fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HomeHeader(
+                    streakCount = streakCount,
                     onSettingsClicked = onSettingsClicked,
                     onProfileClicked = onProfileClicked,
+                    onMissionsClicked = onMissionsClicked,
                 )
                 // Il pannello del Maestro assorbe lo spazio: la Home sta in una schermata, senza scroll.
                 MaestroWelcome(modifier = Modifier.weight(1f))
@@ -155,7 +160,8 @@ public fun HomeScreen(
                         icon = R.drawable.icon_gift,
                         title = stringResource(R.string.home_daily_rewards),
                         iconSize = 52.dp,
-                        modifier = Modifier.weight(1f).height(72.dp),
+                        modifier = Modifier.weight(1f).height(72.dp).testTag("home_missions_tile"),
+                        onClick = onMissionsClicked,
                     )
                     WoodPanel(modifier = Modifier.weight(1f).height(72.dp)) {
                         Row(
@@ -189,8 +195,10 @@ public fun HomeScreen(
 
 @Composable
 private fun HomeHeader(
+    streakCount: Int = 0,
     onSettingsClicked: () -> Unit,
     onProfileClicked: () -> Unit = {},
+    onMissionsClicked: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -219,6 +227,11 @@ private fun HomeHeader(
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 CurrencyPill(icon = R.drawable.icon_coin, value = stringResource(R.string.home_coins_placeholder))
                 CurrencyPill(icon = R.drawable.icon_gem, value = stringResource(R.string.home_gems_placeholder))
+                StreakPill(
+                    streak = streakCount,
+                    onClick = onMissionsClicked,
+                    modifier = Modifier.testTag("home_streak_pill"),
+                )
             }
         }
         WoodIconButton(

@@ -91,14 +91,14 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-05 — Streak quotidiana ("Fiamma") & Missioni didattiche
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `learning_coaching_retention_monetization_strategy.md` §3
 - **Obiettivo:** Sistema di retention giornaliero:
   1. Conteggio giorni consecutivi di gioco ("Streak/Fiamma") con 1 "Gettone Riposo" (Freeze) salvavita per non perdere la sequenza se si salta un giorno.
   2. Tre missioni didattiche giornaliere a rotazione (es. *"Risolvi il puzzle del giorno"*, *"Chiudi una partita con precisione > 80%"*, *"Rispondi correttamente a 2 check sui Sette"*).
 - **Perimetro autorizzato:** `app:android` (DataStore per tracking date/streak, componenti grafici fiamma e badge missioni).
 - **Criteri di accettazione:**
-    - [ ] Test su passaggio di data: incremento streak se giocato, consumo gettone riposo se non giocato, azzeramento se saltati due giorni consecutivi senza gettoni.
+    - [x] Test su passaggio di data: incremento streak se giocato, consumo gettone riposo se non giocato, azzeramento se saltati due giorni consecutivi senza gettoni.
 - **Domande aperte:** —
 
 ---
