@@ -50,7 +50,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-02 — Generatore e risolutore di puzzle tattici
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/ai/maestro.md` (Check e puzzle), `docs/rules/scopa.md` §6
 - **Obiettivo:** In `core:ai`, implementare un generatore e validatore di puzzle tattici basato sul risolutore esatto (`PimcBot` / endgame solver). Un puzzle tattico è definito da uno stato di smazzata (es. ultime 2-3 mani a mazzo vuoto o banco critico) in cui esiste **un'unica sequenza vincente** (o una sola mossa che massimizza i punti garantendo la vittoria o una scopa decisiva).
 - **Perimetro autorizzato:** `core:ai` (nuovo package `it.maestro.ai.puzzle`). Test Kotlin puri senza Android.
