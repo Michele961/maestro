@@ -64,14 +64,14 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-03 — Schermata "Sfida del Giorno" & Social Share
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §4, `learning_coaching_retention_monetization_strategy.md` §2
 - **Obiettivo:** Schermata dedicata accessibile dalla Home per il puzzle tattico quotidiano. Il puzzle del giorno è selezionato o generato in modo deterministico a partire dalla data locale (uguale per tutti gli utenti nel medesimo giorno). Al completamento: feedback celebrativo, accredito ricompensa e pulsante "Condividi" che genera una stringa negli appunti formattata per WhatsApp/social senza spoiler (stile Wordle: *"Maestro Scopa #14 — Risolto al 1° tentativo! 🧠✨"*).
 - **Perimetro autorizzato:** `app:android` (navigazione, PuzzleViewModel, PuzzleScreen, formattazione stringa di share).
 - **Criteri di accettazione:**
-    - [ ] DataStore registra lo stato del puzzle del giorno (risolto/non risolto, data ultimo completamento).
-    - [ ] La condivisione usa l'Intent standard di Android (`ACTION_SEND`).
-    - [ ] Test UI con screenshot Roborazzi della schermata del puzzle.
+    - [x] DataStore registra lo stato del puzzle del giorno (risolto/non risolto, data ultimo completamento).
+    - [x] La condivisione usa l'Intent standard di Android (`ACTION_SEND`).
+    - [x] Test UI con screenshot Roborazzi della schermata del puzzle.
 - **Domande aperte:** —
 
 ---

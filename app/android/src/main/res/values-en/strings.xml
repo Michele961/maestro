@@ -191,4 +191,22 @@
     <string name="game_card_play_confirm">PLAY</string>
     <string name="game_card_release_to_play">Release to play</string>
     <string name="game_arrow_symbol">➔</string>
+    <string name="puzzle_screen_title">DAILY PUZZLE</string>
+    <string name="puzzle_number_format">Puzzle #%1$d</string>
+    <string name="puzzle_coach_initial">Here is today\'s puzzle: look closely at the table and your hand. Find the winning play!</string>
+    <string name="puzzle_coach_hint_level1">Tricky move, but there is something better on the board: take another look at the table!</string>
+    <string name="puzzle_coach_hint_sweep">Careful: there is a sweep in the air, just calculate the combination correctly.</string>
+    <string name="puzzle_coach_hint_win">This is the deciding trick: count carefully the points separating you from victory.</string>
+    <string name="puzzle_coach_hint_points">Coins and Sevens decide the deal: look where the real points lie.</string>
+    <string name="puzzle_coach_solved">Magnificent! Masterful capture and point won: that\'s how a true player thinks!</string>
+    <string name="puzzle_coach_already_solved">You have already completed today\'s challenge! Come back tomorrow for a new puzzle.</string>
+    <string name="puzzle_solved_title">CHALLENGE SOLVED!</string>
+    <string name="puzzle_solved_subtitle_first_try">Solved on the 1st attempt! 🧠✨</string>
+    <string name="puzzle_solved_subtitle_other_tries">Solved in %1$d attempts!</string>
+    <string name="puzzle_button_share">SHARE</string>
+    <string name="puzzle_button_home">BACK TO HOME</string>
+    <string name="puzzle_button_retry">TRY AGAIN</string>
+    <string name="puzzle_table_empty">Empty table</string>
+    <string name="puzzle_attempt_failed_banner">Attempt #%1$d failed. Read the hint!</string>
+    <string name="home_daily_puzzle_button">Daily puzzle</string>
 </resources>

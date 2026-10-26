@@ -72,6 +72,7 @@ public fun HomeScreen(
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
+    onDailyPuzzleClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
@@ -139,9 +140,10 @@ public fun HomeScreen(
                     )
                 }
                 WoodRowTile(
-                    icon = R.drawable.icon_newspaper,
-                    title = stringResource(R.string.home_news),
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    icon = R.drawable.icon_book_quill,
+                    title = stringResource(R.string.home_daily_puzzle_button),
+                    modifier = Modifier.fillMaxWidth().height(50.dp).testTag("home_daily_puzzle_tile"),
+                    onClick = onDailyPuzzleClicked,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     WoodRowTile(
@@ -172,7 +174,7 @@ public fun HomeScreen(
                     }
                 }
             }
-            BottomNavBar()
+            BottomNavBar(onDailyPuzzleClicked = onDailyPuzzleClicked)
         }
     }
 }
@@ -316,7 +318,9 @@ private fun GameTile(
 }
 
 @Composable
-private fun BottomNavBar() {
+private fun BottomNavBar(
+    onDailyPuzzleClicked: () -> Unit = {},
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -325,7 +329,13 @@ private fun BottomNavBar() {
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         BrassIconBadge(size = 76.dp, icon = R.drawable.icon_trophy, label = stringResource(R.string.home_nav_leaderboard))
-        BrassIconBadge(size = 76.dp, icon = R.drawable.icon_book_quill, label = stringResource(R.string.home_nav_training))
+        BrassIconBadge(
+            size = 76.dp,
+            icon = R.drawable.icon_book_quill,
+            label = stringResource(R.string.home_daily_puzzle_button),
+            onClick = onDailyPuzzleClicked,
+            modifier = Modifier.testTag("home_nav_puzzle_button"),
+        )
         BrassIconBadge(size = 76.dp, icon = R.drawable.icon_pouch, label = stringResource(R.string.home_nav_shop))
     }
 }

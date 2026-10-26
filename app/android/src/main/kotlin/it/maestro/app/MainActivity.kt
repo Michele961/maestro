@@ -42,6 +42,7 @@ import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
 import it.maestro.app.ui.dialogs.SettingsDialog
+import it.maestro.app.ui.screens.DailyPuzzleScreen
 import it.maestro.app.ui.screens.GameReviewScreen
 import it.maestro.app.ui.screens.HomeScreen
 import it.maestro.app.ui.screens.PostMatchPreviewScreen
@@ -82,6 +83,7 @@ public sealed interface Screen {
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
     ) : Screen
+    public data object DailyPuzzle : Screen
 }
 
 /**
@@ -204,6 +206,7 @@ public class MainActivity : ComponentActivity() {
                         },
                         onStartGameClicked = { currentScreen = Screen.PreGame },
                         onSettingsClicked = { showSettingsDialog = true },
+                        onDailyPuzzleClicked = { currentScreen = Screen.DailyPuzzle },
                     )
                     Screen.PreGame -> PreGameScreen(
                         onStartGame = { level, targetScore, fundamental ->
@@ -263,6 +266,9 @@ public class MainActivity : ComponentActivity() {
                                 humanSeat = screen.humanSeat,
                             )
                         },
+                    )
+                    Screen.DailyPuzzle -> DailyPuzzleScreen(
+                        onNavigateHome = { currentScreen = Screen.Home },
                     )
                 }
 

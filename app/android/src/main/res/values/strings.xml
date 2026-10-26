@@ -191,4 +191,22 @@
     <string name="game_card_play_confirm">GIOCA</string>
     <string name="game_card_release_to_play">Rilascia per giocare</string>
     <string name="game_arrow_symbol">➔</string>
+    <string name="puzzle_screen_title">SFIDA DEL GIORNO</string>
+    <string name="puzzle_number_format">Puzzle #%1$d</string>
+    <string name="puzzle_coach_initial">Ecco la sfida di oggi: osserva bene la mano e il tavolo. Trova la mossa vincente!</string>
+    <string name="puzzle_coach_hint_level1">Mossa insidiosa, ma c\'è di meglio sul tavolo: riguarda bene le carte a terra!</string>
+    <string name="puzzle_coach_hint_sweep">Attento: c\'è aria di Scopa, basta calcolare bene la combinazione.</string>
+    <string name="puzzle_coach_hint_win">È l\'ultima mano decisiva: conta bene i punti che ti separano dalla vittoria.</string>
+    <string name="puzzle_coach_hint_points">I Denari e i Sette decidono la smazzata: guarda dove si nasconde il vero punto.</string>
+    <string name="puzzle_coach_solved">Magnifico! Presa magistrale e punto conquistato: così ragiona un vero giocatore!</string>
+    <string name="puzzle_coach_already_solved">Hai già trionfato nella Sfida di oggi! Torna domani per un nuovo puzzle.</string>
+    <string name="puzzle_solved_title">SFIDA COMPLETATA!</string>
+    <string name="puzzle_solved_subtitle_first_try">Risolto al 1° tentativo! 🧠✨</string>
+    <string name="puzzle_solved_subtitle_other_tries">Risolto in %1$d tentativi!</string>
+    <string name="puzzle_button_share">CONDIVIDI</string>
+    <string name="puzzle_button_home">TORNA ALLA HOME</string>
+    <string name="puzzle_button_retry">RIPROVA</string>
+    <string name="puzzle_table_empty">Tavolo vuoto</string>
+    <string name="puzzle_attempt_failed_banner">Tentativo #%1$d non riuscito. Leggi l\'indizio!</string>
+    <string name="home_daily_puzzle_button">Sfida del giorno</string>
 </resources>
