@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -229,37 +231,39 @@ private fun PuzzleHeader(
     WoodPanel(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(72.dp)
             .padding(horizontal = 14.dp, vertical = 4.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 10.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 painter = painterResource(R.drawable.button_close),
                 contentDescription = stringResource(R.string.puzzle_button_home),
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(38.dp)
                     .clickable(onClick = onNavigateHome)
                     .testTag("puzzle_back_button"),
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
                 Text(
                     text = stringResource(R.string.puzzle_screen_title),
                     color = BrassRivetGold,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = MaestroDisplayFont,
+                    maxLines = 1,
                 )
                 Text(
                     text = stringResource(R.string.puzzle_number_format, puzzleNumber),
                     color = Color.White.copy(alpha = 0.85f),
                     fontSize = 11.sp,
                     fontFamily = MaestroDisplayFont,
+                    maxLines = 1,
                 )
             }
         }
@@ -271,11 +275,11 @@ private fun PuzzleCoachArea(
     uiState: DailyPuzzleUiState,
     modifier: Modifier = Modifier,
 ) {
-    WoodPanel(modifier = modifier.height(106.dp)) {
+    WoodPanel(modifier = modifier.heightIn(min = 106.dp)) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -300,7 +304,7 @@ private fun PuzzleCoachArea(
                     message = stringResource(uiState.maestroMessageResId),
                     tail = BubbleTail.START,
                     fontSize = 12.sp,
-                    maxLines = 4,
+                    maxLines = 6,
                     modifier = Modifier.fillMaxWidth().testTag("puzzle_coach_bubble"),
                 )
             }
@@ -430,8 +434,9 @@ private fun SolvedCelebrationBanner(
                     text = stringResource(R.string.puzzle_button_share).uppercase(),
                     onClick = onShare,
                     variant = PillButtonVariant.PRIMARY_GREEN,
-                    height = 48.dp,
-                    fontSize = 16.sp,
+                    height = 46.dp,
+                    fontSize = 14.sp,
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),
                     testTag = "puzzle_share_button",
                 )
@@ -439,8 +444,9 @@ private fun SolvedCelebrationBanner(
                     text = stringResource(R.string.puzzle_button_home).uppercase(),
                     onClick = onNavigateHome,
                     variant = PillButtonVariant.SECONDARY_AMBER,
-                    height = 48.dp,
-                    fontSize = 14.sp,
+                    height = 46.dp,
+                    fontSize = 13.sp,
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     modifier = Modifier.weight(1f),
                     testTag = "puzzle_home_button",
                 )

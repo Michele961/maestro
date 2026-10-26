@@ -153,6 +153,8 @@
     <string name="home_news">Notizie dal circolo</string>
     <string name="home_daily_rewards">Premi giornalieri</string>
     <string name="home_daily_missions">Missioni del giorno</string>
+    <string name="home_missions_title">Missioni</string>
+    <string name="home_missions_subtitle">Giornaliere</string>
     <string name="home_friends">Amici</string>
     <string name="home_nav_leaderboard">Classifica</string>
     <string name="home_nav_training">Palestra</string>
@@ -205,7 +207,7 @@
     <string name="puzzle_solved_subtitle_first_try">Risolto al primo tentativo!</string>
     <string name="puzzle_solved_subtitle_other_tries">Risolto in %1$d tentativi!</string>
     <string name="puzzle_button_share">CONDIVIDI</string>
-    <string name="puzzle_button_home">TORNA ALLA HOME</string>
+    <string name="puzzle_button_home">Al Circolo</string>
     <string name="puzzle_button_retry">RIPROVA</string>
     <string name="puzzle_table_empty">Tavolo vuoto</string>
     <string name="puzzle_attempt_failed_banner">Tentativo #%1$d non riuscito. Leggi l\'indizio!</string>

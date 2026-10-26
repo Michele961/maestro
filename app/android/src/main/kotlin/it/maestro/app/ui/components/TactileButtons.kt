@@ -1,5 +1,9 @@
 package it.maestro.app.ui.components
 
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.animateDpAsState
@@ -127,6 +131,8 @@ public fun MaestroPillButton(
             fontFamily = MaestroDisplayFont,
             textAlign = TextAlign.Center,
             letterSpacing = 0.5.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             style = TextStyle(shadow = Shadow(Color(0x99000000), Offset(0f, 3f), 4f)),
         )
     }
@@ -201,7 +207,7 @@ public fun MaestroSpeechBubble(
     modifier: Modifier = Modifier,
     tail: BubbleTail = BubbleTail.BOTTOM_START,
     fontSize: TextUnit = 14.sp,
-    maxLines: Int = 3,
+    maxLines: Int = 6,
 ) {
     if (tail == BubbleTail.START) {
         Row(
@@ -229,18 +235,24 @@ public fun MaestroSpeechBubble(
                 shadowElevation = 4.dp,
                 modifier = Modifier.weight(1f, fill = false),
             ) {
-                Text(
-                    text = message,
-                    color = WoodSurfaceDark,
-                    fontSize = fontSize,
-                    lineHeight = fontSize * 1.2f,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    textAlign = TextAlign.Center,
-                    maxLines = maxLines,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                )
+                Box(
+                    modifier = Modifier
+                        .heightIn(max = 140.dp)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    Text(
+                        text = message,
+                        color = WoodSurfaceDark,
+                        fontSize = fontSize,
+                        lineHeight = fontSize * 1.22f,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        textAlign = TextAlign.Center,
+                        maxLines = maxLines,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    )
+                }
             }
         }
         return
@@ -285,18 +297,24 @@ public fun MaestroSpeechBubble(
             border = BorderStroke(1.dp, Color(0x55603813)),
             shadowElevation = 4.dp,
         ) {
-            Text(
-                text = message,
-                color = WoodSurfaceDark,
-                fontSize = fontSize,
-                lineHeight = fontSize * 1.2f,
-                fontWeight = FontWeight.Bold,
-                fontFamily = MaestroDisplayFont,
-                textAlign = TextAlign.Center,
-                maxLines = maxLines,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            )
+            Box(
+                modifier = Modifier
+                    .heightIn(max = 140.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Text(
+                    text = message,
+                    color = WoodSurfaceDark,
+                    fontSize = fontSize,
+                    lineHeight = fontSize * 1.22f,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
+                    textAlign = TextAlign.Center,
+                    maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                )
+            }
         }
         if (!isTop) {
             tailCanvas()

@@ -164,40 +164,75 @@ public fun HomeScreen(
                     onClick = onDailyPuzzleClicked,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    WoodRowTile(
-                        icon = R.drawable.icon_missions,
-                        title = stringResource(R.string.home_daily_missions),
-                        iconSize = 52.dp,
-                        modifier = Modifier.weight(1f).height(72.dp).testTag("home_missions_tile"),
-                        onClick = onMissionsClicked,
-                        trailingBadge = if (streakCount > 0) {
-                            {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color(0xFF2A170C))
-                                        .border(1.dp, ButtonGoldBorder, RoundedCornerShape(12.dp))
-                                        .padding(horizontal = 6.dp, vertical = 3.dp)
-                                        .testTag("home_missions_streak_badge"),
-                                ) {
-                                    Image(
-                                        painter = painterResource(R.drawable.icon_flame),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp),
-                                    )
-                                    Spacer(modifier = Modifier.width(3.dp))
+                    WoodPanel(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(72.dp)
+                            .testTag("home_missions_tile")
+                            .clickable(onClick = onMissionsClicked),
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.icon_missions),
+                                contentDescription = null,
+                                modifier = Modifier.size(42.dp),
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .padding(start = 6.dp)
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.home_missions_title).uppercase(),
+                                    color = BrassRivetGold,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = MaestroDisplayFont,
+                                    maxLines = 1,
+                                )
+                                if (streakCount > 0) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .padding(top = 2.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(Color(0xFF2A170C))
+                                            .border(1.dp, ButtonGoldBorder, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                                            .testTag("home_missions_streak_badge"),
+                                    ) {
+                                        Image(
+                                            painter = painterResource(R.drawable.icon_flame),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(14.dp),
+                                        )
+                                        Spacer(modifier = Modifier.width(3.dp))
+                                        Text(
+                                            text = stringResource(R.string.home_missions_streak_badge, streakCount),
+                                            color = BrassRivetGold,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = MaestroDisplayFont,
+                                        )
+                                    }
+                                } else {
                                     Text(
-                                        text = stringResource(R.string.home_missions_streak_badge, streakCount),
-                                        color = BrassRivetGold,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        text = stringResource(R.string.home_missions_subtitle),
+                                        color = BrassRivetGold.copy(alpha = 0.75f),
+                                        fontSize = 10.sp,
                                         fontFamily = MaestroDisplayFont,
+                                        maxLines = 1,
                                     )
                                 }
                             }
-                        } else null,
-                    )
+                        }
+                    }
                     WoodPanel(modifier = Modifier.weight(1f).height(72.dp)) {
                         Row(
                             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
@@ -206,15 +241,16 @@ public fun HomeScreen(
                             Image(
                                 painter = painterResource(R.drawable.avatar_friends),
                                 contentDescription = null,
-                                modifier = Modifier.size(64.dp),
+                                modifier = Modifier.size(46.dp),
                             )
                             Text(
                                 text = stringResource(R.string.home_friends).uppercase(),
                                 color = BrassRivetGold,
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = MaestroDisplayFont,
-                                modifier = Modifier.padding(start = 8.dp),
+                                modifier = Modifier.padding(start = 6.dp),
+                                maxLines = 1,
                             )
                         }
                     }
