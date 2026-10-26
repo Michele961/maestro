@@ -1,7 +1,8 @@
 package it.maestro.app.ui
 
+import it.maestro.app.data.local.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyModuleId
+import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
 import it.maestro.app.ui.screens.academy.AcademyViewMode
 import it.maestro.app.ui.screens.academy.AcademyViewModel
@@ -28,7 +29,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Test di unità per il ViewModel dell'Accademia del Maestro (task F2-06).
+ * Test unitari per il ViewModel dell'Accademia con capitoli e sotto-moduli (task F2-06).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AcademyViewModelTest {
@@ -46,159 +47,143 @@ class AcademyViewModelTest {
     }
 
     @Test
-    fun initialUiStateReflectsDefaultProgression() = runTest {
+    fun initialUiStateReflectsChaptersAndFirstLessonUnlocked() = runTest {
         val repo = InMemoryAcademyRepository()
         val viewModel = AcademyViewModel(
             academyRepository = repo,
-            availableModules = AcademyContent.MODULES,
-        )
-
-        advanceUntilIdle()
-        val state = viewModel.uiState.first { it.modules.isNotEmpty() }
-
-        assertEquals(3, state.modules.size)
-        assertTrue(state.modules[0].progress.isUnlocked)
-        assertFalse(state.modules[0].progress.isCompleted)
-        assertFalse(state.modules[1].progress.isUnlocked)
-        assertFalse(state.modules[2].progress.isUnlocked)
-        assertEquals(AcademyViewMode.ModuleMap, state.viewMode)
-    }
-
-    @Test
-    fun openModuleTransitionsToLessonAtStepZero() = runTest {
-        val repo = InMemoryAcademyRepository()
-        val viewModel = AcademyViewModel(
-            academyRepository = repo,
-            availableModules = AcademyContent.MODULES,
+            availableChapters = AcademyContent.CHAPTERS,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
 
         advanceUntilIdle()
-        viewModel.openModule(AcademyModuleId.MODULE_1_ABBECEDARIO)
+        val state = viewModel.uiState.first { it.chapters.isNotEmpty() }
+
+        assertEquals(4, state.chapters.size)
+        // Capitolo 1 è sbloccato
+        assertTrue(state.chapters[0].isUnlocked)
+        assertFalse(state.chapters[0].isCompleted)
+        assertEquals(0, state.chapters[0].completedCount)
+        assertEquals(4, state.chapters[0].totalCount)
+
+        // Prima lezione di Cap 1 è sbloccata
+        assertTrue(state.chapters[0].lessons[0].progress.isUnlocked)
+        assertFalse(state.chapters[0].lessons[0].progress.isCompleted)
+        assertFalse(state.chapters[0].lessons[1].progress.isUnlocked)
+
+        // Capitolo 2 è bloccato
+        assertFalse(state.chapters[1].isUnlocked)
+        assertEquals(AcademyViewMode.ChapterMap, state.viewMode)
+    }
+
+    @Test
+    fun toggleChapterExpandsAndCollapsesSection() = runTest {
+        val repo = InMemoryAcademyRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            availableChapters = AcademyContent.CHAPTERS,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+        advanceUntilIdle()
+        assertEquals(AcademyChapterId.CHAPTER_1_FONDAMENTI, viewModel.uiState.value.expandedChapterId)
+
+        viewModel.toggleChapter(AcademyChapterId.CHAPTER_1_FONDAMENTI)
+        advanceUntilIdle()
+        assertEquals(null, viewModel.uiState.value.expandedChapterId)
+
+        viewModel.toggleChapter(AcademyChapterId.CHAPTER_2_PRIMIERA)
+        advanceUntilIdle()
+        assertEquals(AcademyChapterId.CHAPTER_2_PRIMIERA, viewModel.uiState.value.expandedChapterId)
+    }
+
+    @Test
+    fun openLessonTransitionsToLessonView() = runTest {
+        val repo = InMemoryAcademyRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            availableChapters = AcademyContent.CHAPTERS,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+        advanceUntilIdle()
+        viewModel.openLesson(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        val lesson = state.viewMode as? AcademyViewMode.Lesson
-        assertNotNull(lesson)
-        assertEquals(AcademyModuleId.MODULE_1_ABBECEDARIO, lesson.module.id)
-        assertEquals(0, lesson.currentStepIndex)
-        assertEquals(1, lesson.currentStep.stepNumber)
-        assertFalse(lesson.isStepCompleted)
+        val lessonMode = state.viewMode as? AcademyViewMode.Lesson
+        assertNotNull(lessonMode)
+        assertEquals(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA, lessonMode.lesson.id)
+        assertEquals(0, lessonMode.currentStepIndex)
+        assertFalse(lessonMode.isStepCompleted)
     }
 
     @Test
-    fun questionStepValidatesCorrectAndWrongAnswers() = runTest {
+    fun completeLessonUnlocksNextLessonInState() = runTest {
         val repo = InMemoryAcademyRepository()
         val viewModel = AcademyViewModel(
             academyRepository = repo,
-            availableModules = AcademyContent.MODULES,
+            availableChapters = AcademyContent.CHAPTERS,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
 
         advanceUntilIdle()
-        viewModel.openModule(AcademyModuleId.MODULE_1_ABBECEDARIO)
+        viewModel.openLesson(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA)
         advanceUntilIdle()
 
-        // Seleziona opzione errata
-        viewModel.selectOption("m1_s1_opt2")
+        // Step 1: Risponde correttamente
+        viewModel.selectOption("c1_l1_opt1")
         advanceUntilIdle()
         var lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
-        assertEquals(false, lesson.isAnswerCorrect)
-        assertFalse(lesson.isStepCompleted)
-        assertNotNull(lesson.feedbackRes)
+        assertTrue(lesson.isStepCompleted)
 
-        // Seleziona opzione corretta
-        viewModel.selectOption("m1_s1_opt1")
+        // Passa allo Step 2 (Summary & Badge)
+        viewModel.nextStep()
         advanceUntilIdle()
         lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
-        assertEquals(true, lesson.isAnswerCorrect)
+        assertTrue(lesson.isLastStep)
         assertTrue(lesson.isStepCompleted)
-    }
 
-    @Test
-    fun cardActionStepRequiresTargetCard() = runTest {
-        val repo = InMemoryAcademyRepository()
-        val viewModel = AcademyViewModel(
-            academyRepository = repo,
-            availableModules = AcademyContent.MODULES,
-        )
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
-
-        advanceUntilIdle()
-        viewModel.openModule(AcademyModuleId.MODULE_1_ABBECEDARIO)
-        advanceUntilIdle()
-
-        // Supera lo step 1
-        viewModel.selectOption("m1_s1_opt1")
-        advanceUntilIdle()
+        // Completa la lezione
         viewModel.nextStep()
         advanceUntilIdle()
 
+        // Verifica ritorno a ChapterMap e sblocco della lezione 1.2
+        val state = viewModel.uiState.value
+        assertEquals(AcademyViewMode.ChapterMap, state.viewMode)
+        assertTrue(state.chapters[0].lessons[0].progress.isCompleted)
+        assertTrue(state.chapters[0].lessons[1].progress.isUnlocked)
+        assertEquals(1, state.chapters[0].completedCount)
+    }
+
+    @Test
+    fun cardActionValidationWorksCorrectly() = runTest {
+        val repo = InMemoryAcademyRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            availableChapters = AcademyContent.CHAPTERS,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+        advanceUntilIdle()
+        // Lezione 1.3: Il Re dei Denari (Card Action)
+        viewModel.openLesson(AcademyLessonId.LESSON_1_3_SETTEBELLO)
+        advanceUntilIdle()
+
         var lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
-        assertEquals(1, lesson.currentStepIndex)
         assertFalse(lesson.isCardActionCompleted)
 
-        // Gioca carta errata (4 di Coppe)
+        // Carta errata
         viewModel.playCard(Card(Rank.QUATTRO, Suit.COPPE))
         advanceUntilIdle()
         lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
         assertFalse(lesson.isCardActionCompleted)
         assertFalse(lesson.isStepCompleted)
 
-        // Gioca carta bersaglio corretta (7 di Bastoni)
+        // Carta corretta: 7 di Bastoni
         viewModel.playCard(Card(Rank.SETTE, Suit.BASTONI))
         advanceUntilIdle()
         lesson = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
         assertTrue(lesson.isCardActionCompleted)
         assertTrue(lesson.isStepCompleted)
-    }
-
-    @Test
-    fun fullModuleCompletionUnlocksNextModuleInRepository() = runTest {
-        val repo = InMemoryAcademyRepository()
-        val viewModel = AcademyViewModel(
-            academyRepository = repo,
-            availableModules = AcademyContent.MODULES,
-        )
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
-
-        advanceUntilIdle()
-        viewModel.openModule(AcademyModuleId.MODULE_1_ABBECEDARIO)
-        advanceUntilIdle()
-
-        // Step 1
-        viewModel.selectOption("m1_s1_opt1")
-        advanceUntilIdle()
-        viewModel.nextStep()
-        advanceUntilIdle()
-
-        // Step 2
-        viewModel.playCard(Card(Rank.SETTE, Suit.BASTONI))
-        advanceUntilIdle()
-        viewModel.nextStep()
-        advanceUntilIdle()
-
-        // Step 3
-        viewModel.selectOption("m1_s3_opt1")
-        advanceUntilIdle()
-        viewModel.nextStep()
-        advanceUntilIdle()
-
-        // Step 4 (Summary & Badge)
-        val lessonStep4 = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
-        assertEquals(3, lessonStep4.currentStepIndex)
-        assertTrue(lessonStep4.isLastStep)
-        assertTrue(lessonStep4.isStepCompleted)
-
-        // Completamento finale
-        viewModel.nextStep()
-        advanceUntilIdle()
-
-        // Verifica che sia tornato alla mappa e che il modulo 2 sia ora sbloccato
-        val finalState = viewModel.uiState.value
-        assertEquals(AcademyViewMode.ModuleMap, finalState.viewMode)
-        assertTrue(finalState.modules[0].progress.isCompleted)
-        assertTrue(finalState.modules[1].progress.isUnlocked)
-        assertFalse(finalState.modules[2].progress.isUnlocked)
     }
 }

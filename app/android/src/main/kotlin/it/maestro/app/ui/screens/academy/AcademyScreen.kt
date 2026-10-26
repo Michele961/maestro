@@ -1,8 +1,10 @@
 package it.maestro.app.ui.screens.academy
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,8 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,13 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
-import it.maestro.app.data.local.academy.AcademyModule
-import it.maestro.app.data.local.academy.AcademyModuleId
+import it.maestro.app.data.local.academy.AcademyChapter
+import it.maestro.app.data.local.academy.AcademyChapterId
+import it.maestro.app.data.local.academy.AcademyLesson
+import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.academy.AcademyStep
 import it.maestro.app.data.local.academy.AcademyStepType
 import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.CardView
-import it.maestro.app.ui.components.ClubBackground
 import it.maestro.app.ui.components.ConfettiCelebration
 import it.maestro.app.ui.components.FramedPortrait
 import it.maestro.app.ui.components.MaestroPillButton
@@ -67,7 +70,7 @@ import it.maestro.game.model.Card
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Schermata principale dell'Accademia del Maestro con navigazione a moduli e lezioni al tavolo (task F2-06).
+ * Schermata principale dell'Accademia del Maestro arricchita con Capitoli e Sotto-Moduli (task F2-06).
  */
 @Composable
 public fun AcademyScreen(
@@ -77,138 +80,157 @@ public fun AcademyScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ClubBackground(modifier = modifier.testTag("academy_screen"), feltFraction = 0.5f) {
+    when (val mode = uiState.viewMode) {
+        is AcademyViewMode.ChapterMap -> {
+            AcademyChapterMapContent(
+                chapters = uiState.chapters,
+                expandedChapterId = uiState.expandedChapterId,
+                onToggleChapter = { viewModel.toggleChapter(it) },
+                onOpenLesson = { viewModel.openLesson(it) },
+                onNavigateHome = onNavigateHome,
+                modifier = modifier,
+            )
+        }
+        is AcademyViewMode.Lesson -> {
+            AcademyLessonContent(
+                lesson = mode,
+                onSelectOption = { viewModel.selectOption(it) },
+                onPlayCard = { viewModel.playCard(it) },
+                onNextStep = { viewModel.nextStep() },
+                onBackToMap = { viewModel.backToMap() },
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+/**
+ * Mappa formativa dei Capitoli (macro-moduli) e delle relative Lezioni (sotto-moduli).
+ */
+@Composable
+public fun AcademyChapterMapContent(
+    chapters: List<AcademyChapterCardState>,
+    expandedChapterId: AcademyChapterId?,
+    onToggleChapter: (AcademyChapterId) -> Unit,
+    onOpenLesson: (AcademyLessonId) -> Unit,
+    onNavigateHome: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(WoodSurfaceDark)
+            .testTag("academy_screen"),
+    ) {
+        Image(
+            painter = painterResource(R.drawable.texture_wood),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)),
         ) {
-            when (val mode = uiState.viewMode) {
-                is AcademyViewMode.ModuleMap -> {
-                    AcademyModuleMapContent(
-                        modules = uiState.modules,
-                        onOpenModule = { viewModel.openModule(it) },
-                        onNavigateHome = onNavigateHome,
+            // Intestazione con pulsante di chiusura
+            WoodPanel(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.button_close),
+                        contentDescription = stringResource(R.string.puzzle_button_home),
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable(onClick = onNavigateHome)
+                            .testTag("academy_back_button"),
                     )
-                }
-                is AcademyViewMode.Lesson -> {
-                    AcademyLessonContent(
-                        lesson = mode,
-                        onSelectOption = { viewModel.selectOption(it) },
-                        onPlayCard = { viewModel.playCard(it) },
-                        onNextStep = { viewModel.nextStep() },
-                        onBackToMap = { viewModel.backToMap() },
-                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.academy_screen_title),
+                            color = BrassRivetGold,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                        )
+                        Text(
+                            text = stringResource(R.string.academy_screen_subtitle),
+                            color = Color(0xFFD4AF37),
+                            fontSize = 11.sp,
+                        )
+                    }
                 }
             }
-        }
-    }
-}
 
-/**
- * Mappa dei moduli dell'Accademia con progressione a tappe.
- */
-@Composable
-public fun AcademyModuleMapContent(
-    modules: List<AcademyModuleCardState>,
-    onOpenModule: (AcademyModuleId) -> Unit,
-    onNavigateHome: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag("academy_module_map_content"),
-    ) {
-        // Intestazione con pulsante di chiusura per tornare alla Home
-        WoodPanel(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(horizontal = 14.dp, vertical = 4.dp),
-        ) {
-            Row(
+            // Lista scorrevole dei Capitoli e sotto-moduli
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Image(
-                    painter = painterResource(R.drawable.button_close),
-                    contentDescription = stringResource(R.string.puzzle_button_home),
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clickable(onClick = onNavigateHome)
-                        .testTag("academy_back_button"),
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.academy_screen_title),
-                        color = BrassRivetGold,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = MaestroDisplayFont,
-                    )
-                    Text(
-                        text = stringResource(R.string.academy_screen_subtitle),
-                        color = Color(0xFFD4AF37),
-                        fontSize = 11.sp,
+                chapters.forEach { chapterState ->
+                    AcademyChapterCard(
+                        chapterState = chapterState,
+                        isExpanded = expandedChapterId == chapterState.chapter.id,
+                        onToggle = { onToggleChapter(chapterState.chapter.id) },
+                        onOpenLesson = onOpenLesson,
                     )
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
-        }
-
-        // Elenco a scorrimento dei moduli
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 14.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            modules.forEach { cardState ->
-                AcademyModuleCard(
-                    cardState = cardState,
-                    onOpenModule = { onOpenModule(cardState.module.id) },
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 /**
- * Singola card del modulo all'interno della mappa formativa.
+ * Card di un Capitolo (macro-modulo) espandibile con l'elenco dei sotto-moduli.
  */
 @Composable
-private fun AcademyModuleCard(
-    cardState: AcademyModuleCardState,
-    onOpenModule: () -> Unit,
+private fun AcademyChapterCard(
+    chapterState: AcademyChapterCardState,
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
+    onOpenLesson: (AcademyLessonId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val module = cardState.module
-    val progress = cardState.progress
-    val isUnlocked = progress.isUnlocked
-    val isCompleted = progress.isCompleted
+    val chapter = chapterState.chapter
+    val isUnlocked = chapterState.isUnlocked
+    val isCompleted = chapterState.isCompleted
 
     WoodPanel(
         modifier = modifier
             .fillMaxWidth()
             .alpha(if (isUnlocked) 1f else 0.55f)
-            .testTag("academy_module_card_${module.number}"),
+            .testTag("academy_chapter_card_${chapter.number}"),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Header del capitolo (cliccabile per espandere/comprimere)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = isUnlocked, onClick = onToggle)
+                    .testTag("academy_chapter_header_${chapter.number}"),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Icona decorativa del modulo
+                // Stemma del capitolo
                 Box(
                     modifier = Modifier
                         .size(54.dp)
@@ -218,7 +240,7 @@ private fun AcademyModuleCard(
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
-                        painter = painterResource(module.iconRes),
+                        painter = painterResource(chapter.iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(34.dp),
                     )
@@ -232,12 +254,13 @@ private fun AcademyModuleCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.academy_module_number, module.number).uppercase(),
+                            text = stringResource(R.string.academy_chapter_number, chapter.number).uppercase(),
                             color = Color(0xFFD4AF37),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = MaestroDisplayFont,
                         )
+                        // Badge completamento capitolo
                         if (isCompleted) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -246,7 +269,7 @@ private fun AcademyModuleCard(
                                     .background(Color(0xFF1E3A1E))
                                     .border(1.dp, BrassRivetGold, RoundedCornerShape(8.dp))
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    .testTag("academy_module_completed_tag_${module.number}"),
+                                    .testTag("academy_chapter_completed_tag_${chapter.number}"),
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.badge_best),
@@ -255,7 +278,7 @@ private fun AcademyModuleCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = stringResource(R.string.academy_module_completed_badge),
+                                    text = stringResource(R.string.academy_chapter_completed),
                                     color = BrassRivetGold,
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Bold,
@@ -265,7 +288,7 @@ private fun AcademyModuleCard(
                     }
 
                     Text(
-                        text = stringResource(module.titleRes),
+                        text = stringResource(chapter.titleRes),
                         color = Color(0xFFFFF8DC),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
@@ -273,60 +296,172 @@ private fun AcademyModuleCard(
                     )
 
                     Text(
-                        text = stringResource(module.subtitleRes),
+                        text = stringResource(chapter.subtitleRes),
                         color = Color(0xFFE2D9C8),
                         fontSize = 12.sp,
                     )
                 }
+
+                // Contatore lezioni
+                Column(horizontalAlignment = Alignment.End) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF2A170C))
+                            .border(1.dp, ButtonGoldBorder, RoundedCornerShape(10.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.academy_chapter_progress, chapterState.completedCount, chapterState.totalCount),
+                            color = BrassRivetGold,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
             }
 
-            // Descrizione didattica
+            // Descrizione del capitolo
             Text(
-                text = stringResource(module.descriptionRes),
+                text = stringResource(chapter.descriptionRes),
                 color = Color(0xFFE2D9C8),
-                fontSize = 13.sp,
-                lineHeight = 17.sp,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
             )
 
-            // Blocco sblocco o pulsante azione
-            if (!isUnlocked) {
-                Text(
-                    text = stringResource(R.string.academy_module_locked),
-                    color = Color(0xFFE57373),
-                    fontSize = 11.sp,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+            // Sotto-moduli (lezioni pratiche) espandibili
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    chapterState.lessons.forEach { lessonState ->
+                        AcademyLessonTile(
+                            lessonState = lessonState,
+                            chapterNumber = chapter.number,
+                            onOpenLesson = { onOpenLesson(lessonState.lesson.id) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Singolo sotto-modulo (lezione) con stato di avanzamento e pulsante d'azione.
+ */
+@Composable
+private fun AcademyLessonTile(
+    lessonState: AcademyLessonCardState,
+    chapterNumber: Int,
+    onOpenLesson: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val lesson = lessonState.lesson
+    val progress = lessonState.progress
+    val isUnlocked = progress.isUnlocked
+    val isCompleted = progress.isCompleted
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFF23140A))
+            .border(1.dp, if (isCompleted) Color(0xFFD4AF37) else Color(0xFF5D4037), RoundedCornerShape(10.dp))
+            .padding(10.dp)
+            .testTag("academy_lesson_tile_${chapterNumber}_${lesson.lessonNumber}"),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Icona della lezione
+                Image(
+                    painter = painterResource(lesson.iconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
                 )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.academy_lesson_number, chapterNumber, lesson.lessonNumber).uppercase(),
+                        color = Color(0xFFD4AF37),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = stringResource(lesson.titleRes),
+                        color = Color(0xFFFFF8DC),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                    )
+                }
+
+                if (isCompleted) {
+                    Image(
+                        painter = painterResource(R.drawable.badge_best),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(22.dp)
+                            .testTag("academy_lesson_completed_icon_${chapterNumber}_${lesson.lessonNumber}"),
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(lesson.descriptionRes),
+                color = Color(0xFFE2D9C8),
+                fontSize = 11.sp,
+                lineHeight = 15.sp,
+            )
+
+            // Pulsante d'azione della lezione
+            if (!isUnlocked) {
                 MaestroPillButton(
                     text = stringResource(R.string.academy_button_locked),
                     onClick = {},
                     enabled = false,
                     variant = PillButtonVariant.WOOD,
-                    height = 42.dp,
-                    fontSize = 14.sp,
+                    height = 36.dp,
+                    fontSize = 12.sp,
                     modifier = Modifier.fillMaxWidth(),
-                    testTag = "academy_module_action_${module.number}",
+                    testTag = "academy_lesson_action_${chapterNumber}_${lesson.lessonNumber}",
                 )
             } else if (isCompleted) {
                 MaestroPillButton(
                     text = stringResource(R.string.academy_button_review),
-                    onClick = onOpenModule,
+                    onClick = onOpenLesson,
                     enabled = true,
                     variant = PillButtonVariant.SECONDARY_AMBER,
-                    height = 44.dp,
-                    fontSize = 14.sp,
+                    height = 38.dp,
+                    fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth(),
-                    testTag = "academy_module_action_${module.number}",
+                    testTag = "academy_lesson_action_${chapterNumber}_${lesson.lessonNumber}",
                 )
             } else {
                 MaestroPillButton(
                     text = stringResource(R.string.academy_button_start),
-                    onClick = onOpenModule,
+                    onClick = onOpenLesson,
                     enabled = true,
                     variant = PillButtonVariant.PRIMARY_GREEN,
-                    height = 46.dp,
-                    fontSize = 15.sp,
+                    height = 40.dp,
+                    fontSize = 14.sp,
                     modifier = Modifier.fillMaxWidth(),
-                    testTag = "academy_module_action_${module.number}",
+                    testTag = "academy_lesson_action_${chapterNumber}_${lesson.lessonNumber}",
                 )
             }
         }
@@ -334,7 +469,7 @@ private fun AcademyModuleCard(
 }
 
 /**
- * Schermata interattiva di una lezione al tavolo del Maestro.
+ * Schermata interattiva di una lezione al tavolo del Maestro (100% feltro e legno, zero grigio!).
  */
 @Composable
 public fun AcademyLessonContent(
@@ -348,17 +483,31 @@ public fun AcademyLessonContent(
     val step = lesson.currentStep
     val isSummary = step.type == AcademyStepType.SUMMARY_AND_BADGE
 
-    Box(modifier = modifier.fillMaxSize().testTag("academy_lesson_content")) {
+    // Sfondo a tutto schermo in panno verde lussuoso del circolo
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFF13361E))
+            .testTag("academy_lesson_content"),
+    ) {
+        Image(
+            painter = painterResource(R.drawable.table_felt_bg),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
                 .padding(bottom = 12.dp),
         ) {
             // Intestazione lezione
             LessonHeader(
-                module = lesson.module,
+                lesson = lesson.lesson,
                 currentStep = step,
-                totalSteps = lesson.module.steps.size,
+                totalSteps = lesson.lesson.steps.size,
                 onBackToMap = onBackToMap,
             )
 
@@ -405,15 +554,15 @@ public fun AcademyLessonContent(
                         else -> Unit
                     }
                 } else {
-                    // Schermata di riepilogo con spilla d'oro e regola ferrea
+                    // Schermata di riepilogo con distintivo d'oro e regola ferrea
                     LessonSummarySection(
-                        module = lesson.module,
+                        lesson = lesson.lesson,
                         step = step,
                     )
                 }
             }
 
-            // Pulsante d'azione inferiore per avanzare o completare
+            // Pulsante d'azione inferiore
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -457,7 +606,7 @@ public fun AcademyLessonContent(
  */
 @Composable
 private fun LessonHeader(
-    module: AcademyModule,
+    lesson: AcademyLesson,
     currentStep: AcademyStep,
     totalSteps: Int,
     onBackToMap: () -> Unit,
@@ -485,7 +634,7 @@ private fun LessonHeader(
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(module.titleRes),
+                    text = stringResource(lesson.titleRes),
                     color = BrassRivetGold,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
@@ -557,7 +706,7 @@ private fun LessonCoachArea(
 }
 
 /**
- * Il tavolo da gioco in feltro verde con carte a terra e cartigli esplicativi.
+ * Il tavolo da gioco con carte a terra e cartigli esplicativi.
  */
 @Composable
 private fun LessonTableArea(
@@ -568,7 +717,7 @@ private fun LessonTableArea(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF13361E))
+            .background(Color(0xFF0D2514))
             .border(2.dp, Color(0xFF5D4037), RoundedCornerShape(12.dp))
             .padding(10.dp)
             .testTag("academy_table_area"),
@@ -806,11 +955,11 @@ private fun CardActionSection(
 }
 
 /**
- * Sezione conclusiva dello step 4 con distintivo d'oro e proclamazione della regola ferrea del circolo.
+ * Sezione conclusiva con distintivo d'oro e proclamazione della regola ferrea del circolo.
  */
 @Composable
 private fun LessonSummarySection(
-    module: AcademyModule,
+    lesson: AcademyLesson,
     step: AcademyStep,
 ) {
     WoodPanel(
@@ -860,7 +1009,7 @@ private fun LessonSummarySection(
                         fontFamily = MaestroDisplayFont,
                     )
                     Text(
-                        text = stringResource(step.goldenRuleRes ?: module.goldenRuleRes),
+                        text = stringResource(step.goldenRuleRes ?: lesson.goldenRuleRes),
                         color = Color(0xFFFFF8DC),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,

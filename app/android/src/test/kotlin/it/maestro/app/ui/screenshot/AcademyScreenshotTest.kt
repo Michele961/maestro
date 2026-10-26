@@ -9,14 +9,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
+import it.maestro.app.data.local.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyProgress
+import it.maestro.app.data.local.academy.AcademyLessonProgress
+import it.maestro.app.ui.screens.academy.AcademyChapterCardState
+import it.maestro.app.ui.screens.academy.AcademyChapterMapContent
+import it.maestro.app.ui.screens.academy.AcademyLessonCardState
 import it.maestro.app.ui.screens.academy.AcademyLessonContent
-import it.maestro.app.ui.screens.academy.AcademyModuleCardState
-import it.maestro.app.ui.screens.academy.AcademyModuleMapContent
 import it.maestro.app.ui.screens.academy.AcademyViewMode
 import it.maestro.app.ui.theme.MaestroTheme
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -26,7 +27,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Screenshot Roborazzi e test UI per le schermate dell'Accademia del Maestro (task F2-06).
+ * Screenshot Roborazzi e test UI per l'Accademia arricchita a Capitoli e Sotto-Moduli (task F2-06).
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -36,72 +37,94 @@ class AcademyScreenshotTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    private val sampleModules = AcademyContent.MODULES
+    private val sampleChapters = AcademyContent.CHAPTERS
 
     @Test
     fun academy_map_initial_screenshot() {
-        val cardStates = sampleModules.map { module ->
-            AcademyModuleCardState(
-                module = module,
-                progress = AcademyProgress(
-                    moduleId = module.id,
-                    isUnlocked = module.number == 1,
-                    isCompleted = false,
-                ),
+        val chapterStates = sampleChapters.map { chapter ->
+            val lessonStates = chapter.lessons.map { lesson ->
+                AcademyLessonCardState(
+                    lesson = lesson,
+                    progress = AcademyLessonProgress(
+                        lessonId = lesson.id,
+                        isUnlocked = chapter.number == 1 && lesson.lessonNumber == 1,
+                        isCompleted = false,
+                    ),
+                )
+            }
+            AcademyChapterCardState(
+                chapter = chapter,
+                lessons = lessonStates,
+                completedCount = 0,
+                totalCount = lessonStates.size,
+                isCompleted = false,
+                isUnlocked = chapter.number == 1,
             )
         }
 
         composeRule.setContent {
             MaestroTheme {
-                AcademyModuleMapContent(
-                    modules = cardStates,
-                    onOpenModule = {},
+                AcademyChapterMapContent(
+                    chapters = chapterStates,
+                    expandedChapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
+                    onToggleChapter = {},
+                    onOpenLesson = {},
                     onNavigateHome = {},
                 )
             }
         }
 
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_map_initial.png")
-        composeRule.onNodeWithTag("academy_module_card_1").assertIsDisplayed()
-        composeRule.onNodeWithTag("academy_module_card_2").assertIsDisplayed()
-        composeRule.onNodeWithTag("academy_module_card_3").assertIsDisplayed()
-        composeRule.onNodeWithTag("academy_module_action_1").assertIsEnabled()
-        composeRule.onNodeWithTag("academy_module_action_2").assertIsNotEnabled()
+        composeRule.onNodeWithTag("academy_chapter_card_1").assertIsDisplayed()
+        composeRule.onNodeWithTag("academy_lesson_tile_1_1").assertIsDisplayed()
+        composeRule.onNodeWithTag("academy_lesson_action_1_1").assertIsEnabled()
+        composeRule.onNodeWithTag("academy_lesson_action_1_2").assertIsNotEnabled()
     }
 
     @Test
     fun academy_map_all_completed_screenshot() {
-        val cardStates = sampleModules.map { module ->
-            AcademyModuleCardState(
-                module = module,
-                progress = AcademyProgress(
-                    moduleId = module.id,
-                    isUnlocked = true,
-                    isCompleted = true,
-                ),
+        val chapterStates = sampleChapters.map { chapter ->
+            val lessonStates = chapter.lessons.map { lesson ->
+                AcademyLessonCardState(
+                    lesson = lesson,
+                    progress = AcademyLessonProgress(
+                        lessonId = lesson.id,
+                        isUnlocked = true,
+                        isCompleted = true,
+                    ),
+                )
+            }
+            AcademyChapterCardState(
+                chapter = chapter,
+                lessons = lessonStates,
+                completedCount = lessonStates.size,
+                totalCount = lessonStates.size,
+                isCompleted = true,
+                isUnlocked = true,
             )
         }
 
         composeRule.setContent {
             MaestroTheme {
-                AcademyModuleMapContent(
-                    modules = cardStates,
-                    onOpenModule = {},
+                AcademyChapterMapContent(
+                    chapters = chapterStates,
+                    expandedChapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
+                    onToggleChapter = {},
+                    onOpenLesson = {},
                     onNavigateHome = {},
                 )
             }
         }
 
         composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_map_completed.png")
-        composeRule.onNodeWithTag("academy_module_completed_tag_1").assertIsDisplayed()
-        composeRule.onNodeWithTag("academy_module_completed_tag_2").assertIsDisplayed()
-        composeRule.onNodeWithTag("academy_module_completed_tag_3").assertIsDisplayed()
+        composeRule.onNodeWithTag("academy_chapter_completed_tag_1", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag("academy_lesson_completed_icon_1_1").assertIsDisplayed()
     }
 
     @Test
     fun academy_lesson_step1_question_screenshot() {
         val lesson = AcademyViewMode.Lesson(
-            module = sampleModules[0],
+            lesson = sampleChapters[0].lessons[0],
             currentStepIndex = 0,
         )
 
@@ -125,9 +148,10 @@ class AcademyScreenshotTest {
 
     @Test
     fun academy_lesson_step2_card_action_screenshot() {
+        // Lezione 1.3: Il Re dei Denari (Card Action)
         val lesson = AcademyViewMode.Lesson(
-            module = sampleModules[0],
-            currentStepIndex = 1,
+            lesson = sampleChapters[0].lessons[2],
+            currentStepIndex = 0,
         )
 
         composeRule.setContent {
@@ -151,9 +175,10 @@ class AcademyScreenshotTest {
 
     @Test
     fun academy_lesson_step4_summary_screenshot() {
+        // Step finale di riepilogo e proclamazione regola ferrea
         val lesson = AcademyViewMode.Lesson(
-            module = sampleModules[0],
-            currentStepIndex = 3,
+            lesson = sampleChapters[0].lessons[0],
+            currentStepIndex = 1,
         )
 
         composeRule.setContent {
@@ -176,18 +201,24 @@ class AcademyScreenshotTest {
     @Test
     fun backButtonNavigatesHome() {
         var navigatedHome = false
-        val cardStates = sampleModules.map { module ->
-            AcademyModuleCardState(
-                module = module,
-                progress = AcademyProgress(module.id, isUnlocked = true),
+        val chapterStates = sampleChapters.map { chapter ->
+            AcademyChapterCardState(
+                chapter = chapter,
+                lessons = emptyList(),
+                completedCount = 0,
+                totalCount = 0,
+                isCompleted = false,
+                isUnlocked = true,
             )
         }
 
         composeRule.setContent {
             MaestroTheme {
-                AcademyModuleMapContent(
-                    modules = cardStates,
-                    onOpenModule = {},
+                AcademyChapterMapContent(
+                    chapters = chapterStates,
+                    expandedChapterId = null,
+                    onToggleChapter = {},
+                    onOpenLesson = {},
                     onNavigateHome = { navigatedHome = true },
                 )
             }
