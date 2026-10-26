@@ -36,14 +36,14 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`da fare` · `in cor
 
 ## F2-01 — "Rigioca l'errore" nella Game Review
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Riferimenti:** `docs/vision.md` §5.B, `learning_coaching_retention_monetization_strategy.md` §2
 - **Obiettivo:** Nella `GameReviewScreen`, in corrispondenza di un errore (`BLUNDER` rosso o `INACCURACY` giallo), offrire il pulsante "Riprova la mano". La schermata ricrea la disposizione delle carte sul tavolo per quella mano specifica (carte in mano al giocatore e carte a terra, con carte avversarie coperte). L'utente tocca una carta: se sceglie la mossa migliore (o di pari valore), il Maestro si congratula con una posa positiva ed effetti visivi; se sceglie una mossa ancora imperfetta, lo stimola a riprovare mostrando un suggerimento.
 - **Perimetro autorizzato:** `app:android` (GameReviewViewModel, GameReviewScreen, TableScreen). Nessuna nuova dipendenza esterna.
 - **Criteri di accettazione:**
-    - [ ] Il test UI/Roborazzi verifica l'attivazione della modalità "Riprova la mano".
-    - [ ] Non vengono rivelate le carte coperte dell'avversario prima del gioco della carta.
-    - [ ] Risolvere correttamente l'errore aggiorna lo stato visivo della mossa nella timeline.
+    - [x] Il test UI/Roborazzi verifica l'attivazione della modalità "Riprova la mano".
+    - [x] Non vengono rivelate le carte coperte dell'avversario prima del gioco della carta.
+    - [x] Risolvere correttamente l'errore aggiorna lo stato visivo della mossa nella timeline.
 - **Domande aperte:** —
 
 ---

@@ -13,6 +13,7 @@ import it.maestro.app.data.local.db.MaestroDatabase
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.game.GameViewModel
+import it.maestro.app.ui.screens.GameReviewViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -61,5 +62,9 @@ public val appModule: Module = module {
         GameViewModel(
             matchRepository = get(),
         )
+    }
+
+    viewModel {
+        GameReviewViewModel()
     }
 }
