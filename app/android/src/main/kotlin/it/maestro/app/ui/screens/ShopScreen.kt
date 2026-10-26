@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -412,22 +413,15 @@ private fun ShopItemRow(
             // Azione: Equipaggiato / Equipaggia / Sblocca
             when {
                 card.isEquipped -> {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF1E3A1E))
-                            .border(1.dp, BrassRivetGold, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 10.dp, vertical = 7.dp)
-                            .testTag("shop_equipped_badge_${item.id}"),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.shop_action_equipped),
-                            color = BrassRivetGold,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                    MaestroPillButton(
+                        text = stringResource(R.string.shop_action_equipped),
+                        onClick = {},
+                        variant = PillButtonVariant.DARK_GREEN,
+                        height = 36.dp,
+                        fontSize = 11.sp,
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
+                        testTag = "shop_equipped_badge_${item.id}",
+                    )
                 }
                 card.isUnlocked -> {
                     MaestroPillButton(
