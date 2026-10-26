@@ -31,12 +31,12 @@ Sono emersi rileggendo il report di F0-13 rispetto ai documenti approvati. Nessu
 | Fase | Obiettivo | Risultato visibile | Stack (da `architecture.md`) |
 | --- | --- | --- | --- |
 | **1 — MVP offline Android** | Scopa contro il Maestro, con review locale gratuita | App in test interno su Play Console | Compose, Koin, Room, DataStore, Rive, SoundPool, Crashlytics, i18n it/en |
-| **2 — Online** | Partite 1v1 in tempo reale, account, classificata | Ranked e Tavolo amichevole 1v1 | Ktor server + client WebSocket, Postgres, Redis, Google Sign-In, Play Integrity |
-| **3 — Economia** | Crediti, review a pagamento, pubblicità con premio, puzzle | Lancio pubblico | Play Billing, AdMob rewarded con SSV, UMP |
+| **2 — Didattica, Retention & Economia** | "L'Accademia del Maestro": rigioca l'errore, puzzle del giorno, moduli didattici, abbonamento e monetizzazione | Lancio pubblico su Play Store come trainer & coach | Play Billing, AdMob rewarded con SSV, UMP |
+| **3 — Online** | "Il Circolo": partite 1v1 in tempo reale, account, classificata, leghe | Ranked e Tavolo amichevole 1v1 | Ktor server + client WebSocket, Postgres, Redis, Google Sign-In, Play Integrity |
 | **Briscola** | Secondo gioco sullo stesso motore e sulla stessa app | Briscola in tutte le modalità | — |
 | **4 — iOS** | Stessa app su iPhone | App Store | Compose Multiplatform iOS |
 
-La **Briscola** entra solo quando la Scopa è completa come esperienza, non solo come motore: app, online, economia e lancio pubblico, quindi dopo la Fase 3 (D6). Prima serve `docs/rules/briscola.md` scritto o approvato da Michele (ADR-0004). Il numero della fase si decide allora; ADR-0012 colloca iOS in "Fase 4" e quel nome non cambia senza Michele.
+La **Briscola** entra solo quando la Scopa è completa come esperienza, non solo come motore: app, didattica, economia e lancio pubblico. Prima serve `docs/rules/briscola.md` scritto o approvato da Michele (ADR-0004). Il numero della fase si decide allora; ADR-0012 colloca iOS in "Fase 4" e quel nome non cambia senza Michele.
 
 ### Fase 1 — MVP offline Android
 
@@ -59,19 +59,32 @@ Dettaglio dei task in `docs/backlog/fase-1.md`. In sintesi:
 - zero crash in Crashlytics su almeno 50 partite di test;
 - il playtest umano (F1-16) giudica sensate le etichette della review.
 
-### Fase 2 — Online (alto livello)
+### Fase 2 — Didattica, Retention & Economia: "L'Accademia del Maestro"
 
-`core:protocol` con i messaggi di `architecture.md` (`PlayCard`, `Emote`, `Resync`, `Event`, `Snapshot`, `TurnTimer`); modulo `server` Ktor con stanze WebSocket autoritative (ADR-0002), timer di turno, riconnessione, abbandono = sconfitta; account con Google Sign-In (Supabase solo per auth, se conviene: ADR-0006); matchmaking su Redis con code separate per varianti (ADR-0011); Glicko-2 nascosto + trofei; Tavolo amichevole 1v1 via link; emote e frasi rapide; Play Integrity. Leghe e classifiche regionali/provinciali a fine Fase 2 (D7).
+Focalizzazione sull'USP del prodotto, sulla retention quotidiana e sulla monetizzazione etica prima del multiplayer (decisione D10):
 
-### Fase 3 — Economia (alto livello)
+- **Clinica degli errori:** "Rigioca l'errore" nella Game Review (interactive blunder fixing: il giocatore rigioca la mano direttamente sul tavolo per trovare la mossa corretta con feedback del Maestro).
+- **Sfida del Giorno (Puzzle Tattici):** Generatore offline di puzzle tattici da posizioni a mazzo vuoto con soluzione unica vincente; interfaccia dedicata con condivisione social del risultato senza spoiler (stile Wordle).
+- **Accademia a Moduli:** Micro-lezioni teorico-pratiche interattive (Basi, Primiera rapida, Regola del dispari, Gestione delle uscite, Mnemotecniche da bar).
+- **Indice di Maestria & Abitudini:** Tracciamento della precisione media ponderata (Elo cognitivo indipendente dalla fortuna), Grafico Radar delle abilità (Memoria, Calcolo, Banco, Primiera, Endgame), streak giornaliera di allenamento ("Fiamma").
+- **Economia e Monetizzazione:** Wallet locale "Crediti Maestro" (Room); integrazione AdMob Rewarded Ads (video opzionali per review extra / tentativi puzzle); Google Play Billing (pacchetti crediti e cosmetici regionali); Abbonamento "Circolo dei Maestri" (review illimitate, zero ads, accesso a tutta l'Accademia e archivio puzzle).
+- **Lancio pubblico:** Rilascio su Google Play Store come app di allenamento e sfida mentale definitiva per la Scopa.
 
-Wallet append-only sul server (ADR-0006), Crediti Maestro, token firmato per la review completa (ADR-0005), Play Billing con verifica server e RTDN, AdMob rewarded con SSV e consenso UMP, Sfida del Giorno con puzzle generati dal risolutore (`docs/ai/maestro.md`), cosmetici. Accademia e "Pass del Maestro" sono "fase successiva" nella visione.
+### Fase 3 — Online: "Il Circolo" (alto livello)
+
+Una volta costituita una base utenti fidelizzata e attiva giornalmente:
+
+- `core:protocol` con i messaggi di `architecture.md` (`PlayCard`, `Emote`, `Resync`, `Event`, `Snapshot`, `TurnTimer`).
+- Modulo `server` Ktor con stanze WebSocket autoritative (ADR-0002), timer di turno, riconnessione, abbandono = sconfitta.
+- Account con Google Sign-In; matchmaking su Redis con code separate per varianti (ADR-0011).
+- Glicko-2 nascosto + trofei; Tavolo amichevole 1v1 via link; emote e frasi rapide; Play Integrity.
+- Leghe e classifiche territoriali/regionali (D7).
 
 ### Fase 4 — iOS
 
 Target iOS nei `core:*` e UI in Compose Multiplatform (ADR-0012).
 
-## 3. Decisioni di Michele (2026-10-23)
+## 3. Decisioni di Michele (2026-10-23…2026-10-26)
 
 | ID | Domanda | Decisione |
 | --- | --- | --- |
@@ -81,6 +94,7 @@ Target iOS nei `core:*` e UI in Compose Multiplatform (ADR-0012).
 | D4 | Prestazioni | p95 del tempo per mossa del livello Maestro **< 200 ms sul Pixel 10 Pro** di Michele e **< 800 ms su un emulatore con profilo di fascia bassa** (CPU limitata, API 26) |
 | D5 | Librerie Fase 1 non elencate in `architecture.md` | Approvate: Android Gradle Plugin stabile, Navigation Compose, kotlinx-coroutines, AndroidX Lifecycle/ViewModel per Compose, Compose UI test. Ognuna entra nel version catalog solo dal **Perimetro autorizzato** del suo task; la tabella "Stack per fase" si aggiorna in F1-00 |
 | D6 | Quando entra la Briscola | Dopo la Fase 3: prima la Scopa completa come esperienza (app, online, economia, lancio). Serve prima `docs/rules/briscola.md` |
-| D7 | Leghe e classifiche regionali | Fine Fase 2 |
+| D7 | Leghe e classifiche regionali | In Fase 3 (online) |
 | D8 | Identità dell'app | Nome sullo store **"Maestro – Scopa e Briscola"**; ID applicazione **`it.maestro.app`** (definitivo dopo la prima pubblicazione); account Play Console **personale già esistente** di Michele. Firma: Play App Signing, chiave di upload custodita da Michele fuori dal repository |
 | D9 | Suggerimento su richiesta in Sparring | Sì, in Fase 1 (F1-11) |
+| D10 | Inversione Fase 2 (Didattica/Economia) e Fase 3 (Online) | **Approvata il 2026-10-26.** In assenza iniziale di una massa critica di utenti per il matchmaking sincrono, la priorità va all'USP unica (Coaching, Puzzle del Giorno, Accademia) e alla monetizzazione/lancio su Play Store. L'infrastruttura online in tempo reale (server Ktor/WebSocket) diventa Fase 3, da lanciare su una base utenti già attiva |
