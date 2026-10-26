@@ -6,6 +6,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -55,6 +57,7 @@ import it.maestro.app.ui.theme.WoodSurfaceDark
 public enum class PillButtonVariant {
     HERO_RED,
     PRIMARY_GREEN,
+    DARK_GREEN,
     EDUCATIONAL_BLUE,
     SECONDARY_AMBER,
     WOOD,
@@ -79,11 +82,15 @@ public fun MaestroPillButton(
     // Pelli generate in F1-13 (docs/art/asset-prompts.md, set 1): rilievo, ottone e rivetti dei mockup.
     val skin = when (variant) {
         PillButtonVariant.HERO_RED -> R.drawable.skin_button_red
-        PillButtonVariant.PRIMARY_GREEN -> R.drawable.skin_button_green
+        PillButtonVariant.PRIMARY_GREEN, PillButtonVariant.DARK_GREEN -> R.drawable.skin_button_green
         PillButtonVariant.EDUCATIONAL_BLUE -> R.drawable.skin_button_blue
         PillButtonVariant.SECONDARY_AMBER -> R.drawable.skin_button_amber
         PillButtonVariant.WOOD -> R.drawable.skin_button_wood
         PillButtonVariant.CREAM -> R.drawable.skin_button_cream
+    }
+    val colorFilter = when (variant) {
+        PillButtonVariant.DARK_GREEN -> ColorFilter.tint(Color(0xFF386638), BlendMode.Modulate)
+        else -> null
     }
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -94,6 +101,7 @@ public fun MaestroPillButton(
         skin = skin,
         slice = 0.42f,
         corner = height * 0.42f,
+        colorFilter = colorFilter,
         modifier = modifier
             .height(height)
             .graphicsLayer {

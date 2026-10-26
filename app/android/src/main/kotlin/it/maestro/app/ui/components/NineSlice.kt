@@ -5,17 +5,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
@@ -30,6 +31,7 @@ public fun NineSliceBox(
     slice: Float,
     corner: Dp,
     modifier: Modifier = Modifier,
+    colorFilter: ColorFilter? = null,
     contentAlignment: Alignment = Alignment.Center,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable BoxScope.() -> Unit = {},
@@ -37,13 +39,18 @@ public fun NineSliceBox(
     val image = ImageBitmap.imageResource(skin)
     Box(
         // La pelle va disegnata sull'area intera, prima del padding del contenuto.
-        modifier = modifier.drawBehind { drawNineSlice(image, slice, corner.toPx()) }.padding(contentPadding),
+        modifier = modifier.drawBehind { drawNineSlice(image, slice, corner.toPx(), colorFilter) }.padding(contentPadding),
         contentAlignment = contentAlignment,
         content = content,
     )
 }
 
-private fun DrawScope.drawNineSlice(image: ImageBitmap, slice: Float, cornerPx: Float) {
+private fun DrawScope.drawNineSlice(
+    image: ImageBitmap,
+    slice: Float,
+    cornerPx: Float,
+    colorFilter: ColorFilter? = null,
+) {
     val sw = image.width
     val sh = image.height
     // Angolo sorgente quadrato, preso sul lato corto dell'immagine.
@@ -68,6 +75,7 @@ private fun DrawScope.drawNineSlice(image: ImageBitmap, slice: Float, cornerPx: 
                 srcSize = IntSize(srcW, srcH),
                 dstOffset = IntOffset(dstX[col], dstY[row]),
                 dstSize = IntSize(dstW, dstH),
+                colorFilter = colorFilter,
             )
         }
     }
