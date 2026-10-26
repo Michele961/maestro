@@ -232,6 +232,7 @@
     <string name="profile_history_accuracy">%1$d%% precisione</string>
     <string name="profile_history_elo_delta_plus">+%1$d ELO</string>
     <string name="profile_history_elo_delta_minus">%1$d ELO</string>
+    <string name="profile_history_review_button">Rivedi analisi</string>
     <string name="profile_elo_badge">%1$d ELO</string>
     <string name="profile_accuracy_label">Precisione media: %1$d%%</string>
     <string name="profile_elo_explanation">Indice di Maestria calcolato sulla precisione matematica delle tue scelte, indipendente dalla fortuna delle carte.</string>
@@ -534,5 +535,34 @@
     <string name="cosmetic_avatar_alt_desc">Profilo distinto di chi studia ogni scarto dell\'avversario.</string>
     <string name="cosmetic_avatar_expert_title">Gran Maestro</string>
     <string name="cosmetic_avatar_expert_desc">L\'onorificenza suprema dei maestri di carte del Circolo.</string>
+
+    <!-- Rigioca Sfida del Giorno -->
+    <string name="puzzle_button_replay">Rigioca sfida</string>
+    <string name="puzzle_button_hint">Indizio</string>
+
+    <!-- Obiettivi Chiari Sfida del Giorno -->
+    <string name="puzzle_goal_sweep_desc">Obiettivo: ripulisci il tavolo con una Scopa! Calcola bene le somme per azzerare il banco.</string>
+    <string name="puzzle_goal_win_desc">Obiettivo: mano decisiva per la vittoria! Trova la giocata che assicura il punto decisivo per vincere la partita.</string>
+    <string name="puzzle_goal_points_desc">Obiettivo: massimizza i punti di smazzata! Punta alle carte decisive tra Sette, Denari e Primiera.</string>
+
+    <!-- Chess.com Style Game Review -->
+    <string name="review_find_better_prompt">Riesci a trovare la mossa migliore?</string>
+    <string name="review_show_solution_button">Svela soluzione</string>
+    <string name="review_solution_found_title">Mossa eccellente trovata!</string>
+    <string name="review_solution_revealed_title">Soluzione svelata</string>
+    <string name="review_try_again_prompt">Scelta imperfetta. Riprova con un\'altra carta oppure svela la soluzione.</string>
+
+    <!-- Suggerimenti Socratici in Partita -->
+    <string name="hint_sweep_opportunity">Osserva le carte a terra: hai una carta in mano che può fare Scopa e pulire il tavolo!</string>
+    <string name="hint_settebello_priority">Attenzione al Settebello: c\'è un 7 di Denari da proteggere o catturare, carta regina della Scopa.</string>
+    <string name="hint_denari_priority">Punta a rafforzare i Denari: c\'è una presa conveniente che fa avanzare il conto degli ori.</string>
+    <string name="hint_primiera_priority">Per la Primiera contano i Sette e i Sei: dai priorità alla presa con valore di Primiera più alto.</string>
+    <string name="hint_safe_discard">Nessuna presa favorevole a terra: scarta una carta che non lasci una somma facile da 1 a 10 all\'avversario.</string>
+    <string name="hint_endgame_focus">Siamo alle battute finali: conta le carte residue dell\'avversario e non regalare combinazioni.</string>
+
+    <!-- Impostazioni Debug Partita Test all'ultima mano -->
+    <string name="settings_test_match_title">Sviluppo e collaudo</string>
+    <string name="settings_test_match_subtitle">Avvia una partita già all\'ultima mano per testare fine partita, Elo, missioni e analisi.</string>
+    <string name="settings_test_match_button">Partita rapida all\'ultima mano</string>
 
 </resources>

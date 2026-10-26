@@ -43,6 +43,7 @@ public data class DailyPuzzleUiState(
     val attemptsCount: Int = 0,
     val maestroMood: MaestroMood = MaestroMood.THINKING,
     val maestroMessageResId: Int = R.string.puzzle_coach_initial,
+    val goalDescriptionResId: Int = R.string.puzzle_goal_sweep_desc,
     val shareText: String = "",
     val isAlreadySolvedToday: Boolean = false,
     val currentTierIndex: Int = 0,
@@ -108,6 +109,12 @@ public class DailyPuzzleViewModel(
             val record = repository.getDailyPuzzleRecord(dateString)
             val isTierSolved = record.solvedTiersToday.contains(tierIndex) || (tierIndex == 0 && record.isSolvedToday)
 
+            val goalMsg = when (puzzle.goal) {
+                PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_goal_sweep_desc
+                PuzzleGoal.WIN_MATCH -> R.string.puzzle_goal_win_desc
+                PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_goal_points_desc
+            }
+
             if (isTierSolved) {
                 _uiState.value = _uiState.value.copy(
                     puzzleNumber = puzzleNumber,
@@ -118,6 +125,7 @@ public class DailyPuzzleViewModel(
                     attemptsCount = record.attemptsToday,
                     maestroMood = MaestroMood.TRIUMPHANT,
                     maestroMessageResId = R.string.puzzle_coach_already_solved,
+                    goalDescriptionResId = goalMsg,
                     shareText = PuzzleShareFormatter.formatShareText(
                         puzzleNumber = puzzleNumber,
                         attemptsCount = maxOf(1, record.attemptsToday),
@@ -138,6 +146,7 @@ public class DailyPuzzleViewModel(
                     attemptsCount = 0,
                     maestroMood = MaestroMood.THINKING,
                     maestroMessageResId = R.string.puzzle_coach_initial,
+                    goalDescriptionResId = goalMsg,
                     isAlreadySolvedToday = false,
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
@@ -172,6 +181,9 @@ public class DailyPuzzleViewModel(
             val currentTier = DailyPuzzleProvider.TIERS.getOrNull(currentState.currentTierIndex)
                 ?: DailyPuzzleProvider.TIERS[0]
 
+            val wasAlreadySolved = currentState.isAlreadySolvedToday ||
+                currentState.solvedTiers.contains(currentState.currentTierIndex)
+
             _uiState.value = currentState.copy(
                 status = DailyPuzzleStatus.Solved(newAttempts),
                 attemptsCount = newAttempts,
@@ -181,24 +193,26 @@ public class DailyPuzzleViewModel(
                 solvedTiers = updatedSolvedTiers,
                 logicalConcept = concept,
             )
-            viewModelScope.launch {
-                repository.recordPuzzleCompletion(
-                    todayDate = dateString,
-                    attempts = newAttempts,
-                    solved = true,
-                    tierIndex = currentState.currentTierIndex,
-                )
-                retentionRepository?.let { retention ->
-                    retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
-                    retention.recordGameActivity(effectiveDate)
+            if (!wasAlreadySolved) {
+                viewModelScope.launch {
+                    repository.recordPuzzleCompletion(
+                        todayDate = dateString,
+                        attempts = newAttempts,
+                        solved = true,
+                        tierIndex = currentState.currentTierIndex,
+                    )
+                    retentionRepository?.let { retention ->
+                        retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
+                        retention.recordGameActivity(effectiveDate)
+                    }
+                    val refId = if (currentState.currentTierIndex == 0) dateString else "$dateString-tier-${currentState.currentTierIndex}"
+                    walletRepository?.addCredits(
+                        amount = currentTier.rewardCredits,
+                        reason = TransactionReason.DAILY_PUZZLE_REWARD,
+                        referenceId = refId,
+                        description = "Sfida del Giorno completata: ${currentTier.index + 1}",
+                    )
                 }
-                val refId = if (currentState.currentTierIndex == 0) dateString else "$dateString-tier-${currentState.currentTierIndex}"
-                walletRepository?.addCredits(
-                    amount = currentTier.rewardCredits,
-                    reason = TransactionReason.DAILY_PUZZLE_REWARD,
-                    referenceId = refId,
-                    description = "Sfida del Giorno completata: ${currentTier.index + 1}",
-                )
             }
         } else {
             val hintLevel = if (newAttempts == 1) 1 else 2
@@ -222,6 +236,33 @@ public class DailyPuzzleViewModel(
     }
 
     /**
+     * Fornisce un indizio logico progressivo senza svelare direttamente la carta.
+     */
+    public fun requestHint() {
+        val currentState = _uiState.value
+        if (currentState.status is DailyPuzzleStatus.Solved) return
+        val puzzle = currentState.puzzle ?: return
+
+        val currentLevel = when (val s = currentState.status) {
+            is DailyPuzzleStatus.WrongAttempt -> s.hintLevel
+            else -> if (currentState.maestroMessageResId == R.string.puzzle_coach_hint_level1) 1 else 0
+        }
+        val nextLevel = (currentLevel + 1).coerceAtMost(2)
+        val hintResId = when (nextLevel) {
+            1 -> R.string.puzzle_coach_hint_level1
+            else -> when (puzzle.goal) {
+                PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_coach_hint_sweep
+                PuzzleGoal.WIN_MATCH -> R.string.puzzle_coach_hint_win
+                PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_coach_hint_points
+            }
+        }
+        _uiState.value = currentState.copy(
+            maestroMood = MaestroMood.ENCOURAGING,
+            maestroMessageResId = hintResId,
+        )
+    }
+
+    /**
      * Riavvia il tentativo tornando allo stato di riflessione e gioco.
      */
     public fun retryAttempt() {
@@ -231,5 +272,26 @@ public class DailyPuzzleViewModel(
                 status = DailyPuzzleStatus.Playing,
             )
         }
+    }
+
+    /**
+     * Permette di rigiocare la sfida del giorno per allenarsi liberamente anche se già completata oggi.
+     */
+    public fun replayPuzzle() {
+        val currentState = _uiState.value
+        val puzzle = currentState.puzzle ?: return
+        val goalMsg = when (puzzle.goal) {
+            PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_goal_sweep_desc
+            PuzzleGoal.WIN_MATCH -> R.string.puzzle_goal_win_desc
+            PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_goal_points_desc
+        }
+        _uiState.value = currentState.copy(
+            status = DailyPuzzleStatus.Playing,
+            attemptsCount = 0,
+            isAlreadySolvedToday = true,
+            maestroMood = MaestroMood.THINKING,
+            maestroMessageResId = R.string.puzzle_coach_initial,
+            goalDescriptionResId = goalMsg,
+        )
     }
 }

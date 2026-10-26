@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
 import it.maestro.app.data.local.datastore.MatchHistoryEntry
+import it.maestro.game.scopa.MatchLog
 import it.maestro.app.ui.components.AbilityRadarChart
 import it.maestro.app.ui.components.BubbleTail
 import it.maestro.app.ui.components.ClubBackground
@@ -67,6 +68,7 @@ private val CreamText = Color(0xFFFFF4D6)
 public fun ProfileScreen(
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    onReviewMatch: (MatchLog) -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,6 +76,7 @@ public fun ProfileScreen(
         uiState = uiState,
         onBackClicked = onBackClicked,
         onSelectTab = { viewModel.selectTab(it) },
+        onReviewMatch = onReviewMatch,
         modifier = modifier,
     )
 }
@@ -84,6 +87,7 @@ public fun ProfileContent(
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier,
     onSelectTab: (ProfileTab) -> Unit = {},
+    onReviewMatch: (MatchLog) -> Unit = {},
 ) {
     val profile = uiState.profile
 
@@ -154,7 +158,10 @@ public fun ProfileContent(
                     )
                 } else {
                     // Cronologia Partite e Impatto ELO
-                    MatchHistorySection(entries = uiState.matchHistory)
+                    MatchHistorySection(
+                        entries = uiState.matchHistory,
+                        onReviewMatch = onReviewMatch,
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -192,7 +199,10 @@ private fun ProfileTabChip(
 }
 
 @Composable
-private fun MatchHistorySection(entries: List<MatchHistoryEntry>) {
+private fun MatchHistorySection(
+    entries: List<MatchHistoryEntry>,
+    onReviewMatch: (MatchLog) -> Unit = {},
+) {
     if (entries.isEmpty()) {
         ParchmentPanel(
             modifier = Modifier
@@ -227,6 +237,7 @@ private fun MatchHistorySection(entries: List<MatchHistoryEntry>) {
             entries.forEachIndexed { index, entry ->
                 MatchHistoryCard(
                     entry = entry,
+                    onReviewMatch = onReviewMatch,
                     modifier = Modifier.testTag("profile_history_card_$index"),
                 )
             }
@@ -238,9 +249,30 @@ private fun MatchHistorySection(entries: List<MatchHistoryEntry>) {
 private fun MatchHistoryCard(
     entry: MatchHistoryEntry,
     modifier: Modifier = Modifier,
+    onReviewMatch: (MatchLog) -> Unit = {},
 ) {
+    val parsedLog = androidx.compose.runtime.remember(entry.matchLogText) {
+        if (!entry.matchLogText.isNullOrBlank()) {
+            try {
+                MatchLog.parse(entry.matchLogText)
+            } catch (_: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    val cardModifier = if (parsedLog != null) {
+        modifier
+            .fillMaxWidth()
+            .clickable { onReviewMatch(parsedLog) }
+    } else {
+        modifier.fillMaxWidth()
+    }
+
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = cardModifier,
         shape = RoundedCornerShape(12.dp),
         color = Color(0xFF24150B),
         border = BorderStroke(1.dp, if (entry.isWin) Color(0xFF4CAF50).copy(alpha = 0.6f) else ButtonGoldBorder.copy(alpha = 0.4f)),
@@ -307,24 +339,48 @@ private fun MatchHistoryCard(
                 }
             }
 
-            // Impatto Elo (+X / -Y)
-            Surface(
-                color = if (entry.eloDelta >= 0) Color(0xFF1B3D22) else Color(0xFF3E1E1E),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, if (entry.eloDelta >= 0) Color(0xFF4CAF50) else Color(0xFFE57373)),
+            // Impatto Elo (+X / -Y) e pulsante Rivedi
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text(
-                    text = if (entry.eloDelta >= 0) {
-                        stringResource(R.string.profile_history_elo_delta_plus, entry.eloDelta)
-                    } else {
-                        stringResource(R.string.profile_history_elo_delta_minus, entry.eloDelta)
-                    },
-                    color = if (entry.eloDelta >= 0) Color(0xFF81C784) else Color(0xFFFF8A80),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                )
+                Surface(
+                    color = if (entry.eloDelta >= 0) Color(0xFF1B3D22) else Color(0xFF3E1E1E),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, if (entry.eloDelta >= 0) Color(0xFF4CAF50) else Color(0xFFE57373)),
+                ) {
+                    Text(
+                        text = if (entry.eloDelta >= 0) {
+                            stringResource(R.string.profile_history_elo_delta_plus, entry.eloDelta)
+                        } else {
+                            stringResource(R.string.profile_history_elo_delta_minus, entry.eloDelta)
+                        },
+                        color = if (entry.eloDelta >= 0) Color(0xFF81C784) else Color(0xFFFF8A80),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MaestroDisplayFont,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                    )
+                }
+                if (parsedLog != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.profile_history_review_button),
+                            color = BrassRivetGold,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "→",
+                            color = BrassRivetGold,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
             }
         }
     }

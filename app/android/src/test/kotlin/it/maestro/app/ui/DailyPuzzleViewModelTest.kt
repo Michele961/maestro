@@ -214,4 +214,59 @@ class DailyPuzzleViewModelTest {
         assertEquals(15, walletRepo.getBalance(), "Risolvere la sfida del giorno deve accreditare 15 Crediti Maestro")
         assertTrue(walletRepo.hasClaimed(TransactionReason.DAILY_PUZZLE_REWARD, "2026-10-26"))
     }
+
+    @Test
+    fun replayPuzzle_allowsRetryingWithoutAwardingDuplicateCredits() = runTest {
+        val repo = InMemoryDailyPuzzleRepository()
+        val walletRepo = InMemoryWalletRepository()
+        val testDate = LocalDate.of(2026, 10, 26)
+        val viewModel = DailyPuzzleViewModel(
+            repository = repo,
+            walletRepository = walletRepo,
+            customDate = testDate,
+            customPuzzle = samplePuzzle,
+        )
+        advanceUntilIdle()
+
+        // 1. Risolvi per la prima volta
+        viewModel.playCard(testCardWinning)
+        advanceUntilIdle()
+        assertEquals(15, walletRepo.getBalance())
+
+        // 2. Rigioca la sfida
+        viewModel.replayPuzzle()
+        val replayingState = viewModel.uiState.value
+        assertEquals(DailyPuzzleStatus.Playing, replayingState.status)
+        assertTrue(replayingState.isAlreadySolvedToday)
+
+        // 3. Risolvi di nuovo
+        viewModel.playCard(testCardWinning)
+        advanceUntilIdle()
+
+        // Verifica che lo stato sia Solved ma i crediti NON siano raddoppiati
+        assertTrue(viewModel.uiState.value.status is DailyPuzzleStatus.Solved)
+        assertEquals(15, walletRepo.getBalance(), "Rigiocare la sfida non deve assegnare crediti duplicati")
+    }
+
+    @Test
+    fun requestHint_providesProgressiveLogicalHintsWithoutRevealingCard() = runTest {
+        val repo = InMemoryDailyPuzzleRepository()
+        val testDate = LocalDate.of(2026, 10, 26)
+        val viewModel = DailyPuzzleViewModel(
+            repository = repo,
+            customDate = testDate,
+            customPuzzle = samplePuzzle,
+        )
+        advanceUntilIdle()
+
+        // 1. Richiedi primo indizio
+        viewModel.requestHint()
+        assertEquals(R.string.puzzle_coach_hint_level1, viewModel.uiState.value.maestroMessageResId)
+        assertEquals(MaestroMood.ENCOURAGING, viewModel.uiState.value.maestroMood)
+
+        // 2. Richiedi secondo indizio (tematico sulla Scopa per samplePuzzle)
+        viewModel.requestHint()
+        assertEquals(R.string.puzzle_coach_hint_sweep, viewModel.uiState.value.maestroMessageResId)
+        assertEquals(MaestroMood.ENCOURAGING, viewModel.uiState.value.maestroMood)
+    }
 }

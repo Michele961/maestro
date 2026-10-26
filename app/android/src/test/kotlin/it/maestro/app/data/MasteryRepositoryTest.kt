@@ -149,6 +149,7 @@ class MasteryRepositoryTest {
         assertEquals(11, entry.humanScore)
         assertEquals(7, entry.botScore)
         assertTrue(entry.isWin)
+        org.junit.Assert.assertNotNull(entry.matchLogText)
         assertTrue("Elo delta deve essere positivo per una vittoria ad alta precisione", entry.eloDelta > 0)
     }
 }

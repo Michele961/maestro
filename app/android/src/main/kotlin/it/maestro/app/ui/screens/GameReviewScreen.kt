@@ -196,6 +196,8 @@ public fun GameReviewScreen(
         val moveAnalysis = currentStep.analysis
         val isHumanMove = currentStep.mover == humanSeat
         val isCurrentSolved = uiState.isCurrentStepSolved
+        val isCurrentRevealed = stepIndex in uiState.revealedStepIndices
+        val isSolutionVisible = !isHumanMove || moveAnalysis.grade == MoveGrade.BEST || isCurrentSolved || isCurrentRevealed
         val isRetryMode = uiState.isRetryMode
 
         Column(
@@ -246,6 +248,10 @@ public fun GameReviewScreen(
                 RetryEvaluationBanner(
                     retryFeedback = uiState.retryFeedback,
                     onExitRetry = viewModel::exitRetry,
+                    onRevealSolution = {
+                        viewModel.revealSolution()
+                        viewModel.exitRetry()
+                    },
                 )
             } else {
                 MoveEvaluationBanner(
@@ -253,7 +259,9 @@ public fun GameReviewScreen(
                     playerView = currentStep.playerView,
                     isHumanMove = isHumanMove,
                     isSolved = isCurrentSolved,
+                    isRevealed = isCurrentRevealed,
                     onStartRetry = viewModel::startRetry,
+                    onRevealSolution = viewModel::revealSolution,
                 )
             }
 
@@ -266,6 +274,7 @@ public fun GameReviewScreen(
                     step = currentStep,
                     humanSeat = humanSeat,
                     isRetryMode = isRetryMode,
+                    isSolutionVisible = isSolutionVisible,
                     retryFeedback = uiState.retryFeedback,
                     selectedRetryCard = uiState.selectedRetryCard,
                     onPlayCard = viewModel::playRetryCard,
@@ -300,7 +309,9 @@ private fun MoveEvaluationBanner(
     playerView: ScopaView?,
     isHumanMove: Boolean,
     isSolved: Boolean,
+    isRevealed: Boolean,
     onStartRetry: () -> Unit,
+    onRevealSolution: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (badgeColor, gradeStringRes) = when (analysis.grade) {
@@ -316,8 +327,11 @@ private fun MoveEvaluationBanner(
         else -> R.drawable.badge_wrong
     }
 
-    val explanation = remember(analysis, playerView) {
-        if (playerView != null && analysis.grade != MoveGrade.BEST) {
+    val isMistake = isHumanMove && analysis.grade != MoveGrade.BEST
+    val isSolutionVisible = !isMistake || isSolved || isRevealed
+
+    val explanation = remember(analysis, playerView, isSolutionVisible) {
+        if (isSolutionVisible && playerView != null && analysis.grade != MoveGrade.BEST) {
             ReviewExplanationEngine.explain(
                 playedMove = analysis.playedMove,
                 bestMove = analysis.bestMove,
@@ -389,7 +403,7 @@ private fun MoveEvaluationBanner(
                         color = InkColor,
                         tag = "review_played_move",
                     )
-                    if (analysis.grade != MoveGrade.BEST) {
+                    if (isSolutionVisible && analysis.grade != MoveGrade.BEST) {
                         MoveLine(
                             label = stringResource(id = R.string.review_best_label),
                             move = formatMoveDescription(analysis.bestMove),
@@ -401,6 +415,45 @@ private fun MoveEvaluationBanner(
                             style = MaterialTheme.typography.labelSmall,
                             color = InkColor.copy(alpha = 0.7f),
                             modifier = Modifier.testTag("review_best_value"),
+                        )
+                    }
+                }
+            }
+
+            if (!isSolutionVisible) {
+                Surface(
+                    color = Color(0xFFF6F0E2),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, ButtonGoldBorder.copy(alpha = 0.6f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("review_socratic_prompt_card"),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        MaestroAvatarView(
+                            mood = MaestroMood.THINKING,
+                            size = 32.dp,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.review_find_better_prompt),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = InkColor,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        MaestroPillButton(
+                            text = stringResource(id = R.string.review_show_solution_button),
+                            onClick = onRevealSolution,
+                            variant = PillButtonVariant.WOOD,
+                            height = 30.dp,
+                            fontSize = 11.sp,
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            testTag = "review_show_solution_button",
                         )
                     }
                 }
@@ -459,6 +512,7 @@ private fun MoveEvaluationBanner(
 private fun RetryEvaluationBanner(
     retryFeedback: RetryFeedback?,
     onExitRetry: () -> Unit,
+    onRevealSolution: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val mood = when (retryFeedback) {
@@ -493,6 +547,18 @@ private fun RetryEvaluationBanner(
                         color = InkColor,
                     )
                     Spacer(modifier = Modifier.weight(1f))
+                    if (retryFeedback !is RetryFeedback.Correct) {
+                        MaestroPillButton(
+                            text = stringResource(id = R.string.review_show_solution_button),
+                            onClick = onRevealSolution,
+                            variant = PillButtonVariant.WOOD,
+                            height = 30.dp,
+                            fontSize = 11.sp,
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            testTag = "review_retry_reveal_button",
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
                     MaestroPillButton(
                         text = stringResource(id = R.string.review_retry_exit),
                         onClick = onExitRetry,
@@ -566,6 +632,7 @@ private fun ReviewBoardView(
     step: ReviewStep,
     humanSeat: Seat,
     isRetryMode: Boolean,
+    isSolutionVisible: Boolean = true,
     retryFeedback: RetryFeedback?,
     selectedRetryCard: Card?,
     onPlayCard: (Card) -> Unit,
@@ -573,7 +640,7 @@ private fun ReviewBoardView(
 ) {
     val playerView = step.playerView
     val isMistake = step.analysis.grade != MoveGrade.BEST
-    val bestMoveCard = if (isMistake && step.mover == humanSeat) step.analysis.bestMove.card else null
+    val bestMoveCard = if (isSolutionVisible && isMistake && step.mover == humanSeat) step.analysis.bestMove.card else null
 
     Card(
         modifier = modifier
@@ -637,7 +704,7 @@ private fun ReviewBoardView(
                             val isCapturedByBest = if (isRetryMode) {
                                 retryFeedback is RetryFeedback.Correct && card in retryFeedback.bestMove.capture
                             } else {
-                                isMistake && card in step.analysis.bestMove.capture
+                                isSolutionVisible && isMistake && card in step.analysis.bestMove.capture
                             }
 
                             PlaceholderCardView(
@@ -707,17 +774,20 @@ private fun ReviewBoardView(
                         } else {
                             val isRecommendedBest = card == bestMoveCard
                             val isPlayed = step.mover == humanSeat && card == step.analysis.playedMove.card
+                            val canPlayDirectly = step.mover == humanSeat && isMistake && !isSolutionVisible
+
                             Box(modifier = Modifier.padding(horizontal = 3.dp)) {
                                 PlaceholderCardView(
                                     card = card,
-                                    isPlayable = false,
+                                    isPlayable = canPlayDirectly,
                                     width = handW,
                                     height = handW * 1.5f,
-                                    modifier = if (isRecommendedBest) {
+                                    modifier = (if (isRecommendedBest) {
                                         Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
                                     } else {
                                         Modifier
-                                    },
+                                    }).testTag("review_card_${card.suit.name}_${card.rank.name}"),
+                                    onClick = { if (canPlayDirectly) onPlayCard(card) },
                                 )
                                 val badge = when {
                                     isRecommendedBest -> R.drawable.badge_best

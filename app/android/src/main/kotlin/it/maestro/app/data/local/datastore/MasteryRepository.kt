@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.map
  * @property humanScore Punti totalizzati dal giocatore umano.
  * @property botScore Punti totalizzati dal bot o Maestro.
  * @property isWin True se il giocatore umano ha vinto la partita.
+ * @property matchLogText Rappresentazione testuale canonica del MatchLog per la consultazione e Game Review.
  */
 public data class MatchHistoryEntry(
     val id: String,
@@ -42,6 +43,7 @@ public data class MatchHistoryEntry(
     val humanScore: Int,
     val botScore: Int,
     val isWin: Boolean,
+    val matchLogText: String? = null,
 )
 
 /**
@@ -133,6 +135,7 @@ public class DataStoreMasteryRepository(
             humanScore = humanTotal,
             botScore = opponentTotal,
             isWin = isWin,
+            matchLogText = matchLog.toText(),
         )
 
         dataStore.edit { preferences ->
@@ -194,6 +197,15 @@ public class DataStoreMasteryRepository(
         return raw.split(";").mapNotNull { token ->
             val parts = token.split("|")
             if (parts.size >= 8) {
+                val matchLogText = if (parts.size >= 9 && parts[8].isNotBlank()) {
+                    try {
+                        String(java.util.Base64.getUrlDecoder().decode(parts[8]), Charsets.UTF_8)
+                    } catch (_: Exception) {
+                        null
+                    }
+                } else {
+                    null
+                }
                 MatchHistoryEntry(
                     id = parts[0],
                     timestampMillis = parts[1].toLongOrNull() ?: 0L,
@@ -203,6 +215,7 @@ public class DataStoreMasteryRepository(
                     humanScore = parts[5].toIntOrNull() ?: 0,
                     botScore = parts[6].toIntOrNull() ?: 0,
                     isWin = parts[7] == "1",
+                    matchLogText = matchLogText,
                 )
             } else {
                 null
@@ -212,7 +225,10 @@ public class DataStoreMasteryRepository(
 
     private fun serializeHistory(entries: List<MatchHistoryEntry>): String =
         entries.joinToString(";") {
-            "${it.id}|${it.timestampMillis}|${it.accuracy}|${it.cognitiveElo}|${it.eloDelta}|${it.humanScore}|${it.botScore}|${if (it.isWin) 1 else 0}"
+            val encodedLog = it.matchLogText?.let { text ->
+                java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(text.toByteArray(Charsets.UTF_8))
+            }.orEmpty()
+            "${it.id}|${it.timestampMillis}|${it.accuracy}|${it.cognitiveElo}|${it.eloDelta}|${it.humanScore}|${it.botScore}|${if (it.isWin) 1 else 0}|$encodedLog"
         }
 }
 
@@ -274,6 +290,7 @@ public class InMemoryMasteryRepository(
             humanScore = humanTotal,
             botScore = opponentTotal,
             isWin = isWin,
+            matchLogText = matchLog.toText(),
         )
 
         profileState.value = updated
