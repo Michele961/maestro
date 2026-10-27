@@ -42,8 +42,8 @@ class StringsLocalizationTest {
     @Test
     fun noHardcodedStringsInComposableScreenCode() {
         val rootDir = findProjectRoot()
-        val screensDir = File(rootDir, "app/android/src/main/kotlin/it/maestro/app/ui/screens")
-        assertTrue(screensDir.exists(), "Directory screens non trovata: ${screensDir.absolutePath}")
+        val screensDir = File(rootDir, "app/android/src/main/kotlin/it/maestro/app/feature")
+        assertTrue(screensDir.exists(), "Directory feature non trovata: ${screensDir.absolutePath}")
 
         // Pattern che cerca Text("...") o Text(text = "...") con stringhe letterali anziché stringResource(...)
         val hardcodedTextRegex = Regex("""Text\s*\(\s*(text\s*=\s*)?"([^"]+)"""")

@@ -1,7 +1,7 @@
 package it.maestro.app.ui
 
-import it.maestro.app.crash.TestCrashException
-import it.maestro.app.ui.components.MaestroMood
+import it.maestro.app.shell.crash.TestCrashException
+import it.maestro.app.designsystem.components.MaestroMood
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

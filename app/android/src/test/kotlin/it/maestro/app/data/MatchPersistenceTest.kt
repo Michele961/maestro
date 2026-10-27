@@ -5,8 +5,8 @@ import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.data.local.db.SavedMatchEntity
 import it.maestro.app.data.repository.InMemoryMatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
-import it.maestro.app.game.GameIntent
-import it.maestro.app.game.GameViewModel
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase

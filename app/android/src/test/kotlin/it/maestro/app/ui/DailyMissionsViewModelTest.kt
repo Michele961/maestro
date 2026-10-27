@@ -5,7 +5,7 @@ import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.ui.screens.DailyMissionsViewModel
+import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

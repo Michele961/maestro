@@ -8,9 +8,9 @@ import it.maestro.app.data.local.missions.DailyMission
 import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.StreakState
-import it.maestro.app.ui.dialogs.DailyMissionsDialog
-import it.maestro.app.ui.screens.DailyMissionsUiState
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.missions.ui.DailyMissionsDialog
+import it.maestro.app.feature.missions.presentation.DailyMissionsUiState
+import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

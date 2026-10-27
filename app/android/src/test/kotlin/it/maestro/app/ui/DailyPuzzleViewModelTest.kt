@@ -7,9 +7,9 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.ui.components.MaestroMood
-import it.maestro.app.ui.screens.DailyPuzzleStatus
-import it.maestro.app.ui.screens.DailyPuzzleViewModel
+import it.maestro.app.designsystem.components.MaestroMood
+import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
+import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat

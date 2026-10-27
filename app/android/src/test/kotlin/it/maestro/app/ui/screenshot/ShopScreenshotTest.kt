@@ -9,10 +9,10 @@ import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.app.data.local.cosmetics.CosmeticCategory
 import it.maestro.app.data.local.cosmetics.CosmeticItem
-import it.maestro.app.ui.screens.ShopItemCardState
-import it.maestro.app.ui.screens.ShopScreenContent
-import it.maestro.app.ui.screens.ShopUiState
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.shop.presentation.ShopItemCardState
+import it.maestro.app.feature.shop.ui.ShopScreenContent
+import it.maestro.app.feature.shop.presentation.ShopUiState
+import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule

@@ -21,7 +21,7 @@ internal object ArchitectureRules {
 
     private const val APP_PACKAGE = "it/maestro/app/"
 
-    private val uiPrefixes = listOf("ui/", "game/", "feature/")
+    private val uiPrefixes = listOf("feature/", "designsystem/")
     private val domainPrefix = "domain/"
     private val matchPrefix = "domain/match/"
 

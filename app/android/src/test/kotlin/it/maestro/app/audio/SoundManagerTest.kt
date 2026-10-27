@@ -7,6 +7,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import it.maestro.app.designsystem.audio.NoOpSoundManager
+import it.maestro.app.designsystem.audio.SoundEffect
 
 class SoundManagerTest {
 

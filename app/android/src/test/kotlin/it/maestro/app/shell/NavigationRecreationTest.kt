@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import it.maestro.ai.bot.DifficultyLevel
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.training.TrainingFundamental
@@ -31,7 +31,7 @@ import kotlin.test.assertTrue
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w393dp-h852dp-xxhdpi", application = it.maestro.app.MaestroApp::class)
+@Config(sdk = [35], qualifiers = "it-w393dp-h852dp-xxhdpi", application = it.maestro.app.shell.MaestroApp::class)
 class NavigationRecreationTest {
 
     @get:Rule

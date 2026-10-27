@@ -119,7 +119,7 @@ class MasteryRepositoryTest {
         val p1 = Seat.P1
         val p2 = Seat.P2
 
-        val (state, partialLog) = it.maestro.app.game.TestMatchGenerator.generateEndgameMatch(seed = 101L)
+        val (state, partialLog) = it.maestro.app.feature.table.presentation.TestMatchGenerator.generateEndgameMatch(seed = 101L)
         val move1 = it.maestro.game.scopa.legalMoves(state).first()
         val res1 = it.maestro.game.scopa.play(state, move1) as it.maestro.game.scopa.PlayResult.Applied
         val move2 = it.maestro.game.scopa.legalMoves(res1.state).first()
@@ -165,7 +165,7 @@ class MasteryRepositoryTest {
         assertEquals(1, historyAfterDuplicate.size)
 
         // Se registriamo un secondo match diverso...
-        val (_, partialLog2) = it.maestro.app.game.TestMatchGenerator.generateEndgameMatch(seed = 202L)
+        val (_, partialLog2) = it.maestro.app.feature.table.presentation.TestMatchGenerator.generateEndgameMatch(seed = 202L)
         val log2 = partialLog2.copy(moves = partialLog2.moves + listOf(move1))
         repository.recordMatch(
             matchAnalysis = analysis,

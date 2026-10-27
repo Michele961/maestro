@@ -6,8 +6,8 @@ import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.ui.screens.academy.AcademyViewMode
-import it.maestro.app.ui.screens.academy.AcademyViewModel
+import it.maestro.app.feature.academy.presentation.AcademyViewMode
+import it.maestro.app.feature.academy.presentation.AcademyViewModel
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Suit

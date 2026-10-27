@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveGrade
-import it.maestro.app.audio.SoundEffect
-import it.maestro.app.audio.SoundManager
+import it.maestro.app.designsystem.audio.SoundEffect
+import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.missions.DailyMission
@@ -17,7 +17,7 @@ import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
 import it.maestro.app.domain.time.Clock
-import it.maestro.app.game.TestMatchGenerator
+import it.maestro.app.feature.table.presentation.TestMatchGenerator
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.training.TrainingFundamental
