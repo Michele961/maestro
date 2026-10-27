@@ -95,7 +95,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-05 — Build di rilascio pulita
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Obiettivo:** strumenti di sviluppo (crash di prova, partita all'ultima mano, dialog con lo stack trace) visibili solo con `BuildConfig.DEBUG`; orientamento verticale (ADR-0016).
 - **Criteri di accettazione:**
     - [x] Test: nella variante release le voci non compaiono.
@@ -104,13 +104,13 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-06 — Matrice screenshot multi-dispositivo
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0016, `docs/app/responsive-ui.md` §4
 - **Obiettivo:** un'utilità di test che esegue ogni screenshot sulle 4 configurazioni; tutti i test screenshot esistenti la usano. Si misurano le dimensioni reali del Pixel 10 Pro di Michele (`adb shell wm size`, `wm density`) e si aggiorna la tabella.
 - **Criteri di accettazione:**
-    - [ ] La CI pubblica gli screenshot divisi per configurazione.
-    - [ ] Elenco dei difetti di layout trovati, allegato alla PR (si correggono nei task delle schermate, non qui).
-- **Domande aperte:** —
+    - [x] La CI pubblica gli screenshot divisi per configurazione.
+    - [x] Elenco dei difetti di layout trovati, allegato alla PR (si correggono nei task delle schermate, non qui).
+- **Domande aperte:** misure reali del Pixel 10 Pro (`adb shell wm size`, `wm density`): fornite da Michele quando servono; per ora `w410dp-h914dp-xxxhdpi`.
 
 ## F1R-07 — Package a layer dentro `app:android`
 

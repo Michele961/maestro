@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -33,12 +33,22 @@ import org.robolectric.annotation.GraphicsMode
  * Fine partita e Game Review (F1-22): screenshot da confrontare con `docs/art/reference_review_screen.png`.
  * La partita è una smazzata giocata in modo deterministico (seed fisso, prima mossa legale).
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class ReviewScreensScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private val analyzer = MatchAnalyzer(budget = SearchBudget(samples = 2, maxNodes = 40))
@@ -71,7 +81,7 @@ class ReviewScreensScreenshotTest {
             }
         }
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/post_match.png")
+        composeRule.onRoot().captureRoboImage(screen.path("post_match"))
     }
 
     @Test
@@ -80,7 +90,7 @@ class ReviewScreensScreenshotTest {
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
         // Salta al primo errore, come la mano evidenziata nel mockup
         composeRule.onNodeWithTag("review_next_mistake").performClick()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review.png")
+        composeRule.onRoot().captureRoboImage(screen.path("game_review"))
     }
 
     @Test
@@ -90,7 +100,7 @@ class ReviewScreensScreenshotTest {
         composeRule.onNodeWithTag("review_next_mistake").performClick()
         composeRule.onNodeWithTag("review_retry_button").performClick()
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review_retry.png")
+        composeRule.onRoot().captureRoboImage(screen.path("game_review_retry"))
     }
 
     @Test
@@ -112,6 +122,6 @@ class ReviewScreensScreenshotTest {
         val bestCard = currentStep.analysis.bestMove.card
         composeRule.onNodeWithTag("review_retry_card_${bestCard.suit.name}_${bestCard.rank.name}").performClick()
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/game_review_retry_solved.png")
+        composeRule.onRoot().captureRoboImage(screen.path("game_review_retry_solved"))
     }
 }

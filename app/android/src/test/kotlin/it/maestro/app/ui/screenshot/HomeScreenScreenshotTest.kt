@@ -14,7 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -23,31 +23,41 @@ import org.robolectric.annotation.GraphicsMode
  * e comportamento dei pulsanti attivi e decorativi.
  * Gli screenshot si scrivono con `./gradlew :app:android:testDebugUnitTest -Proborazzi.record=true`.
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 // Application vuota: MaestroApp avvia Koin, che non serve per disegnare la Home.
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class HomeScreenScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     @Test
     fun home_screen_screenshot() {
         composeRule.setContent { MaestroTheme { HomeScreen() } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/home_screen.png")
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen"))
     }
 
     @Test
     fun home_screen_with_active_match_screenshot() {
         composeRule.setContent { MaestroTheme { HomeScreen(hasActiveMatch = true) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/home_screen_active_match.png")
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_active_match"))
     }
 
     @Test
     fun home_screen_with_streak_screenshot() {
         composeRule.setContent { MaestroTheme { HomeScreen(streakCount = 5) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/home_screen_with_streak.png")
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_with_streak"))
     }
 
     @Test

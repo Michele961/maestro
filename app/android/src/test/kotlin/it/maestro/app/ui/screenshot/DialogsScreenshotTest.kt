@@ -21,18 +21,28 @@ import it.maestro.game.training.TrainingQuestion
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /** Dialoghi su pergamena (F1-23): impostazioni, riepilogo smazzata, fine partita. */
 @OptIn(ExperimentalRoborazziApi::class)
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class DialogsScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class DialogsScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private val base = GameUiState(
@@ -66,13 +76,13 @@ class DialogsScreenshotTest {
     @Test
     fun settings_dialog_screenshot() {
         composeRule.setContent { MaestroTheme { SettingsDialog(true, {}, {}, {}) } }
-        captureScreenRoboImage("build/outputs/roborazzi/dialog_settings.png")
+        captureScreenRoboImage(screen.path("dialog_settings"))
     }
 
     @Test
     fun deal_summary_dialog_screenshot() {
         composeRule.setContent { MaestroTheme { TableContent(uiState = base.copy(pendingDealScore = score), onIntent = {}) } }
-        captureScreenRoboImage("build/outputs/roborazzi/dialog_deal_summary.png")
+        captureScreenRoboImage(screen.path("dialog_deal_summary"))
     }
 
     @Test
@@ -99,6 +109,6 @@ class DialogsScreenshotTest {
                 )
             }
         }
-        captureScreenRoboImage("build/outputs/roborazzi/dialog_training_question.png")
+        captureScreenRoboImage(screen.path("dialog_training_question"))
     }
 }

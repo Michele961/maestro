@@ -12,10 +12,11 @@ import it.maestro.app.ui.screens.PreGameScreen
 import it.maestro.app.ui.theme.MaestroTheme
 import it.maestro.game.training.TrainingFundamental
 import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -23,22 +24,35 @@ import org.robolectric.annotation.GraphicsMode
  * Modale "Preparati a giocare" (F1-20): screenshot da confrontare con `docs/art/reference_pre_match_dialog.png`
  * e scelte passate a "Inizia partita".
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class PreGameScreenScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     @Test
     fun pre_game_screenshot() {
         composeRule.setContent { MaestroTheme { PreGameScreen() } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/pre_game.png")
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game"))
     }
 
     @Test
     fun start_passes_the_selected_options() {
+        // Difetto noto sugli schermi bassi (D1 in docs/app/features/layout-defects-f1r06.md): resta sulla configurazione
+        // su cui è nato il test finché il dossier della schermata non lo corregge.
+        assumeTrue(screen == ScreenConfig.MEDIUM || screen == ScreenConfig.PIXEL_10_PRO)
         var chosen: Triple<DifficultyLevel, Int, TrainingFundamental>? = null
         composeRule.setContent {
             MaestroTheme { PreGameScreen(onStartGame = { l, t, f -> chosen = Triple(l, t, f) }) }

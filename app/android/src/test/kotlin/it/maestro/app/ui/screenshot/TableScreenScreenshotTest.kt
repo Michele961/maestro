@@ -34,19 +34,29 @@ import org.koin.core.module.dsl.viewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
  * Tavolo da gioco (F1-21): screenshot da confrontare con `docs/art/reference_table_screen.jpg`.
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class TableScreenScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class TableScreenScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private val midDeal = GameUiState(
@@ -79,14 +89,14 @@ class TableScreenScreenshotTest {
     @Test
     fun table_mid_deal_screenshot() {
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_mid_deal.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_mid_deal"))
     }
 
     @Test
     fun table_with_maestro_hint_screenshot() {
         val hint = ScopaMove(card = midDeal.humanHand[0], capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal.copy(suggestedMove = hint), onIntent = {}) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_hint.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_hint"))
     }
 
     @Test
@@ -100,7 +110,7 @@ class TableScreenScreenshotTest {
             isBotThinking = false,
         )
         composeRule.setContent { MaestroTheme { TableContent(uiState = botState, onIntent = {}) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_bot_play.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_bot_play"))
     }
 
     @Test
@@ -117,7 +127,7 @@ class TableScreenScreenshotTest {
         val cardTag = "card_${cardToSelect.suit.name}_${cardToSelect.rank.name}"
         composeRule.onNodeWithTag(cardTag).performClick()
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_card_selected_and_opponent_hud.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_card_selected_and_opponent_hud"))
     }
 
     @Test
@@ -130,7 +140,7 @@ class TableScreenScreenshotTest {
             ),
         )
         composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_opponent_sweep.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_opponent_sweep"))
     }
 
     @Test
@@ -143,7 +153,7 @@ class TableScreenScreenshotTest {
             ),
         )
         composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/table_opponent_drop.png")
+        composeRule.onRoot().captureRoboImage(screen.path("table_opponent_drop"))
     }
 
     @Test

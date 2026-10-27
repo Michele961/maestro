@@ -26,10 +26,11 @@ import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
 import it.maestro.game.scopa.ScopaView
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.time.LocalDate
@@ -37,12 +38,22 @@ import java.time.LocalDate
 /**
  * Test UI e screenshot Roborazzi per la schermata "Sfida del Giorno" (task F2-03).
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class DailyPuzzleScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class DailyPuzzleScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private val winningCard = Card(Rank.SETTE, Suit.DENARI)
@@ -93,7 +104,7 @@ class DailyPuzzleScreenshotTest {
             }
         }
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/daily_puzzle_initial.png")
+        composeRule.onRoot().captureRoboImage(screen.path("daily_puzzle_initial"))
     }
 
     @Test
@@ -115,7 +126,7 @@ class DailyPuzzleScreenshotTest {
             }
         }
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/daily_puzzle_wrong_attempt.png")
+        composeRule.onRoot().captureRoboImage(screen.path("daily_puzzle_wrong_attempt"))
     }
 
     @Test
@@ -141,11 +152,14 @@ class DailyPuzzleScreenshotTest {
             }
         }
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/daily_puzzle_solved.png")
+        composeRule.onRoot().captureRoboImage(screen.path("daily_puzzle_solved"))
     }
 
     @Test
     fun daily_puzzle_interactiveSolveFlow() {
+        // Difetto noto sugli schermi bassi (D2 in docs/app/features/layout-defects-f1r06.md): resta sulla configurazione
+        // su cui è nato il test finché il dossier della schermata non lo corregge.
+        assumeTrue(screen == ScreenConfig.MEDIUM || screen == ScreenConfig.PIXEL_10_PRO)
         val repository = InMemoryDailyPuzzleRepository()
         val viewModel = DailyPuzzleViewModel(
             repository = repository,

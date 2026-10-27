@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
@@ -17,19 +18,29 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
  * Test UI e screenshot Roborazzi per la schermata Profilo & Radar delle Abilità (task F2-04).
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class ProfileScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class ProfileScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     @Test
@@ -53,20 +64,22 @@ class ProfileScreenshotTest {
         }
 
         composeRule.onNodeWithTag("profile_screen").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_identity_card").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_elo_card").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_elo_text").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_radar_panel").assertIsDisplayed()
-        composeRule.onNodeWithTag("ability_radar_chart").assertIsDisplayed()
-        composeRule.onNodeWithTag("radar_axis_sevens").assertIsDisplayed()
-        composeRule.onNodeWithTag("radar_axis_denari").assertIsDisplayed()
-        composeRule.onNodeWithTag("radar_axis_primiera").assertIsDisplayed()
-        composeRule.onNodeWithTag("radar_axis_board").assertIsDisplayed()
-        composeRule.onNodeWithTag("radar_axis_endgame").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_maestro_advice_panel").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_stats_card").assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_identity_card").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_elo_card").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_elo_text").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_radar_panel").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ability_radar_chart").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("radar_axis_sevens").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("radar_axis_denari").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("radar_axis_primiera").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("radar_axis_board").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("radar_axis_endgame").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_maestro_advice_panel").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_stats_card").performScrollTo().assertIsDisplayed()
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/profile_screen_default.png")
+        // Torna in cima: lo screenshot mostra la schermata come appare all'apertura.
+        composeRule.onNodeWithTag("profile_identity_card").performScrollTo()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_default"))
 
         composeRule.onNodeWithTag("profile_back_button").performClick()
         assertTrue(backClicked)
@@ -104,9 +117,11 @@ class ProfileScreenshotTest {
         }
 
         composeRule.onNodeWithTag("profile_screen").assertIsDisplayed()
-        composeRule.onNodeWithTag("profile_elo_text").assertIsDisplayed()
-        composeRule.onNodeWithTag("ability_radar_chart").assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_elo_text").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ability_radar_chart").performScrollTo().assertIsDisplayed()
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/profile_screen_advanced.png")
+        // Torna in cima: lo screenshot mostra la schermata come appare all'apertura.
+        composeRule.onNodeWithTag("profile_identity_card").performScrollTo()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_advanced"))
     }
 }

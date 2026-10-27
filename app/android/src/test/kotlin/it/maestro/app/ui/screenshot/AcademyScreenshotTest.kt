@@ -22,19 +22,29 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
  * Screenshot Roborazzi e test UI per l'Accademia arricchita a Capitoli e Sotto-Moduli (task F2-06).
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class AcademyScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class AcademyScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private val sampleChapters = AcademyContent.CHAPTERS
@@ -74,7 +84,7 @@ class AcademyScreenshotTest {
             }
         }
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_map_initial.png")
+        composeRule.onRoot().captureRoboImage(screen.path("academy_map_initial"))
         composeRule.onNodeWithTag("academy_chapter_card_1").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_lesson_tile_1_1").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_lesson_action_1_1").assertIsEnabled()
@@ -116,7 +126,7 @@ class AcademyScreenshotTest {
             }
         }
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_map_completed.png")
+        composeRule.onRoot().captureRoboImage(screen.path("academy_map_completed"))
         composeRule.onNodeWithTag("academy_chapter_completed_tag_1", useUnmergedTree = true).assertExists()
         composeRule.onNodeWithTag("academy_lesson_completed_icon_1_1").assertIsDisplayed()
     }
@@ -140,7 +150,7 @@ class AcademyScreenshotTest {
             }
         }
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_lesson_step1_question.png")
+        composeRule.onRoot().captureRoboImage(screen.path("academy_lesson_step1_question"))
         composeRule.onNodeWithTag("academy_table_area").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_question_section").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_next_step_button").assertIsNotEnabled()
@@ -166,7 +176,7 @@ class AcademyScreenshotTest {
             }
         }
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_lesson_step2_card_action.png")
+        composeRule.onRoot().captureRoboImage(screen.path("academy_lesson_step2_card_action"))
         composeRule.onNodeWithTag("academy_table_area").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_card_action_section").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_hand_card_SETTE_BASTONI").assertIsDisplayed()
@@ -193,7 +203,7 @@ class AcademyScreenshotTest {
             }
         }
 
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/academy_lesson_step4_summary.png")
+        composeRule.onRoot().captureRoboImage(screen.path("academy_lesson_step4_summary"))
         composeRule.onNodeWithTag("academy_summary_section").assertIsDisplayed()
         composeRule.onNodeWithTag("academy_complete_module_button").assertIsEnabled()
     }
