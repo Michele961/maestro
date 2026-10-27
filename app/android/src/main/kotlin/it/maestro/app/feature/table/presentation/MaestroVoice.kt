@@ -18,9 +18,9 @@ import it.maestro.game.scopa.GameEvent
  * Il Maestro che parla durante una partita (task F1R-24d): tiene la memoria di una partita e, a ogni battuta,
  * chiede ai fatti, al direttore e al compositore se c'è qualcosa da dire. Solo Sparring lo usa.
  */
-internal class MaestroVoice(seed: Long, private val human: Seat) {
+internal class MaestroVoice(seed: Long, private val human: Seat, humor: Int = HUMOR) {
     private val director = MomentDirector(rng = SeededRng(seed xor DIRECTOR_SALT))
-    private val composer = VoiceComposer(SeededRng(seed xor COMPOSER_SALT), humor = HUMOR)
+    private val composer = VoiceComposer(SeededRng(seed xor COMPOSER_SALT), humor = humor)
     private var playerMoves = 0
     private var dealIndex = 0
 
@@ -42,7 +42,7 @@ internal class MaestroVoice(seed: Long, private val human: Seat) {
         return moment?.takeUnless { it.kind == MomentKind.GREETING }?.let { composer.compose(it, human) }
     }
 
-    private companion object {
+    internal companion object {
         const val DIRECTOR_SALT = 0x4D4F4D45L
         const val COMPOSER_SALT = 0x564F4345L
         const val HUMOR = 1
