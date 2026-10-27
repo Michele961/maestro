@@ -36,6 +36,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
@@ -47,6 +49,8 @@ private val Context.academyDataStore by preferencesDataStore(name = "maestro_aca
  * Modulo Koin principale per l'iniezione delle dipendenze dell'app Android (ADR-0012, task F1-08, F1-14).
  */
 public val appModule: Module = module {
+    single<Clock> { SystemClock }
+
     single<MaestroDatabase> {
         Room.databaseBuilder(
             androidContext(),
@@ -59,7 +63,7 @@ public val appModule: Module = module {
     single { get<MaestroDatabase>().walletDao() }
 
     single<MatchRepository> {
-        RoomMatchRepository(dao = get())
+        RoomMatchRepository(dao = get(), clock = get())
     }
 
     single<WalletRepository> {
@@ -75,7 +79,7 @@ public val appModule: Module = module {
     }
 
     single<MasteryRepository> {
-        DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore)
+        DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
     }
 
     single<RetentionRepository> {
@@ -83,7 +87,7 @@ public val appModule: Module = module {
     }
 
     single<AcademyRepository> {
-        DataStoreAcademyRepository(dataStore = androidContext().academyDataStore)
+        DataStoreAcademyRepository(dataStore = androidContext().academyDataStore, clock = get())
     }
 
     single<SoundManager> {
@@ -113,6 +117,7 @@ public val appModule: Module = module {
             repository = get(),
             retentionRepository = get(),
             walletRepository = get(),
+            clock = get(),
         )
     }
 
@@ -126,6 +131,7 @@ public val appModule: Module = module {
         DailyMissionsViewModel(
             retentionRepository = get(),
             walletRepository = get(),
+            clock = get(),
         )
     }
 

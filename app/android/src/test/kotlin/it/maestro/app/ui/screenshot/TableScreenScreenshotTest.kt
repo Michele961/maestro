@@ -37,6 +37,9 @@ import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.FakeClock
+import java.time.LocalDate
 
 /**
  * Tavolo da gioco (F1-21): screenshot da confrontare con `docs/art/reference_table_screen.jpg`.
@@ -213,6 +216,7 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
             androidContext(context)
             modules(
                 org.koin.dsl.module {
+                    single<Clock> { FakeClock(LocalDate.of(2026, 10, 27)) }
                     single<MaestroDatabase> { testDb }
                     single { testDb.savedMatchDao() }
                     single<MatchRepository> {

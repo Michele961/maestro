@@ -7,6 +7,7 @@ import it.maestro.app.R
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Suit
+import it.maestro.app.domain.time.SystemClock
 import java.time.LocalDate
 
 /**
@@ -60,7 +61,7 @@ public object DailyPuzzleProvider {
     /**
      * Calcola il numero progressivo del puzzle a partire dalla data (es. #14, #15).
      */
-    public fun getPuzzleNumber(date: LocalDate = LocalDate.now()): Int {
+    public fun getPuzzleNumber(date: LocalDate = SystemClock.today()): Int {
         val days = date.toEpochDay() - REFERENCE_EPOCH_DATE.toEpochDay() + 1
         return maxOf(1, days.toInt())
     }
@@ -68,7 +69,7 @@ public object DailyPuzzleProvider {
     /**
      * Calcola il seed deterministico a 64 bit a partire dalla data del giorno.
      */
-    public fun getDailySeed(date: LocalDate = LocalDate.now()): Long {
+    public fun getDailySeed(date: LocalDate = SystemClock.today()): Long {
         return date.year * 10000L + date.monthValue * 100L + date.dayOfMonth
     }
 
@@ -77,7 +78,7 @@ public object DailyPuzzleProvider {
      *
      * Per retrocompatibilità con seed e test esistenti, il livello 0 usa esattamente il generatore base.
      */
-    public fun getDailyPuzzle(date: LocalDate = LocalDate.now(), tierIndex: Int = 0): TacticalPuzzle {
+    public fun getDailyPuzzle(date: LocalDate = SystemClock.today(), tierIndex: Int = 0): TacticalPuzzle {
         val baseSeed = getDailySeed(date)
         return when (tierIndex) {
             0 -> TacticalPuzzleGenerator.generate(seed = baseSeed)

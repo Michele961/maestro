@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 /**
@@ -20,7 +26,7 @@ import java.time.LocalDate
  */
 public data class DailyMissionsUiState(
     val streak: StreakState = StreakState.INITIAL,
-    val missionsState: DailyMissionsState = DailyMissionsState(LocalDate.now().toString(), emptyList()),
+    val missionsState: DailyMissionsState = DailyMissionsState("", emptyList()),
     val isLoading: Boolean = false,
 )
 
@@ -30,16 +36,22 @@ public data class DailyMissionsUiState(
 public class DailyMissionsViewModel(
     private val retentionRepository: RetentionRepository,
     private val walletRepository: WalletRepository? = null,
-    private val dateProvider: () -> LocalDate = { LocalDate.now() },
+    private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
-    private val today: LocalDate
-        get() = dateProvider()
+    // Il giorno si rilegge con refreshDay() (ritorno in primo piano): a mezzanotte cambiano streak e missioni.
+    private val currentDay = MutableStateFlow(clock.today())
 
-    public val uiState: StateFlow<DailyMissionsUiState> = combine(
-        retentionRepository.observeStreak(today),
-        retentionRepository.observeDailyMissions(today),
-    ) { streak, missions ->
+    private val today: LocalDate
+        get() = currentDay.value
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    public val uiState: StateFlow<DailyMissionsUiState> = currentDay.flatMapLatest { day ->
+        combine(
+            retentionRepository.observeStreak(day),
+            retentionRepository.observeDailyMissions(day),
+        ) { streak, missions -> streak to missions }
+    }.map { (streak, missions) ->
         DailyMissionsUiState(
             streak = streak,
             missionsState = missions,
@@ -65,6 +77,11 @@ public class DailyMissionsViewModel(
                 }
             }
         }
+    }
+
+    /** Rilegge la data dal [Clock]; da chiamare quando l'app torna in primo piano (task F1R-02). */
+    public fun refreshDay() {
+        currentDay.value = clock.today()
     }
 
     public fun recordActivity() {

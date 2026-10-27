@@ -62,12 +62,12 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-02 — `Clock`, seed e data iniettati
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/app/layers.md` §3
 - **Obiettivo:** interfaccia `Clock` nel dominio e implementazione di sistema; tutti gli usi di `System.currentTimeMillis`, `LocalDate.now` e i seed `42L`/`12345L` passano da `Clock`. La data si rilegge al ritorno in primo piano (cambio giorno con app aperta).
 - **Criteri di accettazione:**
-    - [ ] Nessuna eccezione residua di questo tipo nel test di F1R-01.
-    - [ ] Test: streak e puzzle del giorno cambiano giorno con un `Clock` finto che passa la mezzanotte.
+    - [x] Nessuna eccezione residua di questo tipo nel test di F1R-01.
+    - [x] Test: streak e puzzle del giorno cambiano giorno con un `Clock` finto che passa la mezzanotte.
 - **Domande aperte:** —
 
 ## F1R-03 — Room con schema esportato e migrazioni
@@ -104,7 +104,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-06 — Matrice screenshot multi-dispositivo
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** ADR-0016, `docs/app/responsive-ui.md` §4
 - **Obiettivo:** un'utilità di test che esegue ogni screenshot sulle 4 configurazioni; tutti i test screenshot esistenti la usano. Si misurano le dimensioni reali del Pixel 10 Pro di Michele (`adb shell wm size`, `wm density`) e si aggiorna la tabella.
 - **Criteri di accettazione:**
