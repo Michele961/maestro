@@ -4,7 +4,6 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.domain.match.PresentationGate
 import it.maestro.game.model.Seat
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -56,19 +55,21 @@ class BotWaitsForPresentationTest {
     }
 
     @Test
-    fun uiGateOpensOnlyWhenBothMoveAndDealArePresented() = runTest {
-        val gate = UiPresentationGate()
-        var passed = false
-        val waiting = launch {
-            gate.awaitPresented(moveId = 3L, dealId = 2L)
-            passed = true
-        }
-        gate.onPresented(moveId = 3L, dealId = 1L)
+    fun withTheDirectorAsGateTheBotMovesOnlyAfterTheHumanSceneEnds() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val viewModel = GameViewModel(ioDispatcher = dispatcher, coroutineScope = TestScope(dispatcher))
+        // Seed in cui apre l'umano: dopo la sua mossa tocca al bot.
+        val seed = (1L..200L).first { GameReducer.initial(GameIntent.StartMatch(seed = it, humanSeat = Seat.P1)).effect == null }
+        viewModel.onIntent(GameIntent.StartMatch(seed = seed, level = DifficultyLevel.PRINCIPIANTE, humanSeat = Seat.P1))
         advanceUntilIdle()
-        assertEquals(false, passed, "La distribuzione 2 non è ancora finita")
-        gate.onPresented(moveId = 3L, dealId = 2L)
+
+        val card = viewModel.uiState.value.humanHand.first()
+        viewModel.onIntent(GameIntent.PlayCard(card))
+        // Il bot non muove finché la regia non ha finito di mettere in scena la mossa dell'umano.
+        assertTrue(viewModel.currentScene.busy, "La regia sta mostrando la mossa")
+        assertEquals(1, viewModel.currentMatchLog.moves.size)
+
         advanceUntilIdle()
-        assertTrue(passed)
-        waiting.cancel()
+        assertTrue(viewModel.currentMatchLog.moves.size >= 2, "A scena finita il bot muove")
     }
 }

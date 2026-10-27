@@ -192,6 +192,7 @@ public object GameReducer {
             session = intent.session,
             humanSeat = intent.humanSeat,
             botLevel = intent.level,
+            lastMoveId = intent.session.log.moves.size.toLong(),
             trainingFundamental = intent.trainingFundamental,
         )
         val botSeat = intent.humanSeat.other()
@@ -265,8 +266,8 @@ public object GameReducer {
         return when (val result = state.session.play(move, state.humanSeat)) {
             is SessionPlay.Applied -> {
                 val mover = result.beat.actor
-                val nextMoveId = state.lastMoveId + 1L
                 val next = result.session
+                val nextMoveId = result.beat.id
                 var dealScore: DealScore? = null
                 var lastEvent: UiGameEvent? = null
                 var sweepCards = state.sweepCards
@@ -331,6 +332,7 @@ public object GameReducer {
                     lastMove = move,
                     lastMover = mover,
                     lastMoveId = nextMoveId,
+                    lastBeat = result.beat,
                     opponentLastMove = newOpponentLastMove,
                     dealAnimationId = nextDealAnimId,
                     isInitialDeal = if (hadCardsDealt) false else state.isInitialDeal,

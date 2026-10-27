@@ -81,7 +81,7 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
 
     @Test
     fun deal_summary_dialog_screenshot() {
-        composeRule.setContent { MaestroTheme { TableContent(uiState = base.copy(pendingDealScore = score), onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = base.copy(pendingDealScore = score), scene = sceneOf(base.copy(pendingDealScore = score)), onIntent = {}) } }
         captureScreenRoboImage(screen.path("dialog_deal_summary"))
     }
 
@@ -99,14 +99,12 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
         )
         composeRule.setContent {
             MaestroTheme {
-                TableContent(
-                    uiState = base.copy(
-                        phase = DealPhase.PLAYING,
-                        activeTrainingQuestion = question,
-                        opponentLastMove = opponentMove,
-                    ),
-                    onIntent = {},
+                val state = base.copy(
+                    phase = DealPhase.PLAYING,
+                    activeTrainingQuestion = question,
+                    opponentLastMove = opponentMove,
                 )
+                TableContent(uiState = state, scene = sceneOf(state), onIntent = {})
             }
         }
         captureScreenRoboImage(screen.path("dialog_training_question"))

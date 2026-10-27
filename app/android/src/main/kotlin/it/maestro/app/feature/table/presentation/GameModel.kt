@@ -6,6 +6,7 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
+import it.maestro.app.domain.match.Beat
 import it.maestro.app.domain.match.MatchSession
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
@@ -174,6 +175,8 @@ public data class GameInternalState(
     val lastMove: ScopaMove? = null,
     val lastMover: Seat? = null,
     val lastMoveId: Long = 0L,
+    /** Ultima battuta prodotta dalla sessione: la presentazione la inoltra alla regia del tavolo. */
+    val lastBeat: Beat? = null,
     val opponentLastMove: OpponentMoveSummary? = null,
     val dealAnimationId: Long = 0L,
     val isInitialDeal: Boolean = false,

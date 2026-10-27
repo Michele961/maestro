@@ -34,7 +34,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import it.maestro.app.R
 import it.maestro.app.feature.table.presentation.UiGameEvent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
@@ -78,7 +77,7 @@ private data class Particle(
  * - Scopa Giocatore: banner dorato con rimbalzo elastico, alloro, esplosione di foglie d'oro e vibrazione.
  * - Scope Consecutive: banner dinamico "ANCORA!" o "DOPPIA!".
  * - Scopa Avversario: banner rosso sobrio con piccolo tonfo a schermo.
- * - Saltabile istantaneamente al tocco ovunque sullo schermo.
+ * - Dura quanto il passo della regia che la mostra (`MotionSpec`); il tocco ovunque sullo schermo salta la scena.
  */
 @Composable
 public fun SweepCelebrationOverlay(
@@ -158,10 +157,6 @@ public fun SweepCelebrationOverlay(
                 )
             }
         }
-
-        // Auto-dismiss dopo 1.8 secondi se non toccato prima
-        delay(1800L)
-        onDismiss()
     }
 
     Box(

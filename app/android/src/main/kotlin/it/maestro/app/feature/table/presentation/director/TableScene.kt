@@ -9,6 +9,7 @@ import it.maestro.game.scopa.ScopaView
  *
  * @property view vista di riferimento: quella prima della battuta mentre la si mette in scena, quella dopo a riposo.
  * @property step passo in corso, `null` a riposo.
+ * @property after vista dopo la battuta in scena; `null` a riposo.
  * @property beatId ultima battuta messa in scena (o in scena).
  * @property busy `true` finché ci sono passi da mostrare, in corso o in coda.
  */
@@ -18,6 +19,7 @@ public data class TableScene(
     val step: SceneStep? = null,
     val beatId: Long = 0L,
     val busy: Boolean = false,
+    val after: ScopaView? = null,
 ) {
     /** La mano è giocabile solo a scena ferma e al turno del giocatore (`table-director.md` §4.2). */
     val inputEnabled: Boolean
