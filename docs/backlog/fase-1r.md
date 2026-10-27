@@ -207,7 +207,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-15 — Sequenza di fine partita
 
-- **Stato:** in corso (dossier `docs/app/features/post-match.md` approvato il 2026-10-27). Fatti: 15a `PostMatchViewModel` e sequenza, 15b schermata a passi, maestria e serie nella ricompensa. 15c missioni avanzate e riscossione con un tocco dalla sequenza. Da fare: 15d messa a punto (spazio su schermi piccoli, suoni)
+- **Stato:** in revisione (dossier `docs/app/features/post-match.md` approvato il 2026-10-27; 15a–d fatte, attende la prova sul dispositivo di Michele). Fatti: 15a `PostMatchViewModel` e sequenza, 15b schermata a passi, 15c missioni avanzate e riscossione con un tocco, 15d contenuti centrati che seguono i passi e velocità di gioco. I suoni della sequenza vanno con F1R-20 (audio)
 - **Riferimenti:** `docs/app/game-feel.md` §6
 - **Obiettivo:** schermata unica di fine partita che anima `RewardSummary` (targa, precisione, missioni, streak, maestria; **senza crediti di partita**, vedi D19) con "Rivedi partita" come azione primaria.
 - **Criteri di accettazione:**

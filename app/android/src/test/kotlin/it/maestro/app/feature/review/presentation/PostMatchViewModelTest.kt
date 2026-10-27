@@ -2,7 +2,9 @@ package it.maestro.app.feature.review.presentation
 
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.app.domain.rewards.RewardSummary
+import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.game.model.Seat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,12 +36,13 @@ class PostMatchViewModelTest {
     @AfterTest
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun viewModel(fromHistory: Boolean = false) = PostMatchViewModel(
+    private fun viewModel(fromHistory: Boolean = false, speed: GameSpeed = GameSpeed.NORMAL) = PostMatchViewModel(
         matchLog = PostMatchFixtures.log,
         humanSeat = Seat.P1,
         fromHistory = fromHistory,
         analysis = analysis,
         reward = reward,
+        speed = flowOf(speed),
     )
 
     private fun TestScope.step(vm: PostMatchViewModel): PostMatchStep {
@@ -107,6 +110,13 @@ class PostMatchViewModelTest {
         step(vm)
         vm.skip()
         assertEquals(PostMatchStep.ANALYSIS, step(vm))
+    }
+
+    @Test
+    fun theChosenGameSpeedAppliesToThePauses() = runTest(dispatcher) {
+        analysis.value = PostMatchFixtures.analysis
+        val vm = viewModel(fromHistory = true, speed = GameSpeed.INSTANT)
+        assertEquals(PostMatchStep.ACTIONS, step(vm))
     }
 
     @Test

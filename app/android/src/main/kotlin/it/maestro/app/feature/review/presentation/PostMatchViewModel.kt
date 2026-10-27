@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -70,8 +71,10 @@ public class PostMatchViewModel(
     fromHistory: Boolean,
     analysis: Flow<MatchAnalysis?>,
     reward: Flow<RewardSummary?>,
-    private val speed: GameSpeed = GameSpeed.NORMAL,
+    speed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
 ) : ViewModel() {
+
+    private var currentSpeed: GameSpeed = GameSpeed.NORMAL
 
     private val _uiState = MutableStateFlow(initialState(matchLog, humanSeat, fromHistory))
 
@@ -81,6 +84,7 @@ public class PostMatchViewModel(
     private var pause: Job? = null
 
     init {
+        viewModelScope.launch { speed.collect { currentSpeed = it } }
         viewModelScope.launch { analysis.filterNotNull().collect { result -> _uiState.update { it.copy(analysis = result) } } }
         viewModelScope.launch { reward.filterNotNull().collect { result -> _uiState.update { it.copy(reward = result) } } }
         viewModelScope.launch { run(analysis, reward, fromHistory) }
@@ -111,7 +115,7 @@ public class PostMatchViewModel(
     private suspend fun show(step: PostMatchStep, token: MotionToken?) {
         _uiState.update { it.copy(step = step) }
         if (token == null) return
-        pause = viewModelScope.launch { MotionSpec.pause(MotionSpec.millis(token, speed)) }
+        pause = viewModelScope.launch { MotionSpec.pause(MotionSpec.millis(token, currentSpeed)) }
         pause?.join()
     }
 
