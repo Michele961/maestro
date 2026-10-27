@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +46,9 @@ import it.maestro.app.feature.missions.presentation.DailyMissionsUiState
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.feature.home.ui.HomeScreen
-import it.maestro.app.feature.review.ui.PostMatchPreviewScreen
+import it.maestro.app.feature.review.presentation.PostMatchViewModel
+import it.maestro.app.feature.review.ui.PostMatchScreen
+import org.koin.core.parameter.parametersOf
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.feature.profile.ui.ProfileScreen
 import it.maestro.app.feature.shop.ui.ShopScreen
@@ -175,22 +178,17 @@ public fun MaestroNavHost(
             val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
             val training = if (route.trainingTotal >= 0) route.trainingCorrect to route.trainingTotal else null
             val fundamental = TrainingFundamental.valueOf(route.fundamental)
-            PostMatchPreviewScreen(
-                matchLog = matchLog,
-                level = DifficultyLevel.valueOf(route.level),
+            LaunchedEffect(route) {
+                shell.startPostMatch(matchLog, Seat.P1, training, fundamental, route.fromHistory)
+            }
+            val viewModel: PostMatchViewModel = koinViewModel(key = route.matchLog) {
+                parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
+            }
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            PostMatchScreen(
+                state = state,
                 trainingScore = training,
-                trainingFundamental = fundamental,
-                isFromHistory = route.fromHistory,
-                onMatchAnalyzed = { analysis ->
-                    shell.onMatchAnalyzed(
-                        matchLog = matchLog,
-                        analysis = analysis,
-                        humanSeat = Seat.P1,
-                        trainingScore = training,
-                        trainingFundamental = fundamental,
-                        fromHistory = route.fromHistory,
-                    )
-                },
+                onSkip = viewModel::skip,
                 onReviewClicked = {
                     navController.navigate(Route.Review(route.matchLog, route.level, route.fromHistory))
                 },
@@ -200,7 +198,6 @@ public fun MaestroNavHost(
                     ) { popUpTo(Route.Home) }
                 },
                 onHomeClicked = { if (route.fromHistory) navController.popBackStack() else goHome() },
-                onProfileClicked = { navController.navigate(Route.Profile) },
             )
         }
         composable<Route.Review> { entry ->

@@ -26,7 +26,9 @@ import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
+import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
+import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.profile.presentation.ProfileViewModel
 import it.maestro.app.feature.shop.presentation.ShopViewModel
 import it.maestro.app.feature.academy.presentation.AcademyViewModel
@@ -115,6 +117,17 @@ public val appModule: Module = module {
             chattiness = get<SettingsRepository>().settingsFlow.map { it.maestroChattiness },
             hintEverUsed = get<SettingsRepository>().settingsFlow.map { it.hintEverUsed },
             onHintUsed = { get<SettingsRepository>().markHintUsed() },
+        )
+    }
+
+    viewModel { params ->
+        PostMatchViewModel(
+            matchLog = params.get(),
+            humanSeat = params.get(),
+            fromHistory = params.get(),
+            analysis = params.get(),
+            reward = params.get(),
+            speed = GameSpeed.NORMAL,
         )
     }
 

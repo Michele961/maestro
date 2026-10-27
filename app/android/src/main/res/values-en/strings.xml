@@ -665,4 +665,7 @@
     <string name="voice_hint_why_capture_1">A clean capture: more cards for you.</string>
     <string name="voice_hint_why_safe_1">The table stays above ten: no easy sweep for your opponent.</string>
     <string name="voice_hint_why_least_bad_1">The table stays low, but it\'s the lesser evil.</string>
+    <string name="post_match_mastery_line">Mastery %1$d</string>
+    <string name="post_match_delta_up">+%1$d</string>
+    <string name="post_match_delta_down">−%1$d</string>
 </resources>

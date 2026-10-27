@@ -2,6 +2,7 @@ package it.maestro.app.ui.screenshot
 
 import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -11,7 +12,11 @@ import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.ai.bot.SearchBudget
 import it.maestro.app.feature.review.ui.GameReviewScreen
-import it.maestro.app.feature.review.ui.PostMatchPreviewScreen
+import it.maestro.app.domain.rewards.RewardSummary
+import it.maestro.app.feature.review.presentation.PostMatchFixtures
+import it.maestro.app.feature.review.presentation.PostMatchStep
+import it.maestro.app.feature.review.presentation.PostMatchUiState
+import it.maestro.app.feature.review.ui.PostMatchScreen
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.CoreGame
 import it.maestro.game.scopa.MatchLog
@@ -68,20 +73,57 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         MatchLog(rulesVersion = CoreGame.RULES_VERSION, config = config, seed = 7L, moves = moves)
     }
 
-    @Test
-    fun post_match_preview_screenshot() {
-        composeRule.setContent {
-            MaestroTheme {
-                PostMatchPreviewScreen(
-                    matchLog = log,
-                    level = DifficultyLevel.INTERMEDIO,
-                    analyzer = analyzer,
-                    ioDispatcher = Dispatchers.Unconfined,
-                )
-            }
-        }
+    private fun postMatchState(step: PostMatchStep, won: Boolean = true, fromHistory: Boolean = false, reward: RewardSummary? = null) =
+        PostMatchUiState(
+            step = step,
+            won = won,
+            humanTotal = if (won) 11 else 7,
+            opponentTotal = if (won) 8 else 11,
+            analysis = if (step == PostMatchStep.PLAQUE || step == PostMatchStep.ANALYSIS) null else PostMatchFixtures.analysis,
+            reward = reward,
+            fromHistory = fromHistory,
+        )
+
+    private fun shotPostMatch(name: String, state: PostMatchUiState) {
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state) } }
         composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage(screen.path("post_match"))
+        composeRule.onRoot().captureRoboImage(screen.path(name))
+    }
+
+    @Test
+    fun post_match_analysis_waiting_screenshot() = shotPostMatch("post_match_analysis", postMatchState(PostMatchStep.ANALYSIS))
+
+    @Test
+    fun post_match_victory_screenshot() = shotPostMatch(
+        "post_match",
+        postMatchState(PostMatchStep.ACTIONS, reward = RewardSummary(masteryBefore = 1200, masteryAfter = 1218, streakAfter = 3)),
+    )
+
+    @Test
+    fun post_match_defeat_screenshot() = shotPostMatch(
+        "post_match_defeat",
+        postMatchState(PostMatchStep.ACTIONS, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209, streakAfter = 3)),
+    )
+
+    @Test
+    fun post_match_from_history_screenshot() = shotPostMatch("post_match_history", postMatchState(PostMatchStep.ACTIONS, fromHistory = true))
+
+    @Test
+    fun post_match_shows_the_mastery_delta_even_after_a_defeat() {
+        val state = postMatchState(PostMatchStep.REWARD, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209))
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state) } }
+        composeRule.onNodeWithTag("reward_mastery_delta", useUnmergedTree = true).assertTextContains("−9")
+        composeRule.onNodeWithTag("post_match_review_button").assertDoesNotExist()
+    }
+
+    @Test
+    fun post_match_tap_skips_and_actions_appear_at_the_end() {
+        var skipped = 0
+        val state = postMatchState(PostMatchStep.ACTIONS)
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onSkip = { skipped++ }) } }
+        composeRule.onNodeWithTag("post_match_review_button").assertExists()
+        composeRule.onNodeWithTag("post_match_preview_screen").performClick()
+        org.junit.Assert.assertEquals(1, skipped)
     }
 
     @Test

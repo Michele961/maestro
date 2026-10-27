@@ -665,4 +665,7 @@
     <string name="voice_hint_why_capture_1">È una presa pulita: carte in più per te.</string>
     <string name="voice_hint_why_safe_1">Il banco resta sopra dieci: niente scopa facile per l\'avversario.</string>
     <string name="voice_hint_why_least_bad_1">Il banco resta basso, ma è il male minore.</string>
+    <string name="post_match_mastery_line">Maestria %1$d</string>
+    <string name="post_match_delta_up">+%1$d</string>
+    <string name="post_match_delta_down">−%1$d</string>
 </resources>
