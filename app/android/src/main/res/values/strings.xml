@@ -652,4 +652,17 @@
     <string name="voice_tail_3">Ragiona, poi decidi.</string>
     <string name="settings_points_race">Mostra la corsa ai punti</string>
     <string name="settings_points_race_subtitle">Carte, Denari, Settebello e Primiera sempre in vista sul tavolo.</string>
+    <string name="voice_hint_take_one_1">Gioca il %1$s e prendi il %2$s.</string>
+    <string name="voice_hint_take_one_2">Il %1$s sul %2$s: la mossa che farei io.</string>
+    <string name="voice_hint_take_many_1">Gioca il %1$s e porta a casa %2$d carte in un colpo.</string>
+    <string name="voice_hint_take_many_2">Il %1$s prende %2$d carte insieme: non è male.</string>
+    <string name="voice_hint_discard_1">Nessuna presa buona: cala il %1$s.</string>
+    <string name="voice_hint_discard_2">Qui si cala: il %1$s è la carta meno pericolosa.</string>
+    <string name="voice_hint_why_sweep_1">È scopa: ripulisci il banco!</string>
+    <string name="voice_hint_why_settebello_1">Ti porti a casa il Settebello.</string>
+    <string name="voice_hint_why_denari_1">Un Denaro in più nel conto degli ori.</string>
+    <string name="voice_hint_why_primiera_1">Sette e Sei pesano nella Primiera.</string>
+    <string name="voice_hint_why_capture_1">È una presa pulita: carte in più per te.</string>
+    <string name="voice_hint_why_safe_1">Il banco resta sopra dieci: niente scopa facile per l\'avversario.</string>
+    <string name="voice_hint_why_least_bad_1">Il banco resta basso, ma è il male minore.</string>
 </resources>

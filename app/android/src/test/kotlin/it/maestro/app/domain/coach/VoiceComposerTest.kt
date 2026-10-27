@@ -54,7 +54,7 @@ class VoiceComposerTest {
     fun everyCatalogIdHasItalianAndEnglishText() {
         val it = stringsOf("values")
         val en = stringsOf("values-en")
-        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.tails).map { v -> v.id }
+        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.hintLeads.values.flatten() + VoiceCatalog.hintReasons.values.flatten() + VoiceCatalog.tails).map { v -> v.id }
         ids.forEach { id ->
             assertTrue(id in it, "Manca il testo italiano di $id")
             assertTrue(id in en, "Manca il testo inglese di $id")

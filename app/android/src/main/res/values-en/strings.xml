@@ -652,4 +652,17 @@
     <string name="voice_tail_3">Reason it out, then decide.</string>
     <string name="settings_points_race">Show the points race</string>
     <string name="settings_points_race_subtitle">Cards, Coins, Settebello and Primiera always visible on the table.</string>
+    <string name="voice_hint_take_one_1">Play the %1$s and take the %2$s.</string>
+    <string name="voice_hint_take_one_2">The %1$s on the %2$s: the move I\'d make.</string>
+    <string name="voice_hint_take_many_1">Play the %1$s and bring home %2$d cards in one go.</string>
+    <string name="voice_hint_take_many_2">The %1$s takes %2$d cards at once: not bad.</string>
+    <string name="voice_hint_discard_1">No good capture: lay down the %1$s.</string>
+    <string name="voice_hint_discard_2">Time to discard: the %1$s is the least dangerous card.</string>
+    <string name="voice_hint_why_sweep_1">It\'s a sweep: you clear the table!</string>
+    <string name="voice_hint_why_settebello_1">You bring home the Settebello.</string>
+    <string name="voice_hint_why_denari_1">One more Coin toward the Coins point.</string>
+    <string name="voice_hint_why_primiera_1">Sevens and Sixes weigh on the Primiera.</string>
+    <string name="voice_hint_why_capture_1">A clean capture: more cards for you.</string>
+    <string name="voice_hint_why_safe_1">The table stays above ten: no easy sweep for your opponent.</string>
+    <string name="voice_hint_why_least_bad_1">The table stays low, but it\'s the lesser evil.</string>
 </resources>
