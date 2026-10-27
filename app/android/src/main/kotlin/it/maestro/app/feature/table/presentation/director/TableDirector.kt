@@ -7,7 +7,7 @@ import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaView
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,13 +22,14 @@ import kotlinx.coroutines.launch
  * L'unica attesa di tempo è [MotionSpec.pause], con durate da `MotionSpec` scalate da [speed].
  */
 public class TableDirector(
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val humanSeat: Seat,
     initialView: ScopaView,
     private val speed: () -> GameSpeed = { GameSpeed.NORMAL },
 ) : PresentationGate {
 
-    private val queue = Channel<Beat>(Channel.UNLIMITED)
+    private val queue = ArrayDeque<Beat>()
+    private var drain: Job? = null
     private var queued = 0
     private var skipCurrent = false
     private var skipQueue = false
@@ -40,17 +41,17 @@ public class TableDirector(
 
     private val presented = MutableStateFlow(0L)
 
-    init {
-        scope.launch {
-            for (beat in queue) play(beat)
-        }
-    }
-
     /** Mette in coda [beat]: verrà mostrata dopo quelle già in coda. */
     public fun enqueue(beat: Beat) {
         queued++
         _scene.value = _scene.value.copy(busy = true)
-        queue.trySend(beat)
+        queue.addLast(beat)
+        if (drain?.isActive != true) {
+            // Il job vive solo finché ci sono battute: nessuna coroutine in attesa a coda vuota.
+            drain = scope.launch {
+                while (queue.isNotEmpty()) play(queue.removeFirst())
+            }
+        }
     }
 
     /**
@@ -67,7 +68,12 @@ public class TableDirector(
      * (`table-director.md` §4.5).
      */
     public fun rest(view: ScopaView, beatId: Long) {
-        _scene.value = TableScene(view = view, humanSeat = humanSeat, beatId = beatId, busy = queued > 0)
+        drain?.cancel()
+        queue.clear()
+        queued = 0
+        skipCurrent = false
+        skipQueue = false
+        _scene.value = TableScene(view = view, humanSeat = humanSeat, beatId = beatId, busy = false)
         if (presented.value < beatId) presented.value = beatId
     }
 
@@ -78,7 +84,7 @@ public class TableDirector(
 
     private suspend fun play(beat: Beat) {
         for (step in BeatScript.steps(beat, humanSeat)) {
-            _scene.value = TableScene(beat.viewBefore, humanSeat, step = step, beatId = beat.id, busy = true)
+            _scene.value = TableScene(beat.viewBefore, humanSeat, step = step, beatId = beat.id, busy = true, after = beat.viewAfter)
             if (!skipCurrent && !skipQueue) MotionSpec.pause(MotionSpec.millis(step.token, speed()))
         }
         queued--

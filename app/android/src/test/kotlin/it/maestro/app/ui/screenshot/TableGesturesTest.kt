@@ -10,7 +10,10 @@ import androidx.compose.ui.test.performClick
 import it.maestro.app.feature.table.presentation.GameIntent
 import it.maestro.app.feature.table.presentation.GameReducer
 import it.maestro.app.feature.table.presentation.OpponentMoveSummary
+import it.maestro.app.feature.table.presentation.director.SceneStep
 import it.maestro.app.feature.table.ui.TableContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
@@ -49,6 +52,7 @@ class TableGesturesTest {
             MaestroTheme {
                 TableContent(
                     uiState = uiState,
+                    scene = sceneOf(uiState),
                     onIntent = { intent ->
                         if (intent is GameIntent.PlayCard) {
                             playedCard = intent.card
@@ -82,29 +86,25 @@ class TableGesturesTest {
     }
 
     @Test
-    fun opponentLastMoveBannerIsDisplayedWhenSummaryPresent() {
+    fun opponentRevealShowsThePlayedCardOnTheTableWithoutLastMoveBanner() {
         val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
-        val summary = OpponentMoveSummary(
-            card = Card(Rank.SETTE, Suit.DENARI),
-            capture = setOf(Card(Rank.SETTE, Suit.COPPE)),
-            isSweep = false,
-        )
-        val uiState = initial.state.toUiState().copy(
-            opponentLastMove = summary,
-            isHumanTurn = true,
-        )
+        val uiState = initial.state.toUiState()
+        val shown = Suit.entries.flatMap { suit -> Rank.entries.map { Card(it, suit) } }
+            .first { it !in uiState.tableCards && it !in uiState.humanHand }
 
         composeRule.setContent {
             MaestroTheme {
                 TableContent(
                     uiState = uiState,
+                    scene = sceneOf(uiState, step = SceneStep.OpponentReveal(shown)),
                     onIntent = {},
                 )
             }
         }
 
-        // Il banner dell'ultima mossa avversario deve essere presente a schermo
-        composeRule.onNodeWithTag("opponent_last_move_banner").assertExists()
+        // "Ultima giocata" è stata tolta (dossier del tavolo, 2026-10-27): racconta la carta girata sul tavolo.
+        composeRule.onNodeWithTag("opponent_last_move_banner").assertDoesNotExist()
+        composeRule.onNodeWithTag("card_${shown.suit.name}_${shown.rank.name}").assertExists()
     }
 
     @Test
@@ -121,6 +121,7 @@ class TableGesturesTest {
             MaestroTheme {
                 TableContent(
                     uiState = uiState,
+                    scene = sceneOf(uiState),
                     onIntent = {},
                 )
             }
@@ -131,7 +132,7 @@ class TableGesturesTest {
     }
 
     @Test
-    fun dealAnimationDisablesAndHidesHandsUntilFinished() {
+    fun handIsNotPlayableWhileTheSceneIsBusyAndPlayableAtRest() {
         val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
         var uiState = initial.state.toUiState()
         if (!uiState.isHumanTurn) {
@@ -139,59 +140,34 @@ class TableGesturesTest {
             val afterBot = GameReducer.reduce(initial.state, GameIntent.ApplyBotMove(botMove))
             uiState = afterBot.state.toUiState()
         }
+        val state = uiState
+        var scene by androidx.compose.runtime.mutableStateOf(sceneOf(state, step = SceneStep.DealCard(0, Seat.P1)))
 
-        composeRule.setContent {
-            MaestroTheme {
-                TableContent(
-                    uiState = uiState,
-                    onIntent = {},
-                )
-            }
-        }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = scene, onIntent = {}) } }
 
-        val cardToSelect = uiState.humanHand.first()
+        val cardToSelect = state.humanHand.first()
         val cardTag = "card_${cardToSelect.suit.name}_${cardToSelect.rank.name}"
 
-        // Durante la distribuzione pendente o attiva, la mano non è interagibile
+        // Durante una scena (qui una distribuzione) la mano non è interagibile.
         composeRule.onNodeWithTag(cardTag).performClick()
         composeRule.onNodeWithTag("confirm_play_button").assertDoesNotExist()
 
-        // Una volta terminata l'animazione di smazzata, la mano diventa attiva e cliccabile
-        composeRule.mainClock.advanceTimeBy(3000L)
+        // A scena ferma la mano torna attiva e cliccabile.
+        scene = sceneOf(state)
         composeRule.waitForIdle()
-
         composeRule.onNodeWithTag(cardTag).performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("confirm_play_button").assertExists()
     }
 
     @Test
-    fun deckCountDecrementsGraduallyDuringDeal() {
+    fun deckShowsTheCardsLeftInTheScene() {
         val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
         val uiState = initial.state.toUiState()
 
-        composeRule.mainClock.autoAdvance = false
-        composeRule.setContent {
-            MaestroTheme {
-                TableContent(
-                    uiState = uiState,
-                    onIntent = {},
-                )
-            }
-        }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = uiState, scene = sceneOf(uiState), onIntent = {}) } }
 
-        // All'inizio della smazzata, il mazzo mostra tutte le 40 carte
-        composeRule.onNodeWithText("40").assertExists()
-
-        // Avanziamo a metà della distribuzione iniziale (es. dopo 3 carte a terra: 220 + 3*160 = ~700ms)
-        composeRule.mainClock.advanceTimeBy(700L)
-        // 40 non c'è più perché le prime carte sono state distribuite
-        composeRule.onNodeWithText("40").assertDoesNotExist()
-
-        // Avanziamo al termine di tutta la distribuzione iniziale
-        composeRule.mainClock.advanceTimeBy(3000L)
-        composeRule.onNodeWithText("30").assertExists()
-        composeRule.mainClock.autoAdvance = true
+        composeRule.onNodeWithText(uiState.deckCardCount.toString()).assertExists()
     }
 
     @org.junit.After

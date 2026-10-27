@@ -134,7 +134,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Suddivisione (2026-10-27):** il task supera le 400 righe e si divide in due parti.
     - **Parte 1:** il bot aspetta la fine della scena tramite `PresentationGate`, alimentato dal tavolo attuale (`UiPresentationGate`), e la riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono. Test `BotWaitsForPresentationTest`.
     - **Parte 2 (F1R-08b nel dossier `docs/app/features/table.md`):** `MatchSession` con le `Beat` e il reducer che lavora solo sulla vista. Chiude i criteri "stesso `MatchLog`" e "nessuno `ScopaState` in presentazione".
-- **Nota parte 2:** `MatchSession` (domain/match) è l'unico a vedere `ScopaState`; il reducer lavora su `MatchSession` e viste. Le `Beat` restano da collegare alla regia nel tavolo ridisegnato (F1R-12a/b). Il cancello del bot resta `UiPresentationGate` finché il tavolo non usa il `TableDirector`.
+- **Nota parte 2:** `MatchSession` (domain/match) è l'unico a vedere `ScopaState`; il reducer lavora su `MatchSession` e viste. Le `Beat` vanno alla regia (`TableDirector`), che è anche il cancello del bot (F1R-12a).
 - **Domande aperte:** —
 
 ## F1R-09 — `MotionSpec` e `GameSpeed`
@@ -168,7 +168,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-12 — Tavolo disegnato dalla scena
 
-- **Stato:** da fare
+- **Stato:** in corso (12a fatta; 12b e 12c da fare)
 - **Riferimenti:** `docs/app/table-director.md`, `docs/app/game-feel.md` §3–4
 - **Obiettivo:** `TableScreen` riscritto come insieme di composable piccoli che disegnano `TableScene` con `TableGeometry`; nessun `delay`, nessuna logica di sequenza nei composable. Il vecchio `FeltLayout` viene rimosso.
 - **Criteri di accettazione:**
@@ -176,7 +176,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] Screenshot della matrice per: inizio smazzata, turno umano, presa in volo, scopa, riepilogo smazzata.
     - [ ] Playtest di Michele sul Pixel: nessuna animazione interrotta o fuori ordine.
 - **Suddivisione (2026-10-27, dossier `docs/app/features/table.md` approvato):**
-    - **F1R-12a — Tavolo a riposo:** layout a zone di `TableGeometry` che disegna `TableScene` senza animazioni; via "Ultima giocata"; mano a ventaglio leggero con carte intere; avversario con nome e ritratto. Screenshot della matrice senza D3–D5.
+    - **F1R-12a — Tavolo a riposo (fatto, 2026-10-27):** layout a zone di `TableGeometry` che disegna `TableScene` senza animazioni; via "Ultima giocata"; mano a ventaglio leggero con carte intere; avversario con nome e ritratto. Screenshot della matrice senza D3–D5.
     - **F1R-12b — Passi animati:** ogni `SceneStep` animato con la durata di `MotionSpec`; suoni e vibrazioni dai passi; salto con un tocco.
     - **F1R-12c — Dialog e pulizia:** scelta presa, riepilogo, domanda, pausa sulla scena; `FeltLayout` rimosso; nessun file > 400 righe.
 - **Domande aperte:** —

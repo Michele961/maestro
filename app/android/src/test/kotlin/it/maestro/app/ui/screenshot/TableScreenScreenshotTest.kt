@@ -5,7 +5,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.app.feature.table.presentation.GameUiState
+import it.maestro.app.feature.table.presentation.director.SceneStep
 import it.maestro.app.feature.table.ui.TableContent
+import androidx.compose.runtime.setValue
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
@@ -91,28 +93,23 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
 
     @Test
     fun table_mid_deal_screenshot() {
-        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_mid_deal"))
     }
 
     @Test
     fun table_with_maestro_hint_screenshot() {
         val hint = ScopaMove(card = midDeal.humanHand[0], capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
-        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal.copy(suggestedMove = hint), onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal.copy(suggestedMove = hint), scene = sceneOf(midDeal.copy(suggestedMove = hint)), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_hint"))
     }
 
     @Test
     fun table_with_bot_card_play_screenshot() {
         val botMove = ScopaMove(card = Card(Rank.SETTE, Suit.SPADE), capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
-        val botState = midDeal.copy(
-            lastMove = botMove,
-            lastMover = Seat.P2,
-            lastMoveId = 1L,
-            isHumanTurn = false,
-            isBotThinking = false,
-        )
-        composeRule.setContent { MaestroTheme { TableContent(uiState = botState, onIntent = {}) } }
+        val botState = midDeal.copy(isHumanTurn = false, isBotThinking = false)
+        val step = SceneStep.CaptureHighlight(Seat.P2, botMove.card, botMove.capture)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = botState, scene = sceneOf(botState, step), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_bot_play"))
     }
 
@@ -125,7 +122,7 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
                 isSweep = false,
             ),
         )
-        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}) } }
         val cardToSelect = state.humanHand.first()
         val cardTag = "card_${cardToSelect.suit.name}_${cardToSelect.rank.name}"
         composeRule.onNodeWithTag(cardTag).performClick()
@@ -142,7 +139,8 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
                 isSweep = true,
             ),
         )
-        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        val step = SceneStep.Sweep(Seat.P2, Seat.P1)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state, step), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_opponent_sweep"))
     }
 
@@ -155,14 +153,15 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
                 isSweep = false,
             ),
         )
-        composeRule.setContent { MaestroTheme { TableContent(uiState = state, onIntent = {}) } }
+        val step = SceneStep.OpponentReadPause(Card(Rank.SEI, Suit.DENARI))
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state, step), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_opponent_drop"))
     }
 
     @Test
     fun pause_opens_dialog_and_menu_goes_home() {
         var home = 0
-        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, onIntent = {}, onNavigateHome = { home++ }) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, onNavigateHome = { home++ }) } }
         composeRule.onNodeWithTag("pause_button").performClick()
         composeRule.onNodeWithTag("pause_home_button").performClick()
         org.junit.Assert.assertEquals(1, home)
@@ -184,8 +183,10 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             MaestroTheme {
+                val scene by viewModel.scene.collectAsStateWithLifecycle(initialValue = viewModel.currentScene)
                 TableContent(
                     uiState = uiState,
+                    scene = scene,
                     onIntent = viewModel::onIntent,
                 )
             }
@@ -254,42 +255,24 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun training_question_waits_for_move_animation_and_shows_opponent_move() {
+    fun training_question_waits_for_the_scene_to_finish() {
         val question = TrainingQuestion(
             fundamental = TrainingFundamental.SEVENS_COUNT,
             options = listOf(0, 1, 2, 3).map { count -> TrainingOption.IntCount(count) },
             correctIndex = 1,
         )
-        val opponentMove = OpponentMoveSummary(
-            card = Card(Rank.SETTE, Suit.DENARI),
-            capture = setOf(Card(Rank.SETTE, Suit.SPADE)),
-            isSweep = false,
-        )
-        val state = midDeal.copy(
-            lastMoveId = 10L,
-            lastMove = it.maestro.game.scopa.ScopaMove(Card(Rank.SETTE, Suit.DENARI), setOf(Card(Rank.SETTE, Suit.SPADE))),
-            lastMover = Seat.P2,
-            opponentLastMove = opponentMove,
-            activeTrainingQuestion = question,
-        )
+        val state = midDeal.copy(activeTrainingQuestion = question)
+        val played = SceneStep.OpponentReadPause(Card(Rank.SETTE, Suit.DENARI))
+        var scene by androidx.compose.runtime.mutableStateOf(sceneOf(state, played))
 
-        composeRule.setContent {
-            MaestroTheme {
-                TableContent(
-                    uiState = state,
-                    onIntent = {},
-                )
-            }
-        }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = scene, onIntent = {}) } }
 
-        // All'inizio dell'animazione della mossa, la domanda non deve ancora coprire il tavolo
+        // Mentre la regia mostra la giocata dell'avversario la domanda non copre il tavolo.
         composeRule.onNodeWithTag("training_question_dialog").assertDoesNotExist()
 
-        // Avanziamo l'orologio oltre l'animazione della mossa e il tempo di respiro (800ms)
-        composeRule.mainClock.advanceTimeBy(3500L)
+        scene = sceneOf(state)
         composeRule.waitForIdle()
 
-        // Ora il dialogo della domanda deve essere visibile e contenere il testo
         composeRule.onNodeWithTag("training_question_dialog").assertExists()
         composeRule.onNodeWithTag("training_question_text").assertExists()
     }

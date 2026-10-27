@@ -21,6 +21,11 @@ import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.designsystem.motion.MotionSpec
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.match.PresentationGate
+import it.maestro.app.feature.table.presentation.director.TableDirector
+import it.maestro.app.feature.table.presentation.director.TableScene
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -37,9 +42,9 @@ public class GameViewModel(
     private val matchRepository: MatchRepository? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
-    // Il bot aspetta la fine della scena (ADR-0015). Senza interfaccia (test con Unconfined) il cancello è aperto.
-    private val presentationGate: PresentationGate =
-        if (ioDispatcher == Dispatchers.Unconfined) PresentationGate.Immediate else UiPresentationGate(),
+    // Il bot aspetta la fine della scena (ADR-0015): per default è la regia del tavolo.
+    // Senza interfaccia (test con Unconfined) il cancello è aperto e la regia non aspetta.
+    presentationGate: PresentationGate? = null,
     gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
 ) : ViewModel() {
 
@@ -48,6 +53,7 @@ public class GameViewModel(
     private val _uiState: MutableStateFlow<GameUiState>
     public val uiState: StateFlow<GameUiState>
 
+    private val withoutUi = ioDispatcher == Dispatchers.Unconfined
     private var currentSpeed: GameSpeed = GameSpeed.NORMAL
     private var botRng: SeededRng = SeededRng(12345L)
     private var botJob: Job? = null
@@ -56,9 +62,36 @@ public class GameViewModel(
     public val currentMatchLog: MatchLog
         get() = internalState.matchLog
 
-    /** Il tavolo ha finito di mostrare la mossa [moveId] e la distribuzione [dealId] (task F1R-08). */
-    public fun onPresented(moveId: Long, dealId: Long) {
-        (presentationGate as? UiPresentationGate)?.onPresented(moveId, dealId)
+    private val director = MutableStateFlow<TableDirector?>(null)
+    private val gate: PresentationGate = presentationGate ?: object : PresentationGate {
+        override suspend fun awaitPresented(moveId: Long, dealId: Long) {
+            if (withoutUi) return
+            director.value?.awaitPresented(moveId, dealId)
+        }
+    }
+
+    /** Scena da disegnare (`docs/app/table-director.md` §2); cambia regia a ogni nuova partita. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    public val scene: Flow<TableScene> = director.filterNotNull().flatMapLatest { it.scene }
+
+    /** Scena corrente, per il valore iniziale di [scene]. */
+    public val currentScene: TableScene
+        get() = checkNotNull(director.value) { "Regia non ancora creata" }.scene.value
+
+    /** Un tocco sul tavolo durante una scena la salta (`table-director.md` §4.3). */
+    public fun skipScene() {
+        director.value?.skip()
+    }
+
+    private fun resetDirector(restoreAt: Long?) {
+        val human = internalState.humanSeat
+        val view = internalState.session.view(human)
+        director.value = TableDirector(
+            scope = scope,
+            humanSeat = human,
+            initialView = view,
+            speed = { if (withoutUi) GameSpeed.INSTANT else currentSpeed },
+        ).also { if (restoreAt != null) it.rest(view, restoreAt) }
     }
 
     /** `true` dopo l'avvio o la ripresa di una partita: dopo una ricreazione la schermata non la riavvia. */
@@ -98,6 +131,7 @@ public class GameViewModel(
         internalState = initialResult.state
         _uiState = MutableStateFlow(internalState.toUiState())
         uiState = _uiState.asStateFlow()
+        resetDirector(restoreAt = null)
         handleEffect(initialResult.effect)
     }
 
@@ -113,8 +147,14 @@ public class GameViewModel(
             botJob?.cancel()
             hintJob?.cancel()
         }
+        val previousBeat = internalState.lastBeat
         val result = GameReducer.reduce(internalState, intent)
         internalState = result.state
+        when (intent) {
+            is GameIntent.StartMatch -> resetDirector(restoreAt = null)
+            is GameIntent.RestoreMatch -> resetDirector(restoreAt = internalState.lastMoveId)
+            else -> internalState.lastBeat?.takeIf { it !== previousBeat }?.let { director.value?.enqueue(it) }
+        }
         _uiState.value = internalState.toUiState()
 
         // Persistenza automatica della partita (ADR-0003, task F1-08)
@@ -153,7 +193,7 @@ public class GameViewModel(
                 botJob = scope.launch {
                     try {
                         // Prima la scena finisce, poi il bot "pensa" in proporzione alle sue scelte (ADR-0015).
-                        presentationGate.awaitPresented(internalState.lastMoveId, internalState.dealAnimationId)
+                        gate.awaitPresented(internalState.lastMoveId, internalState.dealAnimationId)
                         if (ioDispatcher != Dispatchers.Unconfined) {
                             val choices = internalState.session.legalMovesFor(effect.botSeat).size
                             MotionSpec.pause(MotionSpec.botThinkMillis(choices, currentSpeed))
