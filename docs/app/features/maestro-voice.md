@@ -86,3 +86,4 @@ Michele non può leggere ogni combinazione. Si fa così:
 5. **Impostazione «Chiacchiere del Maestro»**: sì, a più livelli. Da **valutare** una modalità per **mutarlo** del tutto (stile Clash Royale).
 6. **Classica**: niente aiuti né battute testuali, solo pose. Potenzialmente l'**Elo si valuterà in questa modalità** (quindi niente consigli in Classica, nemmeno su richiesta).
 7. **Ordine**: questa feature viene **prima** della fine partita; poi fine partita; poi revisione. Le ricompense dipendono dall'economia di gioco, dal multiplayer e dalle modalità di gioco: se ne parla con quelle.
+8. **Testi** (2026-10-27): Michele **approva** i testi `voice_*`, `voice_hint_*` e `voice_review_*` (D16); la raccolta leggibile è in `docs/design/maestro_voice_texts.md` e si cambia indicando chiave e nuovo testo.

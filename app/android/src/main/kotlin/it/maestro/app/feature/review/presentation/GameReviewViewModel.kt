@@ -200,7 +200,7 @@ public class GameReviewViewModel : ViewModel() {
     public fun startRetry() {
         _uiState.update { current ->
             val step = current.currentStep ?: return@update current
-            if (step.analysis.grade == MoveGrade.BEST && !current.isCurrentStepSolved) {
+            if (!step.analysis.isMistake() && !current.isCurrentStepSolved) {
                 return@update current
             }
             current.copy(
@@ -231,7 +231,7 @@ public class GameReviewViewModel : ViewModel() {
     public fun playRetryCard(card: Card) {
         _uiState.update { current ->
             val step = current.currentStep ?: return@update current
-            val isHumanMistake = step.mover == current.humanSeat && step.analysis.grade != MoveGrade.BEST
+            val isHumanMistake = step.mover == current.humanSeat && step.analysis.isMistake()
             if (!current.isRetryMode && !isHumanMistake) return@update current
 
             val bestValue = step.analysis.bestValue

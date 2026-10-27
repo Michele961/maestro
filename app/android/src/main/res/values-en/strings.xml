@@ -714,4 +714,5 @@
     <string name="voice_review_extra_last_deal">It\'s the last deal: the deck is empty, and remembering the cards already played matters.</string>
     <string name="voice_review_extra_score">The score is %1$d to %2$d: that changes how much it\'s worth risking.</string>
     <string name="voice_review_extra_played">%1$d cards have already been played: the Maestro keeps track of those still in play.</string>
+    <string name="review_grade_good">Good move</string>
 </resources>

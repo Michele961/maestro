@@ -1,0 +1,366 @@
+# Testi del Maestro — bozza da leggere
+
+Stato: **approvati da Michele il 2026-10-27** (decisione D16: i testi didattici li approva lui). Questa è la raccolta di tutte le frasi del Maestro oggi nell'app, in italiano e in inglese, generata da `strings.xml`. Se vuoi cambiare una frase, indicami la chiave (es. `voice_greeting_2`) e il nuovo testo.
+
+Come leggerli: `%1$s`, `%2$s` sono i nomi delle carte (es. «7 di denari»), `%1$d` un numero. Il Maestro sceglie una variante in base all'umorismo (1 = serio, 2/3 = più spiritoso) e a volte aggiunge una «coda».
+
+## Saluto e aiuto
+
+- `voice_greeting_1`
+  - it: Buona partita! Il circolo è tuo.
+  - en: Good game! The club is yours.
+- `voice_greeting_2`
+  - it: Siediti, amico: si gioca.
+  - en: Sit down, my friend: let's play.
+- `voice_greeting_3`
+  - it: Carte in mano e occhi aperti: il Maestro è con te.
+  - en: Cards in hand and eyes open: the Maestro is with you.
+- `voice_intro_help_1`
+  - it: Se ti serve, tocca il mio ritratto: ti darò un indizio, la scelta resta tua.
+  - en: If you need it, tap my portrait: I'll give you a hint, the choice stays yours.
+- `voice_intro_help_2`
+  - it: Un consiglio? Basta toccarmi. Decidi sempre tu.
+  - en: Need advice? Just tap me. You always decide.
+- `voice_offer_help_1`
+  - it: Se non sai che pesci pigliare, toccami: ti do un indizio.
+  - en: If you're not sure what to do, tap me: I'll give you a hint.
+- `voice_offer_help_2`
+  - it: Scelta difficile? Chiedimi un consiglio, non mordo.
+  - en: Tough choice? Ask me for advice, I don't bite.
+- `voice_offer_help_3`
+  - it: Vedo che ci pensi su. Un indizio del Maestro non ha mai fatto male a nessuno.
+  - en: I see you're thinking it over. A hint from the Maestro never hurt anyone.
+
+## Opportunità e avvisi
+
+- `voice_opportunity_sweep_1`
+  - it: Occhio al banco: col %1$s puoi fare scopa.
+  - en: Eyes on the table: with the %1$s you can sweep it.
+- `voice_opportunity_sweep_2`
+  - it: C'è aria di scopa. Guarda bene cosa puoi fare col %1$s.
+  - en: There's a sweep in the air. Look at what the %1$s can do.
+- `voice_opportunity_sweep_3`
+  - it: Il banco ti fa l'occhiolino: col %1$s lo ripulisci tutto.
+  - en: The table is winking at you: the %1$s clears it all.
+- `voice_opportunity_settebello_1`
+  - it: Il Settebello è lì, a portata di mano: col %1$s lo prendi.
+  - en: The Seven of Coins is within reach: take it with the %1$s.
+- `voice_opportunity_settebello_2`
+  - it: Quel sette d'oro a terra vale una smazzata. Non lasciarlo al caso.
+  - en: That golden seven on the table is worth a whole deal. Don't leave it to chance.
+- `voice_opportunity_settebello_3`
+  - it: Il gioiello del circolo è sul banco, e tu hai la chiave: il %1$s.
+  - en: The club's jewel is on the table, and you hold the key: the %1$s.
+- `voice_warn_settebello_exposed_1`
+  - it: Attenzione: il Settebello è a terra e tu non puoi prenderlo. Pensa a cosa lasci sul banco.
+  - en: Careful: the Seven of Coins is on the table and you can't take it. Mind what you leave there.
+- `voice_warn_settebello_exposed_2`
+  - it: Quel sette d'oro è scoperto. Non regalarlo all'avversario.
+  - en: That golden seven is out in the open. Don't hand it to your opponent.
+- `voice_warn_settebello_exposed_3`
+  - it: Il gioiello è sul banco e non è tuo: occhio a non servirlo su un piatto d'argento.
+  - en: The jewel is on the table and it isn't yours: don't serve it up on a silver plate.
+- `voice_warn_low_table_safe_1`
+  - it: Il banco vale solo %1$d: chi ha la carta giusta fa scopa. Il %2$s ti mette al sicuro.
+  - en: The table is worth just %1$d: whoever holds the right card sweeps. The %2$s keeps you safe.
+- `voice_warn_low_table_safe_2`
+  - it: Banco basso, scopa facile per l'avversario. Cala il %2$s e respira.
+  - en: Low table, an easy sweep for your opponent. Play the %2$s and breathe.
+- `voice_warn_low_table_safe_3`
+  - it: Con il banco a %1$d l'avversario si sfrega le mani. Il %2$s gli toglie il sorriso.
+  - en: With the table at %1$d your opponent is rubbing their hands. The %2$s wipes the smile off.
+- `voice_warn_low_table_1`
+  - it: Il banco vale solo %1$d: stai attento a cosa scopri.
+  - en: The table is worth just %1$d: be careful what you reveal.
+- `voice_warn_low_table_2`
+  - it: Banco basso, scopa in agguato: ragiona prima di calare.
+  - en: Low table, a sweep lurking: think before you play.
+
+## Reazioni
+
+- `voice_react_your_sweep_1`
+  - it: Scopa! Così si fa.
+  - en: Sweep! That's how it's done.
+- `voice_react_your_sweep_2`
+  - it: Bellissima scopa: il banco è tutto tuo.
+  - en: A beautiful sweep: the table is all yours.
+- `voice_react_your_sweep_3`
+  - it: Pulito come uno specchio! Al circolo ti offrirebbero un caffè.
+  - en: Clean as a mirror! At the club they'd buy you a coffee.
+- `voice_react_opponent_sweep_1`
+  - it: Ahi, scopa dell'avversario! Capita anche ai migliori.
+  - en: Ouch, a sweep for your opponent! It happens to the best.
+- `voice_react_opponent_sweep_2`
+  - it: Mani nei capelli… ma la partita è lunga.
+  - en: Hands in my hair… but the game is long.
+- `voice_react_opponent_sweep_3`
+  - it: Mamma mia, che scopa! Facciamo finta di non averla vista.
+  - en: Mamma mia, what a sweep! Let's pretend we didn't see it.
+- `voice_react_gift_1`
+  - it: L'avversario ha lasciato il banco scoperto: puoi approfittarne.
+  - en: Your opponent left the table exposed: you can take advantage.
+- `voice_react_gift_2`
+  - it: Un regalo dell'avversario: guarda cosa puoi fare.
+  - en: A gift from your opponent: look at what you can do.
+- `voice_react_gift_3`
+  - it: Il banco è apparecchiato: serviti pure.
+  - en: The table is laid out: help yourself.
+- `voice_react_settebello_yours_1`
+  - it: Il Settebello è tuo: il gioiello del circolo!
+  - en: The Seven of Coins is yours: the club's jewel!
+- `voice_react_settebello_yours_2`
+  - it: Settebello in tasca. Un punto che pesa.
+  - en: Seven of Coins in your pocket. A point that weighs.
+- `voice_react_settebello_yours_3`
+  - it: Il sette d'oro ha trovato casa. Complimenti, occhio vispo.
+  - en: The golden seven found a home. Well done, sharp eye.
+- `voice_react_settebello_theirs_1`
+  - it: Il Settebello è andato all'avversario: pazienza, c'è ancora da giocare.
+  - en: The Seven of Coins went to your opponent: patience, there's still play left.
+- `voice_react_settebello_theirs_2`
+  - it: Si è preso il sette d'oro. Ora conta le altre carte.
+  - en: They took the golden seven. Now count the other cards.
+- `voice_react_settebello_theirs_3`
+  - it: Il gioiello se n'è andato dall'altra parte. Ci rifacciamo con i Denari.
+  - en: The jewel went the other way. We'll make it up with the Coins.
+
+## Stato della partita
+
+- `voice_secured_cards_yours_1`
+  - it: Le Carte sono tue: più di venti, il punto è al sicuro.
+  - en: The Cards point is yours: over twenty, it's safe.
+- `voice_secured_cards_yours_2`
+  - it: Oltre venti carte: il punto delle Carte è fatto. Ora pensa al resto.
+  - en: Over twenty cards: the Cards point is done. Now think about the rest.
+- `voice_secured_cards_theirs_1`
+  - it: L'avversario ha già le Carte: gioca pensando al resto.
+  - en: Your opponent already has the Cards point: play for the rest.
+- `voice_secured_cards_theirs_2`
+  - it: Il punto delle Carte è andato. Restano Denari, Settebello e Primiera.
+  - en: The Cards point is gone. Coins, Seven and Prime remain.
+- `voice_secured_denari_yours_1`
+  - it: Denari tuoi: oltre cinque, l'oro è al sicuro.
+  - en: The Coins are yours: over five, the gold is safe.
+- `voice_secured_denari_yours_2`
+  - it: Hai l'oro del circolo: il punto dei Denari è fatto.
+  - en: You hold the club's gold: the Coins point is done.
+- `voice_secured_denari_theirs_1`
+  - it: I Denari sono andati all'avversario: concentrati su Primiera e Settebello.
+  - en: The Coins went to your opponent: focus on Prime and the Seven.
+- `voice_secured_denari_theirs_2`
+  - it: L'oro è dall'altra parte. Si gioca per la Primiera.
+  - en: The gold is on the other side. We play for Prime.
+- `voice_status_last_deal_1`
+  - it: Ultima distribuzione: conta i sette e le carte uscite.
+  - en: Last deal: count the sevens and the cards already out.
+- `voice_status_last_deal_2`
+  - it: Mazzo finito, ultima mano: ogni carta pesa.
+  - en: Deck finished, last hand: every card counts.
+- `voice_status_last_deal_3`
+  - it: Ultimo giro, amico mio: qui si vede chi ha contato.
+  - en: Last round, my friend: here we see who was counting.
+- `voice_match_point_yours_1`
+  - it: Sei a un punto dalla vittoria: non farti prendere dalla fretta.
+  - en: You're one point from victory: don't let haste take over.
+- `voice_match_point_yours_2`
+  - it: Un punto al traguardo. Calma, e gioca da maestro.
+  - en: One point to the finish. Stay calm and play like a master.
+- `voice_match_point_theirs_1`
+  - it: L'avversario è a un punto dal traguardo: ora serve precisione.
+  - en: Your opponent is one point from the finish: precision now.
+- `voice_match_point_theirs_2`
+  - it: Un punto e finisce per l'avversario: non regalargli niente.
+  - en: One point and it's over for your opponent: give nothing away.
+
+## Code
+
+- `voice_tail_1`
+  - it: Pensaci un attimo.
+  - en: Think it over for a moment.
+- `voice_tail_2`
+  - it: Non c'è fretta.
+  - en: There's no rush.
+- `voice_tail_3`
+  - it: Ragiona, poi decidi.
+  - en: Reason it out, then decide.
+
+## Consiglio su richiesta
+
+- `voice_hint_take_one_1`
+  - it: Gioca il %1$s e prendi il %2$s.
+  - en: Play the %1$s and take the %2$s.
+- `voice_hint_take_one_2`
+  - it: Il %1$s sul %2$s: la mossa che farei io.
+  - en: The %1$s on the %2$s: the move I'd make.
+- `voice_hint_take_many_1`
+  - it: Gioca il %1$s e porta a casa %2$d carte in un colpo.
+  - en: Play the %1$s and bring home %2$d cards in one go.
+- `voice_hint_take_many_2`
+  - it: Il %1$s prende %2$d carte insieme: non è male.
+  - en: The %1$s takes %2$d cards at once: not bad.
+- `voice_hint_discard_1`
+  - it: Nessuna presa buona: cala il %1$s.
+  - en: No good capture: lay down the %1$s.
+- `voice_hint_discard_2`
+  - it: Qui si cala: il %1$s è la carta meno pericolosa.
+  - en: Time to discard: the %1$s is the least dangerous card.
+- `voice_hint_why_sweep_1`
+  - it: È scopa: ripulisci il banco!
+  - en: It's a sweep: you clear the table!
+- `voice_hint_why_settebello_1`
+  - it: Ti porti a casa il Settebello.
+  - en: You bring home the Settebello.
+- `voice_hint_why_denari_1`
+  - it: Un Denaro in più nel conto degli ori.
+  - en: One more Coin toward the Coins point.
+- `voice_hint_why_primiera_1`
+  - it: Sette e Sei pesano nella Primiera.
+  - en: Sevens and Sixes weigh on the Primiera.
+- `voice_hint_why_capture_1`
+  - it: È una presa pulita: carte in più per te.
+  - en: A clean capture: more cards for you.
+- `voice_hint_why_safe_1`
+  - it: Il banco resta sopra dieci: niente scopa facile per l'avversario.
+  - en: The table stays above ten: no easy sweep for your opponent.
+- `voice_hint_why_least_bad_1`
+  - it: Il banco resta basso, ma è il male minore.
+  - en: The table stays low, but it's the lesser evil.
+
+## Revisione della partita
+
+- `voice_review_title_sweep`
+  - it: Occasione di scopa
+  - en: A chance to sweep
+- `voice_review_body_sweep`
+  - it: Col %1$s prendi tutto il banco: è scopa, un punto in più e il banco vuoto per l'avversario.
+  - en: With the %1$s you take the whole table: a sweep, one more point and an empty table for your opponent.
+- `voice_review_rule_sweep`
+  - it: Se puoi ripulire il banco, quasi sempre conviene farlo.
+  - en: If you can clear the table, it's almost always worth it.
+- `voice_review_title_settebello_taken`
+  - it: Il Settebello
+  - en: The Settebello
+- `voice_review_body_settebello_taken`
+  - it: Col %1$s prendi il Settebello, il 7 di denari: vale un punto da solo e pesa anche sui Denari e sulla Primiera.
+  - en: With the %1$s you take the Settebello, the Seven of Coins: it's worth a point on its own and weighs on Coins and Primiera too.
+- `voice_review_rule_settebello_taken`
+  - it: Il Settebello a terra si prende, se puoi.
+  - en: If the Settebello is on the table, take it when you can.
+- `voice_review_title_settebello_discarded`
+  - it: Il Settebello sul banco
+  - en: The Settebello on the table
+- `voice_review_body_settebello_discarded`
+  - it: Hai calato il Settebello: l'avversario può prenderlo con un 7. Una carta così si tiene in mano o si usa per prendere.
+  - en: You laid down the Settebello: your opponent can take it with a seven. Keep a card like that in hand, or use it to capture.
+- `voice_review_rule_settebello_discarded`
+  - it: Il Settebello non si regala: calalo solo se non hai altra scelta.
+  - en: Don't give the Settebello away: lay it down only if you have no other choice.
+- `voice_review_title_allows_sweep`
+  - it: Rischio di scopa
+  - en: Sweep risk
+- `voice_review_body_allows_sweep`
+  - it: Dopo la tua mossa a terra restano carte per %1$d: se l'avversario ha una carta da %1$d, fa scopa. La mossa migliore non lascia questa occasione.
+  - en: After your move the table holds cards adding up to %1$d: if your opponent has a %1$d, it's a sweep. The better move doesn't leave that chance.
+- `voice_review_rule_allows_sweep`
+  - it: Non lasciare sul banco carte che sommano da 1 a 10.
+  - en: Don't leave cards on the table that add up to 10 or less.
+- `voice_review_title_denari`
+  - it: I Denari
+  - en: Coins
+- `voice_review_body_denari`
+  - it: Col %1$s i Denari che prendi salgono di %2$d: il punto dei Denari va a chi ne ha di più.
+  - en: With the %1$s your Coins go up by %2$d: the Coins point goes to whoever has more.
+- `voice_review_rule_denari`
+  - it: I Denari decidono molte smazzate: prendine quanti puoi.
+  - en: Coins decide many deals: take as many as you can.
+- `voice_review_title_primiera`
+  - it: Valore di Primiera
+  - en: Primiera value
+- `voice_review_body_primiera`
+  - it: Col %1$s prendi un 7 o un 6: in Primiera valgono 21 e 18 punti, più di ogni figura, che ne vale 10.
+  - en: With the %1$s you take a seven or a six: in Primiera they're worth 21 and 18, more than any face card, which is worth 10.
+- `voice_review_rule_primiera`
+  - it: In Primiera i 7 e i 6 valgono più di Re e Cavalli.
+  - en: In Primiera sevens and sixes beat Kings and Knights.
+- `voice_review_title_more_cards`
+  - it: Il punto delle Carte
+  - en: The Cards point
+- `voice_review_body_more_cards`
+  - it: Col %1$s prendi %2$d carte invece di %3$d: ogni carta conta per il punto delle Carte.
+  - en: With the %1$s you take %2$d cards instead of %3$d: every card counts toward the Cards point.
+- `voice_review_rule_more_cards`
+  - it: A parità di altro, prendi più carte che puoi.
+  - en: All else equal, take as many cards as you can.
+- `voice_review_title_discard_valuable`
+  - it: Carta preziosa calata
+  - en: Valuable card laid down
+- `voice_review_body_discard_valuable`
+  - it: Hai calato il %1$s, una carta che vale più del %2$s e che l'avversario può prendere. Meglio calare il %2$s.
+  - en: You laid down the %1$s, a card worth more than the %2$s that your opponent can take. Better to lay down the %2$s.
+- `voice_review_rule_discard_valuable`
+  - it: Quando non puoi prendere, cala la carta che vale meno.
+  - en: When you can't capture, lay down the card worth less.
+- `voice_review_title_same_capture`
+  - it: Quale carta usare
+  - en: Which card to use
+- `voice_review_body_same_capture`
+  - it: Con il %1$s o con il %2$s prendi le stesse carte, ma conviene usare il %1$s e tenere in mano il %2$s, che vale di più.
+  - en: With the %1$s or the %2$s you take the same cards, but it's better to use the %1$s and keep the %2$s, which is worth more.
+- `voice_review_rule_same_capture`
+  - it: A parità di presa, usa la carta meno preziosa.
+  - en: For the same capture, use the less valuable card.
+- `voice_review_title_ignored_capture`
+  - it: Una presa da non perdere
+  - en: A capture not to miss
+- `voice_review_body_ignored_capture_one`
+  - it: C'era una presa: col %1$s potevi prendere il %2$s. Calare senza prendere regala le carte all'avversario.
+  - en: There was a capture: with the %1$s you could take the %2$s. Laying down without capturing hands cards to your opponent.
+- `voice_review_body_ignored_capture_many`
+  - it: C'era una presa: col %1$s potevi prendere %2$d carte dal banco. Calare senza prendere regala le carte all'avversario.
+  - en: There was a capture: with the %1$s you could take %2$d cards from the table. Laying down without capturing hands cards to your opponent.
+- `voice_review_rule_ignored_capture`
+  - it: Se puoi prendere carte utili, non calare senza motivo.
+  - en: If you can take useful cards, don't lay down for no reason.
+- `voice_review_title_best_discards`
+  - it: Qui conviene calare
+  - en: Here it's better to lay down
+- `voice_review_body_best_discards`
+  - it: Il Maestro preferisce calare il %1$s invece di prendere. Dalla sola mano non si vede il perché: pesano le carte già uscite e il punteggio.
+  - en: The Maestro prefers laying down the %1$s over capturing. You can't see why from your hand alone: the cards already played and the score matter.
+- `voice_review_rule_best_discards`
+  - it: Una presa non è sempre la scelta migliore: guarda anche cosa lasci.
+  - en: A capture isn't always best: look at what you leave behind too.
+- `voice_review_title_context`
+  - it: Una differenza sottile
+  - en: A subtle difference
+- `voice_review_body_context`
+  - it: La differenza è piccola e dalla sola mano non si vede: conta il quadro della partita (carte già uscite, punteggio, carte rimaste). Il Maestro preferisce il %1$s.
+  - en: The difference is small and you can't see it from your hand alone: the whole game counts (cards already played, score, cards left). The Maestro prefers the %1$s.
+- `voice_review_rule_context`
+  - it: Ogni carta cambia le combinazioni future: valuta la mano insieme alla partita.
+  - en: Every card changes the combinations ahead: weigh your hand together with the game.
+- `voice_review_title_settebello_played`
+  - it: Il Settebello in presa
+  - en: The Settebello in your captures
+- `voice_review_body_settebello_played`
+  - it: Giocando il Settebello per prendere lo metti subito al sicuro tra le tue prese, invece di rischiare di doverlo calare.
+  - en: Playing the Settebello to capture puts it safely among your captures right away, instead of risking having to lay it down.
+- `voice_review_rule_settebello_played`
+  - it: Il Settebello vale di più nelle tue prese che in mano.
+  - en: The Settebello is worth more in your captures than in your hand.
+- `voice_review_extra_primiera`
+  - it: Tra le carte che prendi c'è un 7 o un 6, che valgono molto in Primiera.
+  - en: Among the cards you take there's a seven or a six, which are worth a lot in Primiera.
+- `voice_review_extra_denari`
+  - it: Tra le carte che prendi ci sono Denari, utili per il punto dei Denari.
+  - en: Among the cards you take there are Coins, useful for the Coins point.
+- `voice_review_extra_last_deal`
+  - it: È l'ultima distribuzione: nel mazzo non ci sono più carte, e conta ricordare quelle già uscite.
+  - en: It's the last deal: the deck is empty, and remembering the cards already played matters.
+- `voice_review_extra_score`
+  - it: Il punteggio è %1$d a %2$d: questo cambia quanto conviene rischiare.
+  - en: The score is %1$d to %2$d: that changes how much it's worth risking.
+- `voice_review_extra_played`
+  - it: Sono già uscite %1$d carte: il Maestro tiene conto di quelle ancora in gioco.
+  - en: %1$d cards have already been played: the Maestro keeps track of those still in play.
+

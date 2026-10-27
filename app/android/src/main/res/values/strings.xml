@@ -714,4 +714,5 @@
     <string name="voice_review_extra_last_deal">È l\'ultima distribuzione: nel mazzo non ci sono più carte, e conta ricordare quelle già uscite.</string>
     <string name="voice_review_extra_score">Il punteggio è %1$d a %2$d: questo cambia quanto conviene rischiare.</string>
     <string name="voice_review_extra_played">Sono già uscite %1$d carte: il Maestro tiene conto di quelle ancora in gioco.</string>
+    <string name="review_grade_good">Buona mossa</string>
 </resources>

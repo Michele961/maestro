@@ -59,3 +59,11 @@ Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i
 3. **Bottega e Profilo**: nel nuovo schema si aprono da portafoglio e avatar (non più dal cerchio in basso). Va bene?
 4. **Classifica**: sparisce finché non esiste. Va bene, o preferisci mostrare una sezione «prossimamente» nel Profilo?
 5. **Azione principale quando non c'è partita in corso**: «Gioca» parte subito con le ultime scelte (livello e punteggio), oppure apre sempre la pre-partita? Proposta: apre la pre-partita (è dove si sceglie il livello, D11).
+
+## 7. Decisioni di Michele (2026-10-27)
+
+1. **Nome del giocatore**: si **chiede** e resta **modificabile**; la gestione di utenti e accesso verrà più avanti.
+2. **Briscola**: nessuna tessera ora; «Briscola in arrivo» si farà quando la situazione sarà stabile (quindi per ora non compare).
+5. **Azione principale senza partita in corso** («Gioca»): da decidere insieme, **aperto**.
+
+Restano aperte le domande 3 (Bottega e Profilo dal portafoglio e dall'avatar) e 4 (Classifica). Il dossier **resta in bozza** finché non sono chiuse.
