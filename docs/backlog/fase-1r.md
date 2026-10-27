@@ -232,7 +232,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Criteri di accettazione:**
     - [ ] La review mostra solo ciò che il giocatore sapeva più le carte uscite dopo (test esistente conservato).
     - [ ] File della feature review ≤ 400 righe ciascuno.
-- **Domande aperte:** —
+- **Domande aperte:** 17a (regia animata) supera il perimetro di una singola PR: `TableStage`/`PlayArea` sono interni al tavolo e legati a `GameUiState`. Proposta (da approvare): spezzare 17a in (1) estrarre dal tavolo uno `TableStage` di sola lettura che accetti `StageModel` + `TableGeometry` senza `GameUiState` (tocca `feature/table`, API di un altro modulo/feature), (2) costruire i `Beat` dalla revisione (`viewBefore`/`viewAfter`/eventi) e pilotare un `TableDirector` dedicato. Nel frattempo la revisione resta statica. Michele: va bene procedere così?
 
 ## F1R-18 — Avversari come personaggi
 
