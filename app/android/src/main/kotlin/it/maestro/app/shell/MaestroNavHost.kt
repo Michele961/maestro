@@ -149,6 +149,7 @@ public fun MaestroNavHost(
                 credits = credits,
                 avatarId = settings.selectedAvatar,
                 playerName = settings.playerName,
+                day = today.toEpochDay(),
                 askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
                 onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
                 onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },

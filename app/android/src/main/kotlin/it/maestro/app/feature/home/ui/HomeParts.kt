@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.feature.home.presentation.HomeLine
+import it.maestro.app.feature.home.presentation.HomeLineKind
 import it.maestro.app.designsystem.components.BubbleTail
 import it.maestro.app.designsystem.components.CurrencyPill
 import it.maestro.app.designsystem.components.FramedPortrait
@@ -117,7 +119,7 @@ internal fun HomeHeader(
 
 /** Il Maestro con la sua battuta: occupa lo spazio che resta, così la Home sta in una schermata senza scroll. */
 @Composable
-internal fun MaestroWelcome(modifier: Modifier = Modifier) {
+internal fun MaestroWelcome(line: HomeLine, streakCount: Int, playerName: String?, modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 130.dp, max = 240.dp)) {
         val compact = maxHeight < 210.dp
         val ultraCompact = maxHeight < 170.dp
@@ -151,7 +153,7 @@ internal fun MaestroWelcome(modifier: Modifier = Modifier) {
                 }
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     MaestroSpeechBubble(
-                        message = stringResource(R.string.home_coach_welcome),
+                        message = homeLineText(line, streakCount, playerName),
                         tail = BubbleTail.START,
                         fontSize = if (compact) 11.sp else 13.sp,
                         maxLines = 4,
@@ -274,3 +276,17 @@ internal fun GameTile(
     }
 }
 
+
+private val ResumeLines = intArrayOf(R.string.home_line_resume_0, R.string.home_line_resume_1, R.string.home_line_resume_2)
+private val StreakLines = intArrayOf(R.string.home_line_streak_0, R.string.home_line_streak_1, R.string.home_line_streak_2)
+private val NamedLines = intArrayOf(R.string.home_line_named_0, R.string.home_line_named_1, R.string.home_line_named_2)
+private val WelcomeLines = intArrayOf(R.string.home_line_welcome_0, R.string.home_line_welcome_1, R.string.home_line_welcome_2)
+
+/** Il testo della battuta del Maestro in Home (testi nelle risorse, ADR-0007). */
+@Composable
+private fun homeLineText(line: HomeLine, streakCount: Int, playerName: String?): String = when (line.kind) {
+    HomeLineKind.RESUME -> stringResource(ResumeLines[line.variant])
+    HomeLineKind.STREAK -> stringResource(StreakLines[line.variant], streakCount)
+    HomeLineKind.WELCOME_NAMED -> stringResource(NamedLines[line.variant], playerName.orEmpty())
+    HomeLineKind.WELCOME -> stringResource(WelcomeLines[line.variant])
+}

@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.feature.home.presentation.HomeLines
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
@@ -43,6 +44,8 @@ public fun HomeScreen(
     avatarId: String = "avatar_default",
     playerName: String? = null,
     askPlayerName: Boolean = false,
+    /** Giorno corrente (`LocalDate.toEpochDay`): fa cambiare la battuta del Maestro da un giorno all'altro. */
+    day: Long = 0L,
     mastery: Int? = null,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
@@ -83,7 +86,14 @@ public fun HomeScreen(
                 onShopClicked = onShopClicked,
                 onNameClicked = { editingName = true },
             )
-            MaestroWelcome(modifier = Modifier.weight(1f, fill = false))
+            MaestroWelcome(
+                line = remember(hasActiveMatch, streakCount, playerName, day) {
+                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day)
+                },
+                streakCount = streakCount,
+                playerName = playerName,
+                modifier = Modifier.weight(1f, fill = false),
+            )
             PrimaryAction(hasActiveMatch, onResumeGameClicked, onStartGameClicked)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 GameTile(
