@@ -2,6 +2,8 @@ package it.maestro.app.ui.screenshot
 
 import android.app.Application
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.onNodeWithTag
@@ -161,5 +163,32 @@ class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
     fun the_academy_tile_is_displayed_on_a_standard_phone() {
         composeRule.setContent { MaestroTheme { HomeScreen() } }
         composeRule.onNodeWithTag("home_academy_tile").assertIsDisplayed()
+    }
+
+    @Test
+    fun home_asks_the_player_name_and_confirms_it() {
+        var confirmed: String? = null
+        composeRule.setContent {
+            MaestroTheme { HomeScreen(askPlayerName = true, onPlayerNameConfirmed = { confirmed = it }) }
+        }
+        composeRule.onNodeWithTag("player_name_dialog").assertIsDisplayed()
+        composeRule.onNodeWithTag("player_name_confirm").assertIsNotEnabled()
+        composeRule.onNodeWithTag("player_name_field").performTextInput("Michele")
+        composeRule.onNodeWithTag("player_name_confirm").performClick()
+        assertEquals("Michele", confirmed)
+    }
+
+    @Test
+    fun home_name_can_be_changed_by_tapping_it_and_skipped_without_asking_again() {
+        var skipped = 0
+        composeRule.setContent {
+            MaestroTheme { HomeScreen(playerName = "Ada", onPlayerNameSkipped = { skipped++ }) }
+        }
+        composeRule.onNodeWithTag("player_name_dialog").assertDoesNotExist()
+        composeRule.onNodeWithTag("home_player_name").performClick()
+        composeRule.onNodeWithTag("player_name_dialog").assertIsDisplayed()
+        composeRule.onNodeWithTag("player_name_skip").performClick()
+        composeRule.onNodeWithTag("player_name_dialog").assertDoesNotExist()
+        assertEquals(1, skipped)
     }
 }

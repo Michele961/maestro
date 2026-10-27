@@ -738,4 +738,9 @@
     <string name="voice_color_6">Guarda chi ha già preso i Denari: a volte decidono la partita.</string>
     <string name="voice_color_7">Se hai un dubbio, toccami: sono qui per questo.</string>
     <string name="voice_color_8">Tra una carta e l\'altra, un pensiero al Settebello non guasta.</string>
+    <string name="home_name_dialog_title">Come ti chiami?</string>
+    <string name="home_name_dialog_message">Il Maestro ti chiamerà così. Potrai cambiarlo quando vuoi toccando il tuo nome.</string>
+    <string name="home_name_dialog_label">Il tuo nome</string>
+    <string name="home_name_dialog_confirm">Conferma</string>
+    <string name="home_name_dialog_skip">Più tardi</string>
 </resources>

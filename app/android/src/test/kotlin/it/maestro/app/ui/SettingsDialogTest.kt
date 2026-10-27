@@ -58,4 +58,16 @@ class SettingsDialogTest {
         repo.markHintUsed()
         assertTrue(repo.settingsFlow.first().hintEverUsed)
     }
+
+    @Test
+    fun playerNameIsRememberedAndAskedOnlyOnce() = kotlinx.coroutines.test.runTest {
+        val repo = it.maestro.app.data.local.datastore.InMemorySettingsRepository()
+        assertEquals(null, repo.settingsFlow.first().playerName)
+        assertFalse(repo.settingsFlow.first().playerNameAsked)
+        repo.markPlayerNameAsked()
+        assertTrue(repo.settingsFlow.first().playerNameAsked)
+        assertEquals(null, repo.settingsFlow.first().playerName)
+        repo.updatePlayerName("  Ada  ")
+        assertEquals("Ada", repo.settingsFlow.first().playerName)
+    }
 }

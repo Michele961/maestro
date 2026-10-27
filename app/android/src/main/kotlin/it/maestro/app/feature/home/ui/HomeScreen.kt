@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -38,6 +42,7 @@ public fun HomeScreen(
     credits: Int = 50,
     avatarId: String = "avatar_default",
     playerName: String? = null,
+    askPlayerName: Boolean = false,
     mastery: Int? = null,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
@@ -47,7 +52,18 @@ public fun HomeScreen(
     onMissionsClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
     onShopClicked: () -> Unit = {},
+    onPlayerNameConfirmed: (String) -> Unit = {},
+    onPlayerNameSkipped: () -> Unit = {},
 ) {
+    // Si apre da solo la prima volta; poi tocchi il nome per cambiarlo.
+    var editingName by remember { mutableStateOf(false) }
+    if (askPlayerName || editingName) {
+        PlayerNameDialog(
+            currentName = playerName,
+            onConfirm = { editingName = false; onPlayerNameConfirmed(it) },
+            onDismiss = { editingName = false; onPlayerNameSkipped() },
+        )
+    }
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(
             modifier = Modifier
@@ -65,6 +81,7 @@ public fun HomeScreen(
                 onSettingsClicked = onSettingsClicked,
                 onProfileClicked = onProfileClicked,
                 onShopClicked = onShopClicked,
+                onNameClicked = { editingName = true },
             )
             MaestroWelcome(modifier = Modifier.weight(1f, fill = false))
             PrimaryAction(hasActiveMatch, onResumeGameClicked, onStartGameClicked)

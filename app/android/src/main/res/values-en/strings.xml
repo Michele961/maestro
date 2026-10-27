@@ -738,4 +738,9 @@
     <string name="voice_color_6">Check who already has the Coins: sometimes they decide the game.</string>
     <string name="voice_color_7">If you\'re in doubt, tap me: that\'s what I\'m here for.</string>
     <string name="voice_color_8">Between one card and the next, a thought for the Settebello never hurts.</string>
+    <string name="home_name_dialog_title">What\'s your name?</string>
+    <string name="home_name_dialog_message">The Maestro will call you by it. You can change it any time by tapping your name.</string>
+    <string name="home_name_dialog_label">Your name</string>
+    <string name="home_name_dialog_confirm">Confirm</string>
+    <string name="home_name_dialog_skip">Later</string>
 </resources>

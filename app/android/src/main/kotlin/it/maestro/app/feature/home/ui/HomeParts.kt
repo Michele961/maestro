@@ -64,6 +64,7 @@ internal fun HomeHeader(
     onSettingsClicked: () -> Unit,
     onProfileClicked: () -> Unit,
     onShopClicked: () -> Unit,
+    onNameClicked: () -> Unit = {},
 ) {
     val avatarRes = when (avatarId) {
         "avatar_alt" -> R.drawable.avatar_player_alt
@@ -87,7 +88,7 @@ internal fun HomeHeader(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
                 maxLines = 1,
-                modifier = Modifier.testTag("home_player_name"),
+                modifier = Modifier.testTag("home_player_name").clickable(onClick = onNameClicked),
             )
             if (mastery != null) {
                 Text(
