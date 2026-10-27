@@ -1,6 +1,6 @@
 # La voce del Maestro — dossier
 
-Stato: **bozza** · 2026-10-27 · task collegati: F1R-24 (da suddividere dopo l'approvazione), F1R-16, F1R-13
+Stato: **direzione confermata da Michele** (2026-10-27); restano da chiudere le domande di dettaglio del §6 · 2026-10-27 · task collegati: F1R-24 (da suddividere dopo l'approvazione), F1R-16, F1R-13
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
 Fonte: indicazione di Michele del 2026-10-27 («battute dinamiche, nei momenti chiave, né troppo spesso né ravvicinate, con umanità e spirito; il Maestro che ti dice che puoi chiedere aiuto»).
 
@@ -14,6 +14,12 @@ Durante la partita il Maestro è una **presenza**, non un'etichetta: di tanto in
 - Il consiglio non è ancora dinamico come si potrebbe credere: `determineLogicalHintRes` sceglie **una di sei frasi fisse** (`hint_sweep_opportunity`, `hint_settebello_priority`, `hint_denari_priority`, `hint_primiera_priority`, `hint_safe_discard`, generica) in base al tipo di mossa consigliata. Non nomina le carte, non guarda cosa è uscito, il punteggio o il momento della partita.
 - Nessuna battuta spontanea. Le righe di `game-feel.md` §5 (saluto, promemoria, scopa subita) non sono fatte: servono testi e, secondo questa indicazione, un meccanismo, non frasi fisse.
 - Il Maestro non dice mai al giocatore che può chiedere aiuto: la scoperta del consiglio è affidata al tocco sul ritratto.
+
+## 2b. Decisioni di Michele (2026-10-27)
+
+- La direzione è confermata: Maestro **dinamico**, non testi fissi (D18).
+- **Vale anche per la revisione** (Game Review): le spiegazioni devono usare lo stesso meccanismo di fatti e componenti. Michele nota che oggi la revisione talvolta **non è precisissima** e va **tarata** (tuning): fa parte di questa feature, non di un lavoro a parte.
+- Le partite contro i bot **non danno crediti** per ora; un sistema monetario più ampio verrà **più avanti**. La voce del Maestro non deve quindi promettere né citare crediti di partita.
 
 ## 3. Come deve diventare
 
@@ -69,6 +75,7 @@ Michele non può leggere ogni combinazione. Si fa così:
 | F1R-24d | Fumetto e impostazione | Battute a inizio turno a scena ferma; Classica solo pose; impostazione di frequenza |
 | F1R-24e | Consiglio dinamico (con F1R-16) | Il consiglio nomina carte e ragione; livelli maieutici |
 | F1R-24f | Trascrizioni | Strumento che scrive cosa direbbe il Maestro in una partita a seed fisso |
+| F1R-24g | Revisione dinamica e tuning | La Game Review usa fatti e componenti; elenco delle spiegazioni imprecise (da Michele e dai test) e correzione una per una, con test su casi noti |
 
 ## 6. Domande per Michele
 
