@@ -159,6 +159,29 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun table_deal_start_screenshot() {
+        val state = midDeal.copy(isHumanTurn = false)
+        val step = SceneStep.DealCard(index = 2, toSeat = null)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state, step), onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage(screen.path("table_deal_start"))
+    }
+
+    @Test
+    fun table_capture_in_flight_screenshot() {
+        val taken = Card(Rank.SETTE, Suit.COPPE)
+        val step = SceneStep.CaptureFlight(Seat.P1, listOf(Card(Rank.SETTE, Suit.DENARI), taken))
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal, step), onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage(screen.path("table_capture_in_flight"))
+    }
+
+    @Test
+    fun table_human_sweep_screenshot() {
+        val step = SceneStep.Sweep(Seat.P1, Seat.P1)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal, step), onIntent = {}) } }
+        composeRule.onRoot().captureRoboImage(screen.path("table_human_sweep"))
+    }
+
+    @Test
     fun pause_opens_dialog_and_menu_goes_home() {
         var home = 0
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, onNavigateHome = { home++ }) } }

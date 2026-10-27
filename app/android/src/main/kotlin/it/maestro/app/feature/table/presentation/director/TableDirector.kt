@@ -8,6 +8,7 @@ import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.game.model.Card
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaView
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
  * e pubblica la [scene] da disegnare. È anche il [PresentationGate] del bot: una battuta è "presentata"
  * quando tutti i suoi passi sono finiti.
  *
+ * Al riepilogo di smazzata aspetta il giocatore ([waitForPlayer], spento nei test senza interfaccia).
  * L'unica attesa di tempo è [MotionSpec.pause], con durate da `MotionSpec` scalate da [speed].
  */
 public class TableDirector(
@@ -28,11 +30,13 @@ public class TableDirector(
     private val humanSeat: Seat,
     initialView: ScopaView,
     private val speed: () -> GameSpeed = { GameSpeed.NORMAL },
+    private val waitForPlayer: Boolean = true,
 ) : PresentationGate {
 
     private val queue = ArrayDeque<Show>()
     private var drain: Job? = null
     private var queued = 0
+    private var continueGate: CompletableDeferred<Unit>? = null
     private var skipCurrent = false
     private var skipQueue = false
 
@@ -94,12 +98,18 @@ public class TableDirector(
         if (skipCurrent) skipQueue = true else skipCurrent = true
     }
 
+    /** Il giocatore ha letto il riepilogo e continua: la regia riprende dal passo successivo. */
+    public fun resume() {
+        continueGate?.complete(Unit)
+    }
+
     /**
      * Mostra [view] a riposo senza animazioni: dopo una rotazione o la ripresa di una partita
      * (`table-director.md` §4.5).
      */
     public fun rest(view: ScopaView, beatId: Long) {
         drain?.cancel()
+        continueGate = null
         queue.clear()
         queued = 0
         skipCurrent = false
@@ -116,7 +126,8 @@ public class TableDirector(
 
     private suspend fun play(show: Show) {
         for (step in show.steps) {
-            val millis = if (skipCurrent || skipQueue) 0L else stepMillis(step)
+            val waitsForPlayer = waitForPlayer && step is SceneStep.AwaitDealSummary
+            val millis = if (skipCurrent || skipQueue || waitsForPlayer) 0L else stepMillis(step)
             _scene.value = TableScene(
                 view = show.before,
                 humanSeat = humanSeat,
@@ -129,7 +140,13 @@ public class TableDirector(
                 deal = show.deal,
                 stepMillis = millis,
             )
-            MotionSpec.pause(millis)
+            if (waitsForPlayer) {
+                val gate = CompletableDeferred<Unit>().also { continueGate = it }
+                gate.await()
+                continueGate = null
+            } else {
+                MotionSpec.pause(millis)
+            }
         }
         queued--
         skipCurrent = false

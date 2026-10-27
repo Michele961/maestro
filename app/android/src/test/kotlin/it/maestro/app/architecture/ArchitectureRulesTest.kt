@@ -32,7 +32,6 @@ class ArchitectureRulesTest {
         ex("feature/table/presentation/GameViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-08",
         ex("designsystem/audio/SoundManager.kt", Rule.UI_IMPORTS_DATA) to "F1R-20",
         // Timer: la regia del tavolo sostituisce i ritardi sparsi.
-        ex("feature/table/ui/TableScreen.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
     )
 
     @Test

@@ -83,6 +83,12 @@ public class GameViewModel(
         director.value?.skip()
     }
 
+    /** Il giocatore chiude il riepilogo di smazzata: la partita prosegue e la regia riprende (nuova distribuzione). */
+    public fun continueAfterSummary() {
+        onIntent(GameIntent.DismissDealSummary)
+        director.value?.resume()
+    }
+
     private fun resetDirector(restoreAt: Long?) {
         val human = internalState.humanSeat
         val view = internalState.session.view(human)
@@ -91,6 +97,7 @@ public class GameViewModel(
             humanSeat = human,
             initialView = view,
             speed = { if (withoutUi) GameSpeed.INSTANT else currentSpeed },
+            waitForPlayer = !withoutUi,
         ).also { if (restoreAt != null) it.rest(view, restoreAt) }
     }
 

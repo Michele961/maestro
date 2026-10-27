@@ -43,6 +43,7 @@ public object BeatScript {
         if (dealEnded != null) {
             val rows = ScoreCategory.entries.size
             repeat(rows) { add(SceneStep.DealSummaryRow(dealEnded.score, row = it, rows = rows)) }
+            add(SceneStep.AwaitDealSummary(dealEnded.score))
             if (!matchEnded) {
                 add(SceneStep.Shuffle)
                 repeat(TABLE_CARDS) { add(SceneStep.DealCard(index = it, toSeat = null)) }

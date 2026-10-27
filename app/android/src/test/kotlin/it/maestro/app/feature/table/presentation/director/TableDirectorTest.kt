@@ -234,4 +234,38 @@ class TableDirectorTest {
         director.awaitPresented(0L, 0L)
         assertTrue(currentTime - start > 0, "Il bot non parte prima della fine della distribuzione")
     }
+
+    @Test
+    fun dealSummaryWaitsForThePlayerThenTheNewDealFollows() = runTest {
+        val beat = findBeat { b -> b.events.any { it is GameEvent.DealEnded } && b.events.none { it is GameEvent.MatchEnded } }
+        val steps = BeatScript.steps(beat, human)
+        val awaitAt = steps.indexOfFirst { it is SceneStep.AwaitDealSummary }
+        assertTrue(awaitAt > steps.indexOfLast { it is SceneStep.DealSummaryRow }, "L'attesa viene dopo le voci")
+        assertTrue(awaitAt < steps.indexOfFirst { it is SceneStep.Shuffle }, "La nuova distribuzione viene dopo la lettura")
+
+        val director = TableDirector(TestScope(StandardTestDispatcher(testScheduler)), human, beat.viewBefore)
+        director.enqueue(beat)
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertTrue(director.scene.value.step is SceneStep.AwaitDealSummary, "Senza il giocatore la regia non va avanti")
+        assertTrue(director.scene.value.busy)
+
+        director.resume()
+        advanceUntilIdle()
+        assertFalse(director.scene.value.busy)
+        assertEquals(beat.viewAfter, director.scene.value.view)
+    }
+
+    @Test
+    fun skipDoesNotBypassTheSummaryWait() = runTest {
+        val beat = findBeat { b -> b.events.any { it is GameEvent.DealEnded } && b.events.none { it is GameEvent.MatchEnded } }
+        val director = TableDirector(TestScope(StandardTestDispatcher(testScheduler)), human, beat.viewBefore)
+        director.enqueue(beat)
+        runCurrent()
+        director.skip()
+        director.skip()
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertTrue(director.scene.value.step is SceneStep.AwaitDealSummary)
+    }
 }

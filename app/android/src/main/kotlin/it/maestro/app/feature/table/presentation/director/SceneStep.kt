@@ -58,6 +58,11 @@ public sealed interface SceneStep {
         override val token: MotionToken get() = MotionToken.DEAL_CARD
     }
 
+    /** Il giocatore legge il riepilogo e continua: la regia aspetta [TableDirector.resume], nessun timer. */
+    public data class AwaitDealSummary(val score: DealScore) : SceneStep {
+        override val token: MotionToken get() = MotionToken.DEAL_SUMMARY_ROW
+    }
+
     /** Riepilogo di fine smazzata: una voce che si accende per volta ([row] su [rows]). */
     public data class DealSummaryRow(val score: DealScore, val row: Int, val rows: Int) : SceneStep {
         override val token: MotionToken get() = MotionToken.DEAL_SUMMARY_ROW
