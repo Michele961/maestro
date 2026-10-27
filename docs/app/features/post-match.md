@@ -1,6 +1,6 @@
 # Fine partita e ricompense — dossier
 
-Stato: **bozza** · 2026-10-27 · task collegati: F1R-15 (da suddividere dopo l'approvazione), F1R-14, F1R-24
+Stato: **approvato** (Michele, 2026-10-27) · 2026-10-27 · task collegati: F1R-15 (da suddividere dopo l'approvazione), F1R-14, F1R-24
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
 
 ## 1. Cosa fa per il giocatore
@@ -59,11 +59,17 @@ Layout: contenuti in colonna centrata, che occupa lo schermo (nessun panno vuoto
 | F1R-15c | Ricompensa | Maestria, missioni, streak da `RewardSummary`; screenshot con e senza missioni completate |
 | F1R-15d | Messa a punto | Gerarchia dei pulsanti, uso dello spazio, matrice di screenshot, suoni |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-27)
 
-1. **Sequenza**: ti piace l'ordine targa → analisi → precisione → ricompensa → azioni, tutto in una schermata a passi? Troppo lungo per chi ha fretta (si salta con un tocco)?
-2. **Maestria**: va mostrata ogni volta con la differenza (+18 / −12) o solo quando cambia in modo significativo? Una sconfitta con il segno meno è motivante o scoraggiante?
-3. **Missioni**: appena completata una missione, riscossione dalla sequenza stessa (un tocco) o resta nel dialog delle missioni?
-4. **Pulsanti**: "Rivedi partita" primaria, poi "Rivincita" e "Menu"; il radar si sposta nel Profilo. Va bene?
-5. **Vittoria/sconfitta**: serve una piccola festa (coriandoli/foglie d'oro come per la scopa) per la vittoria, e un gesto di incoraggiamento per la sconfitta? Oppure sobrio?
-6. **Ordine dei lavori**: questa feature prima o dopo il tuning della revisione (F1R-24g)? Proposta: prima questa, perché dà un posto alla voce del Maestro.
+1. **Sequenza**: l'ordine targa → analisi → precisione → ricompensa → azioni piace.
+2. **Maestria**: **sempre visibile**, come in Clash Royale (indice con la differenza, in ogni partita, vittoria o sconfitta).
+3. **Missioni**: riscossione **dalla sequenza stessa** (un tocco), come proposto.
+4. **Pulsanti**: «Rivedi partita» primaria, poi «Rivincita» e «Menu»; radar nel Profilo.
+5. **Vittoria/sconfitta**: festa per la vittoria e gesto di incoraggiamento per la sconfitta, o sobrio: **decide l'agente**. Scelta: vittoria con foglie d'oro e Maestro festante (come la scopa, ma più breve); sconfitta sobria, il Maestro incoraggia, mai teatrale.
+6. **Ordine dei lavori**: prima la voce del Maestro (F1R-24), poi questa feature (F1R-15), poi la revisione. Le ricompense (crediti di partita, economia) si decidono con l'economia di gioco, il multiplayer e le modalità di gioco: qui restano maestria, missioni e streak.
+
+## 7. La revisione (Game Review) non è in questa feature
+
+Chiarimento chiesto da Michele: la Game Review ha un **suo dossier** (`review.md`, terzo nell'ordine di `docs/app/features/README.md`) e **non** fa parte di F1R-15. Qui «Rivedi partita» è solo il pulsante che ci porta. In due pezzi:
+- **F1R-24g** (voce del Maestro): spiegazioni dinamiche e tuning della precisione.
+- **`review.md`** (feature a sé): schermata, flusso «Rigioca l'errore», uso della regia del tavolo (F1R-17). Il dossier è in bozza.
