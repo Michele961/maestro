@@ -582,4 +582,8 @@
     <string name="settings_test_match_subtitle">Start a match directly at the final hand to test endgame, Elo, missions, and review.</string>
     <string name="settings_test_match_button">Quick Match at Final Hand</string>
 
+    <string name="settings_game_speed">Game speed</string>
+    <string name="settings_game_speed_normal">Normal</string>
+    <string name="settings_game_speed_fast">Fast</string>
+    <string name="settings_game_speed_faster">Very fast</string>
 </resources>

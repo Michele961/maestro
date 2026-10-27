@@ -29,6 +29,7 @@ import it.maestro.app.designsystem.components.MaestroAlertDialog
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.R
+import it.maestro.app.domain.settings.GameSpeed
 
 /**
  * Dialog delle impostazioni applicative (task F1-14).
@@ -42,6 +43,8 @@ public fun SettingsDialog(
     onTriggerTestCrash: () -> Unit,
     onDismiss: () -> Unit,
     onStartTestEndgameMatch: () -> Unit = {},
+    gameSpeed: GameSpeed = GameSpeed.NORMAL,
+    onGameSpeedChanged: (GameSpeed) -> Unit = {},
     showDeveloperTools: Boolean = DeveloperTools.isEnabled(LocalContext.current),
 ) {
     MaestroAlertDialog(
@@ -85,6 +88,34 @@ public fun SettingsDialog(
                         onCheckedChange = onSoundToggled,
                         modifier = Modifier.testTag("sound_enabled_switch"),
                     )
+                }
+
+                // Velocità di gioco: divide tutte le durate di MotionSpec (task F1R-09).
+                Column(
+                    modifier = Modifier.fillMaxWidth().testTag("game_speed_row"),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.settings_game_speed),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        GameSpeed.USER_CHOICES.forEach { speed ->
+                            MaestroPillButton(
+                                text = stringResource(id = speed.labelRes()),
+                                onClick = { onGameSpeedChanged(speed) },
+                                variant = if (speed == gameSpeed) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
+                                height = 40.dp,
+                                fontSize = 14.sp,
+                                modifier = Modifier.weight(1f),
+                                testTag = "game_speed_${speed.name.lowercase()}",
+                            )
+                        }
+                    }
                 }
 
                 // Strumenti di sviluppo solo nelle build debuggabili (task F1R-05).
@@ -158,4 +189,11 @@ public fun SettingsDialog(
             )
         },
     )
+}
+
+private fun GameSpeed.labelRes(): Int = when (this) {
+    GameSpeed.NORMAL -> R.string.settings_game_speed_normal
+    GameSpeed.FAST -> R.string.settings_game_speed_fast
+    GameSpeed.FASTER -> R.string.settings_game_speed_faster
+    GameSpeed.INSTANT -> R.string.settings_game_speed_faster
 }

@@ -114,7 +114,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-07 — Package a layer dentro `app:android`
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** ADR-0014 (Migrazione), `docs/app/layers.md` §1
 - **Obiettivo:** spostare i file esistenti nei package `shell`, `domain`, `data`, `designsystem`, `feature.<nome>.{ui,presentation}` senza cambiare comportamento.
 - **Criteri di accettazione:**
@@ -135,7 +135,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-09 — `MotionSpec` e `GameSpeed`
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/app/game-feel.md` §2
 - **Obiettivo:** tabella unica dei tempi nel design system e impostazione "Velocità di gioco" (1×, 1,5×, 2×) in DataStore e nelle impostazioni.
 - **Criteri di accettazione:**
@@ -155,11 +155,11 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-11 — `TableGeometry` e layout a zone
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0016, `docs/app/responsive-ui.md` §2–3, `docs/app/game-feel.md` §4
 - **Obiettivo:** geometria pura del tavolo con le zone di `game-feel.md` §4 (pile davanti a ciascun giocatore, mazzo a lato, mano intera).
 - **Criteri di accettazione:**
-    - [ ] Test puri sulle 4 configurazioni: nessuna zona fuori dai bordi, nessuna sovrapposizione mano/terra, carte a terra ≥ 56 dp.
+    - [x] Test puri sulle 4 configurazioni: nessuna zona fuori dai bordi, nessuna sovrapposizione mano/terra, carte a terra ≥ 56 dp.
 - **Domande aperte:** —
 
 ## F1R-12 — Tavolo disegnato dalla scena

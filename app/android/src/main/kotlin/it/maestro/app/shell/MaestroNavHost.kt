@@ -247,6 +247,8 @@ public fun MaestroNavHost(
         SettingsDialog(
             soundEnabled = settings.soundEnabled,
             onSoundToggled = { enabled -> scope.launch { settingsRepository.updateSoundEnabled(enabled) } },
+            gameSpeed = settings.gameSpeed,
+            onGameSpeedChanged = { speed -> scope.launch { settingsRepository.updateGameSpeed(speed) } },
             onTriggerTestCrash = { crashReporter.triggerTestCrash() },
             onDismiss = { showSettings = false },
             onStartTestEndgameMatch = {
