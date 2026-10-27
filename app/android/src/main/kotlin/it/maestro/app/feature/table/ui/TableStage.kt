@@ -51,12 +51,16 @@ internal fun TableStage(
     sweepBy: Seat?,
     stepKey: Any?,
     stepMillis: Int,
+    showPointsRace: Boolean,
     onPlay: (Card) -> Unit,
     onRequestHint: () -> Unit,
     onDismissLine: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val zones = geometry.zones
+    // Le scope già in pila restano visibili durante la presa: la nuova compare solo a scena finita.
+    val opponentSweepCards = restingValue(uiState.opponentSweepCards, atRest)
+    val humanSweepCards = restingValue(uiState.humanSweepCards, atRest)
     Box(modifier = modifier.testTag("felt_layout")) {
         // Avversario: mano coperta e le sue prese davanti a lui.
         Zone(zones.opponentHand, Alignment.Center, Modifier.testTag("opponent_zone")) {
@@ -69,7 +73,7 @@ internal fun TableStage(
         Zone(zones.opponentPile, Alignment.Center) {
             CapturePile(
                 count = model.opponentCaptured,
-                sweepCards = if (atRest) uiState.opponentSweepCards else emptyList(),
+                sweepCards = opponentSweepCards,
                 sweeps = model.opponentSweeps,
                 width = pileCardWidth(zones.opponentPile),
                 tag = "opponent_captures",
@@ -81,7 +85,7 @@ internal fun TableStage(
         Zone(zones.humanPile, Alignment.Center) {
             CapturePile(
                 count = model.humanCaptured,
-                sweepCards = if (atRest) uiState.humanSweepCards else emptyList(),
+                sweepCards = humanSweepCards,
                 sweeps = model.humanSweeps,
                 width = pileCardWidth(zones.humanPile),
                 tag = "human_captures",
@@ -104,7 +108,7 @@ internal fun TableStage(
                 FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
             }
         }
-        RaceOrBubble(model, uiState, geometry, showLine = atRest, onDismissLine = onDismissLine)
+        RaceOrBubble(model, uiState, geometry, showLine = atRest, showRace = showPointsRace, onDismissLine = onDismissLine)
         MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
@@ -224,6 +228,7 @@ private fun RaceOrBubble(
     uiState: GameUiState,
     geometry: TableGeometry,
     showLine: Boolean,
+    showRace: Boolean,
     onDismissLine: () -> Unit,
 ) {
     val zone = geometry.zones.pointsRace
@@ -236,7 +241,7 @@ private fun RaceOrBubble(
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
             MaestroSpeechBubble(
                 message = voiceText(line),
-                tail = BubbleTail.START,
+                tail = BubbleTail.END,
                 fontSize = 11.sp,
                 maxLines = 3,
                 modifier = Modifier.clickable(onClick = onDismissLine).testTag("maestro_line_bubble"),
@@ -248,15 +253,23 @@ private fun RaceOrBubble(
                 } else {
                     stringResource(R.string.game_hint_loading)
                 },
-                tail = BubbleTail.START,
+                tail = BubbleTail.END,
                 fontSize = 11.sp,
                 maxLines = 3,
                 modifier = Modifier.clickable { dismissed = true }.testTag("game_hint_banner"),
             )
-        } else {
+        } else if (showRace) {
             PointsRaceRow(race = model.race, showNumbers = uiState.isSparring, modifier = Modifier.fillMaxSize())
         }
     }
+}
+
+/** [value] aggiornato solo a scena ferma: durante una scena resta l'ultimo valore a riposo. */
+@Composable
+private fun <T> restingValue(value: T, atRest: Boolean): T {
+    var last by remember { mutableStateOf(value) }
+    if (atRest && last != value) last = value
+    return last
 }
 
 /** Larghezza della carta di una pila che sta nella [zone] lasciando posto allo spessore e al numero. */

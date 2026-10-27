@@ -193,8 +193,8 @@ public fun MaestroDialogueBox(
     }
 }
 
-/** Lato da cui esce la codina del [MaestroSpeechBubble]. */
-public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START, START }
+/** Lato da cui esce la codina del [MaestroSpeechBubble]: START a sinistra, END a destra (ritratto sulla destra). */
+public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START, START, END }
 
 /**
  * Fumetto compatto del Maestro come nei mockup (F1-26): carta avorio, testo centrato,
@@ -209,25 +209,35 @@ public fun MaestroSpeechBubble(
     fontSize: TextUnit = 14.sp,
     maxLines: Int = 8,
 ) {
-    if (tail == BubbleTail.START) {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    if (tail == BubbleTail.START || tail == BubbleTail.END) {
+        val pointsRight = tail == BubbleTail.END
+        val tailShape: @Composable () -> Unit = {
             androidx.compose.foundation.Canvas(
                 modifier = Modifier
                     .size(width = 10.dp, height = 16.dp)
-                    .offset(x = 1.dp)
+                    .offset(x = if (pointsRight) (-1).dp else 1.dp)
                     .zIndex(1f),
             ) {
                 val path = androidx.compose.ui.graphics.Path().apply {
-                    moveTo(size.width, 0f)
-                    lineTo(0f, size.height * 0.5f)
-                    lineTo(size.width, size.height)
+                    if (pointsRight) {
+                        moveTo(0f, 0f)
+                        lineTo(size.width, size.height * 0.5f)
+                        lineTo(0f, size.height)
+                    } else {
+                        moveTo(size.width, 0f)
+                        lineTo(0f, size.height * 0.5f)
+                        lineTo(size.width, size.height)
+                    }
                     close()
                 }
                 drawPath(path, BubblePaper)
             }
+        }
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (!pointsRight) tailShape()
             Surface(
                 shape = RoundedCornerShape(10.dp),
                 color = BubblePaper,
@@ -254,13 +264,14 @@ public fun MaestroSpeechBubble(
                     )
                 }
             }
+            if (pointsRight) tailShape()
         }
         return
     }
 
     val isTop = tail == BubbleTail.TOP_START
     val tailAlign = when (tail) {
-        BubbleTail.BOTTOM_START, BubbleTail.TOP_START, BubbleTail.START -> Alignment.Start
+        BubbleTail.BOTTOM_START, BubbleTail.TOP_START, BubbleTail.START, BubbleTail.END -> Alignment.Start
         BubbleTail.BOTTOM_CENTER -> Alignment.CenterHorizontally
         BubbleTail.BOTTOM_END -> Alignment.End
     }
