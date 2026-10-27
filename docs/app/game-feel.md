@@ -1,6 +1,6 @@
 # Game feel: tempi, feedback, Maestro, ricompense
 
-Stato: proposta (PR #77). I valori numerici sono **iniziali**: si tarano nei playtest e si cambiano solo qui.
+Stato: approvata da Michele il 2026-10-27. I valori numerici sono **iniziali**: si tarano nei playtest e si cambiano solo qui.
 
 ## 1. Pilastri
 

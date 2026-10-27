@@ -1,6 +1,6 @@
 # ADR-0017 — Dati locali con migrazioni esplicite
 
-Stato: proposto · 2026-10-27 · da approvare da Michele (PR #77)
+Stato: accettato · 2026-10-27 · approvato da Michele in chat
 
 ## Contesto
 Il database Room usa `fallbackToDestructiveMigration()`: a ogni cambio di schema si cancellano storico, partita in corso e wallet. Con i crediti acquistati (F2-09) diventerebbe una perdita di denaro per l'utente.

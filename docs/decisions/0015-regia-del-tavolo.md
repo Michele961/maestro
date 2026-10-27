@@ -1,6 +1,6 @@
 # ADR-0015 — Regia del tavolo guidata dagli eventi
 
-Stato: proposto · 2026-10-27 · da approvare da Michele (PR #77)
+Stato: accettato · 2026-10-27 · approvato da Michele in chat
 
 ## Contesto
 Oggi lo stato della partita salta subito al risultato finale e la UI ricostruisce le animazioni con ritardi scritti nei composable (`delay(160L)`, `while (…) delay(40L)`). Il bot muove dopo tempi fissi decisi nel reducer (`BOT_NORMAL_MOVE_DELAY_MS = 1400L`, `BOT_HAND_DEAL_DELAY_MS = 2600L`) e sperati più lunghi dell'animazione. Quando non lo sono, un'animazione interrompe l'altra; su dispositivi più lenti o con l'utente che trascina una carta il problema peggiora. Le PR #63–#69 correggono sintomi dello stesso difetto.

@@ -1,6 +1,6 @@
 # ADR-0014 — Architettura dell'app a layer
 
-Stato: proposto · 2026-10-27 · da approvare da Michele (PR #77)
+Stato: accettato · 2026-10-27 · approvato da Michele in chat
 
 ## Contesto
 `app:android` è cresciuta in fretta (16.500 righe in 4 giorni). Navigazione, missioni, wallet e analisi sono in `MainActivity`; `TableScreen.kt` supera le 2.000 righe; la UI chiama direttamente i repository. Ogni nuova funzione tocca gli stessi file e le correzioni si rincorrono (`docs/reports/audit-2026-10-27.md` §2).

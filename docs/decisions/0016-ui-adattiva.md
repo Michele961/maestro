@@ -1,6 +1,6 @@
 # ADR-0016 — UI adattiva alle dimensioni dello schermo
 
-Stato: proposto · 2026-10-27 · da approvare da Michele (PR #77)
+Stato: accettato · 2026-10-27 · approvato da Michele in chat
 
 ## Contesto
 Gli screenshot Roborazzi girano su una sola configurazione. Sul Pixel 10 Pro di Michele alcune schermate non corrispondono agli screenshot. `TableScreen.kt` contiene 148 misure fisse in `dp` e solo 6 punti in tutta l'app leggono le dimensioni disponibili.

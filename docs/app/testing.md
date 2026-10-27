@@ -1,6 +1,6 @@
 # Test dell'app
 
-Stato: proposta (PR #77). Si somma a `docs/conventions.md` (Test).
+Stato: approvata da Michele il 2026-10-27. Si somma a `docs/conventions.md` (Test).
 
 | Layer | Tipo di test | Strumenti | Obbligatorio per |
 | --- | --- | --- | --- |

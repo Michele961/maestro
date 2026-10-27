@@ -1,6 +1,6 @@
 # Guida dell'app Android
 
-Stato: proposta · 2026-10-27 · diventa vincolante quando Michele approva ADR-0014…0017 (PR #77).
+Stato: approvata da Michele il 2026-10-27 (ADR-0014…0017). Vincolante per ogni task che tocca `app:*`.
 
 Questa cartella dice **come** si costruisce l'app. Il **perché** è negli ADR; il **cosa** è nei task del backlog.
 Ogni agente che tocca `app:*` legge questo file e il documento del layer o della funzione che modifica.
@@ -12,6 +12,7 @@ Ogni agente che tocca `app:*` legge questo file e il documento del layer o della
 | [`game-feel.md`](game-feel.md) | Animazioni, tempi, suoni, vibrazione, comportamento del Maestro, ricompense |
 | [`responsive-ui.md`](responsive-ui.md) | Qualunque layout o schermata nuova o modificata |
 | [`testing.md`](testing.md) | Sempre: quali test servono per ogni layer |
+| [`features/`](features/README.md) | Prima di rivedere una feature: procedimento, ordine e modello di dossier |
 
 Riferimenti grafici: `docs/art/style-guide.md`, `docs/art/design-system.md`. Personaggio e tono: `docs/design/maestro_persona.md`.
 

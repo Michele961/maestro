@@ -1,6 +1,6 @@
 # Backlog — Fase 1R: rifondazione dell'app
 
-Stato: **proposta** · 2026-10-27 · diventa eseguibile quando Michele approva la PR #77 (ADR-0014…0017).
+Approvato da Michele il 2026-10-27 (ADR-0014…0017, decisioni D12–D17).
 
 Obiettivo: portare l'app all'architettura di `docs/app/` senza perdere funzioni, e trasformare il tavolo in un gioco (regia, ritmo, feedback, loop di sessione). Le funzioni esistenti restano disponibili per tutta la fase; ogni task lascia l'app giocabile.
 
@@ -11,6 +11,8 @@ Obiettivo: portare l'app all'architettura di `docs/app/` senza perdere funzioni,
 - rotazione, cambio di tema o lingua e chiusura del processo non perdono la partita né la schermata;
 - nessuna migrazione distruttiva; test di migrazione verdi;
 - playtest interno di Michele: tavolo fluido e leggibile, nessuna animazione fuori posto.
+
+**Revisione per feature.** Le ondate A e B costruiscono le fondamenta comuni. Da lì ogni feature si rivede e migliora **singolarmente**, con un dossier approvato da Michele prima dei task (`docs/app/features/README.md`, task F1R-23). I task C e D di questo file restano validi come base e vengono rifiniti dal dossier della loro feature.
 
 Dopo questa fase: alpha su Play Console (F1-15), playtest (F1-16), report (F1-17), poi monetizzazione (F2-08…F2-10) e lancio (F2-12).
 
@@ -40,6 +42,7 @@ Regole per tutti i task: leggere `docs/app/README.md` e i documenti che il task 
 | F1R-20 | Audio a tre livelli | D | F1R-09 |
 | F1R-21 | Revisione dei contenuti didattici | D | F1R-16 |
 | F1R-22 | Estrazione in moduli Gradle | D | F1R-08…F1R-17 |
+| F1R-23 | Dossier di una feature (ripetuto per ogni feature) | B–D | prerequisiti in `docs/app/features/README.md` |
 
 Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F1R-01; F1R-14 e F1R-16 in parallelo con l'ondata B.
 
@@ -257,4 +260,16 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Criteri di accettazione:**
     - [ ] `./gradlew check` verifica i confini dei nuovi moduli.
     - [ ] Nessun cambio di comportamento; screenshot identici.
+- **Domande aperte:** —
+
+## F1R-23 — Dossier di una feature
+
+- **Stato:** da fare (uno per feature, nell'ordine di `docs/app/features/README.md`)
+- **Riferimenti:** `docs/app/features/README.md`
+- **Obiettivo:** scrivere `docs/app/features/<feature>.md` con il modello indicato: stato attuale con screenshot della matrice, problemi, comportamento desiderato, contratti, task proposti, domande.
+- **Perimetro autorizzato:** solo il file del dossier; nessun codice.
+- **Criteri di accettazione:**
+    - [ ] Ogni problema cita il file o lo screenshot che lo mostra.
+    - [ ] I task proposti sono < 400 righe ciascuno e hanno criteri verificabili.
+    - [ ] Michele ha approvato il dossier (stato `approvato`) prima che i task entrino nel backlog.
 - **Domande aperte:** —

@@ -1,6 +1,6 @@
 # UI adattiva
 
-Fonte: ADR-0016. Stato: proposta (PR #77).
+Fonte: ADR-0016. Stato: approvata da Michele il 2026-10-27.
 
 ## 1. Principi
 

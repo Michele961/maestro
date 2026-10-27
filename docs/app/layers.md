@@ -1,6 +1,6 @@
 # Layer, moduli e contratti
 
-Fonte: ADR-0014. Stato: proposta (PR #77).
+Fonte: ADR-0014. Stato: approvata da Michele il 2026-10-27.
 
 ## 1. Mappa
 

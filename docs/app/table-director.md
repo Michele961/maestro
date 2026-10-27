@@ -1,6 +1,6 @@
 # Regia del tavolo (`TableDirector`)
 
-Fonte: ADR-0015. Stato: proposta (PR #77).
+Fonte: ADR-0015. Stato: approvata da Michele il 2026-10-27.
 
 ## 1. Flusso
 
