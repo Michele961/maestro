@@ -226,7 +226,8 @@ private fun RaceOrBubble(
     val nudge = uiState.hintNudge
     val showBubble = uiState.isSparring && (((hint != null || nudge != null) && !dismissed) || uiState.isHintLoading)
     val line = uiState.maestroLine?.takeIf { uiState.isSparring && !showBubble }
-    Zone(zone, Alignment.Center) {
+    // Il fumetto si appoggia al lato del Maestro: la coda tocca il ritratto, senza vuoto in mezzo.
+    Zone(zone, Alignment.CenterEnd) {
         if (line != null) {
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
             MaestroSpeechBubble(

@@ -2,9 +2,7 @@ package it.maestro.app.feature.review.presentation
 
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.app.domain.rewards.RewardSummary
-import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.game.model.Seat
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-/** Task F1R-15a: la sequenza di fine partita avanza a passi, senza mai restare bloccata e saltabile con un tocco. */
+/** Task F1R-15a: la fine partita carica finché tutto è pronto, poi mostra tutto insieme. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class PostMatchViewModelTest {
 
@@ -36,13 +34,12 @@ class PostMatchViewModelTest {
     @AfterTest
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun viewModel(fromHistory: Boolean = false, speed: GameSpeed = GameSpeed.NORMAL) = PostMatchViewModel(
+    private fun viewModel(fromHistory: Boolean = false) = PostMatchViewModel(
         matchLog = PostMatchFixtures.log,
         humanSeat = Seat.P1,
         fromHistory = fromHistory,
         analysis = analysis,
         reward = reward,
-        speed = flowOf(speed),
     )
 
     private fun TestScope.step(vm: PostMatchViewModel): PostMatchStep {
@@ -51,72 +48,34 @@ class PostMatchViewModelTest {
     }
 
     @Test
-    fun opensOnThePlaqueThenWaitsForTheAnalysisWithoutAnySpinnerTimer() = runTest(dispatcher) {
+    fun itLoadsUntilTheAnalysisIsReadyWithoutAnySpinnerTimer() = runTest(dispatcher) {
         val vm = viewModel()
-        assertEquals(PostMatchStep.PLAQUE, step(vm))
-        advanceTimeBy(1_300)
-        assertEquals(PostMatchStep.ANALYSIS, step(vm))
+        assertEquals(PostMatchStep.LOADING, step(vm))
         advanceTimeBy(60_000)
-        assertEquals(PostMatchStep.ANALYSIS, step(vm))
+        assertEquals(PostMatchStep.LOADING, step(vm))
         assertNull(vm.uiState.value.analysis)
     }
 
     @Test
-    fun anAlreadyReadyAnalysisMovesOnAsSoonAsThePlaqueIsDone() = runTest(dispatcher) {
-        analysis.value = PostMatchFixtures.analysis
+    fun aMatchSeenFromHistoryIsReadyAsSoonAsTheAnalysisIs() = runTest(dispatcher) {
         val vm = viewModel(fromHistory = true)
-        advanceTimeBy(1_300)
-        assertEquals(PostMatchStep.ACCURACY, step(vm))
+        assertEquals(PostMatchStep.LOADING, step(vm))
+        analysis.value = PostMatchFixtures.analysis
+        assertEquals(PostMatchStep.READY, step(vm))
         assertNotNull(vm.uiState.value.analysis)
+        assertNull(vm.uiState.value.reward)
     }
 
     @Test
-    fun aMatchSeenFromHistoryHasNoRewardStep() = runTest(dispatcher) {
-        analysis.value = PostMatchFixtures.analysis
-        val vm = viewModel(fromHistory = true)
-        advanceTimeBy(1_300 + 1_000)
-        assertEquals(PostMatchStep.ACTIONS, step(vm))
-    }
-
-    @Test
-    fun aFinishedMatchShowsTheRewardWhenItArrivesThenTheActions() = runTest(dispatcher) {
+    fun aFinishedMatchShowsEverythingTogetherOnlyWhenTheRewardArrivesToo() = runTest(dispatcher) {
         analysis.value = PostMatchFixtures.analysis
         val vm = viewModel()
-        advanceTimeBy(1_300 + 1_000)
-        assertEquals(PostMatchStep.ACCURACY, step(vm))
+        assertEquals(PostMatchStep.LOADING, step(vm))
+        assertNull(vm.uiState.value.analysis)
         reward.value = RewardSummary(masteryBefore = 1200, masteryAfter = 1218)
-        assertEquals(PostMatchStep.REWARD, step(vm))
+        assertEquals(PostMatchStep.READY, step(vm))
+        assertNotNull(vm.uiState.value.analysis)
         assertEquals(18, vm.uiState.value.reward?.masteryDelta)
-        advanceTimeBy(1_000)
-        assertEquals(PostMatchStep.ACTIONS, step(vm))
-    }
-
-    @Test
-    fun aTapSkipsThePauseOfTheCurrentStep() = runTest(dispatcher) {
-        analysis.value = PostMatchFixtures.analysis
-        val vm = viewModel(fromHistory = true)
-        runCurrent()
-        assertEquals(PostMatchStep.PLAQUE, vm.uiState.value.step)
-        vm.skip()
-        assertEquals(PostMatchStep.ACCURACY, step(vm))
-        vm.skip()
-        assertEquals(PostMatchStep.ACTIONS, step(vm))
-    }
-
-    @Test
-    fun tappingWhileWaitingForTheAnalysisDoesNothing() = runTest(dispatcher) {
-        val vm = viewModel()
-        advanceTimeBy(1_300)
-        step(vm)
-        vm.skip()
-        assertEquals(PostMatchStep.ANALYSIS, step(vm))
-    }
-
-    @Test
-    fun theChosenGameSpeedAppliesToThePauses() = runTest(dispatcher) {
-        analysis.value = PostMatchFixtures.analysis
-        val vm = viewModel(fromHistory = true, speed = GameSpeed.INSTANT)
-        assertEquals(PostMatchStep.ACTIONS, step(vm))
     }
 
     @Test

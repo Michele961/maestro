@@ -2,9 +2,6 @@ package it.maestro.app.feature.review.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,9 +20,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,65 +41,63 @@ import it.maestro.app.feature.review.presentation.PostMatchStep
 import it.maestro.app.feature.review.presentation.PostMatchUiState
 
 /**
- * Fine partita a passi (task F1R-15b, `docs/app/features/post-match.md` §3): targa, attesa del Maestro, precisione,
- * ricompensa, azioni. Disegna lo stato di [PostMatchUiState] e non decide nulla; un tocco qualsiasi chiama [onSkip].
+ * Fine partita (task F1R-15b, `docs/app/features/post-match.md` §3): finché l'analisi non è pronta c'è solo il
+ * caricamento del Maestro; poi targa, precisione, ricompensa e azioni compaiono insieme. Disegna lo stato di
+ * [PostMatchUiState] e non decide nulla.
  */
 @Composable
 public fun PostMatchScreen(
     state: PostMatchUiState,
     modifier: Modifier = Modifier,
     trainingScore: Pair<Int, Int>? = null,
-    onSkip: () -> Unit = {},
     onClaimMission: (DailyMission) -> Unit = {},
     onReviewClicked: (MatchAnalysis) -> Unit = {},
     onRematchClicked: () -> Unit = {},
     onHomeClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier.testTag("post_match_preview_screen"), feltFraction = 0.55f) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onSkip),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                ResultPlaque(state.won, state.humanTotal, state.opponentTotal)
-                Spacer(modifier = Modifier.height(10.dp))
-                // Tutto in una colonna che scorre (azioni comprese): niente è mai coperto da altro. Se i contenuti sono
-                // pochi stanno centrati; ad ogni passo nuovo si segue l'ultimo contenuto apparso.
-                val scroll = rememberScrollState()
-                LaunchedEffect(state.step) { snapshotFlow { scroll.maxValue }.collect { scroll.animateScrollTo(it) } }
-                Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().verticalScroll(scroll),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        val analysis = state.analysis
-                        if (analysis != null && state.reached(PostMatchStep.ACCURACY)) {
-                            Reveal { AccuracyCard(analysis, state.humanSeat, trainingScore) }
+        Box(modifier = Modifier.fillMaxSize()) {
+            val analysis = state.analysis
+            if (state.step == PostMatchStep.LOADING || analysis == null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) { MaestroLine(state, analysis = null) }
+                return@Box
+            }
+            AnimatedVisibility(visible = true, enter = fadeIn(), modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ResultPlaque(state.won, state.humanTotal, state.opponentTotal)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    // Colonna che scorre solo se i contenuti non stanno nello schermo (azioni comprese): niente è coperto.
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            AccuracyCard(analysis, state.humanSeat, trainingScore)
+                            val reward = state.reward
+                            if (reward != null && !state.fromHistory && reward.hasContent()) {
+                                RewardCard(reward, state.claimedMissions, onClaimMission)
+                            }
+                            MaestroLine(state, analysis)
+                            Actions(state, analysis, onReviewClicked, onRematchClicked, onHomeClicked)
                         }
-                        val reward = state.reward
-                        if (reward != null && state.reached(PostMatchStep.REWARD) && !state.fromHistory && reward.hasContent()) {
-                            Reveal { RewardCard(reward, state.claimedMissions, onClaimMission) }
-                        }
-                        MaestroLine(state, analysis)
-                        Actions(state, onReviewClicked, onRematchClicked, onHomeClicked)
                     }
                 }
             }
             if (state.won && !state.fromHistory) ConfettiCelebration()
         }
     }
-}
-
-@Composable
-private fun Reveal(content: @Composable () -> Unit) {
-    AnimatedVisibility(visible = true, enter = fadeIn() + slideInVertically { it / 4 }) { content() }
 }
 
 /** Il Maestro segna i momenti chiave mentre l'analisi non è pronta, poi commenta la partita. */
@@ -130,40 +122,37 @@ private fun MaestroLine(state: PostMatchUiState, analysis: MatchAnalysis?) {
     }
 }
 
-/** Rivedi partita (primaria), Rivincita, Menu: compaiono a sequenza finita. */
+/** Rivedi partita (primaria), Rivincita, Menu. */
 @Composable
-private fun Actions(state: PostMatchUiState, onReview: (MatchAnalysis) -> Unit, onRematch: () -> Unit, onHome: () -> Unit) {
-    val analysis = state.analysis
-    AnimatedVisibility(visible = state.reached(PostMatchStep.ACTIONS) && analysis != null, enter = fadeIn()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            MaestroPillButton(
-                text = stringResource(id = R.string.post_match_review_button).uppercase(),
-                onClick = { analysis?.let(onReview) },
-                variant = PillButtonVariant.PRIMARY_GREEN,
-                height = 58.dp,
-                fontSize = 22.sp,
-                modifier = Modifier.fillMaxWidth(),
-                testTag = "post_match_review_button",
-            )
-            MaestroPillButton(
-                text = stringResource(id = R.string.post_match_rematch).uppercase(),
-                onClick = onRematch,
-                variant = PillButtonVariant.SECONDARY_AMBER,
-                height = 46.dp,
-                fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth(0.85f).padding(top = 8.dp),
-                testTag = "post_match_rematch_button",
-            )
-            MaestroPillButton(
-                text = stringResource(id = if (state.fromHistory) R.string.post_match_back_to_history else R.string.post_match_back_to_menu).uppercase(),
-                onClick = onHome,
-                variant = PillButtonVariant.WOOD,
-                height = 40.dp,
-                fontSize = 16.sp,
-                modifier = Modifier.fillMaxWidth(0.85f).padding(top = 6.dp),
-                testTag = "post_match_home_button",
-            )
-        }
+private fun Actions(state: PostMatchUiState, analysis: MatchAnalysis, onReview: (MatchAnalysis) -> Unit, onRematch: () -> Unit, onHome: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+        MaestroPillButton(
+            text = stringResource(id = R.string.post_match_review_button).uppercase(),
+            onClick = { onReview(analysis) },
+            variant = PillButtonVariant.PRIMARY_GREEN,
+            height = 58.dp,
+            fontSize = 22.sp,
+            modifier = Modifier.fillMaxWidth(),
+            testTag = "post_match_review_button",
+        )
+        MaestroPillButton(
+            text = stringResource(id = R.string.post_match_rematch).uppercase(),
+            onClick = onRematch,
+            variant = PillButtonVariant.SECONDARY_AMBER,
+            height = 46.dp,
+            fontSize = 18.sp,
+            modifier = Modifier.fillMaxWidth(0.85f).padding(top = 8.dp),
+            testTag = "post_match_rematch_button",
+        )
+        MaestroPillButton(
+            text = stringResource(id = if (state.fromHistory) R.string.post_match_back_to_history else R.string.post_match_back_to_menu).uppercase(),
+            onClick = onHome,
+            variant = PillButtonVariant.WOOD,
+            height = 40.dp,
+            fontSize = 16.sp,
+            modifier = Modifier.fillMaxWidth(0.85f).padding(top = 6.dp),
+            testTag = "post_match_home_button",
+        )
     }
 }
 

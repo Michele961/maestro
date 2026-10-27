@@ -2,6 +2,7 @@ package it.maestro.app.ui.screenshot
 
 import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -83,7 +84,7 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
             won = won,
             humanTotal = if (won) 11 else 7,
             opponentTotal = if (won) 8 else 11,
-            analysis = if (step == PostMatchStep.PLAQUE || step == PostMatchStep.ANALYSIS) null else PostMatchFixtures.analysis,
+            analysis = if (step == PostMatchStep.LOADING) null else PostMatchFixtures.analysis,
             reward = reward,
             fromHistory = fromHistory,
         )
@@ -95,29 +96,28 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun post_match_analysis_waiting_screenshot() = shotPostMatch("post_match_analysis", postMatchState(PostMatchStep.ANALYSIS))
+    fun post_match_analysis_waiting_screenshot() = shotPostMatch("post_match_analysis", postMatchState(PostMatchStep.LOADING))
 
     @Test
     fun post_match_victory_screenshot() = shotPostMatch(
         "post_match",
-        postMatchState(PostMatchStep.ACTIONS, reward = RewardSummary(masteryBefore = 1200, masteryAfter = 1218, streakAfter = 3)),
+        postMatchState(PostMatchStep.READY, reward = RewardSummary(masteryBefore = 1200, masteryAfter = 1218, streakAfter = 3)),
     )
 
     @Test
     fun post_match_defeat_screenshot() = shotPostMatch(
         "post_match_defeat",
-        postMatchState(PostMatchStep.ACTIONS, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209, streakAfter = 3)),
+        postMatchState(PostMatchStep.READY, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209, streakAfter = 3)),
     )
 
     @Test
-    fun post_match_from_history_screenshot() = shotPostMatch("post_match_history", postMatchState(PostMatchStep.ACTIONS, fromHistory = true))
+    fun post_match_from_history_screenshot() = shotPostMatch("post_match_history", postMatchState(PostMatchStep.READY, fromHistory = true))
 
     @Test
     fun post_match_shows_the_mastery_delta_even_after_a_defeat() {
-        val state = postMatchState(PostMatchStep.REWARD, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209))
+        val state = postMatchState(PostMatchStep.READY, won = false, reward = RewardSummary(masteryBefore = 1218, masteryAfter = 1209))
         composeRule.setContent { MaestroTheme { PostMatchScreen(state = state) } }
         composeRule.onNodeWithTag("reward_mastery_delta", useUnmergedTree = true).assertTextContains("−9")
-        composeRule.onNodeWithTag("post_match_review_button").assertDoesNotExist()
     }
 
     private val completedMission = DailyMission(id = "m1", type = DailyMissionType.MAKE_SWEEPS, progress = 3, target = 3)
@@ -129,12 +129,12 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     )
 
     @Test
-    fun post_match_mission_ready_to_claim_screenshot() = shotPostMatch("post_match_mission", postMatchState(PostMatchStep.REWARD, reward = missionReward))
+    fun post_match_mission_ready_to_claim_screenshot() = shotPostMatch("post_match_mission", postMatchState(PostMatchStep.READY, reward = missionReward))
 
     @Test
     fun post_match_a_completed_mission_is_claimed_with_one_tap() {
         var claimed: DailyMission? = null
-        val state = postMatchState(PostMatchStep.REWARD, reward = missionReward)
+        val state = postMatchState(PostMatchStep.READY, reward = missionReward)
         composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onClaimMission = { claimed = it }) } }
         composeRule.onNodeWithTag("reward_claim_make_sweeps", useUnmergedTree = true).performClick()
         org.junit.Assert.assertEquals(completedMission, claimed)
@@ -143,7 +143,7 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     @Test
     fun post_match_a_claimed_mission_shows_claimed_and_does_not_claim_twice() {
         var claims = 0
-        val state = postMatchState(PostMatchStep.REWARD, reward = missionReward).copy(claimedMissions = setOf("m1"))
+        val state = postMatchState(PostMatchStep.READY, reward = missionReward).copy(claimedMissions = setOf("m1"))
         composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onClaimMission = { claims++ }) } }
         composeRule.onNodeWithText("Riscattata", ignoreCase = true, useUnmergedTree = true).assertExists()
         composeRule.onNodeWithTag("reward_claim_make_sweeps", useUnmergedTree = true).performClick()
@@ -151,13 +151,29 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun post_match_tap_skips_and_actions_appear_at_the_end() {
-        var skipped = 0
-        val state = postMatchState(PostMatchStep.ACTIONS)
-        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onSkip = { skipped++ }) } }
+    fun post_match_shows_only_the_loader_until_everything_is_ready() {
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = postMatchState(PostMatchStep.LOADING)) } }
+        composeRule.onNodeWithTag("analysis_loading_indicator").assertExists()
+        composeRule.onNodeWithTag("post_match_review_button").assertDoesNotExist()
+    }
+
+    @Test
+    fun post_match_shows_the_actions_once_ready() {
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = postMatchState(PostMatchStep.READY)) } }
         composeRule.onNodeWithTag("post_match_review_button").assertExists()
-        composeRule.onNodeWithTag("post_match_preview_screen").performClick()
-        org.junit.Assert.assertEquals(1, skipped)
+        composeRule.onNodeWithTag("analysis_loading_indicator").assertDoesNotExist()
+    }
+
+    @Test
+    fun the_explanation_opens_on_request_and_does_not_squash_the_board() {
+        val analysis = analyzer.analyze(log)
+        composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
+        composeRule.onNodeWithTag("review_next_mistake").performClick()
+        composeRule.onNodeWithTag("review_show_solution_button").performClick()
+        composeRule.onNodeWithTag("review_explanation_card").assertDoesNotExist()
+        composeRule.onNodeWithTag("review_board").assertIsDisplayed()
+        composeRule.onNodeWithTag("review_why_button").performClick()
+        composeRule.onNodeWithTag("review_explanation_card").assertExists()
     }
 
     @Test

@@ -209,7 +209,6 @@ public fun MaestroNavHost(
             PostMatchScreen(
                 state = state,
                 trainingScore = training,
-                onSkip = viewModel::skip,
                 onClaimMission = { mission ->
                     shell.claimMissionReward(mission)
                     viewModel.markClaimed(mission.id)
