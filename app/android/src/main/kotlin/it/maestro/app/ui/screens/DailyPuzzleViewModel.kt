@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 import java.time.LocalDate
 
 /**
@@ -62,11 +64,13 @@ public class DailyPuzzleViewModel(
     private val walletRepository: WalletRepository? = null,
     private val customDate: LocalDate? = null,
     private val customPuzzle: TacticalPuzzle? = null,
+    private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
-    private val effectiveDate: LocalDate = customDate ?: LocalDate.now()
-    private val dateString: String = effectiveDate.toString()
-    private val puzzleNumber: Int = DailyPuzzleProvider.getPuzzleNumber(effectiveDate)
+    // Il giorno si rilegge con refreshDay() (ritorno in primo piano), salvo una data fissata dai test.
+    private var effectiveDate: LocalDate = customDate ?: clock.today()
+    private val dateString: String get() = effectiveDate.toString()
+    private val puzzleNumber: Int get() = DailyPuzzleProvider.getPuzzleNumber(effectiveDate)
 
     private val _uiState = MutableStateFlow(
         DailyPuzzleUiState(
@@ -77,6 +81,18 @@ public class DailyPuzzleViewModel(
     public val uiState: StateFlow<DailyPuzzleUiState> = _uiState.asStateFlow()
 
     init {
+        loadTier(0)
+    }
+
+    /**
+     * Rilegge la data dal [Clock]; se è cambiato giorno carica la sfida nuova dal primo livello (task F1R-02).
+     */
+    public fun refreshDay() {
+        if (customDate != null) return
+        val today = clock.today()
+        if (today == effectiveDate) return
+        effectiveDate = today
+        _uiState.value = DailyPuzzleUiState(puzzleNumber = puzzleNumber, dateString = dateString)
         loadTier(0)
     }
 

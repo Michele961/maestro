@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 
 /**
  * Singola voce nello storico delle partite giocate per la schermata Profilo.
@@ -69,6 +71,7 @@ public interface MasteryRepository {
  */
 public class DataStoreMasteryRepository(
     private val dataStore: DataStore<Preferences>,
+    private val clock: Clock = SystemClock,
 ) : MasteryRepository {
 
     private object PreferencesKeys {
@@ -129,8 +132,8 @@ public class DataStoreMasteryRepository(
         val isWin = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
         val eloDelta = updated.cognitiveElo - current.cognitiveElo
         val entry = MatchHistoryEntry(
-            id = "match_${System.currentTimeMillis()}",
-            timestampMillis = System.currentTimeMillis(),
+            id = "match_${clock.nowMillis()}",
+            timestampMillis = clock.nowMillis(),
             accuracy = matchAccuracy,
             cognitiveElo = updated.cognitiveElo,
             eloDelta = eloDelta,
@@ -239,6 +242,7 @@ public class DataStoreMasteryRepository(
 public class InMemoryMasteryRepository(
     initialProfile: MasteryProfile = MasteryProfile.INITIAL,
     initialHistory: List<MatchHistoryEntry> = emptyList(),
+    private val clock: Clock = SystemClock,
 ) : MasteryRepository {
 
     private val profileState = MutableStateFlow(initialProfile)
@@ -284,8 +288,8 @@ public class InMemoryMasteryRepository(
         val isWin = finalState?.winner?.let { it == humanSeat } ?: (humanTotal >= opponentTotal)
         val eloDelta = updated.cognitiveElo - current.cognitiveElo
         val entry = MatchHistoryEntry(
-            id = "match_${System.currentTimeMillis()}",
-            timestampMillis = System.currentTimeMillis(),
+            id = "match_${clock.nowMillis()}",
+            timestampMillis = clock.nowMillis(),
             accuracy = matchAccuracy,
             cognitiveElo = updated.cognitiveElo,
             eloDelta = eloDelta,

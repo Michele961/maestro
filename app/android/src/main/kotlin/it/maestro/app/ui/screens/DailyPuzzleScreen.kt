@@ -61,6 +61,8 @@ import it.maestro.app.ui.theme.MaestroDisplayFont
 import it.maestro.app.ui.theme.WoodSurfaceDark
 import it.maestro.game.model.Card
 import org.koin.androidx.compose.koinViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 
 /**
  * Schermata dedicata alla "Sfida del Giorno" (task F2-03).
@@ -73,6 +75,8 @@ public fun DailyPuzzleScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    // Se l'app torna in primo piano dopo mezzanotte si passa alla sfida del nuovo giorno (F1R-02).
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.refreshDay() }
 
     DailyPuzzleScreenContent(
         uiState = uiState,

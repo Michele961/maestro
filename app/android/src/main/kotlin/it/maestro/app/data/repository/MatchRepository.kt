@@ -8,6 +8,8 @@ import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ReplayResult
 import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.replay
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 
 /**
  * Risultato del ripristino di una partita interrotta (ADR-0003, task F1-08).
@@ -59,6 +61,7 @@ public interface MatchRepository {
  */
 public class RoomMatchRepository(
     private val dao: SavedMatchDao,
+    private val clock: Clock = SystemClock,
 ) : MatchRepository {
 
     override suspend fun saveActiveMatch(
@@ -68,7 +71,7 @@ public class RoomMatchRepository(
         p1Score: Int,
         p2Score: Int,
     ) {
-        val now = System.currentTimeMillis()
+        val now = clock.nowMillis()
         val existing = dao.getActiveMatch()
         val entity = SavedMatchEntity(
             id = existing?.id ?: "active_match",
@@ -93,7 +96,7 @@ public class RoomMatchRepository(
                 winnerSeat = winner?.name,
                 p1Score = p1Score,
                 p2Score = p2Score,
-                updatedAt = System.currentTimeMillis(),
+                updatedAt = clock.nowMillis(),
             ),
         )
     }
@@ -140,7 +143,9 @@ public class RoomMatchRepository(
 /**
  * Implementazione in memoria per test o preview.
  */
-public class InMemoryMatchRepository : MatchRepository {
+public class InMemoryMatchRepository(
+    private val clock: Clock = SystemClock,
+) : MatchRepository {
     private var activeMatch: SavedMatchEntity? = null
 
     override suspend fun saveActiveMatch(
@@ -150,7 +155,7 @@ public class InMemoryMatchRepository : MatchRepository {
         p1Score: Int,
         p2Score: Int,
     ) {
-        val now = System.currentTimeMillis()
+        val now = clock.nowMillis()
         activeMatch = SavedMatchEntity(
             id = "active_match",
             matchLogText = log.toText(),
@@ -172,7 +177,7 @@ public class InMemoryMatchRepository : MatchRepository {
             winnerSeat = winner?.name,
             p1Score = p1Score,
             p2Score = p2Score,
-            updatedAt = System.currentTimeMillis(),
+            updatedAt = clock.nowMillis(),
         )
     }
 

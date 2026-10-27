@@ -1,5 +1,6 @@
 package it.maestro.app.ui
 
+import it.maestro.app.domain.time.FakeClock
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
@@ -47,7 +48,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
-            dateProvider = { testDate },
+            clock = FakeClock(testDate),
         )
 
         testDispatcher.scheduler.advanceUntilIdle()
@@ -72,7 +73,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
-            dateProvider = { testDate },
+            clock = FakeClock(testDate),
         )
 
         viewModel.recordActivity()
@@ -90,7 +91,7 @@ class DailyMissionsViewModelTest {
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
             walletRepository = walletRepo,
-            dateProvider = { testDate },
+            clock = FakeClock(testDate),
         )
 
         testDispatcher.scheduler.advanceUntilIdle()

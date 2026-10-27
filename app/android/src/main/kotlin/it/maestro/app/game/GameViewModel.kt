@@ -63,6 +63,8 @@ public class GameViewModel(
             botJob?.cancel()
             hintJob?.cancel()
         } else if (intent is GameIntent.RestoreMatch) {
+            // Ripresa: generatore del bot derivato dal log, così resta riproducibile (ADR-0003, F1R-02).
+            botRng = SeededRng(intent.matchLog.seed + 9999L + intent.matchLog.moves.size)
             botJob?.cancel()
             hintJob?.cancel()
         }

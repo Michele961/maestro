@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 
 /**
  * Repository per la progressione a tappe e il salvataggio dei moduli e sotto-moduli dell'Accademia.
@@ -28,6 +30,7 @@ public interface AcademyRepository {
  */
 public class DataStoreAcademyRepository(
     private val dataStore: DataStore<Preferences>,
+    private val clock: Clock = SystemClock,
 ) : AcademyRepository {
 
     private fun completedKey(id: AcademyLessonId) = booleanPreferencesKey("academy_lesson_completed_${id.name}")
@@ -44,7 +47,7 @@ public class DataStoreAcademyRepository(
     }
 
     override suspend fun completeLesson(lessonId: AcademyLessonId) {
-        val now = System.currentTimeMillis()
+        val now = clock.nowMillis()
         dataStore.edit { prefs ->
             prefs[completedKey(lessonId)] = true
             prefs[timestampKey(lessonId)] = now
@@ -89,6 +92,7 @@ public class DataStoreAcademyRepository(
  */
 public class InMemoryAcademyRepository(
     initialCompleted: Set<AcademyLessonId> = emptySet(),
+    private val clock: Clock = SystemClock,
 ) : AcademyRepository {
 
     private val completedLessons = MutableStateFlow(initialCompleted)
@@ -103,7 +107,7 @@ public class InMemoryAcademyRepository(
         buildProgressMap(completedLessons.value)
 
     override suspend fun completeLesson(lessonId: AcademyLessonId) {
-        completedTimes[lessonId] = System.currentTimeMillis()
+        completedTimes[lessonId] = clock.nowMillis()
         completedLessons.value = completedLessons.value + lessonId
     }
 

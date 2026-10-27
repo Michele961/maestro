@@ -1,6 +1,7 @@
 package it.maestro.app.data.local.wallet
 
 import java.util.UUID
+import it.maestro.app.domain.time.SystemClock
 
 /**
  * Causali tipizzate per i movimenti nel registro contabile dei Crediti Maestro (ADR-0006, task F2-07).
@@ -57,7 +58,7 @@ public data class WalletTransaction(
     val id: String = UUID.randomUUID().toString(),
     val amount: Int,
     val reason: TransactionReason,
-    val timestamp: Long = System.currentTimeMillis(),
+    val timestamp: Long = SystemClock.nowMillis(),
     val referenceId: String? = null,
     val description: String? = null,
 ) {

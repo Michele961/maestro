@@ -131,6 +131,7 @@ import it.maestro.game.training.TrainingOption
 import it.maestro.game.training.TrainingQuestion
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import it.maestro.app.domain.time.Clock
 
 public val TableFeltColor: Color = Color(0xFF1B4332)
 public val TableFeltDarkColor: Color = Color(0xFF081C15)
@@ -152,6 +153,7 @@ public fun TableScreen(
     cardBackThemeId: String = "back_classic_trevigiano",
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
+    clock: Clock = koinInject(),
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: (MatchLog, Pair<Int, Int>?) -> Unit = { _, _ -> },
 ) {
@@ -196,7 +198,7 @@ public fun TableScreen(
                 GameIntent.StartMatch(
                     config = ScopaConfig(targetScore = targetScore),
                     level = level,
-                    seed = System.currentTimeMillis(),
+                    seed = clock.newSeed(),
                     trainingFundamental = trainingFundamental,
                 ),
             )

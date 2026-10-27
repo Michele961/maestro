@@ -74,7 +74,10 @@ import it.maestro.game.scopa.ScopaState
 import it.maestro.game.training.TrainingFundamental
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import java.time.LocalDate
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 
 /**
  * Destinazioni di navigazione nell'architettura a singola Activity (ADR-0012, task F1-07, F1-08, F1-09, F2-04).
@@ -86,7 +89,7 @@ public sealed interface Screen {
         val level: DifficultyLevel,
         val targetScore: Int,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
-        val seed: Long = System.currentTimeMillis(),
+        val seed: Long = SystemClock.newSeed(),
         val restoredState: ScopaState? = null,
         val restoredLog: MatchLog? = null,
     ) : Screen
@@ -142,7 +145,10 @@ public class MainActivity : ComponentActivity() {
                 val soundManager: SoundManager = koinInject()
                 val crashReporter: CrashReporter = koinInject()
                 val scope = rememberCoroutineScope()
-                val today = remember { LocalDate.now() }
+                val clock: Clock = koinInject()
+                // Il giorno si rilegge al ritorno in primo piano: a mezzanotte cambiano streak e missioni (F1R-02).
+                var today by remember { mutableStateOf(clock.today()) }
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { today = clock.today() }
                 val streakState by retentionRepository.observeStreak(today).collectAsStateWithLifecycle(initialValue = StreakState.INITIAL)
                 val missionsState by retentionRepository.observeDailyMissions(today).collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
                 val credits by walletRepository.observeBalance().collectAsStateWithLifecycle(initialValue = 0)

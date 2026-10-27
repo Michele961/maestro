@@ -34,16 +34,6 @@ class ArchitectureRulesTest {
         ex("ui/screens/TableScreen.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
         ex("ui/components/SweepCelebrationOverlay.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
         ex("game/GameViewModel.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-08",
-        // Orologio: tutto passa da Clock.
-        ex("MainActivity.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("ui/screens/TableScreen.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("ui/screens/DailyMissionsViewModel.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("ui/screens/DailyPuzzleViewModel.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("data/repository/MatchRepository.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("data/local/datastore/MasteryRepository.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("data/local/datastore/AcademyRepository.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("data/local/wallet/WalletModels.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
-        ex("data/local/DailyPuzzleProvider.kt", Rule.TIME_OUTSIDE_CLOCK) to "F1R-02",
         // Dati.
         ex("di/AppModule.kt", Rule.DESTRUCTIVE_MIGRATION) to "F1R-03",
         // Stato completo della partita solo in MatchSession.
