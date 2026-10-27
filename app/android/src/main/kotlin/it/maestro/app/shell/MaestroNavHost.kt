@@ -39,6 +39,7 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.shell.crash.CrashReporter
 import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.domain.retention.DailyMissionsState
@@ -150,6 +151,7 @@ public fun MaestroNavHost(
                 avatarId = settings.selectedAvatar,
                 playerName = settings.playerName,
                 day = today.toEpochDay(),
+                playerNameMaxLength = MAX_PLAYER_NAME,
                 askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
                 onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
                 onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },

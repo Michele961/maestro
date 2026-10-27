@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import it.maestro.app.R
-import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 
 /**
  * Chiede (o fa cambiare) il nome del giocatore (`docs/app/features/home.md` §7). «Più tardi» non cambia il nome:
@@ -22,6 +21,7 @@ import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 @Composable
 internal fun PlayerNameDialog(
     currentName: String?,
+    maxLength: Int,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -33,7 +33,7 @@ internal fun PlayerNameDialog(
         text = {
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it.take(MAX_PLAYER_NAME) },
+                onValueChange = { name = it.take(maxLength) },
                 singleLine = true,
                 label = { Text(stringResource(R.string.home_name_dialog_label)) },
                 supportingText = { Text(stringResource(R.string.home_name_dialog_message)) },

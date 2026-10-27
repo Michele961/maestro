@@ -44,6 +44,7 @@ public fun HomeScreen(
     avatarId: String = "avatar_default",
     playerName: String? = null,
     askPlayerName: Boolean = false,
+    playerNameMaxLength: Int = 20,
     /** Giorno corrente (`LocalDate.toEpochDay`): fa cambiare la battuta del Maestro da un giorno all'altro. */
     day: Long = 0L,
     mastery: Int? = null,
@@ -63,6 +64,7 @@ public fun HomeScreen(
     if (askPlayerName || editingName) {
         PlayerNameDialog(
             currentName = playerName,
+            maxLength = playerNameMaxLength,
             onConfirm = { editingName = false; onPlayerNameConfirmed(it) },
             onDismiss = { editingName = false; onPlayerNameSkipped() },
         )
