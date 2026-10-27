@@ -23,12 +23,12 @@ Non inventare regole di gioco, varianti, API, dipendenze, moduli, schermate o fu
 
 - Aggiungere o aggiornare dipendenze, plugin o versioni (`gradle/libs.versions.toml`, file `build.gradle.kts`).
 - Creare moduli, cambiare i confini tra moduli (tabella in `build.gradle.kts` root).
-- Modificare i documenti approvati: `docs/decisions/` (ADR), `docs/rules/`, `docs/vision.md`, `docs/architecture.md`, `docs/ai/`, `docs/conventions.md`, `docs/workflow.md`, `.github/`, `.claude/`, questo file e `AGENTS.md`.
+- Modificare i documenti approvati: `docs/decisions/` (ADR), `docs/rules/`, `docs/vision.md`, `docs/architecture.md`, `docs/ai/`, `docs/app/`, `docs/conventions.md`, `docs/workflow.md`, `.github/`, `.claude/`, questo file e `AGENTS.md`.
 - Se il codice non torna con un documento approvato, è il codice a doversi adeguare: non "correggere" il documento per farlo combaciare.
 - Cambiare l'API pubblica di un modulo diverso da quello del task.
 - Cancellare, disattivare o indebolire test esistenti (`@Ignore`, asserzioni rimosse, tolleranze allargate).
 - Rinominare package o spostare file fuori dal perimetro del task.
-- Iniziare lavori di fasi successive (Android, server, grafica, monetizzazione) prima del task dedicato.
+- Iniziare lavori di fasi successive (server, monetizzazione, Briscola) prima del task dedicato.
 - "Migliorare" codice non toccato dal task: refactoring, riformattazioni, rinomine.
 
 Se ti serve una di queste cose, **fermati** e scrivi la richiesta nella sezione "Domande aperte" (vedi §5).
@@ -41,7 +41,8 @@ Se ti serve una di queste cose, **fermati** e scrivi la richiesta nella sezione 
 - **Immutabilità.** Stato e modelli sono `data class`/`value class` immutabili; le funzioni di regola restituiscono un nuovo stato.
 - **Mosse illegali non lanciano eccezioni:** restituiscono un risultato tipizzato (`sealed interface`). Le eccezioni sono solo per bug di programmazione.
 - **L'AI vede solo la vista del giocatore**, mai lo stato completo. Violare questo punto è un bug grave.
-- **Server autoritativo** (Fase 2): il client non riceve mai carte nascoste.
+- **Server autoritativo** (Fase 3, D10): il client non riceve mai carte nascoste.
+- **App a layer** (ADR-0014…0017, `docs/app/`): la UI disegna uno stato e non decide; il dominio non conosce Android; al tavolo si muove solo ciò che mette in scena il `TableDirector` e il bot aspetta la regia; tempi solo da `MotionSpec`, misure dallo spazio disponibile, ricompense solo da `RewardEngine`, nessuna migrazione distruttiva. Le "dieci regole" di `docs/app/README.md` valgono per ogni task che tocca `app:*`.
 
 ## 5. Quando fermarsi e chiedere
 
@@ -102,4 +103,7 @@ Le modifiche ai file protetti (§3) chiedono conferma tramite `.claude/settings.
 | `docs/ai/maestro.md` | Design del motore AI e dell'analizzatore |
 | `docs/conventions.md` | Stile del codice, test, naming |
 | `docs/workflow.md` | Ciclo di vita dei task, ruoli, escalation |
+| `docs/app/` | Guida dell'app Android: layer, regia del tavolo, game feel, UI adattiva, test |
+| `docs/art/`, `docs/design/` | Stile grafico, design system, personaggio del Maestro |
+| `docs/roadmap.md` | Piano delle fasi e decisioni di Michele (D1…) |
 | `docs/backlog/` | Task per fase, con stato e criteri di accettazione |

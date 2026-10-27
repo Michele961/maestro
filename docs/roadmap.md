@@ -3,7 +3,7 @@
 Stato: **approvata da Michele** il 2026-10-23, con le decisioni del §3.
 Questo documento è un piano, non una specifica: non autorizza nessun lavoro. Un task si esegue solo quando compare nel backlog della sua fase con stato `da fare` e Michele lo assegna.
 
-Fonti: `docs/vision.md`, `docs/architecture.md` (stack per fase), ADR-0001…0012, `docs/ai/maestro.md`, `docs/reports/fase-0.md`.
+Fonti: `docs/vision.md`, `docs/architecture.md` (stack per fase), ADR-0001…0017, `docs/ai/maestro.md`, `docs/reports/fase-0.md`.
 
 ## 1. Dove siamo
 
@@ -31,6 +31,7 @@ Sono emersi rileggendo il report di F0-13 rispetto ai documenti approvati. Nessu
 | Fase | Obiettivo | Risultato visibile | Stack (da `architecture.md`) |
 | --- | --- | --- | --- |
 | **1 — MVP offline Android** | Scopa contro il Maestro, con review locale gratuita | App in test interno su Play Console | Compose, Koin, Room, DataStore, Rive, SoundPool, Crashlytics, i18n it/en |
+| **1R — Rifondazione dell'app** | Architettura a layer, regia del tavolo, UI adattiva, loop di sessione (`docs/backlog/fase-1r.md`) | Tavolo fluido e leggibile su ogni schermo; poi alpha su Play Console | Navigation Compose, Room migrations (ADR-0014…0017) |
 | **2 — Didattica, Retention & Economia** | "L'Accademia del Maestro": rigioca l'errore, puzzle del giorno, moduli didattici, abbonamento e monetizzazione | Lancio pubblico su Play Store come trainer & coach | Play Billing, AdMob rewarded con SSV, UMP |
 | **3 — Online** | "Il Circolo": partite 1v1 in tempo reale, account, classificata, leghe | Ranked e Tavolo amichevole 1v1 | Ktor server + client WebSocket, Postgres, Redis, Google Sign-In, Play Integrity |
 | **Briscola** | Secondo gioco sullo stesso motore e sulla stessa app | Briscola in tutte le modalità | — |
@@ -84,7 +85,7 @@ Una volta costituita una base utenti fidelizzata e attiva giornalmente:
 
 Target iOS nei `core:*` e UI in Compose Multiplatform (ADR-0012).
 
-## 3. Decisioni di Michele (2026-10-23…2026-10-26)
+## 3. Decisioni di Michele (2026-10-23…2026-10-27)
 
 | ID | Domanda | Decisione |
 | --- | --- | --- |
@@ -98,3 +99,10 @@ Target iOS nei `core:*` e UI in Compose Multiplatform (ADR-0012).
 | D8 | Identità dell'app | Nome sullo store **"Maestro – Scopa e Briscola"**; ID applicazione **`it.maestro.app`** (definitivo dopo la prima pubblicazione); account Play Console **personale già esistente** di Michele. Firma: Play App Signing, chiave di upload custodita da Michele fuori dal repository |
 | D9 | Suggerimento su richiesta in Sparring | Sì, in Fase 1 (F1-11) |
 | D10 | Inversione Fase 2 (Didattica/Economia) e Fase 3 (Online) | **Approvata il 2026-10-26.** In assenza iniziale di una massa critica di utenti per il matchmaking sincrono, la priorità va all'USP unica (Coaching, Puzzle del Giorno, Accademia) e alla monetizzazione/lancio su Play Store. L'infrastruttura online in tempo reale (server Ktor/WebSocket) diventa Fase 3, da lanciare su una base utenti già attiva |
+| D11 | Livelli nella UI | Proposta: 5 livelli presentati come avversari del circolo con nome e ritratto (F1R-18). Nomi e ritratti da Michele. **Da confermare** |
+| D12 | Priorità dopo la Fase 1 | **Approvata il 2026-10-27.** Prima la rifondazione dell'app (Fase 1R: architettura, regia del tavolo, feedback, review, loop di sessione), poi alpha su Play Console, poi monetizzazione (F2-08…F2-10) e lancio (F2-12) |
+| D13 | Architettura dell'app | **Approvata il 2026-10-27**: ADR-0014…0017 accettati, `docs/app/` vincolante. Ogni feature si rivede poi singolarmente con un dossier (`docs/app/features/`) |
+| D14 | Grafica e musica nuove | Le genera o le procura Michele quando un task le richiede (ADR-0008); gli agenti preparano l'elenco e l'integrazione |
+| D15 | Soglia di `ExpertReviewGamesTest` abbassata da 78% a 75% | Michele vuole 78%. Verifica del 2026-10-27: con 78% il test fallisce perché GreedyBot fa **77%** nella partita #12 dopo il nuovo peso della primiera (D2). **Aperta**: 77% (minimo necessario, motivato da D2) oppure rivedere il test |
+| D16 | Testi didattici | Li approva Michele prima di ogni rilascio (F1R-21) |
+| D17 | Prestazioni e stabilità (F1-04) | Playtest interni di Michele sul Pixel 10 Pro (2026-10-27): prestazioni buone, nessun crash. Problemi di layout su alcune schermate rispetto agli screenshot: li coprono ADR-0016 e F1R-06. Le misure del Pixel per la matrice le fornisce Michele quando servono. Il profilo di fascia bassa non è ancora misurato. Dopo la pre-alpha interna, alpha su Play Console (F1-15) |

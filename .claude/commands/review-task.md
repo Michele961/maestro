@@ -26,5 +26,12 @@ Uso: `/review-task <TASK_ID>` (es. `/review-task F1-01`)
    - L'AI e la vista non devono mai avere accesso a carte nascoste o allo stato completo (`ScopaView` vs `ScopaState`).
    - Immutabilità di stati e modelli.
    - Nessuna eccezione lanciata per mosse non valide (uso di `PlayResult.Rejected`).
-5. **Output della revisione:**
+5. **Verifica dell'architettura dell'app (se il task tocca `app:*`, ADR-0014…0017, `docs/app/`):**
+   - Nessun import vietato tra layer; la UI non chiama repository né `core:*` per calcoli.
+   - Nessun `delay()`, durata o timer fuori da `TableDirector` e `MotionSpec`; il bot non ha timer propri.
+   - Nessun `System.currentTimeMillis`/`LocalDate.now` fuori da `Clock`; nessun testo per l'utente nel codice.
+   - Misure di carte e avatar da una geometria; screenshot sulla matrice di ADR-0016 guardati e citati nella PR.
+   - Ricompense solo da `RewardEngine`; schema Room con migrazione e test.
+   - File ≤ 400 righe, composable ≤ 80 righe.
+6. **Output della revisione:**
    - Emetti un report strutturato indicando esito positivo o eventuali rilievi bloccanti da correggere prima del merge.
