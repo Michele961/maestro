@@ -16,6 +16,8 @@ import it.maestro.game.model.Suit
 import it.maestro.app.feature.table.presentation.OpponentMoveSummary
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.runtime.getValue
@@ -179,6 +181,28 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
         val step = SceneStep.Sweep(Seat.P1, Seat.P1)
         composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal, step), onIntent = {}) } }
         composeRule.onRoot().captureRoboImage(screen.path("table_human_sweep"))
+    }
+
+    @Test
+    fun points_race_shows_numbers_in_sparring() {
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}) } }
+        composeRule.onNodeWithTag("race_cards").assertTextContains("6–2")
+    }
+
+    @Test
+    fun points_race_shows_only_colors_in_classic() {
+        val classic = midDeal.copy(isSparring = false)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = classic, scene = sceneOf(classic), onIntent = {}) } }
+        composeRule.onNodeWithTag("race_cards").assertTextEquals("Carte")
+    }
+
+    @Test
+    fun hint_bubble_takes_the_place_of_the_points_race() {
+        val hint = ScopaMove(card = midDeal.humanHand[0], capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
+        val state = midDeal.copy(suggestedMove = hint)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}) } }
+        composeRule.onNodeWithTag("game_hint_banner").assertExists()
+        composeRule.onNodeWithTag("points_race").assertDoesNotExist()
     }
 
     @Test

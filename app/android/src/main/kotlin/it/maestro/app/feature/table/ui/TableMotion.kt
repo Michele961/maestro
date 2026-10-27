@@ -58,14 +58,16 @@ internal fun MovingCard(
     }
     val density = LocalDensity.current
     Box(
-        modifier = modifier
+        // Il bordo ([modifier]) segue la carta: va applicato dopo lo spostamento e la scala.
+        modifier = Modifier
             .offset { IntOffset(with(density) { position.value.x.roundToPx() }, with(density) { position.value.y.roundToPx() }) }
             .graphicsLayer {
                 scaleX = scale.value
                 scaleY = scale.value
                 rotationY = turn.value
                 cameraDistance = 12f * density.density
-            },
+            }
+            .then(modifier),
     ) {
         if (turn.value > FLIP_HALF) {
             CardBackView(width = width, height = height)
