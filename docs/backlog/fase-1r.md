@@ -243,7 +243,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-19 — Home senza voci finte
 
-- **Stato:** da fare
+- **Stato:** da fare (dossier `docs/app/features/home.md` in bozza, in attesa di Michele; suddivisione in 19a…e)
 - **Obiettivo:** nascondere Amici, Classifica, messaggi e gemme finché non esistono; una sola chiamata all'azione principale; partita in corso in evidenza.
 - **Criteri di accettazione:**
     - [ ] Ogni elemento toccabile della Home porta a una funzione esistente.

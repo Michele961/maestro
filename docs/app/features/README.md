@@ -20,7 +20,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 3 | Game Review e Rigioca l'errore | `review.md` (approvato) | F1R-10, F1R-16 | da fare |
 | 4 | Suggerimenti e Check in partita | `coach-in-game.md` | F1R-16 | da fare |
 | 5 | Pre-partita e avversari | `pre-game.md` | D11 | da fare |
-| 6 | Home | `home.md` | F1R-04 | da fare |
+| 6 | Home | `home.md` (bozza) | F1R-04 | da fare |
 | 7 | Sfida del giorno | `daily-puzzle.md` | F1R-02, F1R-10 | da fare |
 | 8 | Accademia | `academy.md` | F1R-10, F1R-21 | da fare |
 | 9 | Profilo, Maestria e Radar | `profile.md` | F1R-14 | da fare |
