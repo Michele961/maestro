@@ -40,11 +40,21 @@ public sealed interface RetryFeedback {
      *
      * @property messageRes Identificativo risorsa stringa del messaggio di riprova.
      * @property hintRes Identificativo risorsa stringa del suggerimento didattico.
+     * @property attempt Numero del tentativo sbagliato (1 = solo lo stimolo; dal 2 anche l'indizio).
      */
     public data class Imperfect(
         val messageRes: Int,
         val hintRes: Int,
-    ) : RetryFeedback
+        val attempt: Int = 1,
+    ) : RetryFeedback {
+        /** Dal secondo tentativo il Maestro dà anche l'indizio (stimolo → indizio → soluzione). */
+        public val showsHint: Boolean get() = attempt >= HINT_FROM_ATTEMPT
+
+        public companion object {
+            /** Primo tentativo sbagliato per cui compare l'indizio. */
+            public const val HINT_FROM_ATTEMPT: Int = 2
+        }
+    }
 }
 
 /**
@@ -61,6 +71,7 @@ public data class GameReviewUiState(
     val solvedStepIndices: Set<Int> = emptySet(),
     val revealedStepIndices: Set<Int> = emptySet(),
     val selectedRetryCard: Card? = null,
+    val retryAttempts: Int = 0,
     val humanSeat: Seat = Seat.P1,
     val matchSeed: Long = 0L,
 ) {
@@ -213,6 +224,7 @@ public class GameReviewViewModel : ViewModel() {
                 isRetryMode = true,
                 retryFeedback = null,
                 selectedRetryCard = null,
+                retryAttempts = 0,
             )
         }
     }
@@ -267,7 +279,9 @@ public class GameReviewViewModel : ViewModel() {
                     retryFeedback = RetryFeedback.Imperfect(
                         messageRes = R.string.review_retry_imperfect,
                         hintRes = hintRes,
+                        attempt = current.retryAttempts + 1,
                     ),
+                    retryAttempts = current.retryAttempts + 1,
                     selectedRetryCard = card,
                 )
             }

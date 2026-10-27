@@ -114,7 +114,11 @@ class GameReviewRetryUiTest {
         playCard(imperfectTag)
         composeRule.waitForIdle()
 
+        // Primo errore: solo lo stimolo. Al secondo arriva anche l'indizio.
         composeRule.onNodeWithTag("review_retry_feedback").assertIsDisplayed()
+        composeRule.onNodeWithTag("review_retry_hint").assertDoesNotExist()
+        playCard(imperfectTag)
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag("review_retry_hint").assertIsDisplayed()
         composeRule.onNodeWithTag("review_timeline_dot_${stepIndex}_solved").assertDoesNotExist()
 

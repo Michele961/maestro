@@ -616,13 +616,15 @@ private fun RetryEvaluationBanner(
                             color = BlunderBadgeColor,
                             modifier = Modifier.testTag("review_retry_feedback"),
                         )
-                        Text(
-                            text = stringResource(id = retryFeedback.hintRes),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = InkColor.copy(alpha = 0.9f),
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.testTag("review_retry_hint"),
-                        )
+                        if (retryFeedback.showsHint) {
+                            Text(
+                                text = stringResource(id = retryFeedback.hintRes),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = InkColor.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.testTag("review_retry_hint"),
+                            )
+                        }
                     }
                     null -> {
                         Text(
