@@ -68,7 +68,8 @@ public data class TurnContext(
  * la memoria della partita: intervallo minimo, tetto per smazzata, ripetizioni, battute dette.
  */
 public class MomentDirector(
-    private val chattiness: Chattiness = Chattiness.NORMAL,
+    /** Si può cambiare durante la partita (impostazione «Chiacchiere»). */
+    public var chattiness: Chattiness = Chattiness.NORMAL,
     private val rng: SeededRng = SeededRng(0L),
 ) {
     private var lastSpokenMove: Int? = null

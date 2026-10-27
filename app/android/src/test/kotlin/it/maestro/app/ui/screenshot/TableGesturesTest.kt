@@ -170,6 +170,43 @@ class TableGesturesTest {
         composeRule.onNodeWithText(uiState.deckCardCount.toString()).assertExists()
     }
 
+    @Test
+    fun maestroLineShowsAtRestAndDismissesOnTap() {
+        val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
+        val line = it.maestro.app.domain.coach.VoiceLine(
+            kind = it.maestro.app.domain.coach.MomentKind.GREETING,
+            phrases = listOf(it.maestro.app.domain.coach.Phrase("voice_greeting_1")),
+            tone = it.maestro.app.domain.coach.Tone.WARM,
+            pose = it.maestro.app.domain.coach.Pose.PLEASED,
+        )
+        val uiState = initial.state.toUiState().copy(maestroLine = line)
+        val intents = mutableListOf<GameIntent>()
+        composeRule.setContent {
+            MaestroTheme { TableContent(uiState = uiState, scene = sceneOf(uiState), onIntent = { intents += it }) }
+        }
+        composeRule.onNodeWithTag("maestro_line_bubble").assertExists()
+        composeRule.onNodeWithTag("maestro_line_bubble").performClick()
+        assertEquals(true, intents.any { it is GameIntent.DismissMaestroLine })
+    }
+
+    @Test
+    fun maestroLineIsHiddenWhileTheSceneIsBusy() {
+        val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
+        val line = it.maestro.app.domain.coach.VoiceLine(
+            kind = it.maestro.app.domain.coach.MomentKind.GREETING,
+            phrases = listOf(it.maestro.app.domain.coach.Phrase("voice_greeting_1")),
+            tone = it.maestro.app.domain.coach.Tone.WARM,
+            pose = it.maestro.app.domain.coach.Pose.PLEASED,
+        )
+        val uiState = initial.state.toUiState().copy(maestroLine = line)
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(uiState = uiState, scene = sceneOf(uiState, SceneStep.DealCard(0, Seat.P1)), onIntent = {})
+            }
+        }
+        composeRule.onNodeWithTag("maestro_line_bubble").assertDoesNotExist()
+    }
+
     @org.junit.After
     fun tearDown() {
         org.koin.core.context.stopKoin()

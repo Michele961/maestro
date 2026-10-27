@@ -20,6 +20,8 @@ import it.maestro.app.domain.match.RestoreMatchResult
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.designsystem.motion.MotionSpec
 import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.match.Beat
 import it.maestro.app.domain.match.PresentationGate
 import it.maestro.app.feature.table.presentation.director.TableDirector
 import it.maestro.app.feature.table.presentation.director.TableScene
@@ -46,6 +48,9 @@ public class GameViewModel(
     // Senza interfaccia (test con Unconfined) il cancello è aperto e la regia non aspetta.
     presentationGate: PresentationGate? = null,
     gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
+    chattiness: Flow<Chattiness> = flowOf(Chattiness.NORMAL),
+    hintEverUsed: Flow<Boolean> = flowOf(false),
+    private val onHintUsed: suspend () -> Unit = {},
 ) : ViewModel() {
 
     private val scope: kotlinx.coroutines.CoroutineScope = coroutineScope ?: viewModelScope
@@ -55,6 +60,9 @@ public class GameViewModel(
 
     private val withoutUi = ioDispatcher == Dispatchers.Unconfined
     private var currentSpeed: GameSpeed = GameSpeed.NORMAL
+    private var currentChattiness: Chattiness = Chattiness.NORMAL
+    private var hintUsedBefore: Boolean = false
+    private var voice: MaestroVoice = MaestroVoice(seed = 0L, human = Seat.P1)
     private var botRng: SeededRng = SeededRng(12345L)
     private var botJob: Job? = null
     private var hintJob: Job? = null
@@ -87,6 +95,28 @@ public class GameViewModel(
     public fun continueAfterSummary() {
         onIntent(GameIntent.DismissDealSummary)
         director.value?.resume()
+    }
+
+    /** Il Maestro commenta la partita (solo Sparring): saluto a inizio partita, poi una battuta dopo certe mosse. */
+    private fun updateMaestroVoice(intent: GameIntent, previousBeat: Beat?) {
+        val state = internalState
+        when (intent) {
+            is GameIntent.StartMatch -> {
+                voice = MaestroVoice(intent.seed, state.humanSeat)
+                if (state.isSparring) voice.greeting(currentChattiness, hintUsedBefore)?.let { internalState = state.copy(maestroLine = it) }
+            }
+            is GameIntent.RestoreMatch -> voice = MaestroVoice(intent.session.log.seed + intent.session.log.moves.size, state.humanSeat)
+            is GameIntent.RequestHint -> if (!hintUsedBefore) {
+                hintUsedBefore = true
+                scope.launch { onHintUsed() }
+            }
+            else -> {
+                val beat = state.lastBeat?.takeIf { it !== previousBeat } ?: return
+                if (state.isSparring) {
+                    voice.onBeat(beat, state.session, currentChattiness, hintUsedBefore)?.let { internalState = state.copy(maestroLine = it) }
+                }
+            }
+        }
     }
 
     private fun resetDirector(restoreAt: Long?) {
@@ -134,6 +164,8 @@ public class GameViewModel(
 
     init {
         scope.launch { gameSpeed.collect { currentSpeed = it } }
+        scope.launch { chattiness.collect { currentChattiness = it } }
+        scope.launch { hintEverUsed.collect { hintUsedBefore = it } }
         val initialResult = GameReducer.initial()
         internalState = initialResult.state
         _uiState = MutableStateFlow(internalState.toUiState())
@@ -165,6 +197,7 @@ public class GameViewModel(
             is GameIntent.RestoreMatch -> resetDirector(restoreAt = internalState.lastMoveId)
             else -> internalState.lastBeat?.takeIf { it !== previousBeat }?.let { director.value?.enqueue(it) }
         }
+        updateMaestroVoice(intent, previousBeat)
         _uiState.value = internalState.toUiState()
 
         // Persistenza automatica della partita (ADR-0003, task F1-08)

@@ -98,6 +98,10 @@ public object GameReducer {
             is GameIntent.DismissEvent -> {
                 GameReducerResult(state.copy(lastEvent = null))
             }
+
+            is GameIntent.ShowMaestroLine -> GameReducerResult(state.copy(maestroLine = intent.line))
+
+            is GameIntent.DismissMaestroLine -> GameReducerResult(state.copy(maestroLine = null))
         }
     }
 
@@ -321,6 +325,7 @@ public object GameReducer {
                 val newState = state.copy(
                     session = next,
                     pendingCapture = null,
+                    maestroLine = if (isBotMove) state.maestroLine else null,
                     pendingDealScore = dealScore ?: state.pendingDealScore,
                     suggestedMove = null,
                     isHintLoading = false,

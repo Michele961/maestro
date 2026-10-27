@@ -584,6 +584,11 @@
     <string name="settings_test_match_subtitle">Start a match directly at the final hand to test endgame, Elo, missions, and review.</string>
     <string name="settings_test_match_button">Quick Match at Final Hand</string>
 
+    <string name="settings_maestro_chat">Maestro\'s chatter</string>
+    <string name="settings_maestro_chat_talkative">Often</string>
+    <string name="settings_maestro_chat_normal">Normal</string>
+    <string name="settings_maestro_chat_quiet">Rarely</string>
+    <string name="settings_maestro_chat_off">Never</string>
     <string name="settings_game_speed">Game speed</string>
     <string name="settings_game_speed_normal">Normal</string>
     <string name="settings_game_speed_fast">Fast</string>

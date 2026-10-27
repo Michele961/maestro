@@ -6,6 +6,7 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
+import it.maestro.app.domain.coach.VoiceLine
 import it.maestro.app.domain.match.Beat
 import it.maestro.app.domain.match.MatchSession
 import it.maestro.game.scopa.ScopaConfig
@@ -103,6 +104,8 @@ public data class GameUiState(
     val pendingDealScore: DealScore? = null,
     val lastEvent: UiGameEvent?,
     val errorMessage: String?,
+    /** Battuta spontanea del Maestro da mostrare (Sparring), `null` se tace. */
+    val maestroLine: VoiceLine? = null,
     /** Ultima mossa giocata, utile per l'animazione al tavolo (task F1-24). */
     val lastMove: ScopaMove? = null,
     val lastMover: Seat? = null,
@@ -148,6 +151,8 @@ public sealed interface GameIntent {
     public data object DismissTrainingQuestion : GameIntent
     public data object DismissError : GameIntent
     public data object DismissEvent : GameIntent
+    public data class ShowMaestroLine(val line: VoiceLine) : GameIntent
+    public data object DismissMaestroLine : GameIntent
 }
 
 /**
@@ -177,6 +182,7 @@ public data class GameInternalState(
     val lastMoveId: Long = 0L,
     /** Ultima battuta prodotta dalla sessione: la presentazione la inoltra alla regia del tavolo. */
     val lastBeat: Beat? = null,
+    val maestroLine: VoiceLine? = null,
     val opponentLastMove: OpponentMoveSummary? = null,
     val dealAnimationId: Long = 0L,
     val isInitialDeal: Boolean = false,
@@ -218,6 +224,7 @@ public data class GameInternalState(
             pendingDealScore = pendingDealScore,
             lastEvent = lastEvent,
             errorMessage = lastError,
+            maestroLine = maestroLine,
             lastMove = lastMove,
             lastMover = lastMover,
             lastMoveId = lastMoveId,

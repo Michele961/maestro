@@ -112,6 +112,9 @@ public val appModule: Module = module {
         GameViewModel(
             matchRepository = get(),
             gameSpeed = get<SettingsRepository>().settingsFlow.map { it.gameSpeed },
+            chattiness = get<SettingsRepository>().settingsFlow.map { it.maestroChattiness },
+            hintEverUsed = get<SettingsRepository>().settingsFlow.map { it.hintEverUsed },
+            onHintUsed = { get<SettingsRepository>().markHintUsed() },
         )
     }
 
