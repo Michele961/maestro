@@ -14,7 +14,7 @@ import it.maestro.app.ui.theme.MaestroTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -22,12 +22,22 @@ import org.robolectric.annotation.GraphicsMode
  * Screenshot test per il Dialog delle Missioni Didattiche Quotidiane e Streak ("Fiamma") (task F2-05).
  */
 @OptIn(ExperimentalRoborazziApi::class)
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class DailyMissionsScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     @Test
@@ -76,7 +86,7 @@ class DailyMissionsScreenshotTest {
                 )
             }
         }
-        captureScreenRoboImage("build/outputs/roborazzi/daily_missions_dialog_active_streak.png")
+        captureScreenRoboImage(screen.path("daily_missions_dialog_active_streak"))
     }
 
     @Test
@@ -125,6 +135,6 @@ class DailyMissionsScreenshotTest {
                 )
             }
         }
-        captureScreenRoboImage("build/outputs/roborazzi/daily_missions_dialog_all_completed.png")
+        captureScreenRoboImage(screen.path("daily_missions_dialog_all_completed"))
     }
 }

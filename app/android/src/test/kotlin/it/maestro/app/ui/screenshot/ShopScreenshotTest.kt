@@ -18,7 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -26,12 +26,22 @@ import org.robolectric.annotation.GraphicsMode
  * Screenshot e interaction test per "La Bottega del Maestro" (F2-11).
  * Verifica visuale dell'assenza di grigio di sistema, fedeltà dello sfondo noce e rendering degli elementi.
  */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w411dp-h891dp-xxhdpi", application = Application::class)
-class ShopScreenshotTest {
+@Config(sdk = [35], application = Application::class)
+class ShopScreenshotTest(private val screen: ScreenConfig) {
 
-    @get:Rule
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun screens(): List<Array<Any>> = ScreenConfig.parameters()
+    }
+
+    @get:Rule(order = 0)
+    val screenRule = ScreenConfigRule(screen)
+
+
+    @get:Rule(order = 1)
     val composeRule = createComposeRule()
 
     private fun sampleStateForCategory(
@@ -127,7 +137,7 @@ class ShopScreenshotTest {
                 )
             }
         }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/shop_screen_tables.png")
+        composeRule.onRoot().captureRoboImage(screen.path("shop_screen_tables"))
     }
 
     @Test
@@ -144,7 +154,7 @@ class ShopScreenshotTest {
                 )
             }
         }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/shop_screen_card_backs.png")
+        composeRule.onRoot().captureRoboImage(screen.path("shop_screen_card_backs"))
     }
 
     @Test
@@ -161,7 +171,7 @@ class ShopScreenshotTest {
                 )
             }
         }
-        composeRule.onRoot().captureRoboImage("build/outputs/roborazzi/shop_screen_avatars.png")
+        composeRule.onRoot().captureRoboImage(screen.path("shop_screen_avatars"))
     }
 
     @Test
