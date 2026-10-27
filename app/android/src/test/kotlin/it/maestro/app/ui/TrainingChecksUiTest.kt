@@ -1,5 +1,7 @@
 package it.maestro.app.ui
 
+import it.maestro.app.scopaState
+
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.feature.table.presentation.GameIntent
 import it.maestro.app.feature.table.presentation.GameReducer
@@ -58,8 +60,8 @@ class TrainingChecksUiTest {
         // Assicuriamoci che sia il turno di P1
         while (state.scopaState.toMove != Seat.P1) {
             val botMove = legalMoves(state.scopaState).first()
-            val applied = play(state.scopaState, botMove) as it.maestro.game.scopa.PlayResult.Applied
-            state = state.copy(scopaState = applied.state)
+            val applied = state.session.play(botMove, Seat.P1) as it.maestro.app.domain.match.SessionPlay.Applied
+            state = state.copy(session = applied.session)
         }
 
         // Iniettiamo una domanda attiva
@@ -140,8 +142,8 @@ class TrainingChecksUiTest {
 
         while (state.scopaState.toMove != Seat.P1) {
             val botMove = legalMoves(state.scopaState).first()
-            val applied = play(state.scopaState, botMove) as it.maestro.game.scopa.PlayResult.Applied
-            state = state.copy(scopaState = applied.state)
+            val applied = state.session.play(botMove, Seat.P1) as it.maestro.app.domain.match.SessionPlay.Applied
+            state = state.copy(session = applied.session)
         }
 
         val stateWithQuestion = state.copy(activeTrainingQuestion = mockQuestion)

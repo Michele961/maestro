@@ -1,5 +1,7 @@
 package it.maestro.app.game
 
+import it.maestro.app.scopaState
+
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank

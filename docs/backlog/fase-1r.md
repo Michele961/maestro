@@ -124,16 +124,17 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-08 — `MatchSession` nel dominio
 
-- **Stato:** in corso (parte 1 fatta, parte 2 da fare)
+- **Stato:** fatto (parte 1 e parte 2)
 - **Riferimenti:** ADR-0015, `docs/app/layers.md` §3, `docs/app/table-director.md` §1–2
 - **Obiettivo:** `MatchSession` sostituisce la logica di partita di `GameReducer`/`GameViewModel`: applica le mosse, produce `Beat`, salva, chiama il bot solo dopo `PresentationGate.awaitIdle`, con tempo di riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono.
 - **Criteri di accettazione:**
-    - [ ] Test con gate finto: il bot non muove prima di `awaitIdle`.
-    - [ ] Test: una partita completa su seed fisso produce lo stesso `MatchLog` di oggi.
-    - [ ] La presentazione non riceve mai `ScopaState` (test F1R-01 senza eccezioni per questo punto).
+    - [x] Test con gate finto: il bot non muove prima di `awaitIdle`.
+    - [x] Test: una partita completa su seed fisso produce lo stesso `MatchLog` di oggi.
+    - [x] La presentazione non riceve mai `ScopaState` (test F1R-01 senza eccezioni per questo punto).
 - **Suddivisione (2026-10-27):** il task supera le 400 righe e si divide in due parti.
     - **Parte 1:** il bot aspetta la fine della scena tramite `PresentationGate`, alimentato dal tavolo attuale (`UiPresentationGate`), e la riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono. Test `BotWaitsForPresentationTest`.
     - **Parte 2 (F1R-08b nel dossier `docs/app/features/table.md`):** `MatchSession` con le `Beat` e il reducer che lavora solo sulla vista. Chiude i criteri "stesso `MatchLog`" e "nessuno `ScopaState` in presentazione".
+- **Nota parte 2:** `MatchSession` (domain/match) è l'unico a vedere `ScopaState`; il reducer lavora su `MatchSession` e viste. Le `Beat` restano da collegare alla regia nel tavolo ridisegnato (F1R-12a/b). Il cancello del bot resta `UiPresentationGate` finché il tavolo non usa il `TableDirector`.
 - **Domande aperte:** —
 
 ## F1R-09 — `MotionSpec` e `GameSpeed`

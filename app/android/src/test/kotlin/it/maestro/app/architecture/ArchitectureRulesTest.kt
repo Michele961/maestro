@@ -34,10 +34,6 @@ class ArchitectureRulesTest {
         // Timer: la regia del tavolo sostituisce i ritardi sparsi.
         ex("feature/table/ui/TableScreen.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
         ex("feature/table/ui/SweepCelebrationOverlay.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
-        // Stato completo della partita solo in MatchSession.
-        ex("feature/table/presentation/GameModel.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
-        ex("feature/table/presentation/TestMatchGenerator.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
-        ex("data/repository/MatchRepository.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
     )
 
     @Test

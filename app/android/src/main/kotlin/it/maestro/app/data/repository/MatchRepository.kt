@@ -6,8 +6,8 @@ import it.maestro.app.data.local.db.SavedMatchEntity
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ReplayResult
-import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.replay
+import it.maestro.app.domain.match.MatchSession
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
 
@@ -16,7 +16,7 @@ import it.maestro.app.domain.time.SystemClock
  */
 public sealed interface RestoreMatchResult {
     public data class Success(
-        val state: ScopaState,
+        val session: MatchSession,
         val matchLog: MatchLog,
         val level: DifficultyLevel,
         val targetScore: Int,
@@ -117,7 +117,8 @@ public class RoomMatchRepository(
                     DifficultyLevel.INTERMEDIO
                 }
                 RestoreMatchResult.Success(
-                    state = result.state,
+                    session = MatchSession.fromLog(parsedLog)
+                        ?: return RestoreMatchResult.Corrupted("Log non rigiocabile"),
                     matchLog = parsedLog,
                     level = level,
                     targetScore = active.targetScore,
@@ -198,7 +199,8 @@ public class InMemoryMatchRepository(
                     DifficultyLevel.INTERMEDIO
                 }
                 RestoreMatchResult.Success(
-                    state = result.state,
+                    session = MatchSession.fromLog(parsedLog)
+                        ?: return RestoreMatchResult.Corrupted("Log non rigiocabile"),
                     matchLog = parsedLog,
                     level = level,
                     targetScore = active.targetScore,

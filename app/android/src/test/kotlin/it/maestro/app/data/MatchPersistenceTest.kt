@@ -90,8 +90,7 @@ class MatchPersistenceTest {
 
         viewModel2.onIntent(
             GameIntent.RestoreMatch(
-                state = restoredMatch.state,
-                matchLog = restoredMatch.matchLog,
+                session = restoredMatch.session,
                 level = restoredMatch.level,
             ),
         )

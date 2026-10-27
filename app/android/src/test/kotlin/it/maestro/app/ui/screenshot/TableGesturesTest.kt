@@ -1,5 +1,7 @@
 package it.maestro.app.ui.screenshot
 
+import it.maestro.app.scopaState
+
 import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag

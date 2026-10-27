@@ -1,5 +1,7 @@
 package it.maestro.app.game
 
+import it.maestro.app.fullState
+
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.PlayResult
@@ -15,7 +17,9 @@ class TestMatchGeneratorTest {
 
     @Test
     fun generateEndgameMatch_producesPlayableStateWithOneCardEach() {
-        val (state, log) = TestMatchGenerator.generateEndgameMatch(seed = 101L)
+        val session = TestMatchGenerator.generateEndgameMatch(seed = 101L)
+        val state = session.fullState()
+        val log = session.log
 
         assertNotNull(state)
         assertNotNull(log)
