@@ -50,6 +50,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
+            rewardEngine = RewardEngine(it.maestro.app.data.local.wallet.InMemoryWalletRepository(), repo, it.maestro.app.data.local.datastore.InMemoryMasteryRepository(), FakeClock(testDate)),
             clock = FakeClock(testDate),
         )
 
@@ -75,6 +76,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
+            rewardEngine = RewardEngine(it.maestro.app.data.local.wallet.InMemoryWalletRepository(), repo, it.maestro.app.data.local.datastore.InMemoryMasteryRepository(), FakeClock(testDate)),
             clock = FakeClock(testDate),
         )
 

@@ -35,7 +35,7 @@ public data class DailyMissionsUiState(
  */
 public class DailyMissionsViewModel(
     private val retentionRepository: RetentionRepository,
-    private val rewardEngine: RewardEngine? = null,
+    private val rewardEngine: RewardEngine,
     private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
@@ -64,7 +64,7 @@ public class DailyMissionsViewModel(
     )
 
     public fun claimReward(mission: DailyMission) {
-        viewModelScope.launch { rewardEngine?.claimMission(mission) }
+        viewModelScope.launch { rewardEngine.claimMission(mission) }
     }
 
     /** Rilegge la data dal [Clock]; da chiamare quando l'app torna in primo piano (task F1R-02). */
@@ -73,6 +73,6 @@ public class DailyMissionsViewModel(
     }
 
     public fun recordActivity() {
-        viewModelScope.launch { rewardEngine?.recordActivity() }
+        viewModelScope.launch { rewardEngine.recordActivity() }
     }
 }
