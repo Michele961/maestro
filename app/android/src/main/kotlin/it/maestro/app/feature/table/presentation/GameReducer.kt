@@ -15,9 +15,6 @@ import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.buildTrainingQuestion
 import it.maestro.game.training.isCriticalTrainingMoment
 
-private const val BOT_INITIAL_DEAL_DELAY_MS = 2500L
-private const val BOT_HAND_DEAL_DELAY_MS = 2600L
-private const val BOT_NORMAL_MOVE_DELAY_MS = 1400L
 
 /**
  * Reducer puro per la gestione dello stato della partita di Scopa (ADR-0012, task F1-05).
@@ -52,7 +49,6 @@ public object GameReducer {
             GameEffect.ScheduleBotMove(
                 level = intent.level,
                 botSeat = intent.humanSeat.other(),
-                delayMillis = BOT_INITIAL_DEAL_DELAY_MS,
             )
         } else {
             null
@@ -193,7 +189,6 @@ public object GameReducer {
             GameEffect.ScheduleBotMove(
                 level = state.botLevel,
                 botSeat = botSeat,
-                delayMillis = BOT_INITIAL_DEAL_DELAY_MS,
             )
         } else {
             null
@@ -218,7 +213,6 @@ public object GameReducer {
             GameEffect.ScheduleBotMove(
                 level = intent.level,
                 botSeat = botSeat,
-                delayMillis = BOT_NORMAL_MOVE_DELAY_MS,
             )
         } else {
             null
@@ -268,7 +262,6 @@ public object GameReducer {
             effect = GameEffect.ScheduleBotMove(
                 level = state.botLevel,
                 botSeat = botSeat,
-                delayMillis = BOT_NORMAL_MOVE_DELAY_MS,
             ),
         )
     }
@@ -358,11 +351,9 @@ public object GameReducer {
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {
-                    val delay = if (hadCardsDealt) BOT_HAND_DEAL_DELAY_MS else BOT_NORMAL_MOVE_DELAY_MS
                     GameEffect.ScheduleBotMove(
                         level = state.botLevel,
                         botSeat = botSeat,
-                        delayMillis = delay,
                     )
                 } else {
                     null

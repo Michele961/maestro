@@ -124,13 +124,16 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-08 — `MatchSession` nel dominio
 
-- **Stato:** da fare
+- **Stato:** in corso (parte 1 in revisione)
 - **Riferimenti:** ADR-0015, `docs/app/layers.md` §3, `docs/app/table-director.md` §1–2
 - **Obiettivo:** `MatchSession` sostituisce la logica di partita di `GameReducer`/`GameViewModel`: applica le mosse, produce `Beat`, salva, chiama il bot solo dopo `PresentationGate.awaitIdle`, con tempo di riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono.
 - **Criteri di accettazione:**
     - [ ] Test con gate finto: il bot non muove prima di `awaitIdle`.
     - [ ] Test: una partita completa su seed fisso produce lo stesso `MatchLog` di oggi.
     - [ ] La presentazione non riceve mai `ScopaState` (test F1R-01 senza eccezioni per questo punto).
+- **Suddivisione (2026-10-27):** il task supera le 400 righe e si divide in due parti.
+    - **Parte 1:** il bot aspetta la fine della scena tramite `PresentationGate`, alimentato dal tavolo attuale (`UiPresentationGate`), e la riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono. Test `BotWaitsForPresentationTest`.
+    - **Parte 2 (insieme a F1R-10):** `MatchSession` con le `Beat` e il reducer che lavora solo sulla vista. Chiude i criteri "stesso `MatchLog`" e "nessuno `ScopaState` in presentazione".
 - **Domande aperte:** —
 
 ## F1R-09 — `MotionSpec` e `GameSpeed`
@@ -155,7 +158,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-11 — `TableGeometry` e layout a zone
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** ADR-0016, `docs/app/responsive-ui.md` §2–3, `docs/app/game-feel.md` §4
 - **Obiettivo:** geometria pura del tavolo con le zone di `game-feel.md` §4 (pile davanti a ciascun giocatore, mazzo a lato, mano intera).
 - **Criteri di accettazione:**

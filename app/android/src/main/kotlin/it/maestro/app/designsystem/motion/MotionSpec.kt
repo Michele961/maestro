@@ -1,6 +1,7 @@
 package it.maestro.app.designsystem.motion
 
 import it.maestro.app.domain.settings.GameSpeed
+import kotlinx.coroutines.delay
 import kotlin.math.roundToLong
 
 /**
@@ -70,6 +71,11 @@ public object MotionSpec {
         val max = MotionToken.BOT_THINK_MAX.baseMillis
         val fraction = ((legalMoves - 1).coerceIn(0, BUSY_CHOICES - 1)).toDouble() / (BUSY_CHOICES - 1)
         return scale((min + (max - min) * fraction).roundToLong(), speed)
+    }
+
+    /** Attende [millis]: l'unico punto dell'app, con la regia del tavolo, in cui si aspetta del tempo (ADR-0015). */
+    public suspend fun pause(millis: Long) {
+        if (millis > 0L) delay(millis)
     }
 
     /** Numero di mosse legali da cui il bot "pensa" il massimo del tempo. */
