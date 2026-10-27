@@ -81,7 +81,9 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
 
     @Test
     fun deal_summary_dialog_screenshot() {
-        composeRule.setContent { MaestroTheme { TableContent(uiState = base.copy(pendingDealScore = score), scene = sceneOf(base.copy(pendingDealScore = score)), onIntent = {}) } }
+        val state = base.copy(pendingDealScore = score)
+        val step = it.maestro.app.feature.table.presentation.director.SceneStep.AwaitDealSummary(score)
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state, step), onIntent = {}) } }
         captureScreenRoboImage(screen.path("dialog_deal_summary"))
     }
 

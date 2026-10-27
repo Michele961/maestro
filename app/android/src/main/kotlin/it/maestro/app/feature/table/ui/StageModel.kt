@@ -117,7 +117,7 @@ public data class StageModel(
                     table = (before.table + step.card).mapIndexed { i, c -> TableEntry(c, slot = i) }
                     layoutCount = table.size
                 }
-                is SceneStep.Sweep, is SceneStep.DealSummaryRow -> {
+                is SceneStep.Sweep, is SceneStep.DealSummaryRow, is SceneStep.AwaitDealSummary -> {
                     val cards = if (newDeal) emptyList() else after.table
                     table = cards.mapIndexed { i, c -> TableEntry(c, slot = i) }
                     layoutCount = cards.size
