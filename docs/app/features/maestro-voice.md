@@ -1,6 +1,6 @@
 # La voce del Maestro — dossier
 
-Stato: **direzione confermata da Michele** (2026-10-27); restano da chiudere le domande di dettaglio del §6 · 2026-10-27 · task collegati: F1R-24 (da suddividere dopo l'approvazione), F1R-16, F1R-13
+Stato: **approvato** (Michele, 2026-10-27; frequenza e umorismo si tarano con le simulazioni) · 2026-10-27 · task collegati: F1R-24 (da suddividere dopo l'approvazione), F1R-16, F1R-13
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
 Fonte: indicazione di Michele del 2026-10-27 («battute dinamiche, nei momenti chiave, né troppo spesso né ravvicinate, con umanità e spirito; il Maestro che ti dice che puoi chiedere aiuto»).
 
@@ -77,12 +77,12 @@ Michele non può leggere ogni combinazione. Si fa così:
 | F1R-24f | Trascrizioni | Strumento che scrive cosa direbbe il Maestro in una partita a seed fisso |
 | F1R-24g | Revisione dinamica e tuning | La Game Review usa fatti e componenti; elenco delle spiegazioni imprecise (da Michele e dai test) e correzione una per una, con test su casi noti |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-27)
 
-1. **Modello**: va bene un Maestro **componibile e senza rete** (frasi costruite da fatti veri, varianti da seed, testi approvati da te)? In alternativa o in aggiunta, un Maestro con un modello linguistico dal server (battute libere): più «vivo», ma richiede rete, costa a ogni partita, non è riproducibile e va controllato. Proposta: partire offline, lasciare lo spazio per l'LLM in Fase 3.
-2. **Frequenza iniziale**: una battuta spontanea ogni 3 mosse del giocatore al massimo (e in pratica meno) ti sembra giusta come punto di partenza da tarare nel playtest?
-3. **Umorismo**: quanto spinto? Bonario e raro, sempre legato a un fatto di gioco, mai sul giocatore. Ci sono temi da evitare o da usare (il bar, il circolo, il caffè)?
-4. **Offerta d'aiuto**: il Maestro può prendere l'iniziativa («vuoi un indizio?») o deve solo dire una volta che esiste e poi aspettare?
-5. **Impostazione**: ti va un controllo «Chiacchiere del Maestro» a tre livelli, o preferisci nessun controllo per non complicare?
-6. **Sparring/Classica**: in Classica solo pose, come da `game-feel.md`. Confermi?
-7. **Ordine**: questa feature viene prima o dopo la fine partita e ricompense (F1R-14/15)? Proposta: dopo F1R-14, perché cambia il sapore di ogni partita ma non il loop.
+1. **Modello**: Maestro **componibile e senza rete**. Il lato server/LLM si valuta più avanti, se serve.
+2. **Frequenza iniziale**: non fissata a priori; si decide guardando le **simulazioni** (trascrizioni F1R-24f e test di ritmo). Il valore del §3.1 è solo un punto di partenza.
+3. **Umorismo**: da **tarare** (nelle trascrizioni e nei playtest).
+4. **Aiuto**: il Maestro **esiste** e dice che si può chiedere un indizio; talvolta **prende l'iniziativa** se nota qualcosa che non va (errore evidente, tavolo pericoloso), con il freno del ritmo.
+5. **Impostazione «Chiacchiere del Maestro»**: sì, a più livelli. Da **valutare** una modalità per **mutarlo** del tutto (stile Clash Royale).
+6. **Classica**: niente aiuti né battute testuali, solo pose. Potenzialmente l'**Elo si valuterà in questa modalità** (quindi niente consigli in Classica, nemmeno su richiesta).
+7. **Ordine**: questa feature viene **prima** della fine partita; poi fine partita; poi revisione. Le ricompense dipendono dall'economia di gioco, dal multiplayer e dalle modalità di gioco: se ne parla con quelle.
