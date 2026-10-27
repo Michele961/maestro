@@ -316,6 +316,8 @@ public fun TableContent(
                         canPlay = scene.inputEnabled && uiState.isHumanTurn,
                         atRest = !scene.busy,
                         sweepBy = (step as? SceneStep.Sweep)?.actor,
+                        stepKey = step,
+                        stepMillis = scene.stepMillis.toInt(),
                         onPlay = { card ->
                             soundManager.play(SoundEffect.CARD_PLAY)
                             onIntent(GameIntent.PlayCard(card))

@@ -2,6 +2,7 @@ package it.maestro.app.feature.table.presentation.director
 
 import it.maestro.app.designsystem.motion.MotionSpec
 import it.maestro.app.domain.match.Beat
+import it.maestro.app.domain.match.MatchSession
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.GameEvent
@@ -181,5 +182,56 @@ class TableDirectorTest {
         val start = currentTime
         director.awaitPresented(7L, 0L)
         assertEquals(start, currentTime)
+    }
+
+    @Test
+    fun sceneCarriesTheDurationOfTheCurrentStep() = runTest {
+        val beat = findBeat { it.actor == human && it.events.size == 1 }
+        val director = TableDirector(
+            TestScope(StandardTestDispatcher(testScheduler)), human, beat.viewBefore, speed = { GameSpeed.FAST },
+        )
+        director.enqueue(beat)
+        runCurrent()
+        val step = director.scene.value.step!!
+        assertEquals(MotionSpec.millis(step.token, GameSpeed.FAST), director.scene.value.stepMillis)
+        assertEquals(beat.actor, director.scene.value.actor)
+        assertEquals(beat.move.card, director.scene.value.played)
+    }
+
+    @Test
+    fun skippedStepsHaveNoDuration() = runTest {
+        val beat = findBeat { it.actor != human && it.events.size == 1 }
+        val director = TableDirector(TestScope(StandardTestDispatcher(testScheduler)), human, beat.viewBefore)
+        director.enqueue(beat)
+        runCurrent()
+        director.skip()
+        advanceTimeBy(MotionSpec.millis(director.scene.value.step!!.token))
+        runCurrent()
+        assertTrue(director.scene.value.stepMillis == 0L || !director.scene.value.busy)
+    }
+
+    @Test
+    fun openingDealShufflesThenDealsFourToTheTableAndSixToTheHands() = runTest {
+        val view = MatchSession.start(ScopaConfig(), 11L).view(human)
+        val director = TableDirector(TestScope(StandardTestDispatcher(testScheduler)), human, view)
+        val shown = mutableListOf<SceneStep>()
+        backgroundScope.launch(StandardTestDispatcher(testScheduler)) {
+            director.scene.collect { scene -> scene.step?.let { if (shown.lastOrNull() != it) shown += it } }
+        }
+        director.enqueueOpeningDeal(view)
+        advanceUntilIdle()
+        assertEquals(BeatScript.openingDeal(view.dealer), shown)
+        assertEquals(1 + 4 + 6, shown.size)
+        assertFalse(director.scene.value.busy)
+    }
+
+    @Test
+    fun botGateWaitsForTheOpeningDealToFinish() = runTest {
+        val view = MatchSession.start(ScopaConfig(), 11L).view(human)
+        val director = TableDirector(TestScope(StandardTestDispatcher(testScheduler)), human, view)
+        director.enqueueOpeningDeal(view)
+        val start = currentTime
+        director.awaitPresented(0L, 0L)
+        assertTrue(currentTime - start > 0, "Il bot non parte prima della fine della distribuzione")
     }
 }

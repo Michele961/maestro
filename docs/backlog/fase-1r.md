@@ -168,7 +168,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-12 — Tavolo disegnato dalla scena
 
-- **Stato:** in corso (12a fatta; 12b e 12c da fare)
+- **Stato:** in corso (12a e 12b fatte; 12c da fare)
 - **Riferimenti:** `docs/app/table-director.md`, `docs/app/game-feel.md` §3–4
 - **Obiettivo:** `TableScreen` riscritto come insieme di composable piccoli che disegnano `TableScene` con `TableGeometry`; nessun `delay`, nessuna logica di sequenza nei composable. Il vecchio `FeltLayout` viene rimosso.
 - **Criteri di accettazione:**
@@ -177,7 +177,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] Playtest di Michele sul Pixel: nessuna animazione interrotta o fuori ordine.
 - **Suddivisione (2026-10-27, dossier `docs/app/features/table.md` approvato):**
     - **F1R-12a — Tavolo a riposo (fatto, 2026-10-27):** layout a zone di `TableGeometry` che disegna `TableScene` senza animazioni; via "Ultima giocata"; mano a ventaglio leggero con carte intere; avversario con nome e ritratto. Screenshot della matrice senza D3–D5.
-    - **F1R-12b — Passi animati:** ogni `SceneStep` animato con la durata di `MotionSpec`; suoni e vibrazioni dai passi; salto con un tocco.
+    - **F1R-12b — Passi animati (fatto, 2026-10-27):** ogni `SceneStep` animato con la durata di `MotionSpec`; suoni e vibrazioni dai passi; salto con un tocco.
     - **F1R-12c — Dialog e pulizia:** scelta presa, riepilogo, domanda, pausa sulla scena; `FeltLayout` rimosso; nessun file > 400 righe.
 - **Domande aperte:** —
 

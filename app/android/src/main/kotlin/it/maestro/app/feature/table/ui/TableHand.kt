@@ -44,8 +44,6 @@ import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.components.PlaceholderCardView
 import it.maestro.game.model.Card
-import it.maestro.game.model.Rank
-import it.maestro.game.model.Suit
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -162,7 +160,6 @@ internal fun PlayerHand(
                     PlaceholderCardView(
                         card = card,
                         isPlayable = canPlay,
-                        showGoldFrame = card.suit == Suit.DENARI && card.rank == Rank.SETTE,
                         width = cardWidth,
                         height = cardHeight,
                         modifier = if (isSelected || overThreshold) Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(6.dp)) else Modifier,
