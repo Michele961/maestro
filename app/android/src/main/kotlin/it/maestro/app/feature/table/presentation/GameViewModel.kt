@@ -2,7 +2,7 @@ package it.maestro.app.feature.table.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.maestro.app.data.repository.MatchRepository
+import it.maestro.app.domain.match.MatchRepository
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
 import it.maestro.game.scopa.DealPhase
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.domain.match.RestoreMatchResult
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.designsystem.motion.MotionSpec
 import it.maestro.app.domain.settings.GameSpeed

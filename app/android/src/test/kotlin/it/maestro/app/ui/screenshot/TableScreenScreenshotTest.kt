@@ -24,7 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.local.db.MaestroDatabase
-import it.maestro.app.data.repository.MatchRepository
+import it.maestro.app.domain.match.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.designsystem.audio.NoOpSoundManager

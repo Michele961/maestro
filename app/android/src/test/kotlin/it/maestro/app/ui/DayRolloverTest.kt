@@ -8,8 +8,8 @@ import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import it.maestro.app.data.local.datastore.RetentionRepository
-import it.maestro.app.data.local.missions.DailyMissionsState
+import it.maestro.app.domain.retention.RetentionRepository
+import it.maestro.app.domain.retention.DailyMissionsState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher

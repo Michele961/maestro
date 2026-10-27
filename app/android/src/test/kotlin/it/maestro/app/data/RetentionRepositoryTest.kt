@@ -1,8 +1,8 @@
 package it.maestro.app.data
 
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
-import it.maestro.app.data.local.missions.DailyMissionType
-import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.retention.StreakState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

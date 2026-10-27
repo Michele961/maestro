@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
-import it.maestro.app.data.local.datastore.MasteryRepository
-import it.maestro.app.data.local.datastore.MatchHistoryEntry
+import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.mastery.MatchHistoryEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

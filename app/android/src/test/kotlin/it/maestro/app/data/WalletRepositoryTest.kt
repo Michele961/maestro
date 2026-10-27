@@ -6,9 +6,9 @@ import androidx.test.core.app.ApplicationProvider
 import it.maestro.app.data.local.db.MaestroDatabase
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.data.local.wallet.RoomWalletRepository
-import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletOperationResult
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.wallet.TransactionReason
+import it.maestro.app.domain.wallet.WalletOperationResult
+import it.maestro.app.domain.wallet.WalletRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

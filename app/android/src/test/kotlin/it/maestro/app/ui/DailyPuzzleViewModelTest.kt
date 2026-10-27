@@ -10,7 +10,7 @@ import it.maestro.app.R
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel

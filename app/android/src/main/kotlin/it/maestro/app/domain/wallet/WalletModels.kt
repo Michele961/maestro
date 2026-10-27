@@ -1,4 +1,4 @@
-package it.maestro.app.data.local.wallet
+package it.maestro.app.domain.wallet
 
 import java.util.UUID
 import it.maestro.app.domain.time.SystemClock

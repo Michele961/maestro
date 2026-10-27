@@ -6,9 +6,9 @@ import it.maestro.app.data.local.cosmetics.CosmeticCatalog
 import it.maestro.app.data.local.cosmetics.CosmeticCategory
 import it.maestro.app.data.local.cosmetics.CosmeticItem
 import it.maestro.app.data.local.datastore.SettingsRepository
-import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletOperationResult
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.wallet.TransactionReason
+import it.maestro.app.domain.wallet.WalletOperationResult
+import it.maestro.app.domain.wallet.WalletRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

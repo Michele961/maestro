@@ -5,7 +5,7 @@ import it.maestro.app.data.local.cosmetics.CosmeticCategory
 import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.feature.shop.presentation.ShopViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

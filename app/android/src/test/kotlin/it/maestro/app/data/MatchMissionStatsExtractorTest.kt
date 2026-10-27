@@ -1,6 +1,6 @@
 package it.maestro.app.data
 
-import it.maestro.app.data.local.missions.MatchMissionStatsExtractor
+import it.maestro.app.domain.retention.MatchMissionStatsExtractor
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase

@@ -4,7 +4,7 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.data.local.db.SavedMatchEntity
 import it.maestro.app.data.repository.InMemoryMatchRepository
-import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.domain.match.RestoreMatchResult
 import it.maestro.app.feature.table.presentation.GameIntent
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.CoreGame

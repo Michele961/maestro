@@ -1,4 +1,4 @@
-package it.maestro.app.data.local.missions
+package it.maestro.app.domain.retention
 
 import it.maestro.game.model.Seat
 import it.maestro.game.model.Suit

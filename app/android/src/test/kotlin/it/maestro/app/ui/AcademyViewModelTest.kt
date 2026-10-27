@@ -9,7 +9,7 @@ import it.maestro.app.data.local.academy.AcademyContent
 import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.feature.academy.presentation.AcademyViewMode
 import it.maestro.app.feature.academy.presentation.AcademyViewModel
 import it.maestro.game.model.Card
