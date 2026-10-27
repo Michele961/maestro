@@ -281,3 +281,11 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] I task proposti sono < 400 righe ciascuno e hanno criteri verificabili.
     - [ ] Michele ha approvato il dossier (stato `approvato`) prima che i task entrino nel backlog.
 - **Domande aperte:** —
+
+## F1R-24 — La voce del Maestro
+
+- **Stato:** da fare (dossier in attesa di approvazione)
+- **Riferimenti:** `docs/app/features/maestro-voice.md`, `docs/design/maestro_persona.md`, `docs/app/game-feel.md` §5, F1R-13, F1R-16
+- **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto. Il dossier propone la suddivisione in F1R-24a…f.
+- **Criteri di accettazione:** definiti dal dossier dopo l'approvazione di Michele.
+- **Domande aperte:** vedi §6 del dossier.
