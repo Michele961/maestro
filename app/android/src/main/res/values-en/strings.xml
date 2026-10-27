@@ -49,6 +49,8 @@
     <string name="score_category_carte">Cards</string>
     <string name="score_category_denari">Coins</string>
     <string name="score_category_settebello">Seven of Coins</string>
+    <string name="race_values">%1$d–%2$d</string>
+    <string name="race_settebello_short">7♦</string>
     <string name="score_category_primiera">Prime</string>
     <string name="score_category_scope">Sweeps</string>
     <string name="score_category_re_bello">King of Coins</string>

@@ -39,6 +39,16 @@ class TableGeometryTest {
     }
 
     @Test
+    fun maestroBubbleZoneNeverCoversHandOrTableCards() = eachScreen { name, _, _, g ->
+        // Il fumetto del Maestro sta nella zona della corsa ai punti (F1R-13, `game-feel.md` §5).
+        val bubble = g.zones.pointsRace
+        assertFalse(bubble.overlaps(g.zones.hand), "$name: il fumetto copre la mano")
+        assertFalse(bubble.overlaps(g.zones.playZone), "$name: il fumetto copre le carte a terra")
+        assertFalse(bubble.overlaps(g.zones.opponentHand), "$name: il fumetto copre la mano avversaria")
+        assertTrue(bubble.height >= 44.dp, "$name: fumetto troppo basso per due righe: ${bubble.height}")
+    }
+
+    @Test
     fun tableCardsStayReadableAndFitTwoRows() = eachScreen { name, _, _, g ->
         assertTrue(g.cardWidth >= TableGeometry.MIN_TABLE_CARD, "$name: carte a terra ${g.cardWidth}")
         assertTrue(g.cardHeight * 2 <= g.zones.playZone.height, "$name: due file non stanno nella zona di gioco")

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.key
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.offset
@@ -102,6 +103,7 @@ internal fun TableStage(
                 FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
             }
         }
+        RaceOrBubble(model, uiState, geometry)
         MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
@@ -172,8 +174,7 @@ private fun MaestroCorner(
     if (!uiState.isSparring) return
     val zone = geometry.zones.maestro
     val hint = uiState.suggestedMove
-    var dismissed by remember(hint) { mutableStateOf(false) }
-    val showHint = hint != null && !dismissed
+    val showHint = hint != null
     val portrait = when {
         sweepBy == uiState.humanSeat -> R.drawable.maestro_applauding
         sweepBy != null -> R.drawable.maestro_despair
@@ -196,27 +197,6 @@ private fun MaestroCorner(
             )
         }
     }
-    if (showHint || uiState.isHintLoading) {
-        val play = geometry.zones.playZone
-        Box(
-            modifier = Modifier
-                .offset(play.x, play.bottom - geometry.cardHeight)
-                .size(play.width, geometry.cardHeight),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            MaestroSpeechBubble(
-                message = if (hint != null) {
-                    stringResource(determineLogicalHintRes(hint, uiState.tableCards))
-                } else {
-                    stringResource(R.string.game_hint_loading)
-                },
-                tail = BubbleTail.BOTTOM_END,
-                fontSize = 12.sp,
-                maxLines = 6,
-                modifier = Modifier.clickable { dismissed = true }.testTag("game_hint_banner"),
-            )
-        }
-    }
     if (sweepBy != null) {
         Zone(zone, Alignment.TopCenter) {
             MaestroPillButton(
@@ -226,6 +206,35 @@ private fun MaestroCorner(
                 height = 28.dp,
                 fontSize = 13.sp,
             )
+        }
+    }
+}
+
+/**
+ * Zona della corsa ai punti: mostra le quattro targhette, e cede il posto al fumetto del Maestro quando c'è un
+ * consiglio. Il fumetto sta sempre qui, tra le carte a terra e la mano: non copre mai le carte (`game-feel.md` §5).
+ */
+@Composable
+private fun RaceOrBubble(model: StageModel, uiState: GameUiState, geometry: TableGeometry) {
+    val zone = geometry.zones.pointsRace
+    val hint = uiState.suggestedMove
+    var dismissed by remember(hint) { mutableStateOf(false) }
+    val showBubble = uiState.isSparring && ((hint != null && !dismissed) || uiState.isHintLoading)
+    Zone(zone, Alignment.Center) {
+        if (showBubble) {
+            MaestroSpeechBubble(
+                message = if (hint != null) {
+                    stringResource(determineLogicalHintRes(hint, uiState.tableCards))
+                } else {
+                    stringResource(R.string.game_hint_loading)
+                },
+                tail = BubbleTail.START,
+                fontSize = 11.sp,
+                maxLines = 3,
+                modifier = Modifier.clickable { dismissed = true }.testTag("game_hint_banner"),
+            )
+        } else {
+            PointsRaceRow(race = model.race, showNumbers = uiState.isSparring, modifier = Modifier.fillMaxSize())
         }
     }
 }

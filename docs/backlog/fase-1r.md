@@ -183,13 +183,13 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-13 — Corsa ai punti e Maestro al tavolo
 
-- **Stato:** da fare
+- **Stato:** in revisione (corsa ai punti e fumetto fatti; le battute di §5 aspettano i testi di Michele)
 - **Riferimenti:** `docs/app/game-feel.md` P4, §5
 - **Obiettivo:** indicatori Carte, Denari, Settebello, Primiera calcolati dalla vista (numeri in Sparring, solo icone in Classica); Maestro a posto fisso con le regole di §5.
 - **Criteri di accettazione:**
-    - [ ] I valori della corsa ai punti sono calcolati da funzioni pure sulla vista, testate.
-    - [ ] Il fumetto non si sovrappone mai a mano o carte a terra (test sulla geometria).
-- **Domande aperte:** —
+    - [x] I valori della corsa ai punti sono calcolati da funzioni pure sulla vista, testate.
+    - [x] Il fumetto non si sovrappone mai a mano o carte a terra (test sulla geometria).
+- **Domande aperte:** le battute automatiche del Maestro di `game-feel.md` §5 (saluto a inizio partita, promemoria prima dell'ultima distribuzione, battuta sulla scopa subita) hanno bisogno dei testi: li approva Michele (§8). Per ora il Maestro ha solo le pose e il consiglio su richiesta.
 
 ## F1R-14 — `RewardEngine`
 

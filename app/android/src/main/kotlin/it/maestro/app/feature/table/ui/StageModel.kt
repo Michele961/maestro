@@ -1,5 +1,7 @@
 package it.maestro.app.feature.table.ui
 
+import it.maestro.app.domain.match.PointsRace
+import it.maestro.app.domain.match.pointsRaceOf
 import it.maestro.app.feature.table.presentation.director.SceneStep
 import it.maestro.app.feature.table.presentation.director.TableScene
 import it.maestro.game.model.Card
@@ -50,6 +52,7 @@ public data class StageModel(
     val opponentSweeps: Int,
     val humanScore: Int,
     val opponentScore: Int,
+    val race: PointsRace,
     val flights: List<Flight> = emptyList(),
 ) {
     public companion object {
@@ -161,6 +164,7 @@ public data class StageModel(
                 opponentSweeps = counts.sweeps[human.other()] ?: 0,
                 humanScore = counts.totals[human] ?: 0,
                 opponentScore = counts.totals[human.other()] ?: 0,
+                race = pointsRaceOf(counts),
                 flights = flights,
             )
         }
@@ -183,6 +187,7 @@ public data class StageModel(
                 opponentSweeps = view.sweeps[human.other()] ?: 0,
                 humanScore = view.totals[human] ?: 0,
                 opponentScore = view.totals[human.other()] ?: 0,
+                race = pointsRaceOf(view),
             )
         }
     }
