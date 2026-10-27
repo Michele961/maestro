@@ -14,7 +14,7 @@ import it.maestro.app.data.local.academy.AcademyStep
 import it.maestro.app.data.local.academy.AcademyStepType
 import it.maestro.app.data.local.datastore.AcademyRepository
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,7 +92,7 @@ public data class AcademyUiState(
  */
 public class AcademyViewModel(
     private val academyRepository: AcademyRepository,
-    private val walletRepository: WalletRepository? = null,
+    private val rewardEngine: RewardEngine? = null,
     private val availableChapters: List<AcademyChapter> = AcademyContent.CHAPTERS,
 ) : ViewModel() {
 
@@ -219,12 +219,7 @@ public class AcademyViewModel(
         if (currentLesson.isLastStep) {
             viewModelScope.launch {
                 academyRepository.completeLesson(lesson.id)
-                walletRepository?.addCredits(
-                    amount = 5,
-                    reason = TransactionReason.ACADEMY_LESSON_REWARD,
-                    referenceId = lesson.id.name,
-                    description = "Lezione Accademia superata",
-                )
+                rewardEngine?.onLessonCompleted(lesson.id.name)
             }
             viewModeState.value = AcademyViewMode.ChapterMap
         } else {

@@ -1,5 +1,9 @@
 package it.maestro.app.ui
 
+import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
+import it.maestro.app.domain.time.FakeClock
+import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
@@ -202,7 +206,7 @@ class DailyPuzzleViewModelTest {
         val testDate = LocalDate.of(2026, 10, 26)
         val viewModel = DailyPuzzleViewModel(
             repository = repo,
-            walletRepository = walletRepo,
+            rewardEngine = RewardEngine(walletRepo, InMemoryRetentionRepository(), InMemoryMasteryRepository(), FakeClock(testDate)),
             customDate = testDate,
             customPuzzle = samplePuzzle,
         )
@@ -222,7 +226,7 @@ class DailyPuzzleViewModelTest {
         val testDate = LocalDate.of(2026, 10, 26)
         val viewModel = DailyPuzzleViewModel(
             repository = repo,
-            walletRepository = walletRepo,
+            rewardEngine = RewardEngine(walletRepo, InMemoryRetentionRepository(), InMemoryMasteryRepository(), FakeClock(testDate)),
             customDate = testDate,
             customPuzzle = samplePuzzle,
         )

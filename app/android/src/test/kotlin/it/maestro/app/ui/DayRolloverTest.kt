@@ -1,5 +1,6 @@
 package it.maestro.app.ui
 
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.domain.time.FakeClock
@@ -76,7 +77,7 @@ class DayRolloverTest {
     fun missionsMoveToTheNewDayAfterMidnight() = runTest {
         val clock = FakeClock(day1)
         val repo = RecordingRetentionRepository(InMemoryRetentionRepository())
-        val viewModel = DailyMissionsViewModel(retentionRepository = repo, clock = clock)
+        val viewModel = DailyMissionsViewModel(retentionRepository = repo, rewardEngine = RewardEngine(it.maestro.app.data.local.wallet.InMemoryWalletRepository(), repo, it.maestro.app.data.local.datastore.InMemoryMasteryRepository(), clock), clock = clock)
         backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
         advanceUntilIdle()
 

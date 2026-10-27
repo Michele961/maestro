@@ -12,7 +12,7 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.missions.DailyMissionType
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 import it.maestro.game.scopa.ScopaView
@@ -60,8 +60,7 @@ public data class DailyPuzzleUiState(
  */
 public class DailyPuzzleViewModel(
     private val repository: DailyPuzzleRepository,
-    private val retentionRepository: RetentionRepository? = null,
-    private val walletRepository: WalletRepository? = null,
+    private val rewardEngine: RewardEngine? = null,
     private val customDate: LocalDate? = null,
     private val customPuzzle: TacticalPuzzle? = null,
     private val clock: Clock = SystemClock,
@@ -233,16 +232,10 @@ public class DailyPuzzleViewModel(
                         solved = true,
                         tierIndex = currentState.currentTierIndex,
                     )
-                    retentionRepository?.let { retention ->
-                        retention.updateMissionProgress(effectiveDate, DailyMissionType.SOLVE_DAILY_PUZZLE)
-                        retention.recordGameActivity(effectiveDate)
-                    }
-                    val refId = if (currentState.currentTierIndex == 0) dateString else "$dateString-tier-${currentState.currentTierIndex}"
-                    walletRepository?.addCredits(
-                        amount = currentTier.rewardCredits,
-                        reason = TransactionReason.DAILY_PUZZLE_REWARD,
-                        referenceId = refId,
-                        description = "Sfida del Giorno completata: ${currentTier.index + 1}",
+                    rewardEngine?.onPuzzleSolved(
+                        date = effectiveDate,
+                        tierIndex = currentState.currentTierIndex,
+                        tierCredits = currentTier.rewardCredits,
                     )
                 }
             }

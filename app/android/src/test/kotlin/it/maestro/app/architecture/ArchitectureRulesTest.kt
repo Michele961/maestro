@@ -31,6 +31,8 @@ class ArchitectureRulesTest {
         ex("feature/academy/ui/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
         ex("feature/table/presentation/GameViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-08",
         ex("designsystem/audio/SoundManager.kt", Rule.UI_IMPORTS_DATA) to "F1R-20",
+        // Transitorio: RewardEngine usa ancora le interfacce dei repository che stanno in data (F1R-14b le sposta).
+        ex("domain/rewards/RewardEngine.kt", Rule.DOMAIN_IMPORTS_PLATFORM) to "F1R-14",
         // Timer: la regia del tavolo sostituisce i ritardi sparsi.
     )
 
@@ -122,6 +124,18 @@ class ArchitectureRulesTest {
             Rule.SCOPA_STATE_OUTSIDE_MATCH,
         )
         assertRules("it/maestro/app/domain/match/MatchSession.kt", "private var state: ScopaState")
+    }
+
+    @Test
+    fun creditsOutsideRewardEngineAreViolations() {
+        assertRules(
+            "it/maestro/app/feature/demo/presentation/NewViewModel.kt",
+            "walletRepository.addCredits(amount = 5, reason = r)",
+            Rule.CREDITS_OUTSIDE_REWARD_ENGINE,
+        )
+        assertRules("it/maestro/app/shell/ShellViewModel.kt", "wallet.ensureWelcomeBonus(50)", Rule.CREDITS_OUTSIDE_REWARD_ENGINE)
+        assertRules("it/maestro/app/domain/rewards/RewardEngine.kt", "wallet.addCredits(amount, reason, ref, text)")
+        assertRules("it/maestro/app/data/local/wallet/WalletRepository.kt", "return repo.addCredits(1, r)")
     }
 
     @Test

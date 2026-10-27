@@ -16,6 +16,8 @@ import it.maestro.app.data.local.wallet.TransactionReason
 import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.domain.rewards.RewardEngine
+import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.feature.table.presentation.TestMatchGenerator
 import it.maestro.game.model.Seat
@@ -33,15 +35,12 @@ public enum class ResumeOutcome { RESUMED, WRONG_RULES_VERSION, NOTHING_TO_RESUM
 /**
  * ViewModel del guscio dell'app (task F1R-04): ciò che prima viveva in `MainActivity`.
  *
- * Tiene la logica di fine partita (Maestria, streak, missioni) e il riscatto delle missioni finché
- * non passano a `RewardEngine` (F1R-14). Le partite già registrate stanno in [SavedStateHandle]:
+ * Registra le partite finite e le missioni riscosse tramite `RewardEngine`. Le partite già registrate stanno in [SavedStateHandle]:
  * una rotazione o la ricreazione del processo sulla schermata di fine partita non le conta due volte.
  */
 public class ShellViewModel(
     private val matchRepository: MatchRepository,
-    private val masteryRepository: MasteryRepository,
-    private val retentionRepository: RetentionRepository,
-    private val walletRepository: WalletRepository,
+    private val rewardEngine: RewardEngine,
     private val soundManager: SoundManager,
     private val clock: Clock,
     private val savedStateHandle: SavedStateHandle,
@@ -54,9 +53,14 @@ public class ShellViewModel(
 
     private val analyses = mutableMapOf<String, MatchAnalysis>()
 
+    private val _lastReward = MutableStateFlow<RewardSummary?>(null)
+
+    /** Ricompensa dell'ultima partita registrata: la sequenza di fine partita la anima (F1R-15). */
+    public val lastReward: StateFlow<RewardSummary?> = _lastReward.asStateFlow()
+
     init {
         viewModelScope.launch {
-            runCatching { walletRepository.ensureWelcomeBonus(bonusAmount = WELCOME_BONUS) }
+            runCatching { rewardEngine.grantWelcomeBonus() }
         }
     }
 
@@ -116,63 +120,24 @@ public class ShellViewModel(
         savedStateHandle[RECORDED_KEY] = ArrayList(recorded + key)
 
         viewModelScope.launch {
-            val today = clock.today()
-            masteryRepository.recordMatch(
-                matchAnalysis = analysis,
-                matchLog = matchLog,
+            _lastReward.value = rewardEngine.onMatchFinished(
+                log = matchLog,
+                analysis = analysis,
                 humanSeat = humanSeat,
                 trainingScore = trainingScore,
                 trainingFundamental = trainingFundamental,
             )
-            retentionRepository.recordGameActivity(today)
-            updateMissions(today, matchLog, analysis, humanSeat, trainingScore, trainingFundamental)
         }
     }
 
     /** Riscatta la ricompensa di una missione completata. */
     public fun claimMissionReward(mission: DailyMission) {
         viewModelScope.launch {
-            val claimed = retentionRepository.claimMissionReward(clock.today(), mission.type)
-            if (claimed) {
-                walletRepository.addCredits(
-                    amount = mission.type.rewardCredits,
-                    reason = TransactionReason.DAILY_MISSION_REWARD,
-                    referenceId = mission.id,
-                    description = "Ricompensa missione: ${mission.id}",
-                )
-                soundManager.play(SoundEffect.CHECK_CORRECT)
-            }
-        }
-    }
-
-    private suspend fun updateMissions(
-        today: LocalDate,
-        matchLog: MatchLog,
-        analysis: MatchAnalysis,
-        humanSeat: Seat,
-        trainingScore: Pair<Int, Int>?,
-        trainingFundamental: TrainingFundamental,
-    ) {
-        val stats = MatchMissionStatsExtractor.extract(matchLog, humanSeat)
-        if (stats.sweepsCount > 0) {
-            retentionRepository.updateMissionProgress(today, DailyMissionType.MAKE_SWEEPS, stats.sweepsCount)
-        }
-        if (stats.denariCount > 0) {
-            retentionRepository.updateMissionProgress(today, DailyMissionType.CAPTURE_DENARI, stats.denariCount)
-        }
-        if (analysis.accuracy(humanSeat) >= 80) {
-            retentionRepository.updateMissionProgress(today, DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80)
-        }
-        if (analysis.count(humanSeat, MoveGrade.BLUNDER) == 0) {
-            retentionRepository.updateMissionProgress(today, DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS)
-        }
-        if (trainingFundamental == TrainingFundamental.SEVENS_COUNT && trainingScore != null) {
-            retentionRepository.updateMissionProgress(today, DailyMissionType.ANSWER_SEVENS_CHECKS, trainingScore.first)
+            if (rewardEngine.claimMission(mission).creditsEarned > 0) soundManager.play(SoundEffect.CHECK_CORRECT)
         }
     }
 
     private companion object {
-        const val WELCOME_BONUS = 50
         const val RECORDED_KEY = "recorded_matches"
         val TEST_LEVEL = it.maestro.ai.bot.DifficultyLevel.INTERMEDIO
     }

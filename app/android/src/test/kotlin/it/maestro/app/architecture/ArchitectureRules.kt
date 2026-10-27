@@ -13,6 +13,7 @@ internal enum class Rule(val description: String) {
     TIME_OUTSIDE_CLOCK("System.currentTimeMillis/LocalDate.now/Random( solo in Clock"),
     DESTRUCTIVE_MIGRATION("fallbackToDestructiveMigration vietato (ADR-0017)"),
     SCOPA_STATE_OUTSIDE_MATCH("ScopaState solo in domain/match"),
+    CREDITS_OUTSIDE_REWARD_ENGINE("I crediti si accreditano solo da RewardEngine (task F1R-14)"),
 }
 
 internal data class Violation(val path: String, val rule: Rule, val line: Int, val text: String)
@@ -28,6 +29,7 @@ internal object ArchitectureRules {
     private val timerRegex = Regex("""\bdelay\(|\bThread\.sleep\(""")
     private val timeRegex = Regex("""\bSystem\.currentTimeMillis\(|\bLocalDate\.now\(|\bRandom\(""")
     private val scopaStateRegex = Regex("""\bScopaState\b""")
+    private val creditsRegex = Regex("""\.(addCredits|ensureWelcomeBonus)\(""")
     private val domainForbiddenImports = listOf(
         "import android.",
         "import androidx.",
@@ -48,6 +50,7 @@ internal object ArchitectureRules {
         val timerAllowed = fileName.startsWith("TableDirector") || fileName.startsWith("MotionSpec")
         val timeAllowed = fileName.contains("Clock")
         val scopaStateAllowed = local.startsWith(matchPrefix)
+        val creditsAllowed = local.startsWith("domain/rewards/") || local.startsWith("data/")
 
         val violations = mutableListOf<Violation>()
         content.lines().forEachIndexed { index, raw ->
@@ -62,6 +65,7 @@ internal object ArchitectureRules {
             if (!timeAllowed && timeRegex.containsMatchIn(line)) add(Rule.TIME_OUTSIDE_CLOCK)
             if (line.contains("fallbackToDestructiveMigration")) add(Rule.DESTRUCTIVE_MIGRATION)
             if (!scopaStateAllowed && scopaStateRegex.containsMatchIn(line)) add(Rule.SCOPA_STATE_OUTSIDE_MATCH)
+            if (!creditsAllowed && creditsRegex.containsMatchIn(line)) add(Rule.CREDITS_OUTSIDE_REWARD_ENGINE)
         }
         return violations
     }

@@ -1,5 +1,7 @@
 package it.maestro.app.ui
 
+import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.domain.time.FakeClock
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.data.local.missions.StreakState
@@ -48,6 +50,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
+            rewardEngine = RewardEngine(it.maestro.app.data.local.wallet.InMemoryWalletRepository(), repo, it.maestro.app.data.local.datastore.InMemoryMasteryRepository(), FakeClock(testDate)),
             clock = FakeClock(testDate),
         )
 
@@ -73,6 +76,7 @@ class DailyMissionsViewModelTest {
         )
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
+            rewardEngine = RewardEngine(it.maestro.app.data.local.wallet.InMemoryWalletRepository(), repo, it.maestro.app.data.local.datastore.InMemoryMasteryRepository(), FakeClock(testDate)),
             clock = FakeClock(testDate),
         )
 
@@ -90,7 +94,7 @@ class DailyMissionsViewModelTest {
         val walletRepo = InMemoryWalletRepository()
         val viewModel = DailyMissionsViewModel(
             retentionRepository = repo,
-            walletRepository = walletRepo,
+            rewardEngine = RewardEngine(walletRepo, repo, InMemoryMasteryRepository(), FakeClock(testDate)),
             clock = FakeClock(testDate),
         )
 
