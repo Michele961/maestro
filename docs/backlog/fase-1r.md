@@ -124,7 +124,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-08 — `MatchSession` nel dominio
 
-- **Stato:** in corso (parte 1 in revisione)
+- **Stato:** in corso (parte 1 fatta, parte 2 da fare)
 - **Riferimenti:** ADR-0015, `docs/app/layers.md` §3, `docs/app/table-director.md` §1–2
 - **Obiettivo:** `MatchSession` sostituisce la logica di partita di `GameReducer`/`GameViewModel`: applica le mosse, produce `Beat`, salva, chiama il bot solo dopo `PresentationGate.awaitIdle`, con tempo di riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono.
 - **Criteri di accettazione:**
@@ -147,13 +147,13 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-10 — `TableDirector` e `TableScene`
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0015, `docs/app/table-director.md`
 - **Obiettivo:** regia in presentazione: coda di battute, sequenze di passi come dati, scena pubblicata, salto, velocità, ricostruzione dopo ricreazione, suoni e vibrazioni dai passi.
 - **Criteri di accettazione:**
-    - [ ] Test con tempo virtuale per ogni tipo di battuta (§3 della specifica).
-    - [ ] Due battute ravvicinate vengono mostrate per intero e in ordine (test).
-    - [ ] Salto e velocità portano alla stessa scena finale (test).
+    - [x] Test con tempo virtuale per ogni tipo di battuta (§3 della specifica).
+    - [x] Due battute ravvicinate vengono mostrate per intero e in ordine (test).
+    - [x] Salto e velocità portano alla stessa scena finale (test).
 - **Domande aperte:** —
 
 ## F1R-11 — `TableGeometry` e layout a zone
