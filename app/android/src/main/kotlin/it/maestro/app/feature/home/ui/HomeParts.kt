@@ -13,12 +13,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
+import it.maestro.app.designsystem.components.ParchmentPanel
+import it.maestro.app.designsystem.theme.WoodSurfaceDark
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -111,14 +117,13 @@ internal fun HomeHeader(
 /** Il Maestro con la sua battuta: occupa lo spazio che resta, così la Home sta in una schermata senza scroll. */
 @Composable
 internal fun MaestroWelcome(modifier: Modifier = Modifier) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 130.dp)) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().heightIn(min = 130.dp, max = 240.dp)) {
         val compact = maxHeight < 210.dp
         val ultraCompact = maxHeight < 170.dp
-        val tall = maxHeight > 400.dp
         val portrait = when {
             ultraCompact -> 68.dp
             compact -> 80.dp
-            else -> (maxHeight - 90.dp).coerceIn(84.dp, 190.dp)
+            else -> (maxHeight - 90.dp).coerceIn(84.dp, 120.dp)
         }
         WoodPanel(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -147,11 +152,7 @@ internal fun MaestroWelcome(modifier: Modifier = Modifier) {
                     MaestroSpeechBubble(
                         message = stringResource(R.string.home_coach_welcome),
                         tail = BubbleTail.START,
-                        fontSize = when {
-                            compact -> 11.sp
-                            tall -> 17.sp
-                            else -> 13.sp
-                        },
+                        fontSize = if (compact) 11.sp else 13.sp,
                         maxLines = 4,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -228,3 +229,47 @@ private fun TileTitle(text: String) {
         maxLines = 1,
     )
 }
+
+/** Tessera di un gioco: Scopa si gioca, Briscola arriva più avanti. */
+@Composable
+internal fun GameTile(
+    title: String,
+    @DrawableRes card: Int,
+    available: Boolean,
+    onPlay: () -> Unit,
+    testTag: String,
+    modifier: Modifier = Modifier,
+) {
+    ParchmentPanel(modifier = modifier.testTag(testTag)) {
+        Text(
+            text = title.uppercase(),
+            color = WoodSurfaceDark,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = MaestroDisplayFont,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        Image(
+            painter = painterResource(card),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .height(70.dp)
+                .rotate(-6f)
+                .alpha(if (available) 1f else 0.55f)
+                .align(Alignment.CenterHorizontally),
+        )
+        MaestroPillButton(
+            text = stringResource(if (available) R.string.home_play else R.string.home_coming_soon),
+            onClick = onPlay,
+            enabled = available,
+            variant = if (available) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.WOOD,
+            height = 46.dp,
+            fontSize = if (available) 18.sp else 12.sp,
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
+            testTag = "${testTag}_button",
+        )
+    }
+}
+

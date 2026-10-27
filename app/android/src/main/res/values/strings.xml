@@ -708,4 +708,8 @@
     <string name="review_grade_good">Buona mossa</string>
     <string name="home_player_default_name">Giocatore</string>
     <string name="home_mastery_label">Maestria %1$d</string>
+    <string name="home_game_briscola">Briscola</string>
+    <string name="home_game_scopa">Scopa</string>
+    <string name="home_coming_soon">Presto disponibile</string>
+    <string name="home_play">Gioca</string>
 </resources>

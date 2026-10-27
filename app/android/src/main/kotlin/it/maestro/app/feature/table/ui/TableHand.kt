@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,32 +77,33 @@ internal fun PlayerHand(
     val overlap = -(cardWidth * 0.08f)
 
     Column(modifier = modifier.testTag("player_zone_fan"), horizontalAlignment = Alignment.CenterHorizontally) {
-        AnimatedVisibility(visible = activeSelected != null && canPlay, enter = fadeIn(), exit = fadeOut()) {
-            if (activeSelected != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    // La carta scelta si alza di 0.18 della sua altezza: i comandi stanno sopra, mai coperti da lei.
-                    modifier = Modifier.padding(bottom = cardHeight * SELECTED_LIFT + 4.dp),
-                ) {
-                    MaestroPillButton(
-                        text = stringResource(R.string.game_card_play_confirm),
-                        onClick = {
-                            selected = null
-                            onPlay(activeSelected)
-                        },
-                        variant = PillButtonVariant.PRIMARY_GREEN,
-                        height = 36.dp,
-                        fontSize = 14.sp,
-                        testTag = "confirm_play_button",
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.game_card_drag_hint),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = GoldAccentColor,
-                        fontWeight = FontWeight.Medium,
-                    )
+        // Fascia dei comandi sempre riservata: scegliere una carta non cambia la misura di niente (feedback di Michele).
+        Box(modifier = Modifier.height(TableGeometry.CONTROLS_STRIP).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+            if (activeSelected != null && canPlay) {
+                run {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        MaestroPillButton(
+                            text = stringResource(R.string.game_card_play_confirm),
+                            onClick = {
+                                selected = null
+                                onPlay(activeSelected)
+                            },
+                            variant = PillButtonVariant.PRIMARY_GREEN,
+                            height = 32.dp,
+                            fontSize = 14.sp,
+                            testTag = "confirm_play_button",
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
+                        )
+                        Text(
+                            text = stringResource(R.string.game_card_drag_hint),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = GoldAccentColor,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
             }
         }
@@ -182,4 +185,4 @@ internal fun PlayerHand(
 }
 
 /** Quanto si alza la carta selezionata, in frazione della sua altezza. */
-private const val SELECTED_LIFT = 0.18f
+private const val SELECTED_LIFT = 0.10f

@@ -708,4 +708,8 @@
     <string name="review_grade_good">Good move</string>
     <string name="home_player_default_name">Player</string>
     <string name="home_mastery_label">Mastery %1$d</string>
+    <string name="home_game_briscola">Briscola</string>
+    <string name="home_game_scopa">Scopa</string>
+    <string name="home_coming_soon">Coming soon</string>
+    <string name="home_play">Play</string>
 </resources>

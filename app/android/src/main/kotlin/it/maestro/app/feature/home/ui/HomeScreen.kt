@@ -1,8 +1,6 @@
 package it.maestro.app.feature.home.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,9 +15,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,9 +26,9 @@ import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.components.WoodRowTile
 
 /**
- * Menu iniziale di Maestro (task F1R-19, `docs/app/features/home.md`): una sola azione principale («Riprendi partita» se
- * ce n'è una in corso, altrimenti «Gioca»), il Maestro, e le destinazioni che esistono davvero: Sfida del giorno,
- * Missioni, Accademia. Il Profilo si apre dall'avatar, la Bottega dal portafoglio. Tutti i testi dalle risorse (ADR-0007).
+ * Menu iniziale di Maestro (task F1R-19, `docs/app/features/home.md`): l'azione principale («Riprendi partita» se ce n'è
+ * una in corso, altrimenti «Gioca ora»), le tessere dei giochi (Scopa; Briscola arriverà), il Maestro e le
+ * destinazioni che esistono davvero: Sfida del giorno, Missioni, Accademia. Il Profilo si apre dall'avatar, la Bottega dal portafoglio. Tutti i testi dalle risorse (ADR-0007).
  */
 @Composable
 public fun HomeScreen(
@@ -59,7 +55,7 @@ public fun HomeScreen(
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
                 .padding(horizontal = 14.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
         ) {
             HomeHeader(
                 credits = credits,
@@ -70,8 +66,26 @@ public fun HomeScreen(
                 onProfileClicked = onProfileClicked,
                 onShopClicked = onShopClicked,
             )
-            MaestroWelcome(modifier = Modifier.weight(1f))
+            MaestroWelcome(modifier = Modifier.weight(1f, fill = false))
             PrimaryAction(hasActiveMatch, onResumeGameClicked, onStartGameClicked)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                GameTile(
+                    title = stringResource(R.string.home_game_briscola),
+                    card = R.drawable.card_bastoni_asso,
+                    available = false,
+                    onPlay = {},
+                    testTag = "briscola_tile",
+                    modifier = Modifier.weight(1f),
+                )
+                GameTile(
+                    title = stringResource(R.string.home_game_scopa),
+                    card = R.drawable.card_denari_7,
+                    available = true,
+                    onPlay = onStartGameClicked,
+                    testTag = "scopa_tile",
+                    modifier = Modifier.weight(1f),
+                )
+            }
             WoodRowTile(
                 icon = R.drawable.icon_book_quill,
                 title = stringResource(R.string.home_daily_puzzle_button),
@@ -79,33 +93,25 @@ public fun HomeScreen(
                 onClick = onDailyPuzzleClicked,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                MissionsTile(streakCount, onMissionsClicked, Modifier.weight(1f).height(72.dp))
-                AcademyTile(onAcademyClicked, Modifier.weight(1f).height(72.dp))
+                MissionsTile(streakCount, onMissionsClicked, Modifier.weight(1f).height(84.dp))
+                AcademyTile(onAcademyClicked, Modifier.weight(1f).height(84.dp))
             }
         }
     }
 }
 
-/** L'unica chiamata all'azione: sul piedistallo di panno ovale, come nel mockup. */
+/** La chiamata all'azione principale: senza ornamenti dietro, il pulsante basta. */
 @Composable
 private fun PrimaryAction(hasActiveMatch: Boolean, onResume: () -> Unit, onStart: () -> Unit) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(R.drawable.felt_oval_base),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxWidth().height(if (hasActiveMatch) 82.dp else 96.dp),
-        )
-        MaestroPillButton(
-            text = stringResource(if (hasActiveMatch) R.string.home_resume_game else R.string.home_play_now).uppercase(),
-            onClick = if (hasActiveMatch) onResume else onStart,
-            variant = PillButtonVariant.HERO_RED,
-            height = if (hasActiveMatch) 66.dp else 80.dp,
-            fontSize = if (hasActiveMatch) 24.sp else 34.sp,
-            modifier = Modifier.fillMaxWidth(if (hasActiveMatch) 0.82f else 0.72f),
-            testTag = if (hasActiveMatch) "resume_game_button" else "play_now_button",
-        )
-    }
+    MaestroPillButton(
+        text = stringResource(if (hasActiveMatch) R.string.home_resume_game else R.string.home_play_now).uppercase(),
+        onClick = if (hasActiveMatch) onResume else onStart,
+        variant = PillButtonVariant.HERO_RED,
+        height = if (hasActiveMatch) 62.dp else 72.dp,
+        fontSize = if (hasActiveMatch) 24.sp else 32.sp,
+        modifier = Modifier.fillMaxWidth(0.86f),
+        testTag = if (hasActiveMatch) "resume_game_button" else "play_now_button",
+    )
     if (hasActiveMatch) {
         MaestroPillButton(
             text = stringResource(R.string.home_start_game),
