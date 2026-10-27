@@ -50,7 +50,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-01 — Guardrail automatici d'architettura
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/app/layers.md` §6, `docs/app/testing.md`
 - **Obiettivo:** un test JVM nell'app (eseguito da `./gradlew check`) che legge i sorgenti e fallisce se viola i divieti di `layers.md` §6. Le violazioni già presenti vanno in una **lista di eccezioni** esplicita nel test, con il task che le eliminerà; la lista può solo accorciarsi.
 - **Perimetro autorizzato:** nuovo test in `app:android/src/test`; nessuna libreria nuova.
@@ -95,11 +95,11 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-05 — Build di rilascio pulita
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Obiettivo:** strumenti di sviluppo (crash di prova, partita all'ultima mano, dialog con lo stack trace) visibili solo con `BuildConfig.DEBUG`; orientamento verticale (ADR-0016).
 - **Criteri di accettazione:**
-    - [ ] Test: nella variante release le voci non compaiono.
-    - [ ] `screenOrientation="portrait"` nel manifest.
+    - [x] Test: nella variante release le voci non compaiono.
+    - [x] `screenOrientation="portrait"` nel manifest.
 - **Domande aperte:** —
 
 ## F1R-06 — Matrice screenshot multi-dispositivo
