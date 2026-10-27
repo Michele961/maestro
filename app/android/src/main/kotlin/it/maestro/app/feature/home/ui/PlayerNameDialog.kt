@@ -1,6 +1,6 @@
 package it.maestro.app.feature.home.ui
 
-import androidx.compose.material3.AlertDialog
+import it.maestro.app.designsystem.components.MaestroAlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,7 +26,7 @@ internal fun PlayerNameDialog(
     onDismiss: () -> Unit,
 ) {
     var name by remember { mutableStateOf(currentName.orEmpty()) }
-    AlertDialog(
+    MaestroAlertDialog(
         modifier = Modifier.testTag("player_name_dialog"),
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.home_name_dialog_title)) },
