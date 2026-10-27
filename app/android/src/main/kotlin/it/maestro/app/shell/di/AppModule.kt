@@ -37,6 +37,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
 import it.maestro.app.shell.ShellViewModel
@@ -81,6 +82,8 @@ public val appModule: Module = module {
         DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
     }
 
+    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get()) }
+
     single<MasteryRepository> {
         DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
     }
@@ -119,9 +122,7 @@ public val appModule: Module = module {
     viewModel {
         ShellViewModel(
             matchRepository = get(),
-            masteryRepository = get(),
-            retentionRepository = get(),
-            walletRepository = get(),
+            rewardEngine = get(),
             soundManager = get(),
             clock = get(),
             savedStateHandle = get(),
@@ -131,8 +132,7 @@ public val appModule: Module = module {
     viewModel {
         DailyPuzzleViewModel(
             repository = get(),
-            retentionRepository = get(),
-            walletRepository = get(),
+            rewardEngine = get(),
             clock = get(),
         )
     }
@@ -146,7 +146,7 @@ public val appModule: Module = module {
     viewModel {
         DailyMissionsViewModel(
             retentionRepository = get(),
-            walletRepository = get(),
+            rewardEngine = get(),
             clock = get(),
         )
     }
@@ -154,7 +154,7 @@ public val appModule: Module = module {
     viewModel {
         AcademyViewModel(
             academyRepository = get(),
-            walletRepository = get(),
+            rewardEngine = get(),
         )
     }
 

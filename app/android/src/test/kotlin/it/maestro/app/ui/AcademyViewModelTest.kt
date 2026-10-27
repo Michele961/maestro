@@ -1,5 +1,9 @@
 package it.maestro.app.ui
 
+import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
+import it.maestro.app.domain.time.FakeClock
+import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.data.local.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
 import it.maestro.app.data.local.academy.AcademyLessonId
@@ -195,7 +199,7 @@ class AcademyViewModelTest {
         val walletRepo = InMemoryWalletRepository()
         val viewModel = AcademyViewModel(
             academyRepository = repo,
-            walletRepository = walletRepo,
+            rewardEngine = RewardEngine(walletRepo, InMemoryRetentionRepository(), InMemoryMasteryRepository(), FakeClock(java.time.LocalDate.of(2026, 10, 26))),
             availableChapters = AcademyContent.CHAPTERS,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }

@@ -193,13 +193,16 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-14 — `RewardEngine`
 
-- **Stato:** da fare
+- **Stato:** in corso (14a fatta; 14b da fare)
 - **Riferimenti:** `docs/app/layers.md` §3
 - **Obiettivo:** un solo punto per crediti, missioni, streak e maestria a fine partita, puzzle e lezione; rimuovere la stessa logica da `MainActivity`, `DailyPuzzleViewModel`, `DailyMissionsViewModel`, `ShopViewModel`.
 - **Criteri di accettazione:**
-    - [ ] Test: una fine partita produce un `RewardSummary` coerente con wallet e missioni.
-    - [ ] Nessuna chiamata a `WalletRepository.addCredits` fuori da `RewardEngine` (test F1R-01).
-- **Domande aperte:** —
+    - [x] Test: una fine partita produce un `RewardSummary` coerente con wallet e missioni.
+    - [x] Nessuna chiamata a `WalletRepository.addCredits` fuori da `RewardEngine` (test F1R-01).
+- **Suddivisione (2026-10-27):** il task tocca più feature e supera le 400 righe.
+    - **14a (fatto):** `domain/rewards/RewardEngine` e `RewardSummary`; fine partita, puzzle, lezione, riscossione missioni e bonus di benvenuto passano da qui (`ShellViewModel`, `DailyPuzzleViewModel`, `AcademyViewModel`, `DailyMissionsViewModel`). Regola `CREDITS_OUTSIDE_REWARD_ENGINE` nei guardrail. Nessun credito per la partita: la spec non ne assegna (`game-feel.md` §6 parla di crediti che volano, ma non dice quanti: vedi domanda aperta).
+    - **14b (da fare):** spostare nel dominio le interfacce dei repository (wallet, missioni/streak, maestria, accademia, puzzle, impostazioni, cosmetici) e i loro modelli, così `RewardEngine` e le presentazioni non importano `data`; tolte le eccezioni `UI_IMPORTS_DATA` di F1R-14 dai guardrail.
+- **Domande aperte:** la partita finita assegna crediti? Oggi no (solo missioni riscosse, sfida del giorno, lezioni, bonus di benvenuto). La sequenza di fine partita (F1R-15) mostra "crediti che volano": serve una regola di Michele su quanti crediti dà una partita (vittoria, sconfitta, precisione?).
 
 ## F1R-15 — Sequenza di fine partita
 

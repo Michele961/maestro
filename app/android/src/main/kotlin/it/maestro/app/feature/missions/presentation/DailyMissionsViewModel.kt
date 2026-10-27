@@ -7,7 +7,7 @@ import it.maestro.app.data.local.missions.DailyMission
 import it.maestro.app.data.local.missions.DailyMissionsState
 import it.maestro.app.data.local.missions.StreakState
 import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.rewards.RewardEngine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,7 +35,7 @@ public data class DailyMissionsUiState(
  */
 public class DailyMissionsViewModel(
     private val retentionRepository: RetentionRepository,
-    private val walletRepository: WalletRepository? = null,
+    private val rewardEngine: RewardEngine? = null,
     private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
@@ -64,19 +64,7 @@ public class DailyMissionsViewModel(
     )
 
     public fun claimReward(mission: DailyMission) {
-        viewModelScope.launch {
-            if (mission.isCompleted && !mission.isClaimed) {
-                val success = retentionRepository.claimMissionReward(today, mission.type)
-                if (success && walletRepository != null) {
-                    walletRepository.addCredits(
-                        amount = mission.type.rewardCredits,
-                        reason = TransactionReason.DAILY_MISSION_REWARD,
-                        referenceId = mission.id,
-                        description = "Missione completata: ${mission.id}",
-                    )
-                }
-            }
-        }
+        viewModelScope.launch { rewardEngine?.claimMission(mission) }
     }
 
     /** Rilegge la data dal [Clock]; da chiamare quando l'app torna in primo piano (task F1R-02). */
@@ -85,8 +73,6 @@ public class DailyMissionsViewModel(
     }
 
     public fun recordActivity() {
-        viewModelScope.launch {
-            retentionRepository.recordGameActivity(today)
-        }
+        viewModelScope.launch { rewardEngine?.recordActivity() }
     }
 }
