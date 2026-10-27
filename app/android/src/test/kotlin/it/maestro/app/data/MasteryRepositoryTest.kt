@@ -163,5 +163,25 @@ class MasteryRepositoryTest {
         )
         val historyAfterDuplicate = repository.observeMatchHistory().first()
         assertEquals(1, historyAfterDuplicate.size)
+
+        // Se registriamo un secondo match diverso...
+        val (_, partialLog2) = it.maestro.app.game.TestMatchGenerator.generateEndgameMatch(seed = 202L)
+        val log2 = partialLog2.copy(moves = partialLog2.moves + listOf(move1))
+        repository.recordMatch(
+            matchAnalysis = analysis,
+            matchLog = log2,
+            humanSeat = p1,
+        )
+        val historyTwoMatches = repository.observeMatchHistory().first()
+        assertEquals(2, historyTwoMatches.size)
+
+        // Ora ri-registrare il primo match (che ora è al secondo posto nell'elenco) deve essere ignorato
+        repository.recordMatch(
+            matchAnalysis = analysis,
+            matchLog = log,
+            humanSeat = p1,
+        )
+        val historyStillTwo = repository.observeMatchHistory().first()
+        assertEquals(2, historyStillTwo.size)
     }
 }

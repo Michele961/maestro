@@ -2,6 +2,7 @@ package it.maestro.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
@@ -103,6 +104,7 @@ public sealed interface Screen {
         val analysis: MatchAnalysis,
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
+        val isFromHistory: Boolean = false,
     ) : Screen
     public data object DailyPuzzle : Screen
     public data object Profile : Screen
@@ -200,6 +202,25 @@ public class MainActivity : ComponentActivity() {
                     if (currentScreen is Screen.Home) {
                         val active = matchRepository.restoreActiveMatch()
                         hasActiveMatch = active is RestoreMatchResult.Success
+                    }
+                }
+
+                BackHandler(enabled = currentScreen !is Screen.Home) {
+                    currentScreen = when (val screen = currentScreen) {
+                        is Screen.GameReview -> Screen.PostMatchPreview(
+                            matchLog = screen.matchLog,
+                            level = screen.level,
+                            humanSeat = screen.humanSeat,
+                            isFromHistory = true,
+                        )
+                        is Screen.PostMatchPreview -> if (screen.isFromHistory) Screen.Profile else Screen.Home
+                        is Screen.Table -> Screen.Home
+                        is Screen.PreGame,
+                        is Screen.Profile,
+                        is Screen.DailyPuzzle,
+                        is Screen.Academy,
+                        is Screen.Shop -> Screen.Home
+                        Screen.Home -> Screen.Home
                     }
                 }
 
@@ -321,6 +342,7 @@ public class MainActivity : ComponentActivity() {
                         humanSeat = screen.humanSeat,
                         trainingScore = screen.trainingScore,
                         trainingFundamental = screen.trainingFundamental,
+                        isFromHistory = screen.isFromHistory,
                         onMatchAnalyzed = { analysis ->
                             if (!screen.isFromHistory) {
                                 scope.launch {
@@ -377,6 +399,7 @@ public class MainActivity : ComponentActivity() {
                                 analysis = analysis,
                                 level = screen.level,
                                 humanSeat = screen.humanSeat,
+                                isFromHistory = screen.isFromHistory,
                             )
                         },
                         onRematchClicked = {
