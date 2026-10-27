@@ -50,14 +50,14 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-01 — Guardrail automatici d'architettura
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/app/layers.md` §6, `docs/app/testing.md`
 - **Obiettivo:** un test JVM nell'app (eseguito da `./gradlew check`) che legge i sorgenti e fallisce se viola i divieti di `layers.md` §6. Le violazioni già presenti vanno in una **lista di eccezioni** esplicita nel test, con il task che le eliminerà; la lista può solo accorciarsi.
 - **Perimetro autorizzato:** nuovo test in `app:android/src/test`; nessuna libreria nuova.
 - **Criteri di accettazione:**
-    - [ ] Il test copre: import tra layer, `delay`/`Thread.sleep`, `System.currentTimeMillis`/`LocalDate.now`/`Random(`, `fallbackToDestructiveMigration`, `ScopaState` fuori da `domain/match`.
-    - [ ] Ogni eccezione elencata cita il task F1R che la rimuove.
-    - [ ] Un esempio di violazione nuova fa fallire il test (test del test).
+    - [x] Il test copre: import tra layer, `delay`/`Thread.sleep`, `System.currentTimeMillis`/`LocalDate.now`/`Random(`, `fallbackToDestructiveMigration`, `ScopaState` fuori da `domain/match`.
+    - [x] Ogni eccezione elencata cita il task F1R che la rimuove.
+    - [x] Un esempio di violazione nuova fa fallire il test (test del test).
 - **Domande aperte:** —
 
 ## F1R-02 — `Clock`, seed e data iniettati
