@@ -17,6 +17,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import it.maestro.app.DeveloperTools
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,7 @@ public fun SettingsDialog(
     onTriggerTestCrash: () -> Unit,
     onDismiss: () -> Unit,
     onStartTestEndgameMatch: () -> Unit = {},
+    showDeveloperTools: Boolean = DeveloperTools.isEnabled(LocalContext.current),
 ) {
     MaestroAlertDialog(
         onDismissRequest = onDismiss,
@@ -84,6 +87,8 @@ public fun SettingsDialog(
                     )
                 }
 
+                // Strumenti di sviluppo solo nelle build debuggabili (task F1R-05).
+                if (showDeveloperTools) {
                 HorizontalDivider(color = Color(0xFF8C6D1F))
 
                 // Sezione Crashlytics / Diagnostica
@@ -138,6 +143,7 @@ public fun SettingsDialog(
                         modifier = Modifier.fillMaxWidth(),
                         testTag = "start_test_match_button",
                     )
+                }
                 }
             }
         },

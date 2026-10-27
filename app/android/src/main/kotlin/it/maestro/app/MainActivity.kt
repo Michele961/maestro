@@ -158,7 +158,7 @@ public class MainActivity : ComponentActivity() {
                     try {
                         walletRepository.ensureWelcomeBonus(bonusAmount = 50)
                     } catch (_: Throwable) {}
-                    try {
+                    if (DeveloperTools.isEnabled(this@MainActivity)) try {
                         val file = filesDir.resolve("last_crash.txt")
                         if (file.exists()) {
                             val content = file.readText()
