@@ -3,7 +3,7 @@ package it.maestro.app.di
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RestoreMatchResult
-import it.maestro.app.game.GameViewModel
+import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 import kotlinx.coroutines.CoroutineScope

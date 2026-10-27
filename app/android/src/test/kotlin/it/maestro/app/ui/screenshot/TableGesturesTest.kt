@@ -5,11 +5,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import it.maestro.app.game.GameIntent
-import it.maestro.app.game.GameReducer
-import it.maestro.app.game.OpponentMoveSummary
-import it.maestro.app.ui.screens.TableContent
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameReducer
+import it.maestro.app.feature.table.presentation.OpponentMoveSummary
+import it.maestro.app.feature.table.ui.TableContent
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat

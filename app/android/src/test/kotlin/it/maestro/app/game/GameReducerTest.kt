@@ -15,6 +15,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import it.maestro.app.feature.table.presentation.GameEffect
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameReducer
 
 class GameReducerTest {
 

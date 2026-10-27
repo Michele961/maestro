@@ -4,8 +4,8 @@ import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.ai.bot.SearchBudget
 import it.maestro.app.R
-import it.maestro.app.ui.screens.GameReviewViewModel
-import it.maestro.app.ui.screens.RetryFeedback
+import it.maestro.app.feature.review.presentation.GameReviewViewModel
+import it.maestro.app.feature.review.presentation.RetryFeedback
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog

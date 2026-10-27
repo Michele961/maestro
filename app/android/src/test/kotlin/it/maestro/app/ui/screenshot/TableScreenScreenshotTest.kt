@@ -4,14 +4,14 @@ import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
-import it.maestro.app.game.GameUiState
-import it.maestro.app.ui.screens.TableContent
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.table.presentation.GameUiState
+import it.maestro.app.feature.table.ui.TableContent
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
 import it.maestro.game.model.Suit
-import it.maestro.app.game.OpponentMoveSummary
+import it.maestro.app.feature.table.presentation.OpponentMoveSummary
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
 import androidx.compose.ui.test.onNodeWithTag
@@ -22,10 +22,10 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.local.db.MaestroDatabase
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
-import it.maestro.app.audio.SoundManager
-import it.maestro.app.audio.NoOpSoundManager
-import it.maestro.app.game.GameViewModel
-import it.maestro.app.ui.screens.TableScreen
+import it.maestro.app.designsystem.audio.SoundManager
+import it.maestro.app.designsystem.audio.NoOpSoundManager
+import it.maestro.app.feature.table.presentation.GameViewModel
+import it.maestro.app.feature.table.ui.TableScreen
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingOption
 import it.maestro.game.training.TrainingQuestion
@@ -170,11 +170,11 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
 
     @Test
     fun playing_card_in_game_does_not_crash() {
-        val viewModel = it.maestro.app.game.GameViewModel(
+        val viewModel = it.maestro.app.feature.table.presentation.GameViewModel(
             ioDispatcher = kotlinx.coroutines.Dispatchers.Unconfined,
         )
         viewModel.onIntent(
-            it.maestro.app.game.GameIntent.StartMatch(
+            it.maestro.app.feature.table.presentation.GameIntent.StartMatch(
                 config = it.maestro.game.scopa.ScopaConfig(targetScore = 11),
                 seed = 42L,
                 humanSeat = it.maestro.game.model.Seat.P1,

@@ -8,7 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import it.maestro.app.MainActivity
+import it.maestro.app.shell.MainActivity
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +19,7 @@ import org.robolectric.annotation.GraphicsMode
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "it-w360dp-h800dp-xxhdpi", application = it.maestro.app.MaestroApp::class)
+@Config(sdk = [35], qualifiers = "it-w360dp-h800dp-xxhdpi", application = it.maestro.app.shell.MaestroApp::class)
 class MainActivityCrashTest {
 
     @get:Rule

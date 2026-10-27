@@ -83,7 +83,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-04 — Navigazione con rotte tipizzate e stato salvabile
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/app/layers.md` §4
 - **Obiettivo:** `MaestroNavHost` con Navigation Compose e rotte `@Serializable`; argomenti solo identificativi (`matchId`); `MainActivity` diventa un guscio senza logica di dominio (missioni e crediti restano dove sono fino a F1R-14, ma escono dall'Activity in un ViewModel di guscio).
 - **Perimetro autorizzato:** plugin `kotlin-serialization` nell'app (già nel catalog).
@@ -114,12 +114,12 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-07 — Package a layer dentro `app:android`
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0014 (Migrazione), `docs/app/layers.md` §1
 - **Obiettivo:** spostare i file esistenti nei package `shell`, `domain`, `data`, `designsystem`, `feature.<nome>.{ui,presentation}` senza cambiare comportamento.
 - **Criteri di accettazione:**
-    - [ ] Solo spostamenti e import: nessuna modifica di logica (diff verificabile).
-    - [ ] Tutti i test verdi; screenshot identici.
+    - [x] Solo spostamenti e import: nessuna modifica di logica (diff verificabile).
+    - [x] Tutti i test verdi; screenshot identici.
 - **Domande aperte:** —
 
 ## F1R-08 — `MatchSession` nel dominio

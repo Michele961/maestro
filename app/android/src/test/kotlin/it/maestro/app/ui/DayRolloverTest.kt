@@ -3,8 +3,8 @@ package it.maestro.app.ui
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.domain.time.FakeClock
-import it.maestro.app.ui.screens.DailyMissionsViewModel
-import it.maestro.app.ui.screens.DailyPuzzleViewModel
+import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
+import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import it.maestro.app.data.local.datastore.RetentionRepository

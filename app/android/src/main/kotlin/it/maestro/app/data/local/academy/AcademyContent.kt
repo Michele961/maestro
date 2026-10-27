@@ -1,7 +1,7 @@
 package it.maestro.app.data.local.academy
 
 import it.maestro.app.R
-import it.maestro.app.ui.components.MaestroMood
+import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Suit

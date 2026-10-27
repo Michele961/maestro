@@ -8,6 +8,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameReducer
+import it.maestro.app.feature.table.presentation.GameUiState
 
 /**
  * Verifica formale del criterio di accettazione cardine di F1-05 e ADR-0012:

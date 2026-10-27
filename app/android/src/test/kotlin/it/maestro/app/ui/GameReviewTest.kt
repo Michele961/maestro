@@ -4,11 +4,11 @@ import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.ai.bot.SearchBudget
-import it.maestro.app.game.GameIntent
-import it.maestro.app.game.GameViewModel
-import it.maestro.app.ui.screens.buildReviewSteps
-import it.maestro.app.ui.screens.findNextMistake
-import it.maestro.app.ui.screens.findPreviousMistake
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameViewModel
+import it.maestro.app.feature.review.ui.buildReviewSteps
+import it.maestro.app.feature.review.ui.findNextMistake
+import it.maestro.app.feature.review.ui.findPreviousMistake
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.PlayResult

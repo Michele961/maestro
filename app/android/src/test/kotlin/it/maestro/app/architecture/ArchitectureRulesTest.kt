@@ -19,24 +19,25 @@ class ArchitectureRulesTest {
     /** (file relativo a `src/main/kotlin`, regola) → task che rimuove la violazione. */
     private val knownExceptions: Map<Pair<String, Rule>, String> = mapOf(
         // Layer: la presentazione parla con i repository solo tramite interfacce del dominio.
-        ex("ui/dialogs/DailyMissionsDialog.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/ShopScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/ProfileViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/ProfileScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/DailyMissionsViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/academy/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("ui/screens/academy/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("game/GameViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-08",
+        ex("feature/missions/ui/DailyMissionsDialog.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/missions/presentation/DailyMissionsViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/shop/presentation/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/shop/ui/ShopScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/profile/presentation/ProfileViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/profile/ui/ProfileScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/puzzle/presentation/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/puzzle/ui/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/academy/presentation/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/academy/ui/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
+        ex("feature/table/presentation/GameViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-08",
+        ex("designsystem/audio/SoundManager.kt", Rule.UI_IMPORTS_DATA) to "F1R-20",
         // Timer: la regia del tavolo sostituisce i ritardi sparsi.
-        ex("ui/screens/TableScreen.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
-        ex("ui/components/SweepCelebrationOverlay.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
-        ex("game/GameViewModel.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-08",
+        ex("feature/table/ui/TableScreen.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
+        ex("feature/table/ui/SweepCelebrationOverlay.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
+        ex("feature/table/presentation/GameViewModel.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-08",
         // Stato completo della partita solo in MatchSession.
-        ex("game/GameModel.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
-        ex("game/TestMatchGenerator.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
+        ex("feature/table/presentation/GameModel.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
+        ex("feature/table/presentation/TestMatchGenerator.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
         ex("data/repository/MatchRepository.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
     )
 
@@ -75,7 +76,7 @@ class ArchitectureRulesTest {
     @Test
     fun uiImportingDataIsAViolation() {
         assertRules(
-            "it/maestro/app/ui/screens/NewScreen.kt",
+            "it/maestro/app/feature/demo/ui/NewScreen.kt",
             "import it.maestro.app.data.local.wallet.WalletRepository",
             Rule.UI_IMPORTS_DATA,
         )
@@ -94,16 +95,16 @@ class ArchitectureRulesTest {
 
     @Test
     fun timersOutsideDirectorAreViolations() {
-        assertRules("it/maestro/app/ui/screens/NewScreen.kt", "    delay(300L)", Rule.TIMER_OUTSIDE_DIRECTOR)
-        assertRules("it/maestro/app/ui/screens/NewScreen.kt", "Thread.sleep(10)", Rule.TIMER_OUTSIDE_DIRECTOR)
+        assertRules("it/maestro/app/feature/demo/ui/NewScreen.kt", "    delay(300L)", Rule.TIMER_OUTSIDE_DIRECTOR)
+        assertRules("it/maestro/app/feature/demo/ui/NewScreen.kt", "Thread.sleep(10)", Rule.TIMER_OUTSIDE_DIRECTOR)
         assertRules("it/maestro/app/feature/table/presentation/TableDirector.kt", "delay(step.duration)")
         assertRules("it/maestro/app/designsystem/MotionSpec.kt", "delay(ms)")
-        assertRules("it/maestro/app/ui/screens/NewScreen.kt", "// delay(300L) nel commento")
+        assertRules("it/maestro/app/feature/demo/ui/NewScreen.kt", "// delay(300L) nel commento")
     }
 
     @Test
     fun timeSourcesOutsideClockAreViolations() {
-        val path = "it/maestro/app/ui/screens/NewViewModel.kt"
+        val path = "it/maestro/app/feature/demo/ui/NewViewModel.kt"
         assertRules(path, "val now = System.currentTimeMillis()", Rule.TIME_OUTSIDE_CLOCK)
         assertRules(path, "val today = LocalDate.now()", Rule.TIME_OUTSIDE_CLOCK)
         assertRules(path, "val rng = Random(42)", Rule.TIME_OUTSIDE_CLOCK)
@@ -123,7 +124,7 @@ class ArchitectureRulesTest {
     @Test
     fun scopaStateOutsideMatchIsAViolation() {
         assertRules(
-            "it/maestro/app/ui/screens/NewScreen.kt",
+            "it/maestro/app/feature/demo/ui/NewScreen.kt",
             "fun draw(state: ScopaState) {}",
             Rule.SCOPA_STATE_OUTSIDE_MATCH,
         )
@@ -134,7 +135,7 @@ class ArchitectureRulesTest {
     fun newViolationInRealSourceSetWouldFail() {
         // Una violazione nuova in un file senza eccezione non è coperta da knownExceptions.
         val violation = ArchitectureRules.check(
-            "it/maestro/app/ui/screens/HomeScreen.kt",
+            "it/maestro/app/feature/home/ui/HomeScreen.kt",
             "import it.maestro.app.data.local.wallet.WalletRepository",
         ).single()
         assertTrue((violation.path to violation.rule) !in knownExceptions)

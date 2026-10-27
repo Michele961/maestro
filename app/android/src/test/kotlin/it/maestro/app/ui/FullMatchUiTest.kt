@@ -1,9 +1,9 @@
 package it.maestro.app.ui
 
 import it.maestro.ai.bot.DifficultyLevel
-import it.maestro.app.game.GameIntent
-import it.maestro.app.game.GameViewModel
-import it.maestro.app.game.UiGameEvent
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameViewModel
+import it.maestro.app.feature.table.presentation.UiGameEvent
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaConfig

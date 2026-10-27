@@ -8,8 +8,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.bot.DifficultyLevel
-import it.maestro.app.ui.screens.PreGameScreen
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.pregame.ui.PreGameScreen
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.training.TrainingFundamental
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue

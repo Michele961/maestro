@@ -11,9 +11,9 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
-import it.maestro.app.ui.screens.ProfileContent
-import it.maestro.app.ui.screens.ProfileUiState
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.profile.ui.ProfileContent
+import it.maestro.app.feature.profile.presentation.ProfileUiState
+import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test

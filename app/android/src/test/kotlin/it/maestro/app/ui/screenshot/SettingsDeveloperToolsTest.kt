@@ -2,8 +2,8 @@ package it.maestro.app.ui.screenshot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import it.maestro.app.ui.dialogs.SettingsDialog
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.settings.ui.SettingsDialog
+import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Rule
 import org.junit.runner.RunWith
 import android.app.Application

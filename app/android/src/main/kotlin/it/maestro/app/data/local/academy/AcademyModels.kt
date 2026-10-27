@@ -2,7 +2,7 @@ package it.maestro.app.data.local.academy
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import it.maestro.app.ui.components.MaestroMood
+import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 
 /**

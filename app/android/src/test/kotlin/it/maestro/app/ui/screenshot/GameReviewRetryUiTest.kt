@@ -8,9 +8,9 @@ import androidx.compose.ui.test.performClick
 import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.ai.bot.SearchBudget
-import it.maestro.app.ui.screens.GameReviewScreen
-import it.maestro.app.ui.screens.GameReviewViewModel
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.review.ui.GameReviewScreen
+import it.maestro.app.feature.review.presentation.GameReviewViewModel
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog

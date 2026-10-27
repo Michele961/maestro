@@ -3,10 +3,10 @@ package it.maestro.app.ui
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.ai.bot.PimcEvaluator
 import it.maestro.ai.bot.SearchBudget
-import it.maestro.app.game.GameEffect
-import it.maestro.app.game.GameIntent
-import it.maestro.app.game.GameReducer
-import it.maestro.app.game.GameViewModel
+import it.maestro.app.feature.table.presentation.GameEffect
+import it.maestro.app.feature.table.presentation.GameIntent
+import it.maestro.app.feature.table.presentation.GameReducer
+import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
 import it.maestro.game.scopa.DealPhase

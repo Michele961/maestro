@@ -8,8 +8,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
-import it.maestro.app.ui.screens.HomeScreen
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.home.ui.HomeScreen
+import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

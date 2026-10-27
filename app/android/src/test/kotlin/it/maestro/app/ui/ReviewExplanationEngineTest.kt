@@ -1,6 +1,6 @@
 package it.maestro.app.ui
 
-import it.maestro.app.ui.screens.ReviewExplanationEngine
+import it.maestro.app.feature.review.presentation.ReviewExplanationEngine
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat

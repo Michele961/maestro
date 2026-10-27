@@ -3,6 +3,8 @@ package it.maestro.app.crash
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import it.maestro.app.shell.crash.DefaultCrashReporter
+import it.maestro.app.shell.crash.TestCrashException
 
 class CrashReporterTest {
 

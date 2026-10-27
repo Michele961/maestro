@@ -4,8 +4,8 @@ import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
-import it.maestro.app.ui.screens.ProfileTab
-import it.maestro.app.ui.screens.ProfileViewModel
+import it.maestro.app.feature.profile.presentation.ProfileTab
+import it.maestro.app.feature.profile.presentation.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

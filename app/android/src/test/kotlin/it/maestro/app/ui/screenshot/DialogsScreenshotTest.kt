@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureScreenRoboImage
-import it.maestro.app.game.GameUiState
-import it.maestro.app.ui.dialogs.SettingsDialog
-import it.maestro.app.ui.screens.TableContent
-import it.maestro.app.ui.theme.MaestroTheme
+import it.maestro.app.feature.table.presentation.GameUiState
+import it.maestro.app.feature.settings.ui.SettingsDialog
+import it.maestro.app.feature.table.ui.TableContent
+import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
@@ -92,7 +92,7 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
             options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
             correctIndex = 2,
         )
-        val opponentMove = it.maestro.app.game.OpponentMoveSummary(
+        val opponentMove = it.maestro.app.feature.table.presentation.OpponentMoveSummary(
             card = Card(Rank.SETTE, Suit.DENARI),
             capture = setOf(Card(Rank.SETTE, Suit.SPADE)),
             isSweep = false,
