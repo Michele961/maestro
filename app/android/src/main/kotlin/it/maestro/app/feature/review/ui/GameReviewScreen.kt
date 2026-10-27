@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -177,8 +178,10 @@ public fun GameReviewScreen(
     viewModel: GameReviewViewModel = viewModel(),
     onNavigateBack: () -> Unit = {},
 ) {
-    LaunchedEffect(matchLog, analysis, humanSeat) {
+    // Subito, prima del primo disegno: la schermata appare intera e non a pezzi.
+    remember(matchLog, analysis, humanSeat) {
         viewModel.initialize(matchLog, analysis, humanSeat)
+        true
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -261,6 +264,7 @@ public fun GameReviewScreen(
                         viewModel.revealSolution()
                         viewModel.exitRetry()
                     },
+                    modifier = Modifier.weight(BANNER_WEIGHT, fill = false),
                 )
             } else {
                 MoveEvaluationBanner(
@@ -271,6 +275,7 @@ public fun GameReviewScreen(
                     isRevealed = isCurrentRevealed,
                     onStartRetry = viewModel::startRetry,
                     onRevealSolution = viewModel::revealSolution,
+                    modifier = Modifier.weight(BANNER_WEIGHT, fill = false),
                 )
             }
 
@@ -311,6 +316,9 @@ public fun GameReviewScreen(
         }
     }
 }
+
+/** Quota massima dello spazio verticale che il commento può prendere: il resto resta al tavolo. */
+private const val BANNER_WEIGHT = 0.8f
 
 @Composable
 private fun MoveEvaluationBanner(
@@ -356,7 +364,7 @@ private fun MoveEvaluationBanner(
     }
 
     ParchmentPanel(modifier = modifier.fillMaxWidth().testTag("review_evaluation_banner")) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(40.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -399,16 +407,6 @@ private fun MoveEvaluationBanner(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                         }
-                        if (analysis.isMistake() && analysis.loss > 0.0) {
-                            Text(
-                                text = stringResource(id = R.string.review_value_diff, analysis.loss),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = BlunderBadgeColor,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                modifier = Modifier.testTag("review_loss_label"),
-                            )
-                        }
                     }
                     MoveLine(
                         label = stringResource(id = R.string.review_played_label),
@@ -422,12 +420,6 @@ private fun MoveEvaluationBanner(
                             move = formatMoveDescription(analysis.bestMove),
                             color = Color(0xFF1F683D),
                             tag = "review_best_move",
-                        )
-                        Text(
-                            text = stringResource(id = R.string.review_expected_value, analysis.bestValue),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = InkColor.copy(alpha = 0.7f),
-                            modifier = Modifier.testTag("review_best_value"),
                         )
                     }
                 }
@@ -874,9 +866,9 @@ private fun ReviewNavigationControls(
         MaestroPillButton(
             text = stringResource(id = R.string.review_back_button),
             onClick = onNavigateBack,
-            variant = PillButtonVariant.PRIMARY_GREEN,
-            height = 46.dp,
-            fontSize = 18.sp,
+            variant = PillButtonVariant.WOOD,
+            height = 36.dp,
+            fontSize = 13.sp,
             modifier = Modifier.fillMaxWidth(),
             testTag = "review_back_button",
         )
@@ -896,7 +888,7 @@ private fun RowScope.NavPill(
         onClick = onClick,
         enabled = enabled,
         variant = variant,
-        height = 42.dp,
+        height = 38.dp,
         fontSize = 13.sp,
         contentPadding = PaddingValues(horizontal = 4.dp),
         modifier = Modifier.weight(1f),

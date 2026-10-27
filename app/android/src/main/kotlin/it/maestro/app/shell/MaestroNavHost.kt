@@ -1,5 +1,10 @@
 package it.maestro.app.shell
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import it.maestro.app.designsystem.components.ClubBackground
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -218,12 +223,17 @@ public fun MaestroNavHost(
             val analysis by produceState(shell.cachedAnalysis(route.matchLog), route.matchLog) {
                 if (value == null) value = withContext(Dispatchers.Default) { MatchAnalyzer().analyze(matchLog) }
             }
-            analysis?.let {
+            val ready = analysis
+            if (ready != null) {
                 GameReviewScreen(
                     matchLog = matchLog,
-                    analysis = it,
+                    analysis = ready,
                     onNavigateBack = { navController.popBackStack() },
                 )
+            } else {
+                ClubBackground(feltFraction = 0.6f) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                }
             }
         }
         composable<Route.DailyPuzzle> {
