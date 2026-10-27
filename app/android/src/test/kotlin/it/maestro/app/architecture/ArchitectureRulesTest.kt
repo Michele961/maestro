@@ -35,8 +35,6 @@ class ArchitectureRulesTest {
         ex("ui/components/SweepCelebrationOverlay.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-12",
         ex("game/GameViewModel.kt", Rule.TIMER_OUTSIDE_DIRECTOR) to "F1R-08",
         // Stato completo della partita solo in MatchSession.
-        ex("MainActivity.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-04",
-        ex("ui/screens/TableScreen.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
         ex("game/GameModel.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
         ex("game/TestMatchGenerator.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",
         ex("data/repository/MatchRepository.kt", Rule.SCOPA_STATE_OUTSIDE_MATCH) to "F1R-08",

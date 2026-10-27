@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    // Rotte di navigazione tipizzate (task F1R-04).
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -75,6 +77,7 @@ android {
             // I test Compose su Robolectric usano l'activity di ui-test-manifest, presente solo in debug:
             // nella variante release girerebbero due volte gli stessi test senza poterli avviare.
             if (it.name.contains("Release")) it.exclude("**/ui/screenshot/**")
+            if (it.name.contains("Release")) it.exclude("**/shell/NavigationRecreationTest*")
             // Lo schema Room per i test di migrazione è solo negli asset di debug (vedi sourceSets sopra).
             if (it.name.contains("Release")) it.exclude("**/data/local/db/MaestroMigrationsTest*")
         }
@@ -105,6 +108,7 @@ dependencies {
 
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
 

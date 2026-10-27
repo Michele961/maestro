@@ -72,7 +72,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-03 — Room con schema esportato e migrazioni
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** ADR-0017
 - **Obiettivo:** `exportSchema = true`, schema versionato, rimozione di `fallbackToDestructiveMigration()`, prima migrazione di prova e test con `MigrationTestHelper`.
 - **Perimetro autorizzato:** `room-testing` come dipendenza di test; opzione `room.schemaLocation` nel `build.gradle.kts` dell'app.
@@ -83,14 +83,14 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-04 — Navigazione con rotte tipizzate e stato salvabile
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** `docs/app/layers.md` §4
 - **Obiettivo:** `MaestroNavHost` con Navigation Compose e rotte `@Serializable`; argomenti solo identificativi (`matchId`); `MainActivity` diventa un guscio senza logica di dominio (missioni e crediti restano dove sono fino a F1R-14, ma escono dall'Activity in un ViewModel di guscio).
 - **Perimetro autorizzato:** plugin `kotlin-serialization` nell'app (già nel catalog).
 - **Criteri di accettazione:**
-    - [ ] Test: rotazione e ricreazione dell'Activity in partita, in review e nella Sfida del giorno tornano sulla stessa schermata con lo stesso stato.
-    - [ ] Il tasto indietro segue il back stack in ogni schermata.
-    - [ ] `MainActivity.kt` ≤ 120 righe.
+    - [x] Test: rotazione e ricreazione dell'Activity in partita, in review e nella Sfida del giorno tornano sulla stessa schermata con lo stesso stato.
+    - [x] Il tasto indietro segue il back stack in ogni schermata.
+    - [x] `MainActivity.kt` ≤ 120 righe.
 - **Domande aperte:** —
 
 ## F1R-05 — Build di rilascio pulita

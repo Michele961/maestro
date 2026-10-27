@@ -39,6 +39,8 @@ val allowedExternalDeps: Map<String, Set<String>> = mapOf(
         "androidx.compose.material3:material3",
         "androidx.activity:activity-compose",
         "androidx.navigation:navigation-compose",
+        // Rotte di navigazione tipizzate (F1R-04).
+        "org.jetbrains.kotlinx:kotlinx-serialization-json",
         "androidx.lifecycle:lifecycle-runtime-compose",
         "androidx.lifecycle:lifecycle-viewmodel-compose",
         "io.insert-koin:koin-android",

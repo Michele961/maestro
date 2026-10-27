@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.game.training.TrainingFundamental
 
 /**
  * ViewModel MVI per la schermata di gioco della Scopa (ADR-0012, task F1-05, F1-08).
@@ -49,6 +51,38 @@ public class GameViewModel(
     public val currentMatchLog: MatchLog
         get() = internalState.matchLog
 
+    /** `true` dopo l'avvio o la ripresa di una partita: dopo una ricreazione la schermata non la riavvia. */
+    public var hasMatch: Boolean = false
+        private set
+
+    /**
+     * Riprende la partita salvata (ADR-0003, task F1R-04). Se non è rigiocabile [onUnavailable] riceve il
+     * controllo, ad esempio per tornare alla Home.
+     */
+    public fun resumeActiveMatch(
+        trainingFundamental: TrainingFundamental,
+        onUnavailable: () -> Unit = {},
+    ) {
+        val repository = matchRepository ?: return onUnavailable()
+        hasMatch = true
+        scope.launch {
+            when (val result = repository.restoreActiveMatch()) {
+                is RestoreMatchResult.Success -> onIntent(
+                    GameIntent.RestoreMatch(
+                        state = result.state,
+                        matchLog = result.matchLog,
+                        level = result.level,
+                        trainingFundamental = trainingFundamental,
+                    ),
+                )
+                else -> {
+                    hasMatch = false
+                    onUnavailable()
+                }
+            }
+        }
+    }
+
     init {
         val initialResult = GameReducer.initial()
         internalState = initialResult.state
@@ -58,6 +92,7 @@ public class GameViewModel(
     }
 
     public fun onIntent(intent: GameIntent) {
+        if (intent is GameIntent.StartMatch || intent is GameIntent.RestoreMatch) hasMatch = true
         if (intent is GameIntent.StartMatch) {
             botRng = SeededRng(intent.seed + 9999L)
             botJob?.cancel()
