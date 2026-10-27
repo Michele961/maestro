@@ -85,6 +85,9 @@ import it.maestro.game.scopa.play
 import it.maestro.game.scopa.viewFor
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
 import it.maestro.app.feature.review.presentation.RetryFeedback
+import it.maestro.app.feature.review.presentation.ReviewVerdict
+import it.maestro.app.feature.review.presentation.isMistake
+import it.maestro.app.feature.review.presentation.verdict
 import it.maestro.app.domain.coach.ReviewCoach
 import it.maestro.app.feature.table.ui.phrasesText
 
@@ -92,6 +95,7 @@ private val InkColor = Color(0xFF2B1A10)
 private val GoldAccent = ButtonGoldBorder
 
 private val BestBadgeColor = GradeMagistraleBlue
+private val GoodBadgeColor = androidx.compose.ui.graphics.Color(0xFF4F8F5A)
 private val InaccuracyBadgeColor = GradeImprecisioneYellow
 private val BlunderBadgeColor = GradeErroreGraveRed
 
@@ -201,7 +205,7 @@ public fun GameReviewScreen(
         val isHumanMove = currentStep.mover == humanSeat
         val isCurrentSolved = uiState.isCurrentStepSolved
         val isCurrentRevealed = stepIndex in uiState.revealedStepIndices
-        val isSolutionVisible = !isHumanMove || moveAnalysis.grade == MoveGrade.BEST || isCurrentSolved || isCurrentRevealed ||
+        val isSolutionVisible = !isHumanMove || !moveAnalysis.isMistake() || isCurrentSolved || isCurrentRevealed ||
             !ReviewCoach.isWorthRetrying(moveAnalysis.alternatives.size)
         val isRetryMode = uiState.isRetryMode
 
@@ -319,26 +323,28 @@ private fun MoveEvaluationBanner(
     onRevealSolution: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val (badgeColor, gradeStringRes) = when (analysis.grade) {
-        MoveGrade.BEST -> Pair(BestBadgeColor, R.string.review_grade_best)
-        MoveGrade.INACCURACY -> Pair(InaccuracyBadgeColor, R.string.review_grade_inaccuracy)
-        MoveGrade.BLUNDER -> Pair(BlunderBadgeColor, R.string.review_grade_blunder)
+    val (badgeColor, gradeStringRes) = when (analysis.verdict()) {
+        ReviewVerdict.BEST -> Pair(BestBadgeColor, R.string.review_grade_best)
+        ReviewVerdict.GOOD -> Pair(GoodBadgeColor, R.string.review_grade_good)
+        ReviewVerdict.INACCURACY -> Pair(InaccuracyBadgeColor, R.string.review_grade_inaccuracy)
+        ReviewVerdict.BLUNDER -> Pair(BlunderBadgeColor, R.string.review_grade_blunder)
     }
 
     val badge = when {
         isSolved -> R.drawable.badge_best
-        analysis.grade == MoveGrade.BEST -> R.drawable.badge_best
-        analysis.grade == MoveGrade.INACCURACY -> R.drawable.badge_warning
+        analysis.verdict() == ReviewVerdict.BEST -> R.drawable.badge_best
+        analysis.verdict() == ReviewVerdict.GOOD -> R.drawable.badge_correct
+        analysis.verdict() == ReviewVerdict.INACCURACY -> R.drawable.badge_warning
         else -> R.drawable.badge_wrong
     }
 
-    val isMistake = isHumanMove && analysis.grade != MoveGrade.BEST
+    val isMistake = isHumanMove && analysis.isMistake()
     // Con una o due scelte non ha senso far riprovare: si vede subito la soluzione (Michele, 2026-10-27).
     val canRetry = ReviewCoach.isWorthRetrying(analysis.alternatives.size)
     val isSolutionVisible = !isMistake || isSolved || isRevealed || !canRetry
 
     val explanation = remember(analysis, playerView, isSolutionVisible) {
-        if (isSolutionVisible && playerView != null && analysis.grade != MoveGrade.BEST) {
+        if (isSolutionVisible && playerView != null && analysis.isMistake()) {
             ReviewCoach.explain(
                 played = analysis.playedMove,
                 best = analysis.bestMove,
@@ -381,7 +387,7 @@ private fun MoveEvaluationBanner(
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        if (isHumanMove && analysis.grade != MoveGrade.BEST && canRetry) {
+                        if (isHumanMove && analysis.isMistake() && canRetry) {
                             MaestroPillButton(
                                 text = stringResource(id = R.string.review_retry_button),
                                 onClick = onStartRetry,
@@ -393,7 +399,7 @@ private fun MoveEvaluationBanner(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                         }
-                        if (analysis.grade != MoveGrade.BEST && analysis.loss > 0.0) {
+                        if (analysis.isMistake() && analysis.loss > 0.0) {
                             Text(
                                 text = stringResource(id = R.string.review_value_diff, analysis.loss),
                                 style = MaterialTheme.typography.labelLarge,
@@ -410,7 +416,7 @@ private fun MoveEvaluationBanner(
                         color = InkColor,
                         tag = "review_played_move",
                     )
-                    if (isSolutionVisible && analysis.grade != MoveGrade.BEST) {
+                    if (isSolutionVisible && analysis.isMistake()) {
                         MoveLine(
                             label = stringResource(id = R.string.review_best_label),
                             move = formatMoveDescription(analysis.bestMove),
@@ -646,7 +652,7 @@ private fun ReviewBoardView(
     modifier: Modifier = Modifier,
 ) {
     val playerView = step.playerView
-    val isMistake = step.analysis.grade != MoveGrade.BEST
+    val isMistake = step.analysis.isMistake()
     val bestMoveCard = if (isSolutionVisible && isMistake && step.mover == humanSeat) step.analysis.bestMove.card else null
 
     Card(
@@ -937,8 +943,9 @@ private fun ReviewTimeline(
             val isSolved = stepIndex in solvedStepIndices
             val color = when {
                 isSolved -> BestBadgeColor
-                step.analysis.grade == MoveGrade.BEST -> BestBadgeColor
-                step.analysis.grade == MoveGrade.INACCURACY -> InaccuracyBadgeColor
+                step.analysis.verdict() == ReviewVerdict.BEST -> BestBadgeColor
+                step.analysis.verdict() == ReviewVerdict.GOOD -> GoodBadgeColor
+                step.analysis.verdict() == ReviewVerdict.INACCURACY -> InaccuracyBadgeColor
                 else -> BlunderBadgeColor
             }
             val selected = stepIndex == currentIndex
@@ -959,7 +966,7 @@ private fun ReviewTimeline(
 internal fun findPreviousMistake(currentIndex: Int, steps: List<ReviewStep>, seat: Seat): Int {
     for (i in (currentIndex - 1) downTo 0) {
         val step = steps[i]
-        if (step.mover == seat && step.analysis.grade != MoveGrade.BEST) {
+        if (step.mover == seat && step.analysis.isMistake()) {
             return i
         }
     }
@@ -969,7 +976,7 @@ internal fun findPreviousMistake(currentIndex: Int, steps: List<ReviewStep>, sea
 internal fun findNextMistake(currentIndex: Int, steps: List<ReviewStep>, seat: Seat): Int {
     for (i in (currentIndex + 1) until steps.size) {
         val step = steps[i]
-        if (step.mover == seat && step.analysis.grade != MoveGrade.BEST) {
+        if (step.mover == seat && step.analysis.isMistake()) {
             return i
         }
     }
