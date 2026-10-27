@@ -89,6 +89,7 @@ public fun PostMatchPreviewScreen(
     humanSeat: Seat = Seat.P1,
     trainingScore: Pair<Int, Int>? = null,
     trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+    isFromHistory: Boolean = false,
     analyzer: MatchAnalyzer = remember { MatchAnalyzer() },
     ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     onReviewClicked: (MatchAnalysis) -> Unit = {},
@@ -285,7 +286,9 @@ public fun PostMatchPreviewScreen(
                     testTag = "post_match_profile_button",
                 )
                 MaestroPillButton(
-                    text = stringResource(id = R.string.post_match_back_to_menu).uppercase(),
+                    text = stringResource(
+                        id = if (isFromHistory) R.string.post_match_back_to_history else R.string.post_match_back_to_menu,
+                    ).uppercase(),
                     onClick = onHomeClicked,
                     variant = PillButtonVariant.SECONDARY_AMBER,
                     height = 46.dp,
@@ -294,7 +297,7 @@ public fun PostMatchPreviewScreen(
                     testTag = "post_match_home_button",
                 )
             }
-            if (won) {
+            if (won && !isFromHistory) {
                 ConfettiCelebration()
             }
         }

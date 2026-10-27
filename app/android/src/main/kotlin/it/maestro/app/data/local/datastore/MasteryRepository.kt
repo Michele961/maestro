@@ -105,7 +105,7 @@ public class DataStoreMasteryRepository(
         val rawHistory = dataStore.data.first()[PreferencesKeys.MATCH_HISTORY].orEmpty()
         val existingHistory = parseHistory(rawHistory)
         val encodedLog = matchLog.toText()
-        if (existingHistory.isNotEmpty() && existingHistory.first().matchLogText == encodedLog) {
+        if (existingHistory.any { it.matchLogText == encodedLog }) {
             return current
         }
         val matchAccuracy = matchAnalysis.accuracy(humanSeat)
@@ -259,7 +259,7 @@ public class InMemoryMasteryRepository(
     ): MasteryProfile {
         val current = profileState.value
         val encodedLog = matchLog.toText()
-        if (historyState.value.isNotEmpty() && historyState.value.first().matchLogText == encodedLog) {
+        if (historyState.value.any { it.matchLogText == encodedLog }) {
             return current
         }
 

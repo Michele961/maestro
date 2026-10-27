@@ -188,6 +188,7 @@
     <string name="post_match_maestro_review">Ho segnato i momenti chiave. Rivediamo insieme gli errori, mossa per mossa.</string>
     <string name="post_match_rematch">Rivincita</string>
     <string name="post_match_back_to_menu">Torna al menu</string>
+    <string name="post_match_back_to_history">Torna alla cronologia</string>
     <string name="game_opponent_last_move">Ultima giocata</string>
     <string name="game_opponent_drop_table">Calata</string>
     <string name="game_opponent_takes">Prende</string>
