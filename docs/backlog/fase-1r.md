@@ -232,7 +232,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Criteri di accettazione:**
     - [ ] La review mostra solo ciò che il giocatore sapeva più le carte uscite dopo (test esistente conservato).
     - [ ] File della feature review ≤ 400 righe ciascuno.
-- **Domande aperte:** —
+- **Domande aperte:** 17a (regia animata) supera il perimetro di una singola PR: `TableStage`/`PlayArea` sono interni al tavolo e legati a `GameUiState`. Proposta (da approvare): spezzare 17a in (1) estrarre dal tavolo uno `TableStage` di sola lettura che accetti `StageModel` + `TableGeometry` senza `GameUiState` (tocca `feature/table`, API di un altro modulo/feature), (2) costruire i `Beat` dalla revisione (`viewBefore`/`viewAfter`/eventi) e pilotare un `TableDirector` dedicato. Nel frattempo la revisione resta statica. Michele: va bene procedere così?
 
 ## F1R-18 — Avversari come personaggi
 
@@ -243,7 +243,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-19 — Home senza voci finte
 
-- **Stato:** in corso (dossier `docs/app/features/home.md` approvato il 2026-10-27; suddivisione in 19a…e). Fatti: 19a voci finte fuori (gemme, busta, Amici, Briscola, Classifica), 19b un solo «Gioca» e destinazioni vere, avatar → Profilo e portafoglio → Bottega, 19c in parte (nome e Maestria mostrati, campo `playerName`). Da fare: 19c richiesta e modifica del nome, 19d il Maestro dinamico in Home, 19e messa a punto dello spazio
+- **Stato:** in corso (dossier `docs/app/features/home.md` approvato il 2026-10-27; suddivisione in 19a…e). Fatti: 19a voci finte fuori (gemme, busta, Amici, Briscola, Classifica), 19b un solo «Gioca» e destinazioni vere, avatar → Profilo e portafoglio → Bottega, 19c nome e Maestria veri: il nome si chiede al primo avvio (dialogo, «Più tardi» non lo richiede) e si cambia toccandolo nella Home. 19d il Maestro in Home parla dello stato del giocatore (partita in corso, serie, benvenuto; 3 varianti al giorno, testi [bozza] da approvare). Da fare: 19e messa a punto dello spazio
 - **Obiettivo:** nascondere Amici, Classifica, messaggi e gemme finché non esistono; una sola chiamata all'azione principale; partita in corso in evidenza.
 - **Criteri di accettazione:**
     - [ ] Ogni elemento toccabile della Home porta a una funzione esistente.

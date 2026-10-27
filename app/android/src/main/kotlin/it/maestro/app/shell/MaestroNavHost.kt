@@ -39,6 +39,7 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.shell.crash.CrashReporter
 import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.domain.retention.DailyMissionsState
@@ -99,6 +100,9 @@ public fun MaestroNavHost(
     val missions by retentionRepository.observeDailyMissions(today)
         .collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
     val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
+    // Il nome si chiede solo a impostazioni lette: col valore iniziale il dialogo lampeggerebbe a ogni avvio.
+    val loadedFlow = remember(settingsRepository) { settingsRepository.settingsFlow.map { true } }
+    val settingsLoaded by loadedFlow.collectAsStateWithLifecycle(initialValue = false)
     val hasActiveMatch by shell.hasActiveMatch.collectAsStateWithLifecycle()
     val credits by walletRepository.observeBalance().collectAsStateWithLifecycle(initialValue = 0)
     val masteryFlow = remember(masteryRepository) { masteryRepository.observeMasteryProfile().map { it.cognitiveElo } }
@@ -146,6 +150,11 @@ public fun MaestroNavHost(
                 credits = credits,
                 avatarId = settings.selectedAvatar,
                 playerName = settings.playerName,
+                day = today.toEpochDay(),
+                playerNameMaxLength = MAX_PLAYER_NAME,
+                askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
+                onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
+                onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },
                 mastery = mastery,
             )
         }

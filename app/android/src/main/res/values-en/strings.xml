@@ -141,7 +141,6 @@
     <string name="settings_crash_warning">This action will force the app to crash to verify Crashlytics.</string>
     <string name="settings_close">Close</string>
     <string name="home_settings_button">Settings</string>
-    <string name="home_coach_welcome">Welcome to the club! Ready for a match or some strategic training?</string>
     <!-- Home (F1-18): decorative entries with fixed values until the features exist -->
     <string name="home_play_now">Play now</string>
     <string name="home_coins_placeholder">12,450</string>
@@ -738,4 +737,21 @@
     <string name="voice_color_6">Check who already has the Coins: sometimes they decide the game.</string>
     <string name="voice_color_7">If you\'re in doubt, tap me: that\'s what I\'m here for.</string>
     <string name="voice_color_8">Between one card and the next, a thought for the Settebello never hurts.</string>
+    <string name="home_name_dialog_title">What\'s your name?</string>
+    <string name="home_name_dialog_message">The Maestro will call you by it. You can change it any time by tapping your name.</string>
+    <string name="home_name_dialog_label">Your name</string>
+    <string name="home_name_dialog_confirm">Confirm</string>
+    <string name="home_name_dialog_skip">Later</string>
+    <string name="home_line_resume_0">You\'ve got a game in progress: let\'s pick it up where you left it.</string>
+    <string name="home_line_resume_1">Your game is waiting. Whenever you\'re ready.</string>
+    <string name="home_line_resume_2">We were halfway there: let\'s finish it calmly.</string>
+    <string name="home_line_streak_0">%1$d days in a row: the club is noticing. Don\'t break the streak!</string>
+    <string name="home_line_streak_1">Such consistency, %1$d days! A quick hand today?</string>
+    <string name="home_line_streak_2">A %1$d-day streak: practice pays off. Shall we go on?</string>
+    <string name="home_line_named_0">Welcome back, %1$s! A challenge or some practice?</string>
+    <string name="home_line_named_1">Hi %1$s! Shall we try something new today?</string>
+    <string name="home_line_named_2">%1$s, the table is ready. Whenever you like.</string>
+    <string name="home_line_welcome_0">Welcome to the club! Ready for a challenge or some strategy practice?</string>
+    <string name="home_line_welcome_1">Welcome! A hand to warm up?</string>
+    <string name="home_line_welcome_2">The table is ready: a challenge or some practice?</string>
 </resources>
