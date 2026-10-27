@@ -27,6 +27,8 @@ public data class AppSettings(
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
     /** Il giocatore ha già chiesto almeno un consiglio: il Maestro non glielo introduce più. */
     val hintEverUsed: Boolean = false,
+    /** Nome scelto dal giocatore; `null` finché non l'ha detto (si chiede e si può cambiare, `docs/app/features/home.md`). */
+    val playerName: String? = null,
     /** Mostra al tavolo la corsa ai punti (Carte, Denari, Settebello, Primiera): spenta di default, è un aiuto. */
     val showPointsRace: Boolean = false,
     val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
@@ -47,6 +49,7 @@ public interface SettingsRepository {
     public suspend fun updateGameSpeed(speed: GameSpeed)
     public suspend fun updateMaestroChattiness(chattiness: Chattiness)
     public suspend fun updateShowPointsRace(show: Boolean)
+    public suspend fun updatePlayerName(name: String)
     public suspend fun markHintUsed()
     public suspend fun updatePreferredLevel(level: DifficultyLevel)
     public suspend fun updatePreferredTargetScore(targetScore: Int)
@@ -69,6 +72,7 @@ public class DataStoreSettingsRepository(
         val GAME_SPEED = stringPreferencesKey("game_speed")
         val MAESTRO_CHATTINESS = stringPreferencesKey("maestro_chattiness")
         val HINT_EVER_USED = booleanPreferencesKey("hint_ever_used")
+        val PLAYER_NAME = stringPreferencesKey("player_name")
         val SHOW_POINTS_RACE = booleanPreferencesKey("show_points_race")
         val PREFERRED_LEVEL = stringPreferencesKey("preferred_level")
         val PREFERRED_TARGET_SCORE = intPreferencesKey("preferred_target_score")
@@ -105,6 +109,7 @@ public class DataStoreSettingsRepository(
             gameSpeed = speed,
             maestroChattiness = chattiness,
             hintEverUsed = preferences[PreferencesKeys.HINT_EVER_USED] ?: false,
+            playerName = preferences[PreferencesKeys.PLAYER_NAME]?.takeIf { it.isNotBlank() },
             showPointsRace = preferences[PreferencesKeys.SHOW_POINTS_RACE] ?: false,
             preferredLevel = level,
             preferredTargetScore = targetScore,
@@ -142,6 +147,12 @@ public class DataStoreSettingsRepository(
     override suspend fun updateShowPointsRace(show: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.SHOW_POINTS_RACE] = show
+        }
+    }
+
+    override suspend fun updatePlayerName(name: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.PLAYER_NAME] = name.trim().take(MAX_PLAYER_NAME)
         }
     }
 
@@ -218,6 +229,10 @@ public class InMemorySettingsRepository(
         _state.value = _state.value.copy(showPointsRace = show)
     }
 
+    override suspend fun updatePlayerName(name: String) {
+        _state.value = _state.value.copy(playerName = name.trim().take(MAX_PLAYER_NAME).takeIf { it.isNotBlank() })
+    }
+
     override suspend fun markHintUsed() {
         _state.value = _state.value.copy(hintEverUsed = true)
     }
@@ -246,3 +261,6 @@ public class InMemorySettingsRepository(
         _state.value = _state.value.copy(unlockedCosmetics = _state.value.unlockedCosmetics + cosmeticId)
     }
 }
+
+/** Lunghezza massima del nome del giocatore. */
+public const val MAX_PLAYER_NAME: Int = 20

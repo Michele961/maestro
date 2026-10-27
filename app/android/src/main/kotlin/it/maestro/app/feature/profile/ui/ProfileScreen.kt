@@ -72,6 +72,7 @@ public fun ProfileScreen(
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier,
     onReviewMatch: (MatchLog) -> Unit = {},
+    playerName: String? = null,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,6 +81,7 @@ public fun ProfileScreen(
         onBackClicked = onBackClicked,
         onSelectTab = { viewModel.selectTab(it) },
         onReviewMatch = onReviewMatch,
+        playerName = playerName,
         modifier = modifier,
     )
 }
@@ -91,6 +93,7 @@ public fun ProfileContent(
     modifier: Modifier = Modifier,
     onSelectTab: (ProfileTab) -> Unit = {},
     onReviewMatch: (MatchLog) -> Unit = {},
+    playerName: String? = null,
 ) {
     val profile = uiState.profile
 
@@ -140,6 +143,7 @@ public fun ProfileContent(
                     // 1. Scheda Giocatore con Avatar, Nome e Livello di Maestria
                     PlayerIdentityCard(
                         rankTitleRes = uiState.rankTitleRes,
+                        playerName = playerName,
                     )
 
                     // 2. Indice di Maestria (Elo Cognitivo)
@@ -418,7 +422,7 @@ private fun ProfileHeader(onBackClicked: () -> Unit) {
 }
 
 @Composable
-private fun PlayerIdentityCard(rankTitleRes: Int) {
+private fun PlayerIdentityCard(rankTitleRes: Int, playerName: String?) {
     WoodPanel(modifier = Modifier.fillMaxWidth().testTag("profile_identity_card")) {
         Row(
             modifier = Modifier
@@ -437,7 +441,7 @@ private fun PlayerIdentityCard(rankTitleRes: Int) {
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.home_player_name),
+                    text = playerName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.home_player_default_name),
                     color = BrassRivetGold,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,

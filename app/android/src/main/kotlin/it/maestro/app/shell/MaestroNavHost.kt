@@ -38,7 +38,9 @@ import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.domain.retention.DailyMissionsState
 import it.maestro.app.domain.retention.StreakState
+import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.wallet.WalletRepository
+import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.feature.missions.ui.DailyMissionsDialog
 import it.maestro.app.feature.settings.ui.SettingsDialog
@@ -78,6 +80,7 @@ public fun MaestroNavHost(
     val settingsRepository: SettingsRepository = koinInject()
     val retentionRepository: RetentionRepository = koinInject()
     val walletRepository: WalletRepository = koinInject()
+    val masteryRepository: MasteryRepository = koinInject()
     val crashReporter: CrashReporter = koinInject()
     val clock: Clock = koinInject()
     val scope = rememberCoroutineScope()
@@ -93,6 +96,8 @@ public fun MaestroNavHost(
     val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
     val hasActiveMatch by shell.hasActiveMatch.collectAsStateWithLifecycle()
     val credits by walletRepository.observeBalance().collectAsStateWithLifecycle(initialValue = 0)
+    val masteryFlow = remember(masteryRepository) { masteryRepository.observeMasteryProfile().map { it.cognitiveElo } }
+    val mastery by masteryFlow.collectAsStateWithLifecycle(initialValue = null)
 
     var showSettings by rememberSaveable { mutableStateOf(false) }
     var showMissions by rememberSaveable { mutableStateOf(false) }
@@ -135,6 +140,8 @@ public fun MaestroNavHost(
                 streakCount = streak.currentStreak,
                 credits = credits,
                 avatarId = settings.selectedAvatar,
+                playerName = settings.playerName,
+                mastery = mastery,
             )
         }
         composable<Route.PreGame> {
@@ -225,6 +232,7 @@ public fun MaestroNavHost(
         composable<Route.Profile> {
             ProfileScreen(
                 onBackClicked = { navController.popBackStack() },
+                playerName = settings.playerName,
                 onReviewMatch = { log ->
                     navController.navigate(
                         Route.PostMatch(

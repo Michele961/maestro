@@ -1,6 +1,6 @@
 # Home — dossier
 
-Stato: **bozza** · 2026-10-27 · task collegati: F1R-19 (da suddividere dopo l'approvazione), F1R-24 (voce del Maestro), F1R-14
+Stato: **approvato** (Michele, 2026-10-27) · 2026-10-27 · task collegati: F1R-19 (da suddividere dopo l'approvazione), F1R-24 (voce del Maestro), F1R-14
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
 
 ## 1. Cosa fa per il giocatore
@@ -64,6 +64,6 @@ Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i
 
 1. **Nome del giocatore**: si **chiede** e resta **modificabile**; la gestione di utenti e accesso verrà più avanti.
 2. **Briscola**: nessuna tessera ora; «Briscola in arrivo» si farà quando la situazione sarà stabile (quindi per ora non compare).
-5. **Azione principale senza partita in corso** («Gioca»): da decidere insieme, **aperto**.
-
-Restano aperte le domande 3 (Bottega e Profilo dal portafoglio e dall'avatar) e 4 (Classifica). Il dossier **resta in bozza** finché non sono chiuse.
+3. **Bottega e Profilo**: si aprono da **portafoglio** (monete) e **avatar**, come proposto.
+4. **Classifica**: sparisce; verrà con il multiplayer e con un piano per le modalità, quindi per ora non è usata.
+5. **«Gioca»** apre la **pre-partita**; Michele nota che potrebbe essere **ridondante** rispetto al resto: con Briscola e Classifica fuori, la Home ha **un solo «Gioca»** (niente tessera Scopa che duplichi il pulsante principale). Se la pre-partita risulta ridondante si rivede insieme dopo la prova.

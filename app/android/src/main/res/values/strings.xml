@@ -146,24 +146,15 @@
     <string name="home_coach_welcome">Benvenuto al circolo! Pronto per una sfida o per allenarti sulle strategie?</string>
     <!-- Home (F1-18): voci decorative con valori fissi finché non esistono le funzioni -->
     <string name="home_play_now">Gioca ora</string>
-    <string name="home_play">Gioca</string>
-    <string name="home_coming_soon">Presto disponibile</string>
-    <string name="home_game_briscola">Briscola</string>
-    <string name="home_game_scopa">Scopa</string>
-    <string name="home_player_name">Giocatore · Liv. 1</string>
     <string name="home_coins_placeholder">12.450</string>
-    <string name="home_gems_placeholder">280</string>
     <string name="home_news">Notizie dal circolo</string>
     <string name="home_daily_rewards">Premi giornalieri</string>
     <string name="home_daily_missions">Missioni del giorno</string>
     <string name="home_missions_title">Missioni</string>
     <string name="home_missions_subtitle">Giornaliere</string>
-    <string name="home_friends">Amici</string>
-    <string name="home_nav_leaderboard">Classifica</string>
     <string name="home_nav_training">Palestra</string>
     <string name="home_nav_shop">Bottega</string>
     <string name="home_maestro_title">Il Maestro</string>
-    <string name="home_messages">Messaggi</string>
     <string name="pre_game_points">%1$d Punti</string>
     <string name="pre_game_level_number">(Liv. %1$d)</string>
     <string name="level_esperto">Esperto</string>
@@ -715,4 +706,6 @@
     <string name="voice_review_extra_score">Il punteggio è %1$d a %2$d: questo cambia quanto conviene rischiare.</string>
     <string name="voice_review_extra_played">Sono già uscite %1$d carte: il Maestro tiene conto di quelle ancora in gioco.</string>
     <string name="review_grade_good">Buona mossa</string>
+    <string name="home_player_default_name">Giocatore</string>
+    <string name="home_mastery_label">Maestria %1$d</string>
 </resources>

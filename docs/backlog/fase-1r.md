@@ -243,7 +243,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-19 — Home senza voci finte
 
-- **Stato:** da fare (dossier `docs/app/features/home.md` in bozza, in attesa di Michele; suddivisione in 19a…e)
+- **Stato:** in corso (dossier `docs/app/features/home.md` approvato il 2026-10-27; suddivisione in 19a…e). Fatti: 19a voci finte fuori (gemme, busta, Amici, Briscola, Classifica), 19b un solo «Gioca» e destinazioni vere, avatar → Profilo e portafoglio → Bottega, 19c in parte (nome e Maestria mostrati, campo `playerName`). Da fare: 19c richiesta e modifica del nome, 19d il Maestro dinamico in Home, 19e messa a punto dello spazio
 - **Obiettivo:** nascondere Amici, Classifica, messaggi e gemme finché non esistono; una sola chiamata all'azione principale; partita in corso in evidenza.
 - **Criteri di accettazione:**
     - [ ] Ogni elemento toccabile della Home porta a una funzione esistente.
