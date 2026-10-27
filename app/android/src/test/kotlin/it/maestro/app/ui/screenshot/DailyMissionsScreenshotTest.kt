@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureScreenRoboImage
-import it.maestro.app.data.local.missions.DailyMission
-import it.maestro.app.data.local.missions.DailyMissionType
-import it.maestro.app.data.local.missions.DailyMissionsState
-import it.maestro.app.data.local.missions.StreakState
+import it.maestro.app.domain.retention.DailyMission
+import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.retention.DailyMissionsState
+import it.maestro.app.domain.retention.StreakState
 import it.maestro.app.feature.missions.ui.DailyMissionsDialog
 import it.maestro.app.feature.missions.presentation.DailyMissionsUiState
 import it.maestro.app.designsystem.theme.MaestroTheme

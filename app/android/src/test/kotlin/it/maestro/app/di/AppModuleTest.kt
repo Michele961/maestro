@@ -1,8 +1,8 @@
 package it.maestro.app.di
 
 import it.maestro.ai.bot.DifficultyLevel
-import it.maestro.app.data.repository.MatchRepository
-import it.maestro.app.data.repository.RestoreMatchResult
+import it.maestro.app.domain.match.MatchRepository
+import it.maestro.app.domain.match.RestoreMatchResult
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog

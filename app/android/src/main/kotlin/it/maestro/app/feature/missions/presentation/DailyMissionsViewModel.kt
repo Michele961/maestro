@@ -2,11 +2,11 @@ package it.maestro.app.feature.missions.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.maestro.app.data.local.datastore.RetentionRepository
-import it.maestro.app.data.local.missions.DailyMission
-import it.maestro.app.data.local.missions.DailyMissionsState
-import it.maestro.app.data.local.missions.StreakState
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.retention.RetentionRepository
+import it.maestro.app.domain.retention.DailyMission
+import it.maestro.app.domain.retention.DailyMissionsState
+import it.maestro.app.domain.retention.StreakState
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.rewards.RewardEngine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

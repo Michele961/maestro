@@ -9,9 +9,9 @@ import it.maestro.app.data.local.DailyPuzzleProvider
 import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
-import it.maestro.app.data.local.datastore.RetentionRepository
-import it.maestro.app.data.local.missions.DailyMissionType
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.retention.RetentionRepository
+import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card

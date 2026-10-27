@@ -4,9 +4,9 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
-import it.maestro.app.data.local.missions.DailyMissionType
+import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.time.FakeClock
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaConfig

@@ -1,5 +1,7 @@
 package it.maestro.app.architecture
 
+import it.maestro.app.domain.wallet.WalletRepository
+
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,21 +21,14 @@ class ArchitectureRulesTest {
     /** (file relativo a `src/main/kotlin`, regola) → task che rimuove la violazione. */
     private val knownExceptions: Map<Pair<String, Rule>, String> = mapOf(
         // Layer: la presentazione parla con i repository solo tramite interfacce del dominio.
-        ex("feature/missions/ui/DailyMissionsDialog.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/missions/presentation/DailyMissionsViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/shop/presentation/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/shop/ui/ShopScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/profile/presentation/ProfileViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/profile/ui/ProfileScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/puzzle/presentation/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/puzzle/ui/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/academy/presentation/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/academy/ui/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-14",
-        ex("feature/table/presentation/GameViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-08",
+        // Restano i cataloghi di contenuto con risorse (cosmetici, Accademia, sfida): li sposta la revisione della loro feature.
+        ex("feature/shop/presentation/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
+        ex("feature/shop/ui/ShopScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
+        ex("feature/puzzle/presentation/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
+        ex("feature/puzzle/ui/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
+        ex("feature/academy/presentation/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-21",
+        ex("feature/academy/ui/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-21",
         ex("designsystem/audio/SoundManager.kt", Rule.UI_IMPORTS_DATA) to "F1R-20",
-        // Transitorio: RewardEngine usa ancora le interfacce dei repository che stanno in data (F1R-14b le sposta).
-        ex("domain/rewards/RewardEngine.kt", Rule.DOMAIN_IMPORTS_PLATFORM) to "F1R-14",
-        // Timer: la regia del tavolo sostituisce i ritardi sparsi.
     )
 
     @Test

@@ -1,7 +1,5 @@
-package it.maestro.app.data.local.missions
+package it.maestro.app.domain.retention
 
-import androidx.annotation.StringRes
-import it.maestro.app.R
 import it.maestro.game.rng.SeededRng
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -116,44 +114,30 @@ public data class StreakState(
  * Tipologie di missioni didattiche quotidiane (task F2-05).
  */
 public enum class DailyMissionType(
-    @StringRes public val titleRes: Int,
-    @StringRes public val descriptionRes: Int,
     public val defaultTarget: Int,
     public val rewardCredits: Int,
 ) {
     SOLVE_DAILY_PUZZLE(
-        titleRes = R.string.mission_daily_puzzle_title,
-        descriptionRes = R.string.mission_daily_puzzle_desc,
         defaultTarget = 1,
         rewardCredits = 10,
     ),
     COMPLETE_MATCH_WITH_ACCURACY_80(
-        titleRes = R.string.mission_accuracy_80_title,
-        descriptionRes = R.string.mission_accuracy_80_desc,
         defaultTarget = 1,
         rewardCredits = 15,
     ),
     ANSWER_SEVENS_CHECKS(
-        titleRes = R.string.mission_sevens_check_title,
-        descriptionRes = R.string.mission_sevens_check_desc,
         defaultTarget = 2,
         rewardCredits = 10,
     ),
     MAKE_SWEEPS(
-        titleRes = R.string.mission_sweeps_title,
-        descriptionRes = R.string.mission_sweeps_desc,
         defaultTarget = 2,
         rewardCredits = 10,
     ),
     CAPTURE_DENARI(
-        titleRes = R.string.mission_denari_title,
-        descriptionRes = R.string.mission_denari_desc,
         defaultTarget = 6,
         rewardCredits = 10,
     ),
     PLAY_MATCH_WITHOUT_BLUNDERS(
-        titleRes = R.string.mission_no_blunders_title,
-        descriptionRes = R.string.mission_no_blunders_desc,
         defaultTarget = 1,
         rewardCredits = 15,
     ),

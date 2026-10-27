@@ -193,7 +193,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-14 — `RewardEngine`
 
-- **Stato:** in corso (14a fatta; 14b da fare)
+- **Stato:** fatto (14a e 14b)
 - **Riferimenti:** `docs/app/layers.md` §3
 - **Obiettivo:** un solo punto per crediti, missioni, streak e maestria a fine partita, puzzle e lezione; rimuovere la stessa logica da `MainActivity`, `DailyPuzzleViewModel`, `DailyMissionsViewModel`, `ShopViewModel`.
 - **Criteri di accettazione:**
@@ -201,7 +201,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [x] Nessuna chiamata a `WalletRepository.addCredits` fuori da `RewardEngine` (test F1R-01).
 - **Suddivisione (2026-10-27):** il task tocca più feature e supera le 400 righe.
     - **14a (fatto):** `domain/rewards/RewardEngine` e `RewardSummary`; fine partita, puzzle, lezione, riscossione missioni e bonus di benvenuto passano da qui (`ShellViewModel`, `DailyPuzzleViewModel`, `AcademyViewModel`, `DailyMissionsViewModel`). Regola `CREDITS_OUTSIDE_REWARD_ENGINE` nei guardrail. Nessun credito per la partita: la spec non ne assegna (`game-feel.md` §6 parla di crediti che volano, ma non dice quanti: vedi domanda aperta).
-    - **14b (da fare):** spostare nel dominio le interfacce dei repository (wallet, missioni/streak, maestria, accademia, puzzle, impostazioni, cosmetici) e i loro modelli, così `RewardEngine` e le presentazioni non importano `data`; tolte le eccezioni `UI_IMPORTS_DATA` di F1R-14 dai guardrail.
+    - **14b (fatto, 2026-10-27):** interfacce e modelli di wallet, partita (`MatchRepository`), maestria, streak e missioni spostati in `domain/wallet`, `domain/match`, `domain/mastery`, `domain/retention` (le implementazioni restano in `data`); i titoli delle missioni passano dal dominio alla UI (`MissionText.kt`). `RewardEngine`, missioni, profilo e tavolo non importano più `data`. **Restano fuori** i cataloghi di contenuto legati a risorse e al design system: cosmetici e impostazioni (revisione Bottega e Impostazioni), sfida del giorno (revisione della sfida), Accademia (F1R-21); le eccezioni `UI_IMPORTS_DATA` di quelle feature sono ri-etichettate col task che le toglie.
 - **Decisione di Michele (2026-10-27):** le partite contro i bot non danno crediti per ora; un sistema monetario verrà più avanti. La sequenza di fine partita (F1R-15) non mostra crediti di partita: solo missioni, streak e maestria. I crediti da missioni, sfida e lezioni restano.
 - **Domande aperte:** —
 

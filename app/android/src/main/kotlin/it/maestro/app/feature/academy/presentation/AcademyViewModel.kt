@@ -13,7 +13,7 @@ import it.maestro.app.data.local.academy.AcademyLessonProgress
 import it.maestro.app.data.local.academy.AcademyStep
 import it.maestro.app.data.local.academy.AcademyStepType
 import it.maestro.app.data.local.datastore.AcademyRepository
-import it.maestro.app.data.local.wallet.TransactionReason
+import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card

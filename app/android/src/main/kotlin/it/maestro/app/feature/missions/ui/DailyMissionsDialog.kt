@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import it.maestro.app.R
-import it.maestro.app.data.local.missions.DailyMission
+import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.designsystem.components.BubbleTail
 import it.maestro.app.designsystem.components.FramedPortrait
 import it.maestro.app.designsystem.components.MaestroSpeechBubble

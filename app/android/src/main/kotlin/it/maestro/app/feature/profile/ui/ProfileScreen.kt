@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
-import it.maestro.app.data.local.datastore.MatchHistoryEntry
+import it.maestro.app.domain.mastery.MatchHistoryEntry
 import it.maestro.game.scopa.MatchLog
 import it.maestro.app.feature.profile.ui.AbilityRadarChart
 import it.maestro.app.designsystem.components.BubbleTail

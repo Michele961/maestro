@@ -3,8 +3,8 @@ package it.maestro.app.data.local.db
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import it.maestro.app.data.local.wallet.TransactionReason
-import it.maestro.app.data.local.wallet.WalletTransaction
+import it.maestro.app.domain.wallet.TransactionReason
+import it.maestro.app.domain.wallet.WalletTransaction
 
 /**
  * Entità Room per il registro contabile append-only del wallet Crediti Maestro (ADR-0006, task F2-07).

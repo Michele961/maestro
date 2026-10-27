@@ -33,11 +33,11 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.shell.crash.CrashReporter
 import it.maestro.app.data.local.datastore.AppSettings
-import it.maestro.app.data.local.datastore.RetentionRepository
+import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
-import it.maestro.app.data.local.missions.DailyMissionsState
-import it.maestro.app.data.local.missions.StreakState
-import it.maestro.app.data.local.wallet.WalletRepository
+import it.maestro.app.domain.retention.DailyMissionsState
+import it.maestro.app.domain.retention.StreakState
+import it.maestro.app.domain.wallet.WalletRepository
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.feature.missions.ui.DailyMissionsDialog
 import it.maestro.app.feature.settings.ui.SettingsDialog
