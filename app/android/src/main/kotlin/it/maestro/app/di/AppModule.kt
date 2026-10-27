@@ -18,6 +18,7 @@ import it.maestro.app.data.local.datastore.MasteryRepository
 import it.maestro.app.data.local.datastore.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
+import it.maestro.app.data.local.db.MaestroMigrations
 import it.maestro.app.data.local.wallet.RoomWalletRepository
 import it.maestro.app.data.local.wallet.WalletRepository
 import it.maestro.app.data.repository.MatchRepository
@@ -56,7 +57,7 @@ public val appModule: Module = module {
             androidContext(),
             MaestroDatabase::class.java,
             "maestro_scopa.db",
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(*MaestroMigrations.ALL).build()
     }
 
     single { get<MaestroDatabase>().savedMatchDao() }

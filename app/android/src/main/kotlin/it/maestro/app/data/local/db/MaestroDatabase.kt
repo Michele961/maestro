@@ -11,8 +11,8 @@ import androidx.room.RoomDatabase
         SavedMatchEntity::class,
         WalletTransactionEntity::class,
     ],
-    version = 2,
-    exportSchema = false,
+    version = 3,
+    exportSchema = true,
 )
 public abstract class MaestroDatabase : RoomDatabase() {
     public abstract fun savedMatchDao(): SavedMatchDao

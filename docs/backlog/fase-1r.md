@@ -62,7 +62,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-02 — `Clock`, seed e data iniettati
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Riferimenti:** `docs/app/layers.md` §3
 - **Obiettivo:** interfaccia `Clock` nel dominio e implementazione di sistema; tutti gli usi di `System.currentTimeMillis`, `LocalDate.now` e i seed `42L`/`12345L` passano da `Clock`. La data si rilegge al ritorno in primo piano (cambio giorno con app aperta).
 - **Criteri di accettazione:**
@@ -72,13 +72,13 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-03 — Room con schema esportato e migrazioni
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Riferimenti:** ADR-0017
 - **Obiettivo:** `exportSchema = true`, schema versionato, rimozione di `fallbackToDestructiveMigration()`, prima migrazione di prova e test con `MigrationTestHelper`.
 - **Perimetro autorizzato:** `room-testing` come dipendenza di test; opzione `room.schemaLocation` nel `build.gradle.kts` dell'app.
 - **Criteri di accettazione:**
-    - [ ] Aggiornare l'app da `main` attuale alla nuova versione conserva storico, partita in corso e wallet (test).
-    - [ ] Lo schema JSON è nel repository.
+    - [x] Aggiornare l'app da `main` attuale alla nuova versione conserva storico, partita in corso e wallet (test).
+    - [x] Lo schema JSON è nel repository.
 - **Domande aperte:** —
 
 ## F1R-04 — Navigazione con rotte tipizzate e stato salvabile
