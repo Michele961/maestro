@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,8 +75,12 @@ public fun PostMatchScreen(
             ) {
                 ResultPlaque(state.won, state.humanTotal, state.opponentTotal)
                 Spacer(modifier = Modifier.height(10.dp))
+                // Contenuti centrati nello spazio che resta; se non ci stanno scorrono e si seguono i nuovi passi.
+                val scroll = rememberScrollState()
+                LaunchedEffect(state.step, state.reward, state.analysis) { scroll.animateScrollTo(scroll.maxValue) }
+                Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Column(
-                    modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth().verticalScroll(scroll),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     val analysis = state.analysis
@@ -87,6 +92,7 @@ public fun PostMatchScreen(
                         Reveal { RewardCard(reward, state.claimedMissions, onClaimMission) }
                     }
                     MaestroLine(state, analysis)
+                }
                 }
                 Actions(state, onReviewClicked, onRematchClicked, onHomeClicked)
             }

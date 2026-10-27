@@ -26,7 +26,6 @@ import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
-import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.profile.presentation.ProfileViewModel
@@ -127,7 +126,7 @@ public val appModule: Module = module {
             fromHistory = params.get(),
             analysis = params.get(),
             reward = params.get(),
-            speed = GameSpeed.NORMAL,
+            speed = get<SettingsRepository>().settingsFlow.map { it.gameSpeed },
         )
     }
 

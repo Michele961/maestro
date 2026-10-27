@@ -188,7 +188,7 @@ private fun MissionRow(advance: MissionAdvance, claimed: Boolean, onClaim: (Dail
                 text = stringResource(id = if (claimed) R.string.retention_missions_claimed else R.string.retention_missions_claim, mission.type.rewardCredits),
                 onClick = { if (!claimed) onClaim(mission) },
                 variant = if (claimed) PillButtonVariant.WOOD else PillButtonVariant.PRIMARY_GREEN,
-                height = 36.dp,
+                height = 46.dp,
                 fontSize = 14.sp,
                 testTag = "reward_claim_${mission.type.name.lowercase()}",
             )
