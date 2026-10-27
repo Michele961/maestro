@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -38,9 +37,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +65,7 @@ import it.maestro.app.R
 import it.maestro.app.designsystem.components.CardBackView
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.ConfettiCelebration
+import it.maestro.app.designsystem.components.MaestroAlertDialog
 import it.maestro.app.designsystem.components.MaestroAvatarView
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.app.designsystem.components.MaestroPillButton
@@ -264,7 +267,6 @@ public fun GameReviewScreen(
                         viewModel.revealSolution()
                         viewModel.exitRetry()
                     },
-                    modifier = Modifier.weight(BANNER_WEIGHT, fill = false),
                 )
             } else {
                 MoveEvaluationBanner(
@@ -275,7 +277,6 @@ public fun GameReviewScreen(
                     isRevealed = isCurrentRevealed,
                     onStartRetry = viewModel::startRetry,
                     onRevealSolution = viewModel::revealSolution,
-                    modifier = Modifier.weight(BANNER_WEIGHT, fill = false),
                 )
             }
 
@@ -316,9 +317,6 @@ public fun GameReviewScreen(
         }
     }
 }
-
-/** Quota massima dello spazio verticale che il commento può prendere: il resto resta al tavolo. */
-private const val BANNER_WEIGHT = 0.8f
 
 @Composable
 private fun MoveEvaluationBanner(
@@ -364,7 +362,7 @@ private fun MoveEvaluationBanner(
     }
 
     ParchmentPanel(modifier = modifier.fillMaxWidth().testTag("review_evaluation_banner")) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painterResource(badge), contentDescription = null, modifier = Modifier.size(40.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -465,48 +463,42 @@ private fun MoveEvaluationBanner(
             }
 
             if (explanation != null) {
-                Surface(
-                    color = Color(0xFFF6F0E2),
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.dp, ButtonGoldBorder.copy(alpha = 0.6f)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("review_explanation_card"),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.Top,
-                    ) {
-                        MaestroAvatarView(
-                            mood = if (analysis.grade == MoveGrade.BLUNDER) MaestroMood.WARNING else MaestroMood.THINKING,
-                            size = 36.dp,
-                            modifier = Modifier.padding(top = 2.dp),
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(3.dp),
-                        ) {
-                            Text(
-                                text = "${stringResource(id = R.string.review_explanation_header)}: ${phrasesText(listOf(explanation.title))}",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF5C2D16),
-                            )
-                            Text(
-                                text = phrasesText(explanation.explanation),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = InkColor.copy(alpha = 0.95f),
-                                lineHeight = 16.sp,
-                            )
-                            Text(
-                                text = stringResource(id = R.string.review_golden_rule, phrasesText(listOf(explanation.rule))),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF8B4513),
-                            )
-                        }
-                    }
+                var showWhy by remember(analysis) { mutableStateOf(false) }
+                MaestroPillButton(
+                    text = stringResource(id = R.string.review_why_button),
+                    onClick = { showWhy = true },
+                    variant = PillButtonVariant.EDUCATIONAL_BLUE,
+                    height = 36.dp,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth().testTag("review_why_button"),
+                )
+                if (showWhy) {
+                    MaestroAlertDialog(
+                        modifier = Modifier.testTag("review_explanation_card"),
+                        onDismissRequest = { showWhy = false },
+                        title = { Text(phrasesText(listOf(explanation.title)), fontWeight = FontWeight.Bold) },
+                        text = {
+                            Row(verticalAlignment = Alignment.Top) {
+                                MaestroAvatarView(
+                                    mood = if (analysis.grade == MoveGrade.BLUNDER) MaestroMood.WARNING else MaestroMood.THINKING,
+                                    size = 48.dp,
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text(text = phrasesText(explanation.explanation), style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        text = stringResource(id = R.string.review_golden_rule, phrasesText(listOf(explanation.rule))),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color(0xFF8B4513),
+                                    )
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showWhy = false }) { Text(stringResource(id = R.string.review_why_close)) }
+                        },
+                    )
                 }
             }
         }
@@ -867,8 +859,8 @@ private fun ReviewNavigationControls(
             text = stringResource(id = R.string.review_back_button),
             onClick = onNavigateBack,
             variant = PillButtonVariant.WOOD,
-            height = 36.dp,
-            fontSize = 13.sp,
+            height = 42.dp,
+            fontSize = 15.sp,
             modifier = Modifier.fillMaxWidth(),
             testTag = "review_back_button",
         )

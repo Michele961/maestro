@@ -126,7 +126,6 @@ public val appModule: Module = module {
             fromHistory = params.get(),
             analysis = params.get(),
             reward = params.get(),
-            speed = get<SettingsRepository>().settingsFlow.map { it.gameSpeed },
         )
     }
 

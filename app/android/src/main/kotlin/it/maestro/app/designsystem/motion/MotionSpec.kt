@@ -51,12 +51,6 @@ public enum class MotionToken(public val baseMillis: Long) {
     /** Riflessione massima del bot (molte scelte possibili). */
     BOT_THINK_MAX(1300),
 
-    /** Targa Vittoria/Sconfitta a inizio sequenza di fine partita (F1R-15). */
-    POST_MATCH_PLAQUE(1200),
-
-    /** Ogni passo della sequenza di fine partita (precisione, ricompensa). */
-    POST_MATCH_STEP(900),
-
     /** Passaggio tra schermate. */
     SCREEN_TRANSITION(300),
 }

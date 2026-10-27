@@ -226,7 +226,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-17 — Review sulla regia del tavolo
 
-- **Stato:** in corso (dossier `docs/app/features/review.md` approvato il 2026-10-27; suddivisione in 17a…d, vedi §5 del dossier). Fatto 17b (parte 1): caricamento in un colpo solo con attesa visibile, commento limitato in altezza (scorre) così il tavolo non si schiaccia, «Torna all'anteprima» piccolo, niente punteggi con decimali. Da fare: regia animata (17a), spiegazioni sul fumetto (17c), «Riprova la mano» a livelli (17d)
+- **Stato:** in corso (dossier `docs/app/features/review.md` approvato il 2026-10-27; suddivisione in 17a…d, vedi §5 del dossier). Fatto 17b (parte 1): caricamento in un colpo solo con attesa visibile, commento limitato in altezza (scorre) così il tavolo non si schiaccia, «Torna all'anteprima» piccolo, niente punteggi con decimali. Dopo la prova di Michele (2026-10-27): commento del Maestro dietro «Perché?» (niente scorrimento nascosto), «Indietro» più grande; fine partita senza comparse a pezzi (caricamento, poi tutto insieme, anche dalla cronologia); fumetto al tavolo appoggiato al Maestro. Da fare: regia animata (17a), spiegazioni sul fumetto (17c), «Riprova la mano» a livelli (17d)
 - **Riferimenti:** `docs/app/table-director.md` §5
 - **Obiettivo:** Game Review e "Rigioca l'errore" usano `TableDirector` e `TableGeometry`; navigazione tra mosse animata; spiegazioni da `CoachService`.
 - **Criteri di accettazione:**
