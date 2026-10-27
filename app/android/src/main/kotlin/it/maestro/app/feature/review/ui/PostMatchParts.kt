@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,7 +31,12 @@ import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.R
 import it.maestro.app.designsystem.components.NineSliceBox
 import it.maestro.app.designsystem.components.ParchmentPanel
+import it.maestro.app.domain.retention.DailyMission
+import it.maestro.app.domain.rewards.MissionAdvance
 import it.maestro.app.domain.rewards.RewardSummary
+import it.maestro.app.designsystem.components.MaestroPillButton
+import it.maestro.app.designsystem.components.PillButtonVariant
+import it.maestro.app.feature.missions.ui.titleRes
 import it.maestro.game.model.Seat
 
 internal val CreamText = Color(0xFFFFF4D6)
@@ -117,7 +123,12 @@ internal fun AccuracyCard(analysis: MatchAnalysis, human: Seat, trainingScore: P
 
 /** Cosa si è guadagnato: l'Indice di Maestria con la variazione (sempre, vittoria o sconfitta) e la serie di giorni. */
 @Composable
-internal fun RewardCard(reward: RewardSummary, modifier: Modifier = Modifier) {
+internal fun RewardCard(
+    reward: RewardSummary,
+    claimed: Set<String>,
+    onClaim: (DailyMission) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     ParchmentPanel(modifier = modifier.fillMaxWidth().testTag("reward_card")) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             val after = reward.masteryAfter
@@ -140,6 +151,7 @@ internal fun RewardCard(reward: RewardSummary, modifier: Modifier = Modifier) {
                     )
                 }
             }
+            reward.missions.forEach { advance -> MissionRow(advance, advance.mission.id in claimed, onClaim) }
             val streak = reward.streakAfter
             if (streak != null && streak > 0) {
                 Text(
@@ -149,6 +161,37 @@ internal fun RewardCard(reward: RewardSummary, modifier: Modifier = Modifier) {
                     modifier = Modifier.testTag("reward_streak"),
                 )
             }
+        }
+    }
+}
+
+/** Una missione avanzata: titolo, avanzamento e, se completata, il pulsante per riscuotere la ricompensa (un tocco). */
+@Composable
+private fun MissionRow(advance: MissionAdvance, claimed: Boolean, onClaim: (DailyMission) -> Unit) {
+    val mission = advance.mission
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("reward_mission_${mission.type.name.lowercase()}"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = stringResource(id = mission.type.titleRes), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = InkText)
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { mission.progressFraction },
+                modifier = Modifier.fillMaxWidth().padding(top = 3.dp).height(6.dp),
+                color = Color(0xFF2E7D32),
+                trackColor = InkText.copy(alpha = 0.15f),
+            )
+        }
+        if (mission.isCompleted && !mission.isClaimed || claimed) {
+            MaestroPillButton(
+                text = stringResource(id = if (claimed) R.string.retention_missions_claimed else R.string.retention_missions_claim, mission.type.rewardCredits),
+                onClick = { if (!claimed) onClaim(mission) },
+                variant = if (claimed) PillButtonVariant.WOOD else PillButtonVariant.PRIMARY_GREEN,
+                height = 36.dp,
+                fontSize = 14.sp,
+                testTag = "reward_claim_${mission.type.name.lowercase()}",
+            )
         }
     }
 }

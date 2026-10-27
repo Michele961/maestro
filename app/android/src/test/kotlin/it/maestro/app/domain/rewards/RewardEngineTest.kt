@@ -58,6 +58,8 @@ class RewardEngineTest {
         summary.missions.forEach { advance ->
             assertEquals(state.first { it.type == advance.type }.progress, advance.progressAfter)
             assertTrue(advance.progressAfter > advance.progressBefore)
+            // La missione allegata è quella di adesso e si può riscuotere dalla sequenza di fine partita.
+            assertEquals(state.first { it.type == advance.type }, advance.mission)
         }
         val types = state.map { it.type }
         if (DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80 in types) {

@@ -23,6 +23,8 @@ public data class MissionAdvance(
     val progressBefore: Int,
     val progressAfter: Int,
     val target: Int,
+    /** La missione dopo l'evento: serve a riscuoterla dalla sequenza di fine partita. */
+    val mission: DailyMission,
 ) {
     /** La missione è stata completata proprio da questo evento. */
     val completedNow: Boolean get() = progressBefore < target && progressAfter >= target
@@ -169,7 +171,7 @@ public class RewardEngine(
     private fun advances(before: List<DailyMission>, after: List<DailyMission>): List<MissionAdvance> =
         after.mapNotNull { now ->
             val was = before.firstOrNull { it.id == now.id }?.progress ?: 0
-            if (now.progress == was) null else MissionAdvance(now.type, was, now.progress, now.target)
+            if (now.progress == was) null else MissionAdvance(now.type, was, now.progress, now.target, now)
         }
 
     private companion object {
