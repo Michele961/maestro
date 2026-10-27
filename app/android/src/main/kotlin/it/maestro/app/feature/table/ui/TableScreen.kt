@@ -190,6 +190,7 @@ public fun TableScreen(
             val training = if (results.isEmpty()) null else results.count { it.isCorrect } to results.size
             onViewAnalysis(viewModel.currentMatchLog, training)
         },
+        onPresented = viewModel::onPresented,
         onRematch = {
             viewModel.onIntent(
                 GameIntent.StartMatch(
@@ -215,6 +216,7 @@ public fun TableContent(
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
+    onPresented: (moveId: Long, dealId: Long) -> Unit = { _, _ -> },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var showPause by remember { mutableStateOf(false) }
@@ -377,6 +379,7 @@ public fun TableContent(
                             onIntent(GameIntent.RequestHint)
                         },
                         onAnimationRunningChanged = { isTableAnimating = it },
+                        onPresented = onPresented,
                     )
             }
         }
@@ -1532,6 +1535,7 @@ private fun FeltLayout(
     onCardClicked: (Card) -> Unit,
     onRequestHint: () -> Unit,
     onAnimationRunningChanged: (Boolean) -> Unit = {},
+    onPresented: (moveId: Long, dealId: Long) -> Unit = { _, _ -> },
 ) {
     var activeMoveAnim by remember { mutableStateOf<ActiveMoveAnimation?>(null) }
     var activeDealAnim by remember { mutableStateOf<ActiveDealAnimation?>(null) }
@@ -1541,6 +1545,10 @@ private fun FeltLayout(
     val isAnimating = activeMoveAnim != null || lastHandledMoveId < uiState.lastMoveId || activeDealAnim != null
     LaunchedEffect(isAnimating) {
         onAnimationRunningChanged(isAnimating)
+    }
+    // Segnala al ViewModel cosa è stato mostrato per intero: il bot aspetta questo, non un timer (F1R-08).
+    LaunchedEffect(isAnimating, lastHandledMoveId, lastCompletedDealId) {
+        if (!isAnimating) onPresented(lastHandledMoveId, lastCompletedDealId)
     }
 
     LaunchedEffect(uiState.dealAnimationId) {

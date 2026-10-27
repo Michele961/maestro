@@ -22,6 +22,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import it.maestro.app.data.repository.RestoreMatchResult
 import it.maestro.game.training.TrainingFundamental
+import it.maestro.app.designsystem.motion.MotionSpec
+import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.domain.match.PresentationGate
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 /**
  * ViewModel MVI per la schermata di gioco della Scopa (ADR-0012, task F1-05, F1-08).
@@ -36,7 +41,10 @@ public class GameViewModel(
     private val matchRepository: MatchRepository? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
     coroutineScope: kotlinx.coroutines.CoroutineScope? = null,
-    private val botThinkDelayMillis: Long = if (ioDispatcher == Dispatchers.Unconfined) 0L else 1000L,
+    // Il bot aspetta la fine della scena (ADR-0015). Senza interfaccia (test con Unconfined) il cancello è aperto.
+    private val presentationGate: PresentationGate =
+        if (ioDispatcher == Dispatchers.Unconfined) PresentationGate.Immediate else UiPresentationGate(),
+    gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
 ) : ViewModel() {
 
     private val scope: kotlinx.coroutines.CoroutineScope = coroutineScope ?: viewModelScope
@@ -44,12 +52,18 @@ public class GameViewModel(
     private val _uiState: MutableStateFlow<GameUiState>
     public val uiState: StateFlow<GameUiState>
 
+    private var currentSpeed: GameSpeed = GameSpeed.NORMAL
     private var botRng: SeededRng = SeededRng(12345L)
     private var botJob: Job? = null
     private var hintJob: Job? = null
 
     public val currentMatchLog: MatchLog
         get() = internalState.matchLog
+
+    /** Il tavolo ha finito di mostrare la mossa [moveId] e la distribuzione [dealId] (task F1R-08). */
+    public fun onPresented(moveId: Long, dealId: Long) {
+        (presentationGate as? UiPresentationGate)?.onPresented(moveId, dealId)
+    }
 
     /** `true` dopo l'avvio o la ripresa di una partita: dopo una ricreazione la schermata non la riavvia. */
     public var hasMatch: Boolean = false
@@ -84,6 +98,7 @@ public class GameViewModel(
     }
 
     init {
+        scope.launch { gameSpeed.collect { currentSpeed = it } }
         val initialResult = GameReducer.initial()
         internalState = initialResult.state
         _uiState = MutableStateFlow(internalState.toUiState())
@@ -142,9 +157,11 @@ public class GameViewModel(
                 botJob?.cancel()
                 botJob = scope.launch {
                     try {
-                        val delay = if (ioDispatcher == Dispatchers.Unconfined) 0L else (effect.delayMillis ?: botThinkDelayMillis)
-                        if (delay > 0L) {
-                            kotlinx.coroutines.delay(delay)
+                        // Prima la scena finisce, poi il bot "pensa" in proporzione alle sue scelte (ADR-0015).
+                        presentationGate.awaitPresented(internalState.lastMoveId, internalState.dealAnimationId)
+                        if (ioDispatcher != Dispatchers.Unconfined) {
+                            val choices = legalMoves(internalState.scopaState).size
+                            MotionSpec.pause(MotionSpec.botThinkMillis(choices, currentSpeed))
                         }
                         val botSeat = effect.botSeat
                         val state = internalState.scopaState
