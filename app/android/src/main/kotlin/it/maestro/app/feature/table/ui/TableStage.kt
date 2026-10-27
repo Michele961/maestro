@@ -206,17 +206,6 @@ private fun MaestroCorner(
             )
         }
     }
-    if (sweepBy != null) {
-        Zone(zone, Alignment.TopCenter) {
-            MaestroPillButton(
-                text = stringResource(R.string.game_event_sweep).uppercase(),
-                onClick = {},
-                variant = PillButtonVariant.HERO_RED,
-                height = 28.dp,
-                fontSize = 13.sp,
-            )
-        }
-    }
 }
 
 /**
