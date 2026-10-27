@@ -207,7 +207,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-15 — Sequenza di fine partita
 
-- **Stato:** da fare
+- **Stato:** da fare (dossier `docs/app/features/post-match.md` in attesa di approvazione; proposta di suddivisione in 15a…d)
 - **Riferimenti:** `docs/app/game-feel.md` §6
 - **Obiettivo:** schermata unica di fine partita che anima `RewardSummary` (targa, precisione, missioni, streak, maestria; **senza crediti di partita**, vedi D19) con "Rivedi partita" come azione primaria.
 - **Criteri di accettazione:**
