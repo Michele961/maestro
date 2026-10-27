@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import it.maestro.app.domain.settings.GameSpeed
 
 /**
  * Impostazioni utente dell'applicazione Maestro (task F1-08).
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.map
 public data class AppSettings(
     val language: String = "system",
     val soundEnabled: Boolean = true,
+    val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     val preferredTargetScore: Int = 11,
     val selectedTableTheme: String = "felt_classic_green",
@@ -35,6 +37,7 @@ public interface SettingsRepository {
     public val settingsFlow: Flow<AppSettings>
     public suspend fun updateLanguage(language: String)
     public suspend fun updateSoundEnabled(enabled: Boolean)
+    public suspend fun updateGameSpeed(speed: GameSpeed)
     public suspend fun updatePreferredLevel(level: DifficultyLevel)
     public suspend fun updatePreferredTargetScore(targetScore: Int)
     public suspend fun updateSelectedTableTheme(tableThemeId: String)
@@ -53,6 +56,7 @@ public class DataStoreSettingsRepository(
     private object PreferencesKeys {
         val LANGUAGE = stringPreferencesKey("app_language")
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
+        val GAME_SPEED = stringPreferencesKey("game_speed")
         val PREFERRED_LEVEL = stringPreferencesKey("preferred_level")
         val PREFERRED_TARGET_SCORE = intPreferencesKey("preferred_target_score")
         val SELECTED_TABLE_THEME = stringPreferencesKey("selected_table_theme")
@@ -64,6 +68,9 @@ public class DataStoreSettingsRepository(
     override val settingsFlow: Flow<AppSettings> = dataStore.data.map { preferences ->
         val lang = preferences[PreferencesKeys.LANGUAGE] ?: "system"
         val sound = preferences[PreferencesKeys.SOUND_ENABLED] ?: true
+        val speed = preferences[PreferencesKeys.GAME_SPEED]
+            ?.let { name -> GameSpeed.USER_CHOICES.firstOrNull { it.name == name } }
+            ?: GameSpeed.NORMAL
         val levelStr = preferences[PreferencesKeys.PREFERRED_LEVEL] ?: DifficultyLevel.INTERMEDIO.name
         val level = try {
             DifficultyLevel.valueOf(levelStr)
@@ -79,6 +86,7 @@ public class DataStoreSettingsRepository(
         AppSettings(
             language = lang,
             soundEnabled = sound,
+            gameSpeed = speed,
             preferredLevel = level,
             preferredTargetScore = targetScore,
             selectedTableTheme = tableTheme,
@@ -97,6 +105,12 @@ public class DataStoreSettingsRepository(
     override suspend fun updateSoundEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.SOUND_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun updateGameSpeed(speed: GameSpeed) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.GAME_SPEED] = speed.name
         }
     }
 
@@ -153,6 +167,10 @@ public class InMemorySettingsRepository(
 
     override suspend fun updateSoundEnabled(enabled: Boolean) {
         _state.value = _state.value.copy(soundEnabled = enabled)
+    }
+
+    override suspend fun updateGameSpeed(speed: GameSpeed) {
+        _state.value = _state.value.copy(gameSpeed = speed)
     }
 
     override suspend fun updatePreferredLevel(level: DifficultyLevel) {

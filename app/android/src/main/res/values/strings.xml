@@ -582,4 +582,8 @@
     <string name="settings_test_match_subtitle">Avvia una partita già all\'ultima mano per testare fine partita, Elo, missioni e analisi.</string>
     <string name="settings_test_match_button">Partita rapida all\'ultima mano</string>
 
+    <string name="settings_game_speed">Velocità di gioco</string>
+    <string name="settings_game_speed_normal">Normale</string>
+    <string name="settings_game_speed_fast">Veloce</string>
+    <string name="settings_game_speed_faster">Rapidissima</string>
 </resources>
