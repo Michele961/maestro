@@ -1,7 +1,7 @@
 # Partita al tavolo — dossier
 
-Stato: **bozza** · 2026-10-27 · task collegati: F1R-08 (parte 2), F1R-12, F1R-13
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
+Stato: **approvato** (Michele, 2026-10-27) · 2026-10-27 · task collegati: F1R-08 (parte 2), F1R-12, F1R-13
+Procedimento: `docs/app/features/README.md`. Approvato da Michele: i task del §5 possono partire.
 
 ## 1. Cosa fa per il giocatore
 
@@ -68,9 +68,9 @@ Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i
 | F1R-12c | Dialog e rimozione del vecchio tavolo | Scelta presa, riepilogo, domanda, pausa portati sulla scena; `FeltLayout` rimosso; nessun file > 400 righe |
 | F1R-13 | Corsa ai punti e Maestro | Come da backlog |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-27)
 
-1. **Layout**: va bene lo schema del §3? In particolare le pile davanti a ciascun giocatore e il mazzo a sinistra.
-2. **"Ultima giocata"**: la togliamo e lasciamo che sia la carta girata sul tavolo a raccontare la mossa avversaria?
-3. **Mano**: ventaglio come oggi o fila dritta con le carte intere? Proposta: ventaglio leggero, ma con le carte sempre interamente visibili.
-4. **Avversario**: in alto nome e ritratto del livello (es. "Maestro") invece del solo testo? Questo si lega a D11 (avversari come personaggi).
+1. **Layout**: lo schema del §3 va bene (pile davanti a ciascun giocatore, mazzo a sinistra).
+2. **"Ultima giocata"**: si toglie; la carta girata sul tavolo racconta la mossa avversaria. Si verifica nel playtest che resti chiaro.
+3. **Mano**: ventaglio leggero, con le carte sempre interamente visibili.
+4. **Avversario**: in alto nome e ritratto del livello (legato a D11).
