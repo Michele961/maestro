@@ -24,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,26 +76,27 @@ public fun PostMatchScreen(
             ) {
                 ResultPlaque(state.won, state.humanTotal, state.opponentTotal)
                 Spacer(modifier = Modifier.height(10.dp))
-                // Contenuti centrati nello spazio che resta; se non ci stanno scorrono e si seguono i nuovi passi.
+                // Tutto in una colonna che scorre (azioni comprese): niente è mai coperto da altro. Se i contenuti sono
+                // pochi stanno centrati; ad ogni passo nuovo si segue l'ultimo contenuto apparso.
                 val scroll = rememberScrollState()
-                LaunchedEffect(state.step, state.reward, state.analysis) { scroll.animateScrollTo(scroll.maxValue) }
+                LaunchedEffect(state.step) { snapshotFlow { scroll.maxValue }.collect { scroll.animateScrollTo(it) } }
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().verticalScroll(scroll),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    val analysis = state.analysis
-                    if (analysis != null && state.reached(PostMatchStep.ACCURACY)) {
-                        Reveal { AccuracyCard(analysis, state.humanSeat, trainingScore) }
+                    Column(
+                        modifier = Modifier.fillMaxWidth().verticalScroll(scroll),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        val analysis = state.analysis
+                        if (analysis != null && state.reached(PostMatchStep.ACCURACY)) {
+                            Reveal { AccuracyCard(analysis, state.humanSeat, trainingScore) }
+                        }
+                        val reward = state.reward
+                        if (reward != null && state.reached(PostMatchStep.REWARD) && !state.fromHistory && reward.hasContent()) {
+                            Reveal { RewardCard(reward, state.claimedMissions, onClaimMission) }
+                        }
+                        MaestroLine(state, analysis)
+                        Actions(state, onReviewClicked, onRematchClicked, onHomeClicked)
                     }
-                    val reward = state.reward
-                    if (reward != null && state.reached(PostMatchStep.REWARD) && !state.fromHistory) {
-                        Reveal { RewardCard(reward, state.claimedMissions, onClaimMission) }
-                    }
-                    MaestroLine(state, analysis)
                 }
-                }
-                Actions(state, onReviewClicked, onRematchClicked, onHomeClicked)
             }
             if (state.won && !state.fromHistory) ConfettiCelebration()
         }
@@ -164,3 +166,7 @@ private fun Actions(state: PostMatchUiState, onReview: (MatchAnalysis) -> Unit, 
         }
     }
 }
+
+/** `true` se la ricompensa ha qualcosa da mostrare: altrimenti non si disegna un riquadro vuoto. */
+private fun it.maestro.app.domain.rewards.RewardSummary.hasContent(): Boolean =
+    missions.isNotEmpty() || masteryDelta != null || (streakAfter ?: 0) > 0

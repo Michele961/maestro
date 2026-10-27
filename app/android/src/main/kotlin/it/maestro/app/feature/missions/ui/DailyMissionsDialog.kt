@@ -39,9 +39,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import it.maestro.app.R
 import it.maestro.app.domain.retention.DailyMission
-import it.maestro.app.designsystem.components.BubbleTail
-import it.maestro.app.designsystem.components.FramedPortrait
-import it.maestro.app.designsystem.components.MaestroSpeechBubble
 import it.maestro.app.designsystem.components.NineSliceBox
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.designsystem.components.WoodPanel
@@ -121,29 +118,6 @@ public fun DailyMissionsDialog(
                             onClaimReward = onClaimReward,
                             modifier = Modifier.testTag("daily_mission_item_$index"),
                         )
-                    }
-
-                    // 3. Commento Pedagogico del Maestro
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 2.dp, bottom = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        FramedPortrait(
-                            portrait = R.drawable.maestro_pleased,
-                            size = 50.dp,
-                            contentDescription = stringResource(R.string.maestro_avatar_description),
-                        )
-                        Box(modifier = Modifier.weight(1f)) {
-                            MaestroSpeechBubble(
-                                message = stringResource(R.string.retention_maestro_encouragement),
-                                tail = BubbleTail.START,
-                                fontSize = 11.sp,
-                                maxLines = 4,
-                            )
-                        }
                     }
                 }
             }

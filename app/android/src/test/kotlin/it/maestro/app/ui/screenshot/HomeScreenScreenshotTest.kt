@@ -62,12 +62,21 @@ class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun play_now_starts_a_new_game_and_there_is_only_one_play_button() {
+    fun play_now_and_the_scopa_tile_start_a_new_game() {
         var starts = 0
         composeRule.setContent { MaestroTheme { HomeScreen(onStartGameClicked = { starts++ }) } }
         composeRule.onNodeWithTag("play_now_button").performClick()
-        assertEquals(1, starts)
-        composeRule.onNodeWithTag("scopa_tile_button").assertDoesNotExist()
+        composeRule.onNodeWithTag("scopa_tile_button").performClick()
+        assertEquals(2, starts)
+    }
+
+    @Test
+    fun briscola_is_coming_soon_and_does_not_start_a_game() {
+        var starts = 0
+        composeRule.setContent { MaestroTheme { HomeScreen(onStartGameClicked = { starts++ }) } }
+        composeRule.onNodeWithText("Presto disponibile").assertExists()
+        composeRule.onNodeWithTag("briscola_tile_button").performClick()
+        assertEquals(0, starts)
     }
 
     @Test
@@ -81,12 +90,11 @@ class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
     @Test
     fun the_home_has_no_fake_entries() {
         composeRule.setContent { MaestroTheme { HomeScreen() } }
-        // Gemme, messaggi, Amici, Briscola e Classifica non esistono ancora: non si mostrano (F1R-19).
-        listOf("home_gems_pill", "briscola_tile", "home_nav_profile_button", "home_nav_shop_button", "home_nav_academy_button").forEach {
+        // Gemme, messaggi, Amici e Classifica non esistono ancora: non si mostrano (F1R-19).
+        listOf("home_gems_pill", "home_nav_profile_button", "home_nav_shop_button", "home_nav_academy_button").forEach {
             composeRule.onNodeWithTag(it).assertDoesNotExist()
         }
         composeRule.onNodeWithText("Amici").assertDoesNotExist()
-        composeRule.onNodeWithText("Presto disponibile").assertDoesNotExist()
         composeRule.onNodeWithText("Classifica").assertDoesNotExist()
     }
 

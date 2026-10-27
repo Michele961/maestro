@@ -190,7 +190,7 @@ class TableGesturesTest {
     }
 
     @Test
-    fun maestroLineIsHiddenWhileTheSceneIsBusy() {
+    fun maestroLineStaysVisibleWhileTheOpponentPlays() {
         val initial = GameReducer.initial(GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1))
         val line = it.maestro.app.domain.coach.VoiceLine(
             kind = it.maestro.app.domain.coach.MomentKind.GREETING,
@@ -204,7 +204,8 @@ class TableGesturesTest {
                 TableContent(uiState = uiState, scene = sceneOf(uiState, SceneStep.DealCard(0, Seat.P1)), onIntent = {})
             }
         }
-        composeRule.onNodeWithTag("maestro_line_bubble").assertDoesNotExist()
+        // Prova sul telefono: la battuta non deve sparire e riapparire quando l'avversario gioca.
+        composeRule.onNodeWithTag("maestro_line_bubble").assertExists()
     }
 
     @org.junit.After

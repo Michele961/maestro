@@ -109,7 +109,7 @@ internal fun TableStage(
                 FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
             }
         }
-        RaceOrBubble(model, uiState, geometry, showLine = atRest, showRace = showPointsRace, onDismissLine = onDismissLine)
+        RaceOrBubble(model, uiState, geometry, showRace = showPointsRace, onDismissLine = onDismissLine)
         MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
@@ -182,7 +182,7 @@ private fun MaestroCorner(
     val zone = geometry.zones.maestro
     val hint = uiState.suggestedMove
     val showHint = hint != null
-    val line = uiState.maestroLine?.takeIf { atRest }
+    val line = uiState.maestroLine
     val portrait = when {
         line != null && hint == null -> line.pose.portraitRes()
         sweepBy == uiState.humanSeat -> R.drawable.maestro_applauding
@@ -228,7 +228,6 @@ private fun RaceOrBubble(
     model: StageModel,
     uiState: GameUiState,
     geometry: TableGeometry,
-    showLine: Boolean,
     showRace: Boolean,
     onDismissLine: () -> Unit,
 ) {
@@ -236,15 +235,15 @@ private fun RaceOrBubble(
     val hint = uiState.suggestedMove
     var dismissed by remember(hint) { mutableStateOf(false) }
     val showBubble = uiState.isSparring && ((hint != null && !dismissed) || uiState.isHintLoading)
-    val line = uiState.maestroLine?.takeIf { showLine && uiState.isSparring && !showBubble }
+    val line = uiState.maestroLine?.takeIf { uiState.isSparring && !showBubble }
     Zone(zone, Alignment.Center) {
         if (line != null) {
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
             MaestroSpeechBubble(
                 message = voiceText(line),
                 tail = BubbleTail.END,
-                fontSize = 11.sp,
-                maxLines = 3,
+                fontSize = 12.sp,
+                maxLines = 5,
                 modifier = Modifier.clickable(onClick = onDismissLine).testTag("maestro_line_bubble"),
             )
         } else if (showBubble) {
@@ -255,8 +254,8 @@ private fun RaceOrBubble(
                     stringResource(R.string.game_hint_loading)
                 },
                 tail = BubbleTail.END,
-                fontSize = 11.sp,
-                maxLines = 3,
+                fontSize = 12.sp,
+                maxLines = 5,
                 modifier = Modifier.clickable { dismissed = true }.testTag("game_hint_banner"),
             )
         } else if (showRace) {

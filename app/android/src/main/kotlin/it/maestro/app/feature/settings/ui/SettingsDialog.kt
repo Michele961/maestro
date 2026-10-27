@@ -116,6 +116,7 @@ public fun SettingsDialog(
                                 variant = if (speed == gameSpeed) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
                                 height = 40.dp,
                                 fontSize = 14.sp,
+                                contentPadding = CHOICE_PADDING,
                                 modifier = Modifier.weight(1f),
                                 testTag = "game_speed_${speed.name.lowercase()}",
                             )
@@ -170,6 +171,7 @@ public fun SettingsDialog(
                                 variant = if (level == maestroChattiness) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
                                 height = 40.dp,
                                 fontSize = 13.sp,
+                                contentPadding = CHOICE_PADDING,
                                 modifier = Modifier.weight(1f),
                                 testTag = "maestro_chat_${level.name.lowercase()}",
                             )
@@ -263,3 +265,6 @@ private fun Chattiness.labelRes(): Int = when (this) {
     Chattiness.QUIET -> R.string.settings_maestro_chat_quiet
     Chattiness.OFF -> R.string.settings_maestro_chat_off
 }
+
+/** Poco margine interno: le etichette delle scelte (Normale, Rapidissima…) devono leggersi per intero. */
+private val CHOICE_PADDING = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 4.dp)
