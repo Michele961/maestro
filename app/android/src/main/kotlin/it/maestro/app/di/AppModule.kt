@@ -39,6 +39,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
+import it.maestro.app.shell.ShellViewModel
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
@@ -111,6 +112,18 @@ public val appModule: Module = module {
 
     viewModel {
         GameReviewViewModel()
+    }
+
+    viewModel {
+        ShellViewModel(
+            matchRepository = get(),
+            masteryRepository = get(),
+            retentionRepository = get(),
+            walletRepository = get(),
+            soundManager = get(),
+            clock = get(),
+            savedStateHandle = get(),
+        )
     }
 
     viewModel {

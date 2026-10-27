@@ -122,7 +122,6 @@ import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
-import it.maestro.game.scopa.ScopaState
 import it.maestro.game.scopa.ScoreCategory
 import it.maestro.game.training.SeatLead
 import it.maestro.game.training.SettebelloLocation
@@ -132,6 +131,7 @@ import it.maestro.game.training.TrainingQuestion
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import it.maestro.app.domain.time.Clock
+import androidx.compose.runtime.saveable.rememberSaveable
 
 public val TableFeltColor: Color = Color(0xFF1B4332)
 public val TableFeltDarkColor: Color = Color(0xFF081C15)
@@ -147,8 +147,7 @@ public fun TableScreen(
     targetScore: Int = 11,
     trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     seed: Long = 42L,
-    restoreState: ScopaState? = null,
-    restoreLog: MatchLog? = null,
+    resume: Boolean = false,
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     viewModel: GameViewModel = koinViewModel(),
@@ -157,16 +156,13 @@ public fun TableScreen(
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: (MatchLog, Pair<Int, Int>?) -> Unit = { _, _ -> },
 ) {
-    LaunchedEffect(level, targetScore, seed, restoreState, restoreLog, trainingFundamental) {
-        if (restoreState != null && restoreLog != null) {
-            viewModel.onIntent(
-                GameIntent.RestoreMatch(
-                    state = restoreState,
-                    matchLog = restoreLog,
-                    level = level,
-                    trainingFundamental = trainingFundamental,
-                ),
-            )
+    // La partita parte una volta sola: dopo una rotazione il ViewModel la conserva; dopo la chiusura del
+    // processo il ViewModel è nuovo ma `started` sopravvive, quindi si riprende quella salvata (F1R-04).
+    var started by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (viewModel.hasMatch) return@LaunchedEffect
+        if (resume || started) {
+            viewModel.resumeActiveMatch(trainingFundamental, onUnavailable = onNavigateHome)
         } else {
             viewModel.onIntent(
                 GameIntent.StartMatch(
@@ -177,6 +173,7 @@ public fun TableScreen(
                 ),
             )
         }
+        started = true
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
