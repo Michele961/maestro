@@ -133,7 +133,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] La presentazione non riceve mai `ScopaState` (test F1R-01 senza eccezioni per questo punto).
 - **Suddivisione (2026-10-27):** il task supera le 400 righe e si divide in due parti.
     - **Parte 1:** il bot aspetta la fine della scena tramite `PresentationGate`, alimentato dal tavolo attuale (`UiPresentationGate`), e la riflessione da `MotionSpec`. Le costanti `BOT_*_DELAY_MS` spariscono. Test `BotWaitsForPresentationTest`.
-    - **Parte 2 (insieme a F1R-10):** `MatchSession` con le `Beat` e il reducer che lavora solo sulla vista. Chiude i criteri "stesso `MatchLog`" e "nessuno `ScopaState` in presentazione".
+    - **Parte 2 (F1R-08b nel dossier `docs/app/features/table.md`):** `MatchSession` con le `Beat` e il reducer che lavora solo sulla vista. Chiude i criteri "stesso `MatchLog`" e "nessuno `ScopaState` in presentazione".
 - **Domande aperte:** —
 
 ## F1R-09 — `MotionSpec` e `GameSpeed`
@@ -174,6 +174,10 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] Nessun file della feature tavolo sopra 400 righe.
     - [ ] Screenshot della matrice per: inizio smazzata, turno umano, presa in volo, scopa, riepilogo smazzata.
     - [ ] Playtest di Michele sul Pixel: nessuna animazione interrotta o fuori ordine.
+- **Suddivisione (2026-10-27, dossier `docs/app/features/table.md` approvato):**
+    - **F1R-12a — Tavolo a riposo:** layout a zone di `TableGeometry` che disegna `TableScene` senza animazioni; via "Ultima giocata"; mano a ventaglio leggero con carte intere; avversario con nome e ritratto. Screenshot della matrice senza D3–D5.
+    - **F1R-12b — Passi animati:** ogni `SceneStep` animato con la durata di `MotionSpec`; suoni e vibrazioni dai passi; salto con un tocco.
+    - **F1R-12c — Dialog e pulizia:** scelta presa, riepilogo, domanda, pausa sulla scena; `FeltLayout` rimosso; nessun file > 400 righe.
 - **Domande aperte:** —
 
 ## F1R-13 — Corsa ai punti e Maestro al tavolo
