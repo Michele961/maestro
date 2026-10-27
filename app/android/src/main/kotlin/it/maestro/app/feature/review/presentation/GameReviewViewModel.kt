@@ -1,6 +1,7 @@
 package it.maestro.app.feature.review.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.R
@@ -81,6 +82,10 @@ public class GameReviewViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameReviewUiState())
     public val uiState: StateFlow<GameReviewUiState> = _uiState.asStateFlow()
 
+    /** Regia del tavolo di revisione; `null` finché [initialize] non ha costruito i passi. */
+    public var stage: ReviewStage? = null
+        private set
+
     /**
      * Inizializza gli step di review a partire da [matchLog], [analysis] e [humanSeat].
      */
@@ -94,6 +99,7 @@ public class GameReviewViewModel : ViewModel() {
         }
 
         val steps = buildReviewSteps(matchLog, analysis, humanSeat)
+        stage = steps.firstOrNull()?.let { ReviewStage(viewModelScope, humanSeat, it.playerView) }
         _uiState.value = GameReviewUiState(
             steps = steps,
             currentStepIndex = 0,

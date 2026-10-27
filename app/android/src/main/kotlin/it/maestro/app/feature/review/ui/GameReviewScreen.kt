@@ -5,10 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,7 +17,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -32,8 +29,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -62,7 +56,6 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveAnalysis
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.R
-import it.maestro.app.designsystem.components.CardBackView
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.ConfettiCelebration
 import it.maestro.app.designsystem.components.MaestroAlertDialog
@@ -71,11 +64,11 @@ import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.designsystem.components.PillButtonVariant
-import it.maestro.app.designsystem.components.PlaceholderCardView
 import it.maestro.app.designsystem.theme.ButtonGoldBorder
 import it.maestro.app.designsystem.theme.GradeErroreGraveRed
 import it.maestro.app.designsystem.theme.GradeImprecisioneYellow
 import it.maestro.app.designsystem.theme.GradeMagistraleBlue
+import it.maestro.app.domain.match.Beat
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
@@ -115,12 +108,16 @@ private val BlunderBadgeColor = GradeErroreGraveRed
  * @property mover Giocatore che ha effettuato la mossa ([Seat.P1] o [Seat.P2]).
  * @property playerView Vista del giocatore umano nello stato immediatamente precedente la mossa.
  * @property analysis Analisi dettagliata della mossa prodotta da `MatchAnalyzer`.
+ * @property beat La mossa giocata, da mettere in scena con la regia del tavolo.
+ * @property bestBeat La mossa migliore al suo posto, solo per un errore del giocatore umano.
  */
 public data class ReviewStep(
     val moveIndex: Int,
     val mover: Seat,
     val playerView: ScopaView,
     val analysis: MoveAnalysis,
+    val beat: Beat,
+    val bestBeat: Beat? = null,
 )
 
 /**
@@ -143,22 +140,42 @@ public fun buildReviewSteps(
             break
         }
 
+        val result = play(state, move) as? PlayResult.Applied ?: break
+        val bestBeat = if (mover == humanSeat && moveAnalysis.isMistake()) {
+            (play(state, moveAnalysis.bestMove) as? PlayResult.Applied)?.let { beatOf(index, mover, moveAnalysis.bestMove, playerView, it, humanSeat) }
+        } else {
+            null
+        }
         steps.add(
             ReviewStep(
                 moveIndex = index,
                 mover = mover,
                 playerView = playerView,
                 analysis = moveAnalysis,
+                beat = beatOf(index, mover, move, playerView, result, humanSeat),
+                bestBeat = bestBeat,
             ),
         )
-
-        when (val result = play(state, move)) {
-            is PlayResult.Applied -> state = result.state
-            is PlayResult.Rejected -> break
-        }
+        state = result.state
     }
     return steps
 }
+
+private fun beatOf(
+    index: Int,
+    mover: Seat,
+    move: ScopaMove,
+    viewBefore: ScopaView,
+    result: PlayResult.Applied,
+    humanSeat: Seat,
+): Beat = Beat(
+    id = index + 1L,
+    actor = mover,
+    move = move,
+    events = result.events,
+    viewBefore = viewBefore,
+    viewAfter = viewFor(result.state, humanSeat),
+)
 
 /**
  * Schermata di Game Review mossa per mossa e funzione didattica "Rigioca l'errore"
@@ -214,6 +231,18 @@ public fun GameReviewScreen(
         val isSolutionVisible = !isHumanMove || !moveAnalysis.isMistake() || isCurrentSolved || isCurrentRevealed ||
             !ReviewCoach.isWorthRetrying(moveAnalysis.alternatives.size)
         val isRetryMode = uiState.isRetryMode
+
+        // La regia mette in scena la mossa giocata; la migliore, quando la soluzione è svelata o trovata.
+        val isFound = uiState.retryFeedback is RetryFeedback.Correct
+        val bestShown = isFound || isCurrentRevealed || isCurrentSolved
+        LaunchedEffect(stepIndex, isRetryMode, bestShown, isFound) {
+            val stage = viewModel.stage ?: return@LaunchedEffect
+            when {
+                isFound || (!isRetryMode && bestShown && currentStep.bestBeat != null) -> stage.showBest(currentStep)
+                isRetryMode -> stage.rest(currentStep)
+                else -> stage.showPlayed(currentStep)
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -285,16 +314,18 @@ public fun GameReviewScreen(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
-                ReviewBoardView(
-                    step = currentStep,
-                    humanSeat = humanSeat,
-                    isRetryMode = isRetryMode,
-                    isSolutionVisible = isSolutionVisible,
-                    retryFeedback = uiState.retryFeedback,
-                    selectedRetryCard = uiState.selectedRetryCard,
-                    onPlayCard = viewModel::playRetryCard,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                viewModel.stage?.let { stage ->
+                    ReviewBoard(
+                        stage = stage,
+                        step = currentStep,
+                        humanSeat = humanSeat,
+                        isRetryMode = isRetryMode,
+                        isSolutionVisible = isSolutionVisible,
+                        retryFeedback = uiState.retryFeedback,
+                        onPlayCard = viewModel::playRetryCard,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
 
                 if (isRetryMode && uiState.retryFeedback is RetryFeedback.Correct) {
                     ConfettiCelebration(modifier = Modifier.fillMaxSize())
@@ -622,193 +653,6 @@ private fun MoveLine(label: String, move: String, color: Color, tag: String) {
         maxLines = 2,
         modifier = Modifier.testTag(tag),
     )
-}
-
-@Composable
-private fun ReviewBoardView(
-    step: ReviewStep,
-    humanSeat: Seat,
-    isRetryMode: Boolean,
-    isSolutionVisible: Boolean = true,
-    retryFeedback: RetryFeedback?,
-    selectedRetryCard: Card?,
-    onPlayCard: (Card) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val playerView = step.playerView
-    val isMistake = step.analysis.isMistake()
-    val bestMoveCard = if (isSolutionVisible && isMistake && step.mover == humanSeat) step.analysis.bestMove.card else null
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .testTag("review_board"),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E4D2B)),
-        border = BorderStroke(4.dp, Brush.verticalGradient(listOf(Color(0xFFFFE082), GoldAccent, Color(0xFF8C6D1F)))),
-    ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val unit = (maxHeight / 330f).value.coerceIn(0.55f, 1.15f)
-            val backW = (44 * unit).dp
-            val tableW = (64 * unit).dp
-            val handW = (84 * unit).dp
-
-            Column(
-                modifier = Modifier.fillMaxSize().padding(10.dp),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Mano avversaria: visualizza ESCLUSIVAMENTE dorsi coperti (mai le carte vere!)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("review_opponent_hand"),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    repeat(playerView.opponentHandSize) {
-                        CardBackView(
-                            width = backW,
-                            height = backW * 1.5f,
-                            modifier = Modifier.padding(horizontal = 2.dp),
-                        )
-                    }
-                }
-
-                // Tavolo centrale: carte scoperte sul tavolo in quel momento
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .testTag("review_table_cards"),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (playerView.table.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .height(66.dp)
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.review_table_empty),
-                                color = Color.LightGray,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                    } else {
-                        for (card in playerView.table) {
-                            val isCapturedByBest = if (isRetryMode) {
-                                retryFeedback is RetryFeedback.Correct && card in retryFeedback.bestMove.capture
-                            } else {
-                                isSolutionVisible && isMistake && card in step.analysis.bestMove.capture
-                            }
-
-                            PlaceholderCardView(
-                                card = card,
-                                isPlayable = false,
-                                width = tableW,
-                                height = tableW * 1.5f,
-                                modifier = Modifier
-                                    .padding(horizontal = 2.dp)
-                                    .then(
-                                        if (isCapturedByBest) {
-                                            Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
-                                        } else {
-                                            Modifier
-                                        },
-                                    ),
-                            )
-                        }
-                    }
-                }
-
-                // Mano del giocatore umano in quel momento
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .testTag("review_player_hand"),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    for (card in playerView.hand) {
-                        if (isRetryMode) {
-                            val isCorrectCard = retryFeedback is RetryFeedback.Correct && card == retryFeedback.bestMove.card
-                            val isWrongCard = retryFeedback is RetryFeedback.Imperfect && card == selectedRetryCard
-                            val badge = when {
-                                isCorrectCard -> R.drawable.badge_best
-                                isWrongCard -> R.drawable.badge_wrong
-                                else -> null
-                            }
-                            val borderModifier = when {
-                                isCorrectCard -> Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
-                                isWrongCard -> Modifier.border(3.dp, GradeErroreGraveRed, RoundedCornerShape(8.dp))
-                                else -> Modifier
-                            }
-
-                            Box(
-                                modifier = Modifier.padding(horizontal = 3.dp),
-                            ) {
-                                PlaceholderCardView(
-                                    card = card,
-                                    isPlayable = true,
-                                    width = handW,
-                                    height = handW * 1.5f,
-                                    modifier = borderModifier.testTag("review_retry_card_${card.suit.name}_${card.rank.name}"),
-                                    onClick = { onPlayCard(card) },
-                                )
-                                if (badge != null) {
-                                    Image(
-                                        painter = painterResource(badge),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .offset(x = 10.dp, y = (-10).dp)
-                                            .size(34.dp),
-                                    )
-                                }
-                            }
-                        } else {
-                            val isRecommendedBest = card == bestMoveCard
-                            val isPlayed = step.mover == humanSeat && card == step.analysis.playedMove.card
-                            val canPlayDirectly = step.mover == humanSeat && isMistake && !isSolutionVisible
-
-                            Box(modifier = Modifier.padding(horizontal = 3.dp)) {
-                                PlaceholderCardView(
-                                    card = card,
-                                    isPlayable = canPlayDirectly,
-                                    width = handW,
-                                    height = handW * 1.5f,
-                                    modifier = (if (isRecommendedBest) {
-                                        Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
-                                    } else {
-                                        Modifier
-                                    }).testTag("review_card_${card.suit.name}_${card.rank.name}"),
-                                    onClick = { if (canPlayDirectly) onPlayCard(card) },
-                                )
-                                val badge = when {
-                                    isRecommendedBest -> R.drawable.badge_best
-                                    isPlayed && isMistake -> R.drawable.badge_wrong
-                                    isPlayed -> R.drawable.badge_correct
-                                    else -> null
-                                }
-                                if (badge != null) {
-                                    Image(
-                                        painter = painterResource(badge),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .offset(x = 10.dp, y = (-10).dp)
-                                            .size(34.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable

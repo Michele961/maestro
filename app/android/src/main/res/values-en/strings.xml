@@ -87,7 +87,6 @@
     <string name="review_capture_none">No capture</string>
     <string name="review_capture">Captures: %1$s</string>
     <string name="review_no_moves">No moves recorded</string>
-    <string name="review_table_empty">Empty table</string>
     <string name="review_retry_button">Retry Hand</string>
     <string name="review_retry_title">Retry Hand</string>
     <string name="review_retry_prompt">Which card would you play instead?</string>

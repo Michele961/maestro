@@ -102,7 +102,7 @@ class GameReviewRetryUiTest {
         composeRule.onNodeWithTag("review_retry_prompt").assertIsDisplayed()
 
         // 4. Verifica che le carte coperte dell'avversario rimangano coperte (Criterio 2)
-        composeRule.onNodeWithTag("review_opponent_hand").assertIsDisplayed()
+        composeRule.onNodeWithTag("opponent_zone").assertIsDisplayed()
 
         // 5. Trova la carta migliore e una carta subottimale
         val bestCard = currentStep.analysis.bestMove.card
@@ -110,8 +110,8 @@ class GameReviewRetryUiTest {
         assertNotNull(imperfectCard)
 
         // 6. Gioca la carta imperfetta: deve mostrare suggerimento e non segnare la mossa come risolta
-        val imperfectTag = "review_retry_card_${imperfectCard.suit.name}_${imperfectCard.rank.name}"
-        composeRule.onNodeWithTag(imperfectTag).performClick()
+        val imperfectTag = "card_${imperfectCard.suit.name}_${imperfectCard.rank.name}"
+        playCard(imperfectTag)
         composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("review_retry_feedback").assertIsDisplayed()
@@ -119,8 +119,8 @@ class GameReviewRetryUiTest {
         composeRule.onNodeWithTag("review_timeline_dot_${stepIndex}_solved").assertDoesNotExist()
 
         // 7. Gioca la carta ottimale: congratulazioni e aggiornamento timeline (Criterio 3)
-        val bestTag = "review_retry_card_${bestCard.suit.name}_${bestCard.rank.name}"
-        composeRule.onNodeWithTag(bestTag).performClick()
+        val bestTag = "card_${bestCard.suit.name}_${bestCard.rank.name}"
+        playCard(bestTag)
         composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("review_retry_feedback").assertIsDisplayed()
@@ -132,5 +132,12 @@ class GameReviewRetryUiTest {
 
         composeRule.onNodeWithTag("review_retry_mode").assertDoesNotExist()
         composeRule.onNodeWithTag("review_timeline_dot_${stepIndex}_solved").assertExists()
+    }
+
+    /** Al tavolo una carta si gioca con due tocchi: il primo la sceglie, il secondo la gioca. */
+    private fun playCard(tag: String) {
+        composeRule.onNodeWithTag(tag).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(tag).performClick()
     }
 }
