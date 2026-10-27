@@ -202,13 +202,14 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Suddivisione (2026-10-27):** il task tocca più feature e supera le 400 righe.
     - **14a (fatto):** `domain/rewards/RewardEngine` e `RewardSummary`; fine partita, puzzle, lezione, riscossione missioni e bonus di benvenuto passano da qui (`ShellViewModel`, `DailyPuzzleViewModel`, `AcademyViewModel`, `DailyMissionsViewModel`). Regola `CREDITS_OUTSIDE_REWARD_ENGINE` nei guardrail. Nessun credito per la partita: la spec non ne assegna (`game-feel.md` §6 parla di crediti che volano, ma non dice quanti: vedi domanda aperta).
     - **14b (da fare):** spostare nel dominio le interfacce dei repository (wallet, missioni/streak, maestria, accademia, puzzle, impostazioni, cosmetici) e i loro modelli, così `RewardEngine` e le presentazioni non importano `data`; tolte le eccezioni `UI_IMPORTS_DATA` di F1R-14 dai guardrail.
-- **Domande aperte:** la partita finita assegna crediti? Oggi no (solo missioni riscosse, sfida del giorno, lezioni, bonus di benvenuto). La sequenza di fine partita (F1R-15) mostra "crediti che volano": serve una regola di Michele su quanti crediti dà una partita (vittoria, sconfitta, precisione?).
+- **Decisione di Michele (2026-10-27):** le partite contro i bot non danno crediti per ora; un sistema monetario verrà più avanti. La sequenza di fine partita (F1R-15) non mostra crediti di partita: solo missioni, streak e maestria. I crediti da missioni, sfida e lezioni restano.
+- **Domande aperte:** —
 
 ## F1R-15 — Sequenza di fine partita
 
 - **Stato:** da fare
 - **Riferimenti:** `docs/app/game-feel.md` §6
-- **Obiettivo:** schermata unica di fine partita che anima `RewardSummary` (targa, precisione, crediti, missioni, streak, maestria) con "Rivedi partita" come azione primaria.
+- **Obiettivo:** schermata unica di fine partita che anima `RewardSummary` (targa, precisione, missioni, streak, maestria; **senza crediti di partita**, vedi D19) con "Rivedi partita" come azione primaria.
 - **Criteri di accettazione:**
     - [ ] Ogni passo saltabile; screenshot della matrice per vittoria e sconfitta.
 - **Domande aperte:** —
@@ -287,8 +288,8 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-24 — La voce del Maestro
 
-- **Stato:** da fare (dossier in attesa di approvazione)
+- **Stato:** da fare (direzione confermata da Michele; dettagli del dossier da chiudere)
 - **Riferimenti:** `docs/app/features/maestro-voice.md`, `docs/design/maestro_persona.md`, `docs/app/game-feel.md` §5, F1R-13, F1R-16
-- **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto. Il dossier propone la suddivisione in F1R-24a…f.
+- **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto, e la stessa voce dinamica con tuning nella revisione (Game Review). Il dossier propone la suddivisione in F1R-24a…g.
 - **Criteri di accettazione:** definiti dal dossier dopo l'approvazione di Michele.
 - **Domande aperte:** vedi §6 del dossier.
