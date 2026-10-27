@@ -46,6 +46,7 @@ val allowedExternalDeps: Map<String, Set<String>> = mapOf(
         "androidx.room:room-runtime",
         "androidx.room:room-ktx",
         "androidx.room:room-compiler",
+        "androidx.room:room-testing",
         "androidx.datastore:datastore-preferences",
         "androidx.datastore:datastore-preferences-core",
         // Solo test: screenshot della UI (F1-18, approvato da Michele)

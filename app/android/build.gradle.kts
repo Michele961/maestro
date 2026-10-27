@@ -57,6 +57,11 @@ android {
         compose = true
     }
 
+    // Schema Room versionato in Git e letto dai test di migrazione (ADR-0017, F1R-03).
+    // Robolectric legge gli asset della variante, non quelli del source set di test: lo schema va negli
+    // asset di debug, mai in quelli di rilascio.
+    sourceSets.getByName("debug").assets.srcDir("$projectDir/schemas")
+
     testOptions {
         unitTests.isReturnDefaultValues = true
         // Robolectric ha bisogno delle risorse Android per disegnare le schermate.
@@ -70,12 +75,18 @@ android {
             // I test Compose su Robolectric usano l'activity di ui-test-manifest, presente solo in debug:
             // nella variante release girerebbero due volte gli stessi test senza poterli avviare.
             if (it.name.contains("Release")) it.exclude("**/ui/screenshot/**")
+            // Lo schema Room per i test di migrazione è solo negli asset di debug (vedi sourceSets sopra).
+            if (it.name.contains("Release")) it.exclude("**/data/local/db/MaestroMigrationsTest*")
         }
     }
 }
 
 kotlin {
     jvmToolchain(21)
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -111,6 +122,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
+    testImplementation(libs.room.testing)
     testImplementation(libs.robolectric)
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
