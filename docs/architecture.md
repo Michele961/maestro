@@ -14,16 +14,17 @@ Regole e AI vivono in un modulo Kotlin Multiplatform puro. App Android, server d
 | `core:ai` | 0 | Bot (casuale, avido, PIMC), risolutore finale, analizzatore | `core:game` |
 | `core:protocol` | 2 | Messaggi client-server serializzabili | `core:game`, kotlinx-serialization |
 | `sim` | 0 | CLI headless: partite bot contro bot, report | `core:game`, `core:ai` |
-| `app:android` | 1 | UI Compose, persistenza locale, audio, animazioni | `core:*` |
+| `app:android` | 1 | App Android: oggi tutto in un modulo, organizzato a layer secondo ADR-0014 e `docs/app/` | `core:*` |
+| `app:domain`, `app:data`, `app:designsystem`, `app:feature:*` | 1R | Moduli di arrivo dell'app (ADR-0014), creati da F1R-22 | vedi `docs/app/layers.md` |
 | `server` | 2 | Ktor: stanze WebSocket, matchmaking, ranking, economia | `core:*` |
 
-`core:protocol` esiste già come scaffold vuoto; il suo contenuto arriva in Fase 2. `app:android` e `server` **non esistono ancora** e non vanno creati fuori dai task dedicati.
+`core:protocol` esiste già come scaffold vuoto; il suo contenuto arriva con l'online (Fase 3, D10). `server` **non esiste ancora** e non va creato fuori dal task dedicato. L'app Android segue ADR-0014…0017: layer, regia del tavolo, UI adattiva e migrazioni; la guida operativa è `docs/app/`.
 La tabella dei confini è applicata da `./gradlew check` (task `checkModuleBoundaries`, definito nel `build.gradle.kts` root).
 
 ## Target
 
-- Oggi: solo `jvm()` (test, simulatore, futuro server).
-- Fase 1: si aggiunge `androidTarget()` ai moduli `core:*`.
+- `core:*`: `jvm()` e `androidTarget()` (F1-01).
+- `app:domain` (quando estratto, F1R-22): `jvm()` e `androidTarget()`.
 - Fase 4: si aggiungono i target iOS.
 
 ## Package
@@ -74,7 +75,7 @@ Tutte queste funzioni stanno in `it.maestro.game.scopa`. I tipi e i valori non e
 
 ## Flussi
 
-**Partita offline (Fase 1):** UI → `play()` → nuovo stato → UI. Il bot riceve `viewFor()` e restituisce una mossa. A fine partita, l'analizzatore lavora sul `MatchLog`.
+**Partita offline:** UI → ViewModel → `MatchSession` (dominio) → `play()` → `Beat` (eventi + vista) → `TableDirector` → scena → UI. Il bot riceve `viewFor()` e muove solo quando la regia ha finito la scena precedente (ADR-0015). A fine partita, l'analizzatore lavora sul `MatchLog` e `RewardEngine` assegna le ricompense.
 
 **Partita online (Fase 2):** il client invia `PlayCard`; il server chiama `play()` sullo stato autoritativo e invia a ciascun client gli eventi filtrati e, alla riconnessione, `viewFor()`. Il server conserva il `MatchLog` e lo rigioca per verificarlo.
 

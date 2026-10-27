@@ -15,6 +15,7 @@ Uso: `/start-task <TASK_ID>` (es. `/start-task F1-01`)
    - Leggi sempre `docs/architecture.md` e `docs/conventions.md`.
    - Se il task tocca le regole o il modello di gioco, leggi `docs/rules/scopa.md` e `docs/rules/glossary.md` ("la specifica vince sul codice").
    - Se tocca l'AI o l'analisi, leggi `docs/ai/maestro.md`.
+   - Se tocca `app:*`, leggi `docs/app/README.md` e i documenti di `docs/app/` che il task cita; per la grafica anche `docs/art/design-system.md`.
    - Se tocca decisioni architetturali, leggi gli ADR pertinenti in `docs/decisions/`.
 4. **Aggiornamento stato backlog:**
    - Imposta lo stato del task a `in corso` nel file di backlog corrispondente.

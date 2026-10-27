@@ -18,3 +18,8 @@ Per proporre una decisione nuova: un agente scrive la proposta nella PR ("Domand
 | [0010](0010-core-senza-dipendenze.md) | `core:game` senza dipendenze esterne | accettato |
 | [0011](0011-varianti-per-modalita.md) | Varianti di regole come configurazione per modalità | accettato |
 | [0012](0012-piattaforma-android.md) | Android nativo, API minima 26 | accettato |
+| [0013](0013-mazzo-napoletano-pubblico-dominio.md) | Mazzo base: carte napoletane in pubblico dominio | accettato |
+| [0014](0014-architettura-app-a-layer.md) | Architettura dell'app a layer | proposto |
+| [0015](0015-regia-del-tavolo.md) | Regia del tavolo guidata dagli eventi | proposto |
+| [0016](0016-ui-adattiva.md) | UI adattiva alle dimensioni dello schermo | proposto |
+| [0017](0017-dati-e-migrazioni.md) | Dati locali con migrazioni esplicite | proposto |

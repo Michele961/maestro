@@ -9,6 +9,7 @@
       "docs/vision.md",
       "docs/architecture.md",
       "docs/ai/**",
+      "docs/app/**",
       "docs/conventions.md",
       "docs/workflow.md",
       ".github/**",

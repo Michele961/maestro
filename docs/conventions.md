@@ -33,6 +33,17 @@
 - Un tipo pubblico principale per file, file con il nome del tipo.
 - Test nello stesso package del codice testato, in `commonTest`.
 
+## App Android
+
+Regole complete in `docs/app/` (ADR-0014…0017). In breve:
+
+- Package per layer: `shell`, `domain`, `data`, `designsystem`, `feature.<nome>.{ui,presentation}` (`docs/app/layers.md`).
+- File ≤ 400 righe, composable ≤ 80 righe, un'intera schermata in più file della sua feature.
+- Composable senza logica: ricevono uno stato e callback; nessun `delay`, nessuna lettura di orologio o repository.
+- Durate solo da `MotionSpec`, misure di carte e avatar solo da una geometria (`responsive-ui.md`).
+- Testi solo da `strings.xml` (it/en) con `plurals` dove serve; il dominio restituisce codici.
+- Test per layer come in `docs/app/testing.md`; screenshot sulla matrice di ADR-0016.
+
 ## Git e PR
 
 - Branch `task/<ID>-<slug>`, Conventional Commits con ID (`feat(game): F0-05 presa per somma`).
