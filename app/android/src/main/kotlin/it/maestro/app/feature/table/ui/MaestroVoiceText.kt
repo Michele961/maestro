@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import it.maestro.app.R
+import it.maestro.app.domain.coach.ItalianElision
 import it.maestro.app.domain.coach.Phrase
 import it.maestro.app.domain.coach.Pose
 import it.maestro.app.domain.coach.VoiceArg
@@ -21,13 +22,14 @@ internal fun voiceText(line: VoiceLine): String = phrasesText(line.phrases)
 internal fun hintText(line: it.maestro.app.domain.coach.HintLine): String = phrasesText(line.phrases)
 
 @Composable
-private fun phrasesText(phrases: List<Phrase>): String {
+internal fun phrasesText(phrases: List<Phrase>): String {
     val context = LocalContext.current
     val cardName = rememberCardFormatter()
-    return phrases.joinToString(" ") { phrase ->
+    val text = phrases.joinToString(" ") { phrase ->
         val id = context.resources.getIdentifier(phrase.id, "string", context.packageName)
         if (id == 0) "" else context.getString(id, *phrase.formatArgs(cardName))
     }.trim()
+    return ItalianElision.fix(text)
 }
 
 private fun Phrase.formatArgs(cardName: (it.maestro.game.model.Card) -> String): Array<Any> =

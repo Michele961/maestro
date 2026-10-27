@@ -75,6 +75,12 @@ public object VoiceCatalog {
         "hint_why_least_bad" to v("hint_why_least_bad", 0),
     )
 
+    /** Frasi della revisione (task F1R-24g): titolo, corpo e regola per ogni [ReviewReason]; id senza numero di variante. */
+    public val reviewPhrases: List<VoiceVariant> = ReviewReason.entries.flatMap { reason ->
+        val bodies = if (reason == ReviewReason.IGNORED_CAPTURE) listOf("ignored_capture_one", "ignored_capture_many") else listOf(reason.key)
+        listOf("voice_review_title_${reason.key}", "voice_review_rule_${reason.key}") + bodies.map { "voice_review_body_$it" }
+    }.plus(listOf("primiera", "denari", "last_deal", "score", "played").map { "voice_review_extra_$it" }).map { VoiceVariant(it, humor = 0) }
+
     /** Code brevi che si possono aggiungere a avvisi e opportunità per dare varietà. */
     public val tails: List<VoiceVariant> = v("tail", 0, 0, 1)
 }
