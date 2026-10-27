@@ -288,7 +288,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-24 — La voce del Maestro
 
-- **Stato:** da fare (dossier approvato il 2026-10-27; viene prima di F1R-15)
+- **Stato:** in corso (dossier approvato il 2026-10-27; viene prima di F1R-15). Fatti: 24a `MatchFacts`, 24b `MomentDirector`. Da fare: 24c prontuario e `VoiceComposer`, 24d fumetto e impostazione, 24e consiglio dinamico, 24f trascrizioni, 24g revisione e tuning
 - **Riferimenti:** `docs/app/features/maestro-voice.md`, `docs/design/maestro_persona.md`, `docs/app/game-feel.md` §5, F1R-13, F1R-16
 - **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto, e la stessa voce dinamica con tuning nella revisione (Game Review). Il dossier propone la suddivisione in F1R-24a…g.
 - **Criteri di accettazione:** definiti dal dossier dopo l'approvazione di Michele.
