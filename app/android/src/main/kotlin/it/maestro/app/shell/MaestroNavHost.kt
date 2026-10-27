@@ -139,13 +139,13 @@ public fun MaestroNavHost(
                         }
                     }
                 },
-                onStartGameClicked = { navController.navigate(Route.PreGame) },
+                onStartGameClicked = { navController.navigate(Route.PreGame) { launchSingleTop = true } },
                 onSettingsClicked = { showSettings = true },
-                onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) },
-                onProfileClicked = { navController.navigate(Route.Profile) },
+                onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
+                onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
                 onMissionsClicked = { showMissions = true },
-                onAcademyClicked = { navController.navigate(Route.Academy) },
-                onShopClicked = { navController.navigate(Route.Shop) },
+                onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
+                onShopClicked = { navController.navigate(Route.Shop) { launchSingleTop = true } },
                 streakCount = streak.currentStreak,
                 credits = credits,
                 avatarId = settings.selectedAvatar,
