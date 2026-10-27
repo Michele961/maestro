@@ -43,6 +43,12 @@ class VoiceComposerTest {
         Moment(MomentKind.OFFER_HELP, listOf(Fact.ManyChoices(7))),
         Moment(MomentKind.INTRO_HELP, emptyList()),
         Moment(MomentKind.GREETING, emptyList()),
+        Moment(MomentKind.HAND_SETTEBELLO, listOf(Fact.SettebelloInHand)),
+        Moment(MomentKind.REACT_BIG_CAPTURE, listOf(Fact.BigCapture(Seat.P1, 5))),
+        Moment(MomentKind.TIP_EMPTY_TABLE, listOf(Fact.TableEmpty)),
+        Moment(MomentKind.STATUS_AHEAD, listOf(Fact.ScoreGap(3))),
+        Moment(MomentKind.STATUS_BEHIND, listOf(Fact.ScoreGap(-4))),
+        Moment(MomentKind.COLOR, emptyList()),
     )
 
     private fun stringsOf(file: String): Map<String, String> {
@@ -54,7 +60,7 @@ class VoiceComposerTest {
     fun everyCatalogIdHasItalianAndEnglishText() {
         val it = stringsOf("values")
         val en = stringsOf("values-en")
-        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.hintLeads.values.flatten() + VoiceCatalog.hintReasons.values.flatten() + VoiceCatalog.reviewPhrases + VoiceCatalog.tails).map { v -> v.id }
+        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.hintLeads.values.flatten() + VoiceCatalog.hintReasons.values.flatten() + VoiceCatalog.hintNudges + VoiceCatalog.reviewPhrases + VoiceCatalog.tails).map { v -> v.id }
         ids.forEach { id ->
             assertTrue(id in it, "Manca il testo italiano di $id")
             assertTrue(id in en, "Manca il testo inglese di $id")

@@ -71,7 +71,7 @@ public object GameReducer {
 
             is GameIntent.ApplyHint -> {
                 GameReducerResult(
-                    state = state.copy(suggestedMove = intent.move, isHintLoading = false),
+                    state = state.copy(suggestedMove = intent.move, hintRevealed = false, isHintLoading = false),
                 )
             }
 
@@ -113,8 +113,10 @@ public object GameReducer {
         ) {
             return GameReducerResult(state)
         }
+        // Secondo tocco sul Maestro: dopo lo stimolo arriva la soluzione (non si ricalcola).
+        if (state.suggestedMove != null) return GameReducerResult(state.copy(hintRevealed = true))
         return GameReducerResult(
-            state = state.copy(isHintLoading = true, suggestedMove = null),
+            state = state.copy(isHintLoading = true, suggestedMove = null, hintRevealed = false),
             effect = GameEffect.ComputeHint(humanSeat = state.humanSeat),
         )
     }
@@ -328,6 +330,7 @@ public object GameReducer {
                     maestroLine = if (isBotMove) state.maestroLine else null,
                     pendingDealScore = dealScore ?: state.pendingDealScore,
                     suggestedMove = null,
+                    hintRevealed = false,
                     isHintLoading = false,
                     activeTrainingQuestion = activeQuestion ?: state.activeTrainingQuestion,
                     hasAskedQuestionThisDeal = if (isDealOver) false else (state.hasAskedQuestionThisDeal || questionAskedNow),

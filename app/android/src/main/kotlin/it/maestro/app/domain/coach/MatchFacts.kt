@@ -67,6 +67,12 @@ public sealed interface Fact {
     /** [seat] ha preso il Settebello con l'ultima mossa. */
     public data class SettebelloCaptured(val seat: Seat) : Fact
 
+    /** Il banco è vuoto e tocca al giocatore: la prima carta che cala resta sola a terra. */
+    public data object TableEmpty : Fact
+
+    /** [seat] ha preso [count] carte (3 o più) con l'ultima mossa. */
+    public data class BigCapture(val seat: Seat, val count: Int) : Fact
+
     /** L'avversario ha calato senza prendere e ora il giocatore può fare scopa: un regalo. */
     public data object OpponentGift : Fact
 }
@@ -79,6 +85,7 @@ public object MatchFacts {
     private const val MANY_CHOICES = 6
     private const val CARDS_SECURE = 20
     private const val DENARI_SECURE = 5
+    private const val BIG_CAPTURE = 4
 
     /**
      * Fatti veri per [view] (giocatore umano, `view.seat`) quando può muovere [legal]; [lastBeat] è l'ultima mossa
@@ -97,6 +104,7 @@ public object MatchFacts {
         val owner = view.capturedBy.entries.firstOrNull { settebello in it.value }?.key
         if (owner != null) add(Fact.SettebelloTaken(if (owner == me) SeatLead.HUMAN else SeatLead.OPPONENT))
 
+        if (view.table.isEmpty() && view.hand.isNotEmpty() && !lastPlay) add(Fact.TableEmpty)
         val sum = view.table.sumOf { it.rank.value }
         if (view.table.isNotEmpty() && sum <= LOW_TABLE_SUM) add(Fact.TableSumLow(sum))
         if (legal.isNotEmpty() && legal.all { it.capture.isEmpty() }) {
@@ -129,6 +137,8 @@ public object MatchFacts {
         beat.events.filterIsInstance<GameEvent.Captured>()
             .filter { settebello in it.cards || (settebello == beat.move.card && it.cards.isNotEmpty()) }
             .forEach { add(Fact.SettebelloCaptured(it.seat)) }
+        beat.events.filterIsInstance<GameEvent.Captured>().filter { it.cards.size + 1 >= BIG_CAPTURE }
+            .forEach { add(Fact.BigCapture(it.seat, it.cards.size + 1)) }
         if (beat.actor != view.seat && beat.move.capture.isEmpty() && sweepNow) add(Fact.OpponentGift)
     }
 

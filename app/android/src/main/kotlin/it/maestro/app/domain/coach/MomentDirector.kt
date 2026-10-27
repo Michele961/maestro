@@ -33,6 +33,14 @@ public enum class MomentKind(
     OFFER_HELP(45, 8, Tone.WARM),
     INTRO_HELP(30, 99, Tone.WARM),
     GREETING(10, 99, Tone.WARM),
+    HAND_SETTEBELLO(58, 14, Tone.MAIEUTIC),
+    REACT_BIG_CAPTURE(56, 6, Tone.WARM),
+    TIP_EMPTY_TABLE(42, 10, Tone.MAIEUTIC),
+    STATUS_AHEAD(36, 14, Tone.WARM),
+    STATUS_BEHIND(37, 14, Tone.WARM),
+
+    /** Una parola di compagnia quando non c'è altro da dire: colore, il più debole dei momenti. */
+    COLOR(5, 10, Tone.IRONIC),
 }
 
 /** Un momento scelto: il tipo e i fatti che lo giustificano (la battuta la compone `VoiceComposer`). */
@@ -40,9 +48,9 @@ public data class Moment(val kind: MomentKind, val facts: List<Fact>)
 
 /** Quanto parla il Maestro (impostazione «Chiacchiere», dossier §3.4); i valori si tarano con le simulazioni. */
 public enum class Chattiness(public val minGapMoves: Int, public val maxPerDeal: Int) {
-    TALKATIVE(minGapMoves = 2, maxPerDeal = 3),
-    NORMAL(minGapMoves = 3, maxPerDeal = 2),
-    QUIET(minGapMoves = 5, maxPerDeal = 1),
+    TALKATIVE(minGapMoves = 1, maxPerDeal = 5),
+    NORMAL(minGapMoves = 2, maxPerDeal = 4),
+    QUIET(minGapMoves = 4, maxPerDeal = 2),
     OFF(minGapMoves = Int.MAX_VALUE, maxPerDeal = 0),
 }
 
@@ -126,9 +134,18 @@ public class MomentDirector(
         if (many != null && c.hesitating) moment(MomentKind.OFFER_HELP, many)
         if (!c.everUsedHint && c.playerMoves >= INTRO_AFTER_MOVES && c.dealIndex == 0) add(Moment(MomentKind.INTRO_HELP, emptyList()))
         if (c.matchStart) add(Moment(MomentKind.GREETING, emptyList()))
+        if (Fact.SettebelloInHand in facts) moment(MomentKind.HAND_SETTEBELLO, Fact.SettebelloInHand)
+        facts.filterIsInstance<Fact.BigCapture>().firstOrNull { it.seat == c.humanSeat }?.let { moment(MomentKind.REACT_BIG_CAPTURE, it) }
+        if (Fact.TableEmpty in facts) moment(MomentKind.TIP_EMPTY_TABLE, Fact.TableEmpty)
+        facts.filterIsInstance<Fact.ScoreGap>().firstOrNull { kotlin.math.abs(it.ahead) >= SCORE_GAP_MATTERS }?.let {
+            moment(if (it.ahead > 0) MomentKind.STATUS_AHEAD else MomentKind.STATUS_BEHIND, it)
+        }
+        if (c.playerMoves >= COLOR_AFTER_MOVES) add(Moment(MomentKind.COLOR, emptyList()))
     }
 
     private companion object {
         const val INTRO_AFTER_MOVES = 2
+        const val SCORE_GAP_MATTERS = 2
+        const val COLOR_AFTER_MOVES = 3
     }
 }

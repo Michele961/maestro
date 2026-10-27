@@ -54,8 +54,8 @@ class MaestroVoiceTest {
             val lines = transcript(seed, Chattiness.NORMAL)
             total += lines.size
             lines.zipWithNext().filter { (a, b) -> a.first >= 1 && !b.second.kind.urgent }.forEach { (a, b) ->
-                // Tra due battute dello stesso giocatore passano almeno 3 sue mosse (2 mosse per giro).
-                assertTrue(b.first - a.first >= 4 || b.second.kind.urgent, "Battute ravvicinate (seed $seed): ${a.first} e ${b.first}")
+                // Tra due battute passano almeno `minGapMoves` mosse del giocatore (2 mosse per giro, meno una al bordo).
+                assertTrue(b.first - a.first >= 2 * Chattiness.NORMAL.minGapMoves - 1 || b.second.kind.urgent, "Battute ravvicinate (seed $seed): ${a.first} e ${b.first}")
             }
         }
         assertTrue(total > 30, "Su 30 partite il Maestro deve parlare ogni tanto: $total")
