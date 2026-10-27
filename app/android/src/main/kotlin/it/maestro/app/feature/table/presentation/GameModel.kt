@@ -6,6 +6,8 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
+import it.maestro.app.domain.coach.HintComposer
+import it.maestro.app.domain.coach.HintLine
 import it.maestro.app.domain.coach.VoiceLine
 import it.maestro.app.domain.match.Beat
 import it.maestro.app.domain.match.MatchSession
@@ -94,7 +96,10 @@ public data class GameUiState(
     val isHumanTurn: Boolean,
     val isBotThinking: Boolean,
     val isSparring: Boolean = true,
+    /** Soluzione del consiglio: c'è solo dopo che il giocatore l'ha chiesta (secondo tocco). */
     val suggestedMove: ScopaMove? = null,
+    /** Primo livello del consiglio: uno stimolo a ragionare, senza la mossa. */
+    val hintNudge: HintLine? = null,
     val isHintLoading: Boolean = false,
     val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     val activeTrainingQuestion: TrainingQuestion? = null,
@@ -167,6 +172,8 @@ public data class GameInternalState(
     val isBotThinking: Boolean = false,
     val isSparring: Boolean = true,
     val suggestedMove: ScopaMove? = null,
+    /** Il consiglio c'è ma il giocatore non ha ancora chiesto la soluzione: si mostra solo lo stimolo. */
+    val hintRevealed: Boolean = false,
     val isHintLoading: Boolean = false,
     val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     val activeTrainingQuestion: TrainingQuestion? = null,
@@ -214,7 +221,8 @@ public data class GameInternalState(
                 activeTrainingQuestion == null,
             isBotThinking = isBotThinking,
             isSparring = isSparring,
-            suggestedMove = suggestedMove,
+            suggestedMove = suggestedMove.takeIf { hintRevealed },
+            hintNudge = suggestedMove?.takeIf { !hintRevealed }?.let { HintComposer.nudge(it, view.table) },
             isHintLoading = isHintLoading,
             trainingFundamental = trainingFundamental,
             activeTrainingQuestion = activeTrainingQuestion,

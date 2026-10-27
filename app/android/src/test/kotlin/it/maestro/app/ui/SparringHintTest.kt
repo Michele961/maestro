@@ -106,9 +106,14 @@ class SparringHintTest {
         assertNull(initialState.suggestedMove)
         assertFalse(initialState.isHintLoading)
 
-        // Richiedi suggerimento al Maestro
+        // Primo tocco: il Maestro stimola a ragionare, senza dire la mossa (Michele, 2026-10-27)
         viewModel.onIntent(GameIntent.RequestHint)
+        val nudgeState = viewModel.uiState.value
+        assertNotNull(nudgeState.hintNudge, "Il primo tocco dà uno stimolo")
+        assertNull(nudgeState.suggestedMove, "La soluzione non si dice subito")
 
+        // Secondo tocco: la soluzione
+        viewModel.onIntent(GameIntent.RequestHint)
         val hintState = viewModel.uiState.value
         assertNotNull(hintState.suggestedMove, "Lo stato UI deve contenere la mossa suggerita dal Maestro")
         assertFalse(hintState.isHintLoading)

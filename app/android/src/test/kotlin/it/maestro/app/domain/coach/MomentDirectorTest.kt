@@ -24,8 +24,18 @@ class MomentDirectorTest {
         TurnContext(facts, Seat.P1, playerMoves = move, dealIndex = deal, hesitating = hesitating, everUsedHint = hint)
 
     @Test
-    fun quietWhenNothingHappens() {
-        assertNull(MomentDirector().consider(turn(emptyList(), 5)))
+    fun quietWhenNothingHappensAtTheStart() {
+        assertNull(MomentDirector().consider(turn(emptyList(), 2)))
+    }
+
+    @Test
+    fun withNothingElseToSayTheMaestroKeepsCompanyWithAColorLine() {
+        assertEquals(MomentKind.COLOR, MomentDirector().consider(turn(emptyList(), 5))?.kind)
+    }
+
+    @Test
+    fun aColorLineNeverBeatsSomethingThatMatters() {
+        assertEquals(MomentKind.OPPORTUNITY_SWEEP, MomentDirector().consider(turn(listOf(sweep), 5))?.kind)
     }
 
     @Test
@@ -39,8 +49,7 @@ class MomentDirectorTest {
         val director = MomentDirector(Chattiness.NORMAL)
         assertNotNull(director.consider(turn(listOf(sweep), 4)))
         assertNull(director.consider(turn(listOf(grab), 5)), "Un'opportunità non è urgente: aspetta l'intervallo")
-        assertNull(director.consider(turn(listOf(grab), 6)))
-        assertEquals(MomentKind.OPPORTUNITY_SETTEBELLO, director.consider(turn(listOf(grab), 7))?.kind)
+        assertEquals(MomentKind.OPPORTUNITY_SETTEBELLO, director.consider(turn(listOf(grab), 6))?.kind)
     }
 
     @Test
@@ -48,23 +57,26 @@ class MomentDirectorTest {
         val director = MomentDirector(Chattiness.NORMAL)
         assertNotNull(director.consider(turn(listOf(sweep), 4)))
         assertEquals(MomentKind.WARN_SETTEBELLO_EXPOSED, director.consider(turn(listOf(exposed), 5))?.kind)
-        assertNull(director.consider(turn(listOf(exposed), 12)), "Tetto di due per smazzata")
+        assertEquals(MomentKind.WARN_SETTEBELLO_EXPOSED, director.consider(turn(listOf(exposed), 11))?.kind)
+        assertEquals(MomentKind.WARN_SETTEBELLO_EXPOSED, director.consider(turn(listOf(exposed), 17))?.kind)
+        assertNull(director.consider(turn(listOf(exposed), 23)), "Tetto di quattro per smazzata")
     }
 
     @Test
     fun theCapResetsInANewDeal() {
         val director = MomentDirector(Chattiness.QUIET)
         assertNotNull(director.consider(turn(listOf(sweep), 4, deal = 0)))
-        assertNull(director.consider(turn(listOf(sweep), 20, deal = 0)))
-        assertNotNull(director.consider(turn(listOf(sweep), 30, deal = 1)))
+        assertNotNull(director.consider(turn(listOf(sweep), 20, deal = 0)))
+        assertNull(director.consider(turn(listOf(sweep), 36, deal = 0)), "Tetto di due per smazzata a «Poco»")
+        assertNotNull(director.consider(turn(listOf(sweep), 50, deal = 1)))
     }
 
     @Test
     fun theSameKindWaitsItsCooldown() {
         val director = MomentDirector(Chattiness.TALKATIVE)
         assertNotNull(director.consider(turn(listOf(sweep), 4)))
-        assertNull(director.consider(turn(listOf(sweep), 7)), "Cooldown di 4 mosse")
-        assertNotNull(director.consider(turn(listOf(sweep), 9)))
+        assertTrue(director.consider(turn(listOf(sweep), 7))?.kind != MomentKind.OPPORTUNITY_SWEEP, "Cooldown di 4 mosse")
+        assertEquals(MomentKind.OPPORTUNITY_SWEEP, director.consider(turn(listOf(sweep), 9))?.kind)
     }
 
     @Test
@@ -75,7 +87,7 @@ class MomentDirectorTest {
     @Test
     fun helpIsOfferedOnlyToWhoHesitatesBeforeAManyChoicesTurn() {
         val many = Fact.ManyChoices(7)
-        assertNull(MomentDirector().consider(turn(listOf(many), 6, hesitating = false)))
+        assertTrue(MomentDirector().consider(turn(listOf(many), 6, hesitating = false))?.kind != MomentKind.OFFER_HELP)
         assertEquals(MomentKind.OFFER_HELP, MomentDirector().consider(turn(listOf(many), 6, hesitating = true))?.kind)
     }
 
@@ -83,7 +95,7 @@ class MomentDirectorTest {
     fun introducesHelpOnceToWhoNeverUsedIt() {
         val director = MomentDirector()
         assertEquals(MomentKind.INTRO_HELP, director.consider(turn(emptyList(), 2, hint = false))?.kind)
-        assertNull(director.consider(turn(emptyList(), 30, hint = false)), "Una volta sola")
+        assertTrue(director.consider(turn(emptyList(), 30, hint = false))?.kind != MomentKind.INTRO_HELP, "Una volta sola")
         assertNull(MomentDirector().consider(turn(emptyList(), 2, hint = true)))
     }
 

@@ -38,6 +38,23 @@ public object HintComposer {
         }
     }
 
+    /** Chiave dello stimolo per [reason]: le due calate condividono la stessa domanda sulla carta meno pericolosa. */
+    public fun nudgeKey(reason: Reason): String = when (reason) {
+        Reason.LEAST_BAD_DISCARD -> "least_bad"
+        Reason.SAFE_DISCARD -> "safe"
+        else -> reason.name.lowercase()
+    }
+
+    /**
+     * Primo livello del consiglio: una domanda che orienta il ragionamento senza nominare la mossa, con l'invito a toccare
+     * di nuovo il Maestro per la soluzione ([compose]).
+     */
+    public fun nudge(move: ScopaMove, table: List<Card>): HintLine =
+        HintLine(
+            listOf(Phrase("voice_hint_nudge_${nudgeKey(reason(move, table))}"), Phrase("voice_hint_nudge_more")),
+            Pose.THINKING,
+        )
+
     /** Consiglio per [move] sul banco [table]: apertura con le carte nominate, poi la ragione. */
     public fun compose(move: ScopaMove, table: List<Card>): HintLine {
         val reason = reason(move, table)

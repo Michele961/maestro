@@ -1,8 +1,8 @@
-# Testi del Maestro — bozza da leggere
+# Testi del Maestro — raccolta
 
-Stato: **approvati da Michele il 2026-10-27** (decisione D16: i testi didattici li approva lui). Questa è la raccolta di tutte le frasi del Maestro oggi nell'app, in italiano e in inglese, generata da `strings.xml`. Se vuoi cambiare una frase, indicami la chiave (es. `voice_greeting_2`) e il nuovo testo.
+Stato: i testi fino al 2026-10-27 sono **approvati da Michele** (D16). Quelli segnati **[bozza]** sono stati aggiunti dopo (stimoli del consiglio a due livelli, nuovi momenti, «colore») e aspettano la tua approvazione. Per cambiare una frase dimmi la chiave (es. `voice_greeting_2`) e il nuovo testo.
 
-Come leggerli: `%1$s`, `%2$s` sono i nomi delle carte (es. «7 di denari»), `%1$d` un numero. Il Maestro sceglie una variante in base all'umorismo (1 = serio, 2/3 = più spiritoso) e a volte aggiunge una «coda».
+`%1$s`, `%2$s` sono nomi di carte (es. «7 di denari»); `%1$d` un numero. Il Maestro sceglie una variante in base all'umorismo (1 = serio, 2/3 = più spiritoso) e non ripete una frase finché non le ha dette tutte.
 
 ## Saluto e aiuto
 
@@ -123,6 +123,15 @@ Come leggerli: `%1$s`, `%2$s` sono i nomi delle carte (es. «7 di denari»), `%1
 - `voice_react_settebello_theirs_3`
   - it: Il gioiello se n'è andato dall'altra parte. Ci rifacciamo con i Denari.
   - en: The jewel went the other way. We'll make it up with the Coins.
+- `voice_react_big_capture_1` [bozza]
+  - it: Bella presa: %1$d carte in un colpo.
+  - en: Nice capture: %1$d cards in one go.
+- `voice_react_big_capture_2` [bozza]
+  - it: %1$d carte tutte insieme: così si fa.
+  - en: %1$d cards all together: that's how it's done.
+- `voice_react_big_capture_3` [bozza]
+  - it: Che raccolto: %1$d carte portate a casa in un colpo solo!
+  - en: What a haul: %1$d cards brought home in one shot!
 
 ## Stato della partita
 
@@ -171,6 +180,63 @@ Come leggerli: `%1$s`, `%2$s` sono i nomi delle carte (es. «7 di denari»), `%1
 - `voice_match_point_theirs_2`
   - it: Un punto e finisce per l'avversario: non regalargli niente.
   - en: One point and it's over for your opponent: give nothing away.
+- `voice_status_ahead_1` [bozza]
+  - it: Sei avanti di %1$d: non rilassarti, però.
+  - en: You're ahead by %1$d: don't relax, though.
+- `voice_status_ahead_2` [bozza]
+  - it: Avanti di %1$d punti: continua a giocare con testa.
+  - en: Ahead by %1$d points: keep playing with your head.
+- `voice_status_behind_1` [bozza]
+  - it: Sei indietro di %1$d: nulla è perso, la smazzata è lunga.
+  - en: You're behind by %1$d: nothing is lost, the deal is long.
+- `voice_status_behind_2` [bozza]
+  - it: Indietro di %1$d: calma, si rimonta una carta alla volta.
+  - en: Behind by %1$d: easy, we catch up one card at a time.
+
+## Consigli sulla mano
+
+- `voice_hand_settebello_1` [bozza]
+  - it: Hai il Settebello in mano: tienilo per una presa buona, non calarlo.
+  - en: You hold the Settebello: keep it for a good capture, don't lay it down.
+- `voice_hand_settebello_2` [bozza]
+  - it: Il Settebello è tuo: aspetta il momento giusto per giocarlo.
+  - en: The Settebello is yours: wait for the right moment to play it.
+- `voice_hand_settebello_3` [bozza]
+  - it: Tienilo stretto, il Settebello: è un gioiello di famiglia.
+  - en: Hold the Settebello tight: it's a family jewel.
+- `voice_tip_empty_table_1` [bozza]
+  - it: Banco vuoto: cala una carta bassa e non regalare un 7.
+  - en: Empty table: lay down a low card and don't hand over a seven.
+- `voice_tip_empty_table_2` [bozza]
+  - it: Tavolo vuoto, nessuna fretta: la prima carta la scegli tu, meglio una che non serva all'avversario.
+  - en: Empty table, no rush: you pick the first card, ideally one your opponent can't use.
+
+## Colore (una parola di compagnia)
+
+- `voice_color_1` [bozza]
+  - it: Una carta alla volta: la partita è lunga.
+  - en: One card at a time: it's a long game.
+- `voice_color_2` [bozza]
+  - it: Un buon giocatore guarda sempre cosa è già uscito.
+  - en: A good player always watches what's already out.
+- `voice_color_3` [bozza]
+  - it: Ti vedo concentrato: bene così.
+  - en: I see you're focused: good.
+- `voice_color_4` [bozza]
+  - it: Il circolo è silenzioso: si sente solo il fruscio delle carte.
+  - en: The club is quiet: all you hear is the rustle of cards.
+- `voice_color_5` [bozza]
+  - it: Ai miei tempi si giocava col sigaro e senza fretta.
+  - en: In my day we played with a cigar and no hurry.
+- `voice_color_6` [bozza]
+  - it: Guarda chi ha già preso i Denari: a volte decidono la partita.
+  - en: Check who already has the Coins: sometimes they decide the game.
+- `voice_color_7` [bozza]
+  - it: Se hai un dubbio, toccami: sono qui per questo.
+  - en: If you're in doubt, tap me: that's what I'm here for.
+- `voice_color_8` [bozza]
+  - it: Tra una carta e l'altra, un pensiero al Settebello non guasta.
+  - en: Between one card and the next, a thought for the Settebello never hurts.
 
 ## Code
 
@@ -184,7 +250,34 @@ Come leggerli: `%1$s`, `%2$s` sono i nomi delle carte (es. «7 di denari»), `%1
   - it: Ragiona, poi decidi.
   - en: Reason it out, then decide.
 
-## Consiglio su richiesta
+## Consiglio su richiesta: stimolo (primo tocco)
+
+- `voice_hint_nudge_sweep` [bozza]
+  - it: Guarda bene il banco: c'è una carta che lo ripulisce tutto. Riesci a trovarla?
+  - en: Look closely at the table: one card clears it all. Can you find it?
+- `voice_hint_nudge_settebello` [bozza]
+  - it: Nel gioco c'è il Settebello: sai come metterlo al sicuro?
+  - en: The Settebello is in play: do you know how to make it safe?
+- `voice_hint_nudge_denari` [bozza]
+  - it: Occhio ai Denari: una delle tue carte ne porta a casa più delle altre. Quale?
+  - en: Mind the Coins: one of your cards takes more of them than the others. Which?
+- `voice_hint_nudge_primiera` [bozza]
+  - it: Sul banco c'è qualcosa che pesa in Primiera. Lo vedi?
+  - en: There's something on the table that weighs in Primiera. Can you see it?
+- `voice_hint_nudge_capture` [bozza]
+  - it: C'è una presa pulita. Quale delle tue carte la fa?
+  - en: There's a clean capture. Which of your cards makes it?
+- `voice_hint_nudge_safe` [bozza]
+  - it: Nessuna presa buona: quale carta puoi calare senza lasciare un banco facile da ripulire?
+  - en: No good capture: which card can you lay down without leaving an easy table to clear?
+- `voice_hint_nudge_least_bad` [bozza]
+  - it: Qui nessuna mossa è bella: quale carta lascia meno pericolo sul banco?
+  - en: No move looks good here: which card leaves the least danger on the table?
+- `voice_hint_nudge_more` [bozza]
+  - it: Pensaci un attimo; se vuoi la soluzione, toccami ancora.
+  - en: Think it over for a moment; if you want the answer, tap me again.
+
+## Consiglio su richiesta: soluzione (secondo tocco)
 
 - `voice_hint_take_one_1`
   - it: Gioca il %1$s e prendi il %2$s.

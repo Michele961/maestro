@@ -67,4 +67,19 @@ class HintComposerTest {
         val table = listOf(Card(Rank.QUATTRO, Suit.COPPE), two)
         assertEquals(HintComposer.compose(move, table), HintComposer.compose(move, table))
     }
+
+    @Test
+    fun theNudgeAsksAQuestionWithoutNamingTheMoveAndInvitesToTapAgain() {
+        val move = ScopaMove(four, setOf(Card(Rank.QUATTRO, Suit.COPPE)))
+        val nudge = HintComposer.nudge(move, listOf(Card(Rank.QUATTRO, Suit.COPPE), two))
+        assertEquals(listOf("voice_hint_nudge_capture", "voice_hint_nudge_more"), nudge.phrases.map { it.id })
+        assertTrue(nudge.phrases.all { it.args.isEmpty() }, "Lo stimolo non nomina carte")
+        assertEquals(Pose.THINKING, nudge.pose)
+    }
+
+    @Test
+    fun bothDiscardReasonsShareTheSameKindOfNudgeAsTheirOwnQuestion() {
+        assertEquals("safe", HintComposer.nudgeKey(HintComposer.Reason.SAFE_DISCARD))
+        assertEquals("least_bad", HintComposer.nudgeKey(HintComposer.Reason.LEAST_BAD_DISCARD))
+    }
 }

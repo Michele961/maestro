@@ -181,7 +181,7 @@ private fun MaestroCorner(
     if (!uiState.isSparring) return
     val zone = geometry.zones.maestro
     val hint = uiState.suggestedMove
-    val showHint = hint != null
+    val showHint = hint != null || uiState.hintNudge != null
     val line = uiState.maestroLine
     val portrait = when {
         line != null && hint == null -> line.pose.portraitRes()
@@ -206,17 +206,6 @@ private fun MaestroCorner(
             )
         }
     }
-    if (sweepBy != null) {
-        Zone(zone, Alignment.TopCenter) {
-            MaestroPillButton(
-                text = stringResource(R.string.game_event_sweep).uppercase(),
-                onClick = {},
-                variant = PillButtonVariant.HERO_RED,
-                height = 28.dp,
-                fontSize = 13.sp,
-            )
-        }
-    }
 }
 
 /**
@@ -233,8 +222,9 @@ private fun RaceOrBubble(
 ) {
     val zone = geometry.zones.pointsRace
     val hint = uiState.suggestedMove
-    var dismissed by remember(hint) { mutableStateOf(false) }
-    val showBubble = uiState.isSparring && ((hint != null && !dismissed) || uiState.isHintLoading)
+    var dismissed by remember(hint, uiState.hintNudge) { mutableStateOf(false) }
+    val nudge = uiState.hintNudge
+    val showBubble = uiState.isSparring && (((hint != null || nudge != null) && !dismissed) || uiState.isHintLoading)
     val line = uiState.maestroLine?.takeIf { uiState.isSparring && !showBubble }
     Zone(zone, Alignment.Center) {
         if (line != null) {
@@ -250,6 +240,8 @@ private fun RaceOrBubble(
             MaestroSpeechBubble(
                 message = if (hint != null) {
                     hintText(remember(hint, uiState.tableCards) { HintComposer.compose(hint, uiState.tableCards) })
+                } else if (nudge != null) {
+                    hintText(nudge)
                 } else {
                     stringResource(R.string.game_hint_loading)
                 },

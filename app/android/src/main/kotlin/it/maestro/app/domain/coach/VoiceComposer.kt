@@ -55,6 +55,12 @@ public object VoiceCatalog {
         "offer_help" to v("offer_help", 0, 1, 2),
         "intro_help" to v("intro_help", 0, 1),
         "greeting" to v("greeting", 0, 1, 2),
+        "hand_settebello" to v("hand_settebello", 0, 1, 2),
+        "react_big_capture" to v("react_big_capture", 0, 1, 2),
+        "tip_empty_table" to v("tip_empty_table", 0, 1),
+        "status_ahead" to v("status_ahead", 0, 1),
+        "status_behind" to v("status_behind", 0, 1),
+        "color" to v("color", 0, 1, 1, 1, 1, 2, 2, 2),
     )
 
     /** Aperture del consiglio su richiesta (task F1R-24e): giocare una carta che prende una carta, più carte, o che cala. */
@@ -63,6 +69,11 @@ public object VoiceCatalog {
         "hint_take_many" to v("hint_take_many", 0, 1),
         "hint_discard" to v("hint_discard", 0, 1),
     )
+
+    /** Stimoli del primo livello del consiglio: una domanda per far ragionare, senza dire la mossa (Michele, 2026-10-27). */
+    public val hintNudges: List<VoiceVariant> =
+        HintComposer.Reason.entries.map { "voice_hint_nudge_${HintComposer.nudgeKey(it)}" }.distinct().plus("voice_hint_nudge_more")
+            .map { VoiceVariant(it, humor = 0) }
 
     /** Ragioni del consiglio: una sola frase per ragione. */
     public val hintReasons: Map<String, List<VoiceVariant>> = mapOf(
@@ -97,12 +108,18 @@ public class VoiceComposer(
 ) {
     private val lastVariant = mutableMapOf<String, String>()
 
+    /** Varianti già dette per chiave: si ricomincia solo quando le hanno dette tutte, così il Maestro non si ripete. */
+    private val said = mutableMapOf<String, MutableSet<String>>()
+
     /** [VoiceLine] per [moment], vista dal giocatore seduto in [human]. */
     public fun compose(moment: Moment, human: Seat = Seat.P1): VoiceLine {
         val (key, args) = keyAndArgs(moment, human)
         val variants = VoiceCatalog.bodies.getValue(key).filter { it.humor <= humor }.ifEmpty { VoiceCatalog.bodies.getValue(key).take(1) }
-        val fresh = variants.filter { it.id != lastVariant[key] }.ifEmpty { variants }
+        val spoken = said.getOrPut(key) { mutableSetOf() }
+        if (variants.all { it.id in spoken }) spoken.clear()
+        val fresh = variants.filter { it.id !in spoken && it.id != lastVariant[key] }.ifEmpty { variants.filter { it.id !in spoken } }
         val body = fresh[rng.nextInt(fresh.size)]
+        spoken += body.id
         lastVariant[key] = body.id
         val phrases = mutableListOf(Phrase(body.id, args))
         if (wantsTail(moment.kind) && rng.nextInt(TAIL_ONE_IN) == 0) {
@@ -157,6 +174,12 @@ public class VoiceComposer(
             MomentKind.OFFER_HELP -> "offer_help" to emptyList()
             MomentKind.INTRO_HELP -> "intro_help" to emptyList()
             MomentKind.GREETING -> "greeting" to emptyList()
+            MomentKind.HAND_SETTEBELLO -> "hand_settebello" to emptyList()
+            MomentKind.REACT_BIG_CAPTURE -> "react_big_capture" to listOf(VoiceArg.NumberArg(facts.filterIsInstance<Fact.BigCapture>().first().count))
+            MomentKind.TIP_EMPTY_TABLE -> "tip_empty_table" to emptyList()
+            MomentKind.STATUS_AHEAD -> "status_ahead" to listOf(VoiceArg.NumberArg(facts.filterIsInstance<Fact.ScoreGap>().first().ahead))
+            MomentKind.STATUS_BEHIND -> "status_behind" to listOf(VoiceArg.NumberArg(-facts.filterIsInstance<Fact.ScoreGap>().first().ahead))
+            MomentKind.COLOR -> "color" to emptyList()
         }
     }
 
@@ -170,6 +193,10 @@ public class VoiceComposer(
         MomentKind.STATUS_SECURED, MomentKind.STATUS_LAST_DEAL, MomentKind.STATUS_MATCH_POINT -> Pose.NEUTRAL
         MomentKind.OFFER_HELP, MomentKind.INTRO_HELP -> Pose.ENCOURAGING
         MomentKind.GREETING -> Pose.PLEASED
+        MomentKind.HAND_SETTEBELLO, MomentKind.TIP_EMPTY_TABLE -> Pose.THINKING
+        MomentKind.REACT_BIG_CAPTURE, MomentKind.STATUS_AHEAD -> Pose.PLEASED
+        MomentKind.STATUS_BEHIND -> Pose.ENCOURAGING
+        MomentKind.COLOR -> Pose.NEUTRAL
     }
 
     private companion object {
