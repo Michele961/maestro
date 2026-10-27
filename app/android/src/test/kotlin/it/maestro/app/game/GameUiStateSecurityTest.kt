@@ -1,5 +1,7 @@
 package it.maestro.app.game
 
+import it.maestro.app.scopaState
+
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaState

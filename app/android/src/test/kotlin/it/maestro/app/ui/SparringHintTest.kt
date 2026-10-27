@@ -142,9 +142,7 @@ class SparringHintTest {
         assertNull(nonSparringResult.state.suggestedMove)
 
         // Se non è il turno del giocatore umano, RequestHint non produce effetti
-        val notMyTurnState = initialResult.state.copy(
-            scopaState = initialResult.state.scopaState.copy(toMove = Seat.P2),
-        )
+        val notMyTurnState = initialResult.state.copy(humanSeat = initialResult.state.session.toMove.other())
         val notMyTurnResult = GameReducer.reduce(notMyTurnState, GameIntent.RequestHint)
         assertNull(notMyTurnResult.effect, "Quando non è il proprio turno non deve essere emesso ComputeHint")
     }

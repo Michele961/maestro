@@ -85,7 +85,7 @@ public class ShellViewModel(
 
     /** Salva come partita in corso una partita all'ultima mano, per collaudo (solo build di debug). */
     public suspend fun prepareTestEndgameMatch(): MatchLog {
-        val (_, log) = TestMatchGenerator.generateEndgameMatch()
+        val log = TestMatchGenerator.generateEndgameMatch().log
         matchRepository.saveActiveMatch(log = log, level = TEST_LEVEL, targetScore = log.config.targetScore)
         return log
     }

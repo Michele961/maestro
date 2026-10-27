@@ -2,15 +2,11 @@ package it.maestro.app.feature.table.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.maestro.ai.bot.PimcEvaluator
-import it.maestro.ai.bot.SearchBudget
 import it.maestro.app.data.repository.MatchRepository
 import it.maestro.game.model.Seat
 import it.maestro.game.rng.SeededRng
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.MatchLog
-import it.maestro.game.scopa.legalMoves
-import it.maestro.game.scopa.viewFor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +30,8 @@ import kotlinx.coroutines.flow.flowOf
  * Mantiene il flusso unidirezionale dei dati:
  * `UI -> Intent -> Reducer -> State -> UI`
  *
- * Il turno del bot è eseguito rigorosamente fuori dal thread UI (tramite [ioDispatcher],
- * default [Dispatchers.Default]) passando unicamente [viewFor] e [legalMoves].
+ * Il turno del bot è eseguito fuori dal thread UI (tramite [ioDispatcher], default [Dispatchers.Default])
+ * e passa da [it.maestro.app.domain.match.MatchSession.chooseBotMove], che gli dà solo la sua vista.
  */
 public class GameViewModel(
     private val matchRepository: MatchRepository? = null,
@@ -83,8 +79,7 @@ public class GameViewModel(
             when (val result = repository.restoreActiveMatch()) {
                 is RestoreMatchResult.Success -> onIntent(
                     GameIntent.RestoreMatch(
-                        state = result.state,
-                        matchLog = result.matchLog,
+                        session = result.session,
                         level = result.level,
                         trainingFundamental = trainingFundamental,
                     ),
@@ -114,7 +109,7 @@ public class GameViewModel(
             hintJob?.cancel()
         } else if (intent is GameIntent.RestoreMatch) {
             // Ripresa: generatore del bot derivato dal log, così resta riproducibile (ADR-0003, F1R-02).
-            botRng = SeededRng(intent.matchLog.seed + 9999L + intent.matchLog.moves.size)
+            botRng = SeededRng(intent.session.log.seed + 9999L + intent.session.log.moves.size)
             botJob?.cancel()
             hintJob?.cancel()
         }
@@ -126,20 +121,20 @@ public class GameViewModel(
         if (matchRepository != null) {
             scope.launch {
                 try {
-                    val scopaState = internalState.scopaState
-                    if (scopaState.phase == DealPhase.PLAYING) {
+                    val session = internalState.session
+                    if (session.phase == DealPhase.PLAYING) {
                         matchRepository.saveActiveMatch(
                             log = internalState.matchLog,
                             level = internalState.botLevel,
-                            targetScore = scopaState.config.targetScore,
-                            p1Score = scopaState.totals[Seat.P1] ?: 0,
-                            p2Score = scopaState.totals[Seat.P2] ?: 0,
+                            targetScore = session.config.targetScore,
+                            p1Score = session.totals[Seat.P1] ?: 0,
+                            p2Score = session.totals[Seat.P2] ?: 0,
                         )
-                    } else if (scopaState.phase == DealPhase.MATCH_OVER) {
+                    } else if (session.phase == DealPhase.MATCH_OVER) {
                         matchRepository.markCompleted(
-                            winner = scopaState.winner,
-                            p1Score = scopaState.totals[Seat.P1] ?: 0,
-                            p2Score = scopaState.totals[Seat.P2] ?: 0,
+                            winner = session.winner,
+                            p1Score = session.totals[Seat.P1] ?: 0,
+                            p2Score = session.totals[Seat.P2] ?: 0,
                         )
                     }
                 } catch (_: Throwable) {
@@ -160,25 +155,13 @@ public class GameViewModel(
                         // Prima la scena finisce, poi il bot "pensa" in proporzione alle sue scelte (ADR-0015).
                         presentationGate.awaitPresented(internalState.lastMoveId, internalState.dealAnimationId)
                         if (ioDispatcher != Dispatchers.Unconfined) {
-                            val choices = legalMoves(internalState.scopaState).size
+                            val choices = internalState.session.legalMovesFor(effect.botSeat).size
                             MotionSpec.pause(MotionSpec.botThinkMillis(choices, currentSpeed))
                         }
-                        val botSeat = effect.botSeat
-                        val state = internalState.scopaState
-                        if (state.phase != DealPhase.PLAYING || state.toMove != botSeat) {
-                            return@launch
-                        }
-
-                        val bot = effect.level.toBot()
-                        val view = viewFor(state, botSeat)
-                        val legal = legalMoves(state)
-                        if (legal.isEmpty()) {
-                            return@launch
-                        }
-
+                        val session = internalState.session
                         val chosenMove = withContext(ioDispatcher) {
-                            bot.chooseMove(view = view, legal = legal, rng = botRng)
-                        }
+                            session.chooseBotMove(effect.level.toBot(), effect.botSeat, botRng)
+                        } ?: return@launch
 
                         onIntent(GameIntent.ApplyBotMove(chosenMove))
                     } catch (_: CancellationException) {
@@ -192,28 +175,8 @@ public class GameViewModel(
                 hintJob?.cancel()
                 hintJob = scope.launch {
                     try {
-                        val state = internalState.scopaState
-                        if (state.phase != DealPhase.PLAYING || state.toMove != effect.humanSeat) {
-                            onIntent(GameIntent.ClearHint)
-                            return@launch
-                        }
-
-                        val humanView = viewFor(state, effect.humanSeat)
-                        val legal = legalMoves(state)
-                        if (legal.isEmpty()) {
-                            onIntent(GameIntent.ClearHint)
-                            return@launch
-                        }
-
-                        val bestMove = withContext(ioDispatcher) {
-                            val evaluations = PimcEvaluator.evaluate(
-                                view = humanView,
-                                legal = legal,
-                                rng = SeededRng(state.rngState xor 0x7E7E7EL),
-                                budget = SearchBudget(samples = 15, maxNodes = 60),
-                            )
-                            evaluations.maxByOrNull { it.value }?.move ?: legal.firstOrNull()
-                        }
+                        val session = internalState.session
+                        val bestMove = withContext(ioDispatcher) { session.hint(effect.humanSeat) }
                         if (bestMove != null) {
                             onIntent(GameIntent.ApplyHint(bestMove))
                         } else {

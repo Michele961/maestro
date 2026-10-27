@@ -1,5 +1,7 @@
 package it.maestro.app.ui
 
+import it.maestro.app.scopaState
+
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.feature.table.presentation.GameIntent
 import it.maestro.app.feature.table.presentation.GameReducer

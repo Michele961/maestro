@@ -6,10 +6,9 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.MatchLog
+import it.maestro.app.domain.match.MatchSession
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
-import it.maestro.game.scopa.ScopaState
-import it.maestro.game.scopa.viewFor
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingQuestion
 
@@ -71,7 +70,7 @@ public sealed interface UiGameEvent {
  * Stato della schermata di gioco esposto alla UI (ADR-0012, task F1-05).
  *
  * **Principio di sicurezza e architettura:**
- * La UI non riceve mai [ScopaState] né alcuna informazione nascosta (mano avversaria, tallone coperto).
+ * La UI non riceve mai lo stato completo né alcuna informazione nascosta (mano avversaria, tallone coperto).
  * Tutti i campi derivano rigorosamente dalla [it.maestro.game.scopa.ScopaView] del giocatore umano.
  */
 public data class GameUiState(
@@ -128,8 +127,7 @@ public sealed interface GameIntent {
     ) : GameIntent
 
     public data class RestoreMatch(
-        val state: ScopaState,
-        val matchLog: MatchLog,
+        val session: MatchSession,
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
@@ -155,10 +153,9 @@ public sealed interface GameIntent {
  * Stato autoritativo interno gestito dal Reducer (ADR-0012, task F1-05).
  */
 public data class GameInternalState(
-    val scopaState: ScopaState,
+    val session: MatchSession,
     val humanSeat: Seat,
     val botLevel: DifficultyLevel,
-    val matchLog: MatchLog,
     val pendingCapture: PendingCaptureChoice? = null,
     val pendingDealScore: DealScore? = null,
     val isBotThinking: Boolean = false,
@@ -181,8 +178,11 @@ public data class GameInternalState(
     val dealAnimationId: Long = 0L,
     val isInitialDeal: Boolean = false,
 ) {
+    /** Log della partita: seed + configurazione + mosse (ADR-0003). */
+    val matchLog: MatchLog get() = session.log
+
     public fun toUiState(): GameUiState {
-        val view = viewFor(scopaState, humanSeat)
+        val view = session.view(humanSeat)
         val opponentSeat = humanSeat.other()
         return GameUiState(
             phase = view.phase,
