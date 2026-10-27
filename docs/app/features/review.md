@@ -1,6 +1,6 @@
 # Revisione della partita (Game Review) e «Rigioca l'errore» — dossier
 
-Stato: **bozza** · 2026-10-27 · task collegati: F1R-17, F1R-16, F1R-24g (spiegazioni dinamiche e tuning)
+Stato: **approvato** (Michele, 2026-10-27) · 2026-10-27 · task collegati: F1R-17, F1R-16, F1R-24g (spiegazioni dinamiche e tuning)
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
 Ordine deciso da Michele: dopo la voce del Maestro (F1R-24) e la fine partita (F1R-15).
 
@@ -66,3 +66,17 @@ Ordine deciso da Michele: dopo la voce del Maestro (F1R-24) e la fine partita (F
 2. **Mossa migliore**: va mostrata sempre dopo un errore, oppure solo a richiesta («Svela soluzione», come oggi)? Proposta: a richiesta, per non togliere il ragionamento.
 3. **Quanto è lunga la revisione**: tutte le mosse, o solo i momenti chiave (errori e mosse brillanti)? Proposta: i momenti chiave, con la possibilità di scorrere tutte.
 4. **Classica**: in Classica (senza aiuti, con l'Elo) la revisione resta disponibile dopo la partita? Proposta: sì, è fuori partita.
+
+## 7. Decisioni di Michele (2026-10-27)
+
+Il piano del dossier è approvato («mi piace il tuo piano»). Risposte alle domande del §6:
+
+2. **Mossa migliore**: a richiesta («Svela soluzione»), come proposto.
+3. **Lunghezza**: i momenti chiave, con la possibilità di scorrere tutte le mosse, come proposto.
+4. **Classica**: la revisione resta disponibile **dopo la partita e fuori partita** (cronologia); **durante la partita** c'è solo il coach.
+1. **Casi imprecisi**: Michele non ha casi specifici; chiede all'agente di **simulare partite, verificare le spiegazioni e migliorarle** (F1R-24g).
+
+Indicazioni aggiunte:
+- **«Riprova la mano» non si propone quando la scelta è banale**: con una sola carta o due scelte possibili non ha senso far giocare, perché il giocatore vede già la carta in errore e come risolvere. Si mostra la spiegazione e basta.
+- **Tono e spiegazioni**: sempre chiari e logici, una cosa alla volta.
+- **Informazioni fuori dalla mano**: alcune mosse migliori dipendono da dati che non si vedono nella sola mano (carte già uscite, punteggio, mazzo). Se la mossa migliore non è chiara o sembra illogica guardando la sola mano, la spiegazione **lo dice** e indica il dato che la giustifica.

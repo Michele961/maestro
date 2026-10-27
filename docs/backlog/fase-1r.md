@@ -226,7 +226,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-17 — Review sulla regia del tavolo
 
-- **Stato:** da fare (dossier `docs/app/features/review.md` in bozza; viene dopo F1R-24 e F1R-15)
+- **Stato:** da fare (dossier `docs/app/features/review.md` approvato il 2026-10-27; suddivisione in 17a…d, vedi §5 del dossier; le spiegazioni sono F1R-24g, da fare per prima)
 - **Riferimenti:** `docs/app/table-director.md` §5
 - **Obiettivo:** Game Review e "Rigioca l'errore" usano `TableDirector` e `TableGeometry`; navigazione tra mosse animata; spiegazioni da `CoachService`.
 - **Criteri di accettazione:**
@@ -288,7 +288,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-24 — La voce del Maestro
 
-- **Stato:** in corso (dossier approvato il 2026-10-27; viene prima di F1R-15). Fatti: 24a `MatchFacts`, 24b `MomentDirector`, 24c prontuario (bozza testi it/en da approvare) e `VoiceComposer`. 24d fumetto al tavolo, impostazione «Chiacchiere» e suggerimento ricordato. 24f trascrizioni (test che scrive `app/android/build/maestro-transcripts/*.md`). 24e consiglio dinamico (`HintComposer`: nomina le carte e la ragione; livelli maieutici da decidere con Michele). Da fare: 24g revisione e tuning
+- **Stato:** in corso (dossier approvato il 2026-10-27; viene prima di F1R-15). Fatti: 24a `MatchFacts`, 24b `MomentDirector`, 24c prontuario (bozza testi it/en da approvare) e `VoiceComposer`. 24d fumetto al tavolo, impostazione «Chiacchiere» e suggerimento ricordato. 24f trascrizioni (test che scrive `app/android/build/maestro-transcripts/*.md`). 24e consiglio dinamico (`HintComposer`: nomina le carte e la ragione; livelli maieutici da decidere con Michele). 24g parte 1: `ReviewCoach` (spiegazioni in codici, vere nella posizione, che ammettono quando la mano non basta; «Riprova la mano» non si propone con 1–2 scelte) e simulazione delle spiegazioni (`ReviewSimulationTest` → `app/android/build/review-simulation/`). Da fare: 24g parte 2 (altre simulazioni e messa a punto, punteggi senza decimali nella schermata con F1R-17)
 - **Riferimenti:** `docs/app/features/maestro-voice.md`, `docs/design/maestro_persona.md`, `docs/app/game-feel.md` §5, F1R-13, F1R-16
 - **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto, e la stessa voce dinamica con tuning nella revisione (Game Review). Il dossier propone la suddivisione in F1R-24a…g.
 - **Criteri di accettazione:** definiti dal dossier dopo l'approvazione di Michele.

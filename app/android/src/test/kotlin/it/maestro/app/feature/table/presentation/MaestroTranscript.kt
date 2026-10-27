@@ -26,7 +26,12 @@ internal object MaestroTranscript {
 
     /** Testi di una lingua: nome stringa → valore, letti dal file risorse del modulo. */
     class Strings(private val values: Map<String, String>) {
-        fun text(line: VoiceLine): String = line.phrases.joinToString(" ") { phrase ->
+        fun text(line: VoiceLine): String = text(line.phrases)
+
+        /** Testo di una sequenza di frasi, per la revisione e i consigli. */
+        fun text(phrases: List<it.maestro.app.domain.coach.Phrase>): String = it.maestro.app.domain.coach.ItalianElision.fix(textOf(phrases))
+
+        private fun textOf(phrases: List<it.maestro.app.domain.coach.Phrase>): String = phrases.joinToString(" ") { phrase ->
             val template = values[phrase.id] ?: "«${phrase.id}?»"
             String.format(template, *phrase.args.map { arg ->
                 when (arg) {

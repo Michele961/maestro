@@ -85,7 +85,8 @@ import it.maestro.game.scopa.play
 import it.maestro.game.scopa.viewFor
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
 import it.maestro.app.feature.review.presentation.RetryFeedback
-import it.maestro.app.feature.review.presentation.ReviewExplanationEngine
+import it.maestro.app.domain.coach.ReviewCoach
+import it.maestro.app.feature.table.ui.phrasesText
 
 private val InkColor = Color(0xFF2B1A10)
 private val GoldAccent = ButtonGoldBorder
@@ -200,7 +201,8 @@ public fun GameReviewScreen(
         val isHumanMove = currentStep.mover == humanSeat
         val isCurrentSolved = uiState.isCurrentStepSolved
         val isCurrentRevealed = stepIndex in uiState.revealedStepIndices
-        val isSolutionVisible = !isHumanMove || moveAnalysis.grade == MoveGrade.BEST || isCurrentSolved || isCurrentRevealed
+        val isSolutionVisible = !isHumanMove || moveAnalysis.grade == MoveGrade.BEST || isCurrentSolved || isCurrentRevealed ||
+            !ReviewCoach.isWorthRetrying(moveAnalysis.alternatives.size)
         val isRetryMode = uiState.isRetryMode
 
         Column(
@@ -331,14 +333,16 @@ private fun MoveEvaluationBanner(
     }
 
     val isMistake = isHumanMove && analysis.grade != MoveGrade.BEST
-    val isSolutionVisible = !isMistake || isSolved || isRevealed
+    // Con una o due scelte non ha senso far riprovare: si vede subito la soluzione (Michele, 2026-10-27).
+    val canRetry = ReviewCoach.isWorthRetrying(analysis.alternatives.size)
+    val isSolutionVisible = !isMistake || isSolved || isRevealed || !canRetry
 
     val explanation = remember(analysis, playerView, isSolutionVisible) {
         if (isSolutionVisible && playerView != null && analysis.grade != MoveGrade.BEST) {
-            ReviewExplanationEngine.explain(
-                playedMove = analysis.playedMove,
-                bestMove = analysis.bestMove,
-                playerView = playerView,
+            ReviewCoach.explain(
+                played = analysis.playedMove,
+                best = analysis.bestMove,
+                view = playerView,
             )
         } else {
             null
@@ -377,7 +381,7 @@ private fun MoveEvaluationBanner(
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        if (isHumanMove && analysis.grade != MoveGrade.BEST) {
+                        if (isHumanMove && analysis.grade != MoveGrade.BEST && canRetry) {
                             MaestroPillButton(
                                 text = stringResource(id = R.string.review_retry_button),
                                 onClick = onStartRetry,
@@ -486,19 +490,19 @@ private fun MoveEvaluationBanner(
                             verticalArrangement = Arrangement.spacedBy(3.dp),
                         ) {
                             Text(
-                                text = "${stringResource(id = R.string.review_explanation_header)}: ${explanation.title}",
+                                text = "${stringResource(id = R.string.review_explanation_header)}: ${phrasesText(listOf(explanation.title))}",
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF5C2D16),
                             )
                             Text(
-                                text = explanation.explanation,
+                                text = phrasesText(explanation.explanation),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = InkColor.copy(alpha = 0.95f),
                                 lineHeight = 16.sp,
                             )
                             Text(
-                                text = "Regola d'oro: ${explanation.keyConcept}",
+                                text = stringResource(id = R.string.review_golden_rule, phrasesText(listOf(explanation.rule))),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color(0xFF8B4513),

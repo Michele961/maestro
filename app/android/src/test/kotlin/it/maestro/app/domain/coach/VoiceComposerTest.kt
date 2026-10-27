@@ -54,7 +54,7 @@ class VoiceComposerTest {
     fun everyCatalogIdHasItalianAndEnglishText() {
         val it = stringsOf("values")
         val en = stringsOf("values-en")
-        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.hintLeads.values.flatten() + VoiceCatalog.hintReasons.values.flatten() + VoiceCatalog.tails).map { v -> v.id }
+        val ids = (VoiceCatalog.bodies.values.flatten() + VoiceCatalog.hintLeads.values.flatten() + VoiceCatalog.hintReasons.values.flatten() + VoiceCatalog.reviewPhrases + VoiceCatalog.tails).map { v -> v.id }
         ids.forEach { id ->
             assertTrue(id in it, "Manca il testo italiano di $id")
             assertTrue(id in en, "Manca il testo inglese di $id")
@@ -83,7 +83,7 @@ class VoiceComposerTest {
             assertTrue(variants.any { v -> v.humor == 0 }, "$key: serve almeno una variante seria")
         }
         (stringsOf("values") + stringsOf("values-en")).forEach { (id, text) ->
-            assertTrue(text.length <= 130, "$id è troppo lungo: ${text.length}")
+            assertTrue(text.length <= if (id.startsWith("voice_review_")) 200 else 130, "$id è troppo lungo: ${text.length}")
             assertFalse(Regex("""\d[.,]\d""").containsMatchIn(text), "$id contiene un decimale")
         }
     }
