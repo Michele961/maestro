@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.key
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +48,8 @@ internal fun TableStage(
     canPlay: Boolean,
     atRest: Boolean,
     sweepBy: Seat?,
+    stepKey: Any?,
+    stepMillis: Int,
     onPlay: (Card) -> Unit,
     onRequestHint: () -> Unit,
     modifier: Modifier = Modifier,
@@ -72,7 +76,6 @@ internal fun TableStage(
         Zone(zones.deck, Alignment.Center, Modifier.testTag("deck_pile")) {
             CardPile(count = model.deck, width = pileCardWidth(zones.deck))
         }
-        PlayArea(model = model, suggested = uiState.suggestedMove?.capture.orEmpty(), geometry = geometry)
         Zone(zones.humanPile, Alignment.Center) {
             CapturePile(
                 count = model.humanCaptured,
@@ -82,6 +85,7 @@ internal fun TableStage(
                 tag = "human_captures",
             )
         }
+        PlayArea(model, suggested = uiState.suggestedMove?.capture.orEmpty(), geometry = geometry, millis = stepMillis)
         Zone(zones.hand, Alignment.BottomCenter, Modifier.testTag("player_zone")) {
             PlayerHand(
                 cards = model.hand,
@@ -91,42 +95,69 @@ internal fun TableStage(
                 onPlay = onPlay,
             )
         }
+        model.flights.forEach { flight ->
+            key(stepKey) {
+                val from = anchorOrigin(flight.from, geometry, geometry.opponentCardWidth, geometry.opponentCardHeight)
+                val to = anchorOrigin(flight.to, geometry, geometry.opponentCardWidth, geometry.opponentCardHeight)
+                FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
+            }
+        }
         MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
 
-/** Carte a terra e carta in gioco, in due file al massimo (vedi [PlayZoneLayout]). */
+/** Carte a terra e carta in gioco, in due file al massimo (vedi [PlayZoneLayout]); si muovono al ritmo del passo. */
 @Composable
-private fun PlayArea(model: StageModel, suggested: Set<Card>, geometry: TableGeometry) {
+private fun PlayArea(model: StageModel, suggested: Set<Card>, geometry: TableGeometry, millis: Int) {
     val zone = geometry.zones.playZone
-    val cards = model.table + listOfNotNull(model.played)
     val positions = PlayZoneLayout.positions(
-        count = cards.size,
+        count = model.layoutCount,
         zoneWidth = zone.width,
         zoneHeight = zone.height,
         cardWidth = geometry.cardWidth,
         cardHeight = geometry.cardHeight,
     )
-    Zone(zone, Alignment.TopStart, Modifier.testTag("table_cards_zone")) {
-        cards.forEachIndexed { i, card ->
-            val isPlayed = card == model.played
-            val highlighted = card in model.highlighted
-            val border = when {
-                highlighted -> Modifier.graphicsLayer { scaleX = 1.06f; scaleY = 1.06f }.border(3.dp, GoldAccentColor, RoundedCornerShape(8.dp))
-                isPlayed -> Modifier.border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                card in suggested -> Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
-                else -> Modifier
+    Box(modifier = Modifier.testTag("table_cards_zone")) {
+        model.table.forEach { entry ->
+            key(entry.card) {
+                val target = entry.flyTo?.let { anchorOrigin(it, geometry, geometry.cardWidth, geometry.cardHeight) }
+                    ?: positions[entry.slot ?: 0].let { DpOffset(zone.x + it.x, zone.y + it.y) }
+                val origin = entry.origin?.let { anchorOrigin(it, geometry, geometry.cardWidth, geometry.cardHeight) }
+                val highlight = entry.kind == EntryKind.HIGHLIGHTED
+                val ring = when {
+                    highlight -> Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(8.dp))
+                    entry.kind == EntryKind.PLAYED -> Modifier.border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                    entry.card in suggested -> Modifier.border(3.dp, Color(0xFF42A5F5), RoundedCornerShape(8.dp))
+                    else -> Modifier
+                }
+                MovingCard(
+                    card = entry.card,
+                    target = target,
+                    origin = origin,
+                    millis = millis,
+                    flip = entry.origin == Anchor.OPPONENT_HAND,
+                    shrink = entry.flyTo != null,
+                    width = geometry.cardWidth,
+                    height = geometry.cardHeight,
+                    highlighted = highlight,
+                    modifier = ring,
+                )
             }
-            PlaceholderCardView(
-                card = card,
-                isPlayable = false,
-                showGoldFrame = highlighted || (card.suit == Suit.DENARI && card.rank == Rank.SETTE),
-                width = geometry.cardWidth,
-                height = geometry.cardHeight,
-                modifier = Modifier.offset(positions[i].x, positions[i].y).then(border),
-            )
         }
     }
+}
+
+/** Angolo in alto a sinistra di una carta [width] × [height] posata sul punto [anchor] del tavolo. */
+private fun anchorOrigin(anchor: Anchor, geometry: TableGeometry, width: Dp, height: Dp): DpOffset {
+    val zones = geometry.zones
+    val zone = when (anchor) {
+        Anchor.DECK -> zones.deck
+        Anchor.HAND -> zones.hand
+        Anchor.OPPONENT_HAND -> zones.opponentHand
+        Anchor.HUMAN_PILE -> zones.humanPile
+        Anchor.OPPONENT_PILE -> zones.opponentPile
+    }
+    return centeredIn(zone, width, height)
 }
 
 /** Maestro a posto fisso: tocco per il consiglio, fumetto verso l'alto sulla zona di gioco. */

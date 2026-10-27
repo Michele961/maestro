@@ -34,7 +34,9 @@ class MainActivityCrashTest {
         // Clicchiamo su "Inizia partita" per entrare in TableScreen
         composeRule.onNodeWithTag("start_game_button").performClick()
         composeRule.waitForIdle()
-        composeRule.mainClock.advanceTimeBy(1000L)
+        // La regia apre la partita con mescolata e distribuzione (circa 1,8 s a velocità normale).
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(4))
+        composeRule.mainClock.advanceTimeBy(4000L)
         composeRule.waitForIdle()
 
         // Verifichiamo che TableScreen sia presente

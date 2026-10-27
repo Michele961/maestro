@@ -151,7 +151,10 @@ public class GameViewModel(
         val result = GameReducer.reduce(internalState, intent)
         internalState = result.state
         when (intent) {
-            is GameIntent.StartMatch -> resetDirector(restoreAt = null)
+            is GameIntent.StartMatch -> {
+                resetDirector(restoreAt = null)
+                director.value?.enqueueOpeningDeal(internalState.session.view(internalState.humanSeat))
+            }
             is GameIntent.RestoreMatch -> resetDirector(restoreAt = internalState.lastMoveId)
             else -> internalState.lastBeat?.takeIf { it !== previousBeat }?.let { director.value?.enqueue(it) }
         }

@@ -7,84 +7,136 @@ import it.maestro.app.feature.table.presentation.director.BeatScript
 import it.maestro.app.feature.table.presentation.director.SceneStep
 import it.maestro.app.feature.table.presentation.director.TableScene
 import it.maestro.game.model.Seat
+import it.maestro.game.scopa.DealPhase
+import it.maestro.game.scopa.GameEvent
 import it.maestro.game.scopa.ScopaConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-/** Task F1R-12a (`docs/app/features/table.md` §3): cosa mostra il tavolo in ogni passo della regia. */
+/** Task F1R-12a/b (`docs/app/features/table.md` §3): cosa mostra il tavolo in ogni passo della regia. */
 class StageModelTest {
 
     private val human = Seat.P1
 
-    /** Prima battuta dell'umano (o del bot) con presa, cercata sui seed fissi. */
-    private fun firstBeat(actor: Seat, captures: Boolean): Beat {
-        for (seed in 1L..300L) {
+    /** Battute di partite a seed fissi, giocando sempre la prima mossa legale. */
+    private fun beats(): Sequence<Beat> = sequence {
+        for (seed in 1L..120L) {
             var session = MatchSession.start(ScopaConfig(), seed)
-            repeat(40) {
-                val moves = session.legalMovesFor(session.toMove)
-                if (moves.isEmpty()) return@repeat
-                val move = moves.firstOrNull { (it.capture.isNotEmpty()) == captures } ?: moves.first()
+            while (session.phase == DealPhase.PLAYING) {
+                val move = session.legalMovesFor(session.toMove).firstOrNull() ?: break
                 val applied = session.play(move, human) as SessionPlay.Applied
-                if (applied.beat.actor == actor && (move.capture.isNotEmpty()) == captures) return applied.beat
+                yield(applied.beat)
                 session = applied.session
             }
         }
-        error("Nessuna battuta")
     }
 
-    private fun sceneAt(beat: Beat, step: SceneStep?): TableScene =
-        TableScene(beat.viewBefore, human, step = step, beatId = beat.id, busy = step != null, after = beat.viewAfter)
+    private fun findBeat(predicate: (Beat) -> Boolean): Beat = beats().first(predicate)
+
+    private fun sceneAt(beat: Beat, step: SceneStep?): TableScene = TableScene(
+        view = beat.viewBefore,
+        humanSeat = human,
+        step = step,
+        beatId = beat.id,
+        busy = step != null,
+        after = beat.viewAfter,
+        actor = beat.actor,
+        played = beat.move.card,
+        deal = BeatScript.dealPlan(beat),
+        stepMillis = 100,
+    )
+
+    private fun stepsOf(beat: Beat) = BeatScript.steps(beat, human)
 
     @Test
     fun atRestTheStageShowsTheViewAsIs() {
-        val beat = firstBeat(human, captures = false)
+        val beat = findBeat { it.actor == human }
         val model = StageModel.from(TableScene(beat.viewAfter, human))
         assertEquals(beat.viewAfter.hand, model.hand)
-        assertEquals(beat.viewAfter.table, model.table)
+        assertEquals(beat.viewAfter.table, model.table.map { it.card })
         assertEquals(beat.viewAfter.deckSize, model.deck)
-        assertEquals(null, model.played)
     }
 
     @Test
-    fun humanCardInFlightLeavesTheHandAndStaysVisibleInThePlayZone() {
-        val beat = firstBeat(human, captures = false)
-        val step = BeatScript.steps(beat, human).first() as SceneStep.CardToPlayZone
+    fun humanCardInFlightLeavesTheHandAndEntersFromTheHand() {
+        val beat = findBeat { it.actor == human && BeatScript.dealPlan(it) == null }
+        val step = stepsOf(beat).first() as SceneStep.CardToPlayZone
         val model = StageModel.from(sceneAt(beat, step))
         assertEquals(beat.viewBefore.hand - step.card, model.hand)
-        assertEquals(step.card, model.played)
-        assertEquals(beat.viewBefore.table, model.table)
+        val played = model.table.last()
+        assertEquals(step.card, played.card)
+        assertEquals(EntryKind.PLAYED, played.kind)
+        assertEquals(Anchor.HAND, played.origin)
+        assertEquals(beat.viewBefore.table.size + 1, model.layoutCount)
     }
 
     @Test
-    fun opponentRevealTurnsOneCoveredCardIntoTheVisiblePlayedCard() {
-        val beat = firstBeat(human.other(), captures = false)
-        val step = BeatScript.steps(beat, human).first() as SceneStep.OpponentReveal
+    fun opponentRevealEntersFromTheOpponentHandAndTakesOneCoveredCard() {
+        val beat = findBeat { it.actor != human && BeatScript.dealPlan(it) == null }
+        val step = stepsOf(beat).first() as SceneStep.OpponentReveal
         val model = StageModel.from(sceneAt(beat, step))
         assertEquals(beat.viewBefore.opponentHandSize - 1, model.opponentHand)
-        assertEquals(step.card, model.played)
+        assertEquals(Anchor.OPPONENT_HAND, model.table.last().origin)
     }
 
     @Test
     fun captureHighlightLightsUpTheCardsAboutToBeTaken() {
-        val beat = firstBeat(human, captures = true)
-        val step = BeatScript.steps(beat, human).filterIsInstance<SceneStep.CaptureHighlight>().single()
+        val beat = findBeat { b -> b.events.any { it is GameEvent.Captured } }
+        val step = stepsOf(beat).filterIsInstance<SceneStep.CaptureHighlight>().first()
         val model = StageModel.from(sceneAt(beat, step))
-        assertTrue(step.captured.isNotEmpty())
-        assertEquals(step.captured, model.highlighted)
-        assertTrue(model.table.containsAll(step.captured), "Le carte prese sono ancora a terra")
+        val lit = model.table.filter { it.kind == EntryKind.HIGHLIGHTED }.map { it.card }.toSet()
+        assertEquals(step.captured, lit)
     }
 
     @Test
-    fun afterTheCaptureFlightTheBoardIsTheOneAfterTheMove() {
-        val beat = firstBeat(human, captures = true)
-        val step = BeatScript.steps(beat, human).filterIsInstance<SceneStep.CaptureFlight>().single()
+    fun captureFlightSendsPlayedAndTakenCardsToTheTakersPile() {
+        val beat = findBeat { b -> b.actor == human && b.events.any { it is GameEvent.Captured } }
+        val step = stepsOf(beat).filterIsInstance<SceneStep.CaptureFlight>().first()
         val model = StageModel.from(sceneAt(beat, step))
-        assertEquals(beat.viewAfter.table, model.table)
+        val flying = model.table.filter { it.flyTo != null }
+        assertEquals(step.cards.toSet(), flying.map { it.card }.toSet())
+        assertTrue(flying.all { it.flyTo == Anchor.HUMAN_PILE && it.slot == null })
+        // La pila cresce solo a volo finito.
+        assertEquals(beat.viewBefore.capturedBy[human]?.size, model.humanCaptured)
+    }
+
+    @Test
+    fun afterTheFlightThePileHasGrown() {
+        val beat = findBeat { b -> b.events.any { it is GameEvent.Sweep } && b.actor == human }
+        val step = stepsOf(beat).filterIsInstance<SceneStep.Sweep>().first()
+        val model = StageModel.from(sceneAt(beat, step))
         assertEquals(beat.viewAfter.capturedBy[human]?.size, model.humanCaptured)
-        assertFalse(model.highlighted.isNotEmpty())
-        assertNotNull(model)
+        assertEquals(beat.viewAfter.sweeps[human], model.humanSweeps)
+    }
+
+    @Test
+    fun handDealGivesOneCardAtATimeWithTheDeckGoingDown() {
+        val beat = findBeat { b -> BeatScript.dealPlan(b)?.tableCards == 0 }
+        val deals = stepsOf(beat).filterIsInstance<SceneStep.DealCard>()
+        var previousDeck = Int.MAX_VALUE
+        var humanSeen = 0
+        deals.forEach { step ->
+            val model = StageModel.from(sceneAt(beat, step))
+            assertEquals(humanSeen, model.hand.size, "Le carte già arrivate in mano prima di ${step.index}")
+            val flight = model.flights.single()
+            assertEquals(Anchor.DECK, flight.from)
+            if (step.toSeat == human) humanSeen++
+            assertTrue(model.deck < previousDeck, "Il mazzo scende a ogni carta")
+            previousDeck = model.deck
+        }
+        assertEquals(beat.viewAfter.hand.size, humanSeen)
+        assertEquals(beat.viewAfter.deckSize, previousDeck)
+    }
+
+    @Test
+    fun beforeTheDealTheHandsAreEmpty() {
+        val beat = findBeat { b -> BeatScript.dealPlan(b) != null }
+        val step = stepsOf(beat).first { it is SceneStep.CaptureFlight || it is SceneStep.DropToTable }
+        val model = StageModel.from(sceneAt(beat, step))
+        assertTrue(model.hand.isEmpty())
+        assertEquals(0, model.opponentHand)
+        assertNull(model.flights.firstOrNull())
     }
 }

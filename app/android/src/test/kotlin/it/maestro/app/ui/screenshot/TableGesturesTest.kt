@@ -141,7 +141,7 @@ class TableGesturesTest {
             uiState = afterBot.state.toUiState()
         }
         val state = uiState
-        var scene by androidx.compose.runtime.mutableStateOf(sceneOf(state, step = SceneStep.DealCard(0, Seat.P1)))
+        var scene by androidx.compose.runtime.mutableStateOf(sceneOf(state, step = SceneStep.OpponentReadPause(it.maestro.game.model.Card(Rank.SETTE, Suit.DENARI))))
 
         composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = scene, onIntent = {}) } }
 

@@ -32,5 +32,23 @@ fun sceneOf(uiState: GameUiState, step: SceneStep? = null, busy: Boolean = step 
         sweeps = mapOf(human to uiState.humanSweeps, human.other() to uiState.opponentSweeps),
         totals = mapOf(human to uiState.humanScore, human.other() to uiState.opponentScore),
     )
-    return TableScene(view = view, humanSeat = human, step = step, busy = busy, after = view.takeIf { step != null })
+    val (actor, played) = when (step) {
+        is SceneStep.CardToPlayZone -> human to step.card
+        is SceneStep.OpponentReveal -> human.other() to step.card
+        is SceneStep.OpponentReadPause -> human.other() to step.card
+        is SceneStep.CaptureHighlight -> step.actor to step.card
+        is SceneStep.CaptureFlight -> step.actor to step.cards.first()
+        is SceneStep.DropToTable -> step.actor to step.card
+        is SceneStep.Sweep -> step.actor to null
+        else -> null to null
+    }
+    return TableScene(
+        view = view,
+        humanSeat = human,
+        step = step,
+        busy = busy,
+        after = view.takeIf { step != null },
+        actor = actor,
+        played = played,
+    )
 }
