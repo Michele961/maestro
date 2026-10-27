@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -12,6 +13,9 @@ import it.maestro.ai.analysis.MatchAnalyzer
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.ai.bot.SearchBudget
 import it.maestro.app.feature.review.ui.GameReviewScreen
+import it.maestro.app.domain.retention.DailyMission
+import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.rewards.MissionAdvance
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.app.feature.review.presentation.PostMatchFixtures
 import it.maestro.app.feature.review.presentation.PostMatchStep
@@ -114,6 +118,36 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent { MaestroTheme { PostMatchScreen(state = state) } }
         composeRule.onNodeWithTag("reward_mastery_delta", useUnmergedTree = true).assertTextContains("−9")
         composeRule.onNodeWithTag("post_match_review_button").assertDoesNotExist()
+    }
+
+    private val completedMission = DailyMission(id = "m1", type = DailyMissionType.MAKE_SWEEPS, progress = 3, target = 3)
+    private val missionReward = RewardSummary(
+        missions = listOf(MissionAdvance(DailyMissionType.MAKE_SWEEPS, 1, 3, 3, completedMission)),
+        masteryBefore = 1200,
+        masteryAfter = 1218,
+        streakAfter = 3,
+    )
+
+    @Test
+    fun post_match_mission_ready_to_claim_screenshot() = shotPostMatch("post_match_mission", postMatchState(PostMatchStep.REWARD, reward = missionReward))
+
+    @Test
+    fun post_match_a_completed_mission_is_claimed_with_one_tap() {
+        var claimed: DailyMission? = null
+        val state = postMatchState(PostMatchStep.REWARD, reward = missionReward)
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onClaimMission = { claimed = it }) } }
+        composeRule.onNodeWithTag("reward_claim_make_sweeps", useUnmergedTree = true).performClick()
+        org.junit.Assert.assertEquals(completedMission, claimed)
+    }
+
+    @Test
+    fun post_match_a_claimed_mission_shows_claimed_and_does_not_claim_twice() {
+        var claims = 0
+        val state = postMatchState(PostMatchStep.REWARD, reward = missionReward).copy(claimedMissions = setOf("m1"))
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = state, onClaimMission = { claims++ }) } }
+        composeRule.onNodeWithText("Riscattata", ignoreCase = true, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag("reward_claim_make_sweeps", useUnmergedTree = true).performClick()
+        org.junit.Assert.assertEquals(0, claims)
     }
 
     @Test

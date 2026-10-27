@@ -189,6 +189,10 @@ public fun MaestroNavHost(
                 state = state,
                 trainingScore = training,
                 onSkip = viewModel::skip,
+                onClaimMission = { mission ->
+                    shell.claimMissionReward(mission)
+                    viewModel.markClaimed(mission.id)
+                },
                 onReviewClicked = {
                     navController.navigate(Route.Review(route.matchLog, route.level, route.fromHistory))
                 },

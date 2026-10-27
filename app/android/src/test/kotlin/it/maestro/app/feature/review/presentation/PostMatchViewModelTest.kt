@@ -110,6 +110,13 @@ class PostMatchViewModelTest {
     }
 
     @Test
+    fun aClaimedMissionIsRemembered() = runTest(dispatcher) {
+        val vm = viewModel()
+        vm.markClaimed("m1")
+        assertEquals(setOf("m1"), vm.uiState.value.claimedMissions)
+    }
+
+    @Test
     fun theOutcomeComesFromReplayingTheLog() = runTest(dispatcher) {
         val state = viewModel().uiState.value
         assertEquals(state.humanTotal >= state.opponentTotal, state.won)

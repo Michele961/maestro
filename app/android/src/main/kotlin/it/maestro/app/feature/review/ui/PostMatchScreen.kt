@@ -40,6 +40,7 @@ import it.maestro.app.designsystem.components.FramedPortrait
 import it.maestro.app.designsystem.components.MaestroDialogueBox
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
+import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.feature.review.presentation.PostMatchStep
 import it.maestro.app.feature.review.presentation.PostMatchUiState
 
@@ -53,6 +54,7 @@ public fun PostMatchScreen(
     modifier: Modifier = Modifier,
     trainingScore: Pair<Int, Int>? = null,
     onSkip: () -> Unit = {},
+    onClaimMission: (DailyMission) -> Unit = {},
     onReviewClicked: (MatchAnalysis) -> Unit = {},
     onRematchClicked: () -> Unit = {},
     onHomeClicked: () -> Unit = {},
@@ -82,7 +84,7 @@ public fun PostMatchScreen(
                     }
                     val reward = state.reward
                     if (reward != null && state.reached(PostMatchStep.REWARD) && !state.fromHistory) {
-                        Reveal { RewardCard(reward) }
+                        Reveal { RewardCard(reward, state.claimedMissions, onClaimMission) }
                     }
                     MaestroLine(state, analysis)
                 }

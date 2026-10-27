@@ -52,6 +52,8 @@ public data class PostMatchUiState(
     val reward: RewardSummary? = null,
     val humanSeat: Seat = Seat.P1,
     val fromHistory: Boolean = false,
+    /** Id delle missioni già riscosse da questa schermata. */
+    val claimedMissions: Set<String> = emptySet(),
 ) {
     /** `true` se la schermata deve già mostrare [target]. */
     public fun reached(target: PostMatchStep): Boolean = step.ordinal >= target.ordinal
@@ -82,6 +84,11 @@ public class PostMatchViewModel(
         viewModelScope.launch { analysis.filterNotNull().collect { result -> _uiState.update { it.copy(analysis = result) } } }
         viewModelScope.launch { reward.filterNotNull().collect { result -> _uiState.update { it.copy(reward = result) } } }
         viewModelScope.launch { run(analysis, reward, fromHistory) }
+    }
+
+    /** Segna come riscossa la missione [id]: il pulsante diventa «Riscattata». */
+    public fun markClaimed(id: String) {
+        _uiState.update { it.copy(claimedMissions = it.claimedMissions + id) }
     }
 
     /** Un tocco chiude la pausa del passo in corso; sull'attesa dell'analisi non fa nulla. */
