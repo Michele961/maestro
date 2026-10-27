@@ -53,6 +53,7 @@ internal fun TableStage(
     stepMillis: Int,
     onPlay: (Card) -> Unit,
     onRequestHint: () -> Unit,
+    onDismissLine: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val zones = geometry.zones
@@ -103,8 +104,8 @@ internal fun TableStage(
                 FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
             }
         }
-        RaceOrBubble(model, uiState, geometry)
-        MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
+        RaceOrBubble(model, uiState, geometry, showLine = atRest, onDismissLine = onDismissLine)
+        MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
 
@@ -168,6 +169,7 @@ private fun MaestroCorner(
     uiState: GameUiState,
     geometry: TableGeometry,
     canAskHint: Boolean,
+    atRest: Boolean,
     sweepBy: Seat?,
     onRequestHint: () -> Unit,
 ) {
@@ -175,7 +177,9 @@ private fun MaestroCorner(
     val zone = geometry.zones.maestro
     val hint = uiState.suggestedMove
     val showHint = hint != null
+    val line = uiState.maestroLine?.takeIf { atRest }
     val portrait = when {
+        line != null && hint == null -> line.pose.portraitRes()
         sweepBy == uiState.humanSeat -> R.drawable.maestro_applauding
         sweepBy != null -> R.drawable.maestro_despair
         uiState.isBotThinking -> R.drawable.maestro_thinking
@@ -215,13 +219,29 @@ private fun MaestroCorner(
  * consiglio. Il fumetto sta sempre qui, tra le carte a terra e la mano: non copre mai le carte (`game-feel.md` §5).
  */
 @Composable
-private fun RaceOrBubble(model: StageModel, uiState: GameUiState, geometry: TableGeometry) {
+private fun RaceOrBubble(
+    model: StageModel,
+    uiState: GameUiState,
+    geometry: TableGeometry,
+    showLine: Boolean,
+    onDismissLine: () -> Unit,
+) {
     val zone = geometry.zones.pointsRace
     val hint = uiState.suggestedMove
     var dismissed by remember(hint) { mutableStateOf(false) }
     val showBubble = uiState.isSparring && ((hint != null && !dismissed) || uiState.isHintLoading)
+    val line = uiState.maestroLine?.takeIf { showLine && uiState.isSparring && !showBubble }
     Zone(zone, Alignment.Center) {
-        if (showBubble) {
+        if (line != null) {
+            // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
+            MaestroSpeechBubble(
+                message = voiceText(line),
+                tail = BubbleTail.START,
+                fontSize = 11.sp,
+                maxLines = 3,
+                modifier = Modifier.clickable(onClick = onDismissLine).testTag("maestro_line_bubble"),
+            )
+        } else if (showBubble) {
             MaestroSpeechBubble(
                 message = if (hint != null) {
                     stringResource(determineLogicalHintRes(hint, uiState.tableCards))

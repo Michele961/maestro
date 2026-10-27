@@ -29,6 +29,7 @@ import it.maestro.app.designsystem.components.MaestroAlertDialog
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.R
+import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.settings.GameSpeed
 
 /**
@@ -45,6 +46,8 @@ public fun SettingsDialog(
     onStartTestEndgameMatch: () -> Unit = {},
     gameSpeed: GameSpeed = GameSpeed.NORMAL,
     onGameSpeedChanged: (GameSpeed) -> Unit = {},
+    maestroChattiness: Chattiness = Chattiness.NORMAL,
+    onMaestroChattinessChanged: (Chattiness) -> Unit = {},
     showDeveloperTools: Boolean = DeveloperTools.isEnabled(LocalContext.current),
 ) {
     MaestroAlertDialog(
@@ -113,6 +116,34 @@ public fun SettingsDialog(
                                 fontSize = 14.sp,
                                 modifier = Modifier.weight(1f),
                                 testTag = "game_speed_${speed.name.lowercase()}",
+                            )
+                        }
+                    }
+                }
+
+                // Chiacchiere del Maestro: quanto parla spontaneamente durante la partita (task F1R-24d).
+                Column(
+                    modifier = Modifier.fillMaxWidth().testTag("maestro_chat_row"),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.settings_maestro_chat),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Chattiness.entries.forEach { level ->
+                            MaestroPillButton(
+                                text = stringResource(id = level.labelRes()),
+                                onClick = { onMaestroChattinessChanged(level) },
+                                variant = if (level == maestroChattiness) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
+                                height = 40.dp,
+                                fontSize = 13.sp,
+                                modifier = Modifier.weight(1f),
+                                testTag = "maestro_chat_${level.name.lowercase()}",
                             )
                         }
                     }
@@ -196,4 +227,11 @@ private fun GameSpeed.labelRes(): Int = when (this) {
     GameSpeed.FAST -> R.string.settings_game_speed_fast
     GameSpeed.FASTER -> R.string.settings_game_speed_faster
     GameSpeed.INSTANT -> R.string.settings_game_speed_faster
+}
+
+private fun Chattiness.labelRes(): Int = when (this) {
+    Chattiness.TALKATIVE -> R.string.settings_maestro_chat_talkative
+    Chattiness.NORMAL -> R.string.settings_maestro_chat_normal
+    Chattiness.QUIET -> R.string.settings_maestro_chat_quiet
+    Chattiness.OFF -> R.string.settings_maestro_chat_off
 }

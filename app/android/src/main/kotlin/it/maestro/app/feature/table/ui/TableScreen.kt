@@ -251,6 +251,7 @@ public fun TableContent(
                             soundManager.play(SoundEffect.BUTTON_CLICK)
                             onIntent(GameIntent.RequestHint)
                         },
+                        onDismissLine = { onIntent(GameIntent.DismissMaestroLine) },
                     )
                 }
                 if (scene.busy) {

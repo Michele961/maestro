@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.settings.GameSpeed
 
 /**
@@ -22,6 +23,10 @@ public data class AppSettings(
     val language: String = "system",
     val soundEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
+    /** Quanto parla il Maestro (impostazione «Chiacchiere», `docs/app/features/maestro-voice.md` §3.4). */
+    val maestroChattiness: Chattiness = Chattiness.NORMAL,
+    /** Il giocatore ha già chiesto almeno un consiglio: il Maestro non glielo introduce più. */
+    val hintEverUsed: Boolean = false,
     val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     val preferredTargetScore: Int = 11,
     val selectedTableTheme: String = "felt_classic_green",
@@ -38,6 +43,8 @@ public interface SettingsRepository {
     public suspend fun updateLanguage(language: String)
     public suspend fun updateSoundEnabled(enabled: Boolean)
     public suspend fun updateGameSpeed(speed: GameSpeed)
+    public suspend fun updateMaestroChattiness(chattiness: Chattiness)
+    public suspend fun markHintUsed()
     public suspend fun updatePreferredLevel(level: DifficultyLevel)
     public suspend fun updatePreferredTargetScore(targetScore: Int)
     public suspend fun updateSelectedTableTheme(tableThemeId: String)
@@ -57,6 +64,8 @@ public class DataStoreSettingsRepository(
         val LANGUAGE = stringPreferencesKey("app_language")
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
         val GAME_SPEED = stringPreferencesKey("game_speed")
+        val MAESTRO_CHATTINESS = stringPreferencesKey("maestro_chattiness")
+        val HINT_EVER_USED = booleanPreferencesKey("hint_ever_used")
         val PREFERRED_LEVEL = stringPreferencesKey("preferred_level")
         val PREFERRED_TARGET_SCORE = intPreferencesKey("preferred_target_score")
         val SELECTED_TABLE_THEME = stringPreferencesKey("selected_table_theme")
@@ -71,6 +80,9 @@ public class DataStoreSettingsRepository(
         val speed = preferences[PreferencesKeys.GAME_SPEED]
             ?.let { name -> GameSpeed.USER_CHOICES.firstOrNull { it.name == name } }
             ?: GameSpeed.NORMAL
+        val chattiness = preferences[PreferencesKeys.MAESTRO_CHATTINESS]
+            ?.let { name -> Chattiness.entries.firstOrNull { it.name == name } }
+            ?: Chattiness.NORMAL
         val levelStr = preferences[PreferencesKeys.PREFERRED_LEVEL] ?: DifficultyLevel.INTERMEDIO.name
         val level = try {
             DifficultyLevel.valueOf(levelStr)
@@ -87,6 +99,8 @@ public class DataStoreSettingsRepository(
             language = lang,
             soundEnabled = sound,
             gameSpeed = speed,
+            maestroChattiness = chattiness,
+            hintEverUsed = preferences[PreferencesKeys.HINT_EVER_USED] ?: false,
             preferredLevel = level,
             preferredTargetScore = targetScore,
             selectedTableTheme = tableTheme,
@@ -111,6 +125,18 @@ public class DataStoreSettingsRepository(
     override suspend fun updateGameSpeed(speed: GameSpeed) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.GAME_SPEED] = speed.name
+        }
+    }
+
+    override suspend fun updateMaestroChattiness(chattiness: Chattiness) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.MAESTRO_CHATTINESS] = chattiness.name
+        }
+    }
+
+    override suspend fun markHintUsed() {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.HINT_EVER_USED] = true
         }
     }
 
@@ -171,6 +197,14 @@ public class InMemorySettingsRepository(
 
     override suspend fun updateGameSpeed(speed: GameSpeed) {
         _state.value = _state.value.copy(gameSpeed = speed)
+    }
+
+    override suspend fun updateMaestroChattiness(chattiness: Chattiness) {
+        _state.value = _state.value.copy(maestroChattiness = chattiness)
+    }
+
+    override suspend fun markHintUsed() {
+        _state.value = _state.value.copy(hintEverUsed = true)
     }
 
     override suspend fun updatePreferredLevel(level: DifficultyLevel) {
