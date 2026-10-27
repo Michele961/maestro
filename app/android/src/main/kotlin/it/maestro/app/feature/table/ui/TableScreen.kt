@@ -76,6 +76,7 @@ public fun TableScreen(
     resume: Boolean = false,
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
+    showPointsRace: Boolean = false,
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     clock: Clock = koinInject(),
@@ -112,6 +113,7 @@ public fun TableScreen(
         soundManager = soundManager,
         tableThemeId = tableThemeId,
         cardBackThemeId = cardBackThemeId,
+        showPointsRace = showPointsRace,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -142,6 +144,7 @@ public fun TableContent(
     soundManager: SoundManager = NoOpSoundManager(),
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
+    showPointsRace: Boolean = false,
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
@@ -243,6 +246,7 @@ public fun TableContent(
                         sweepBy = (step as? SceneStep.Sweep)?.actor,
                         stepKey = step,
                         stepMillis = scene.stepMillis.toInt(),
+                        showPointsRace = showPointsRace,
                         onPlay = { card ->
                             soundManager.play(SoundEffect.CARD_PLAY)
                             onIntent(GameIntent.PlayCard(card))

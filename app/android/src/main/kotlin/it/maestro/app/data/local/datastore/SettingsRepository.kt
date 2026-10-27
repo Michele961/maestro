@@ -27,6 +27,8 @@ public data class AppSettings(
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
     /** Il giocatore ha già chiesto almeno un consiglio: il Maestro non glielo introduce più. */
     val hintEverUsed: Boolean = false,
+    /** Mostra al tavolo la corsa ai punti (Carte, Denari, Settebello, Primiera): spenta di default, è un aiuto. */
+    val showPointsRace: Boolean = false,
     val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     val preferredTargetScore: Int = 11,
     val selectedTableTheme: String = "felt_classic_green",
@@ -44,6 +46,7 @@ public interface SettingsRepository {
     public suspend fun updateSoundEnabled(enabled: Boolean)
     public suspend fun updateGameSpeed(speed: GameSpeed)
     public suspend fun updateMaestroChattiness(chattiness: Chattiness)
+    public suspend fun updateShowPointsRace(show: Boolean)
     public suspend fun markHintUsed()
     public suspend fun updatePreferredLevel(level: DifficultyLevel)
     public suspend fun updatePreferredTargetScore(targetScore: Int)
@@ -66,6 +69,7 @@ public class DataStoreSettingsRepository(
         val GAME_SPEED = stringPreferencesKey("game_speed")
         val MAESTRO_CHATTINESS = stringPreferencesKey("maestro_chattiness")
         val HINT_EVER_USED = booleanPreferencesKey("hint_ever_used")
+        val SHOW_POINTS_RACE = booleanPreferencesKey("show_points_race")
         val PREFERRED_LEVEL = stringPreferencesKey("preferred_level")
         val PREFERRED_TARGET_SCORE = intPreferencesKey("preferred_target_score")
         val SELECTED_TABLE_THEME = stringPreferencesKey("selected_table_theme")
@@ -101,6 +105,7 @@ public class DataStoreSettingsRepository(
             gameSpeed = speed,
             maestroChattiness = chattiness,
             hintEverUsed = preferences[PreferencesKeys.HINT_EVER_USED] ?: false,
+            showPointsRace = preferences[PreferencesKeys.SHOW_POINTS_RACE] ?: false,
             preferredLevel = level,
             preferredTargetScore = targetScore,
             selectedTableTheme = tableTheme,
@@ -131,6 +136,12 @@ public class DataStoreSettingsRepository(
     override suspend fun updateMaestroChattiness(chattiness: Chattiness) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.MAESTRO_CHATTINESS] = chattiness.name
+        }
+    }
+
+    override suspend fun updateShowPointsRace(show: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SHOW_POINTS_RACE] = show
         }
     }
 
@@ -201,6 +212,10 @@ public class InMemorySettingsRepository(
 
     override suspend fun updateMaestroChattiness(chattiness: Chattiness) {
         _state.value = _state.value.copy(maestroChattiness = chattiness)
+    }
+
+    override suspend fun updateShowPointsRace(show: Boolean) {
+        _state.value = _state.value.copy(showPointsRace = show)
     }
 
     override suspend fun markHintUsed() {

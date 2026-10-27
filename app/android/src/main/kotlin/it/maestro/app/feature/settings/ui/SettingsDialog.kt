@@ -48,6 +48,8 @@ public fun SettingsDialog(
     onGameSpeedChanged: (GameSpeed) -> Unit = {},
     maestroChattiness: Chattiness = Chattiness.NORMAL,
     onMaestroChattinessChanged: (Chattiness) -> Unit = {},
+    showPointsRace: Boolean = false,
+    onShowPointsRaceToggled: (Boolean) -> Unit = {},
     showDeveloperTools: Boolean = DeveloperTools.isEnabled(LocalContext.current),
 ) {
     MaestroAlertDialog(
@@ -119,6 +121,32 @@ public fun SettingsDialog(
                             )
                         }
                     }
+                }
+
+                // Corsa ai punti al tavolo: un aiuto, spento di default (feedback di Michele, 2026-10-27).
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(id = R.string.settings_points_race),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = stringResource(id = R.string.settings_points_race_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF6D5A48),
+                        )
+                    }
+                    Switch(
+                        checked = showPointsRace,
+                        onCheckedChange = onShowPointsRaceToggled,
+                        modifier = Modifier.testTag("points_race_switch"),
+                    )
                 }
 
                 // Chiacchiere del Maestro: quanto parla spontaneamente durante la partita (task F1R-24d).

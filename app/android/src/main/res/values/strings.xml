@@ -50,7 +50,7 @@
     <string name="score_category_denari">Denari</string>
     <string name="score_category_settebello">Settebello</string>
     <string name="race_values">%1$d–%2$d</string>
-    <string name="race_settebello_short">7♦</string>
+    <string name="race_settebello_short">Settebello</string>
     <string name="score_category_primiera">Primiera</string>
     <string name="score_category_scope">Scope</string>
     <string name="score_category_re_bello">Re Bello</string>
@@ -650,4 +650,6 @@
     <string name="voice_tail_1">Pensaci un attimo.</string>
     <string name="voice_tail_2">Non c\'è fretta.</string>
     <string name="voice_tail_3">Ragiona, poi decidi.</string>
+    <string name="settings_points_race">Mostra la corsa ai punti</string>
+    <string name="settings_points_race_subtitle">Carte, Denari, Settebello e Primiera sempre in vista sul tavolo.</string>
 </resources>

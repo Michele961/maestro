@@ -185,14 +185,29 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
 
     @Test
     fun points_race_shows_numbers_in_sparring() {
-        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, showPointsRace = true) } }
         composeRule.onNodeWithTag("race_cards").assertTextContains("6–2")
+    }
+
+    @Test
+    fun points_race_is_hidden_unless_the_player_asks_for_it() {
+        composeRule.setContent { MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}) } }
+        composeRule.onNodeWithTag("points_race").assertDoesNotExist()
+    }
+
+    @Test
+    fun sweepCardsStayOnThePileWhileASceneIsPlaying() {
+        val state = midDeal.copy(humanSweepCards = listOf(Card(Rank.SETTE, Suit.COPPE)))
+        val step = SceneStep.CaptureFlight(Seat.P1, listOf(Card(Rank.SETTE, Suit.DENARI)))
+        // A riposo la scopa si vede; poi parte una scena: non deve sparire e riapparire (feedback di Michele).
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state, step), onIntent = {}) } }
+        composeRule.onNodeWithTag("human_captures_sweep_0").assertExists()
     }
 
     @Test
     fun points_race_shows_only_colors_in_classic() {
         val classic = midDeal.copy(isSparring = false)
-        composeRule.setContent { MaestroTheme { TableContent(uiState = classic, scene = sceneOf(classic), onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = classic, scene = sceneOf(classic), onIntent = {}, showPointsRace = true) } }
         composeRule.onNodeWithTag("race_cards").assertTextEquals("Carte")
     }
 
@@ -200,7 +215,7 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     fun hint_bubble_takes_the_place_of_the_points_race() {
         val hint = ScopaMove(card = midDeal.humanHand[0], capture = setOf(Card(Rank.SETTE, Suit.COPPE)))
         val state = midDeal.copy(suggestedMove = hint)
-        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}) } }
+        composeRule.setContent { MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}, showPointsRace = true) } }
         composeRule.onNodeWithTag("game_hint_banner").assertExists()
         composeRule.onNodeWithTag("points_race").assertDoesNotExist()
     }

@@ -155,6 +155,7 @@ public fun MaestroNavHost(
                 resume = route.resume,
                 tableThemeId = settings.selectedTableTheme,
                 cardBackThemeId = settings.selectedCardBackTheme,
+                showPointsRace = settings.showPointsRace,
                 onNavigateHome = { goHome() },
                 onViewAnalysis = { log, training ->
                     navController.navigate(
@@ -251,6 +252,8 @@ public fun MaestroNavHost(
             onGameSpeedChanged = { speed -> scope.launch { settingsRepository.updateGameSpeed(speed) } },
             maestroChattiness = settings.maestroChattiness,
             onMaestroChattinessChanged = { level -> scope.launch { settingsRepository.updateMaestroChattiness(level) } },
+            showPointsRace = settings.showPointsRace,
+            onShowPointsRaceToggled = { show -> scope.launch { settingsRepository.updateShowPointsRace(show) } },
             onTriggerTestCrash = { crashReporter.triggerTestCrash() },
             onDismiss = { showSettings = false },
             onStartTestEndgameMatch = {

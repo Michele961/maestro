@@ -80,7 +80,8 @@ internal fun PlayerHand(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(bottom = 4.dp),
+                    // La carta scelta si alza di 0.18 della sua altezza: i comandi stanno sopra, mai coperti da lei.
+                    modifier = Modifier.padding(bottom = cardHeight * SELECTED_LIFT + 4.dp),
                 ) {
                     MaestroPillButton(
                         text = stringResource(R.string.game_card_play_confirm),
@@ -120,7 +121,7 @@ internal fun PlayerHand(
                         .offset {
                             val lift = when {
                                 isDragging -> dragOffsetY.value
-                                isSelected -> -(cardHeight * 0.18f).toPx()
+                                isSelected -> -(cardHeight * SELECTED_LIFT).toPx()
                                 else -> 0f
                             }
                             IntOffset(0, (abs(i - mid) * 3.dp.toPx() + lift).roundToInt())
@@ -179,3 +180,6 @@ internal fun PlayerHand(
         }
     }
 }
+
+/** Quanto si alza la carta selezionata, in frazione della sua altezza. */
+private const val SELECTED_LIFT = 0.18f
