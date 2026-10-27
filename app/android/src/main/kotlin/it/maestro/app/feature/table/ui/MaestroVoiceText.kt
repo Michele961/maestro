@@ -14,10 +14,17 @@ import it.maestro.app.domain.coach.VoiceLine
  * `voice_*` (it/en) e si formattano carte e numeri (ADR-0007).
  */
 @Composable
-internal fun voiceText(line: VoiceLine): String {
+internal fun voiceText(line: VoiceLine): String = phrasesText(line.phrases)
+
+/** Testo di un consiglio su richiesta ([HintLine]). */
+@Composable
+internal fun hintText(line: it.maestro.app.domain.coach.HintLine): String = phrasesText(line.phrases)
+
+@Composable
+private fun phrasesText(phrases: List<Phrase>): String {
     val context = LocalContext.current
     val cardName = rememberCardFormatter()
-    return line.phrases.joinToString(" ") { phrase ->
+    return phrases.joinToString(" ") { phrase ->
         val id = context.resources.getIdentifier(phrase.id, "string", context.packageName)
         if (id == 0) "" else context.getString(id, *phrase.formatArgs(cardName))
     }.trim()

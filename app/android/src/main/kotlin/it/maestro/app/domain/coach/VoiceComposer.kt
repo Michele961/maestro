@@ -57,6 +57,24 @@ public object VoiceCatalog {
         "greeting" to v("greeting", 0, 1, 2),
     )
 
+    /** Aperture del consiglio su richiesta (task F1R-24e): giocare una carta che prende una carta, più carte, o che cala. */
+    public val hintLeads: Map<String, List<VoiceVariant>> = mapOf(
+        "hint_take_one" to v("hint_take_one", 0, 1),
+        "hint_take_many" to v("hint_take_many", 0, 1),
+        "hint_discard" to v("hint_discard", 0, 1),
+    )
+
+    /** Ragioni del consiglio: una sola frase per ragione. */
+    public val hintReasons: Map<String, List<VoiceVariant>> = mapOf(
+        "hint_why_sweep" to v("hint_why_sweep", 0),
+        "hint_why_settebello" to v("hint_why_settebello", 0),
+        "hint_why_denari" to v("hint_why_denari", 0),
+        "hint_why_primiera" to v("hint_why_primiera", 0),
+        "hint_why_capture" to v("hint_why_capture", 0),
+        "hint_why_safe" to v("hint_why_safe", 0),
+        "hint_why_least_bad" to v("hint_why_least_bad", 0),
+    )
+
     /** Code brevi che si possono aggiungere a avvisi e opportunità per dare varietà. */
     public val tails: List<VoiceVariant> = v("tail", 0, 0, 1)
 }

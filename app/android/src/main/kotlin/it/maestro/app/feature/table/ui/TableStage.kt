@@ -34,6 +34,7 @@ import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.MaestroSpeechBubble
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.components.PlaceholderCardView
+import it.maestro.app.domain.coach.HintComposer
 import it.maestro.app.feature.table.presentation.GameUiState
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
@@ -249,7 +250,7 @@ private fun RaceOrBubble(
         } else if (showBubble) {
             MaestroSpeechBubble(
                 message = if (hint != null) {
-                    stringResource(determineLogicalHintRes(hint, uiState.tableCards))
+                    hintText(remember(hint, uiState.tableCards) { HintComposer.compose(hint, uiState.tableCards) })
                 } else {
                     stringResource(R.string.game_hint_loading)
                 },
