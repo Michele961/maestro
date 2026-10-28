@@ -110,6 +110,8 @@ public data class AcademyChapter(
     @StringRes public val descriptionRes: Int,
     @DrawableRes public val iconRes: Int,
     @DrawableRes public val badgeRes: Int,
+    /** Titolo che il capitolo finito assegna (si deriva dalle lezioni completate, non si salva). */
+    @StringRes public val rankTitleRes: Int,
     public val lessons: List<AcademyLesson>,
 )
 

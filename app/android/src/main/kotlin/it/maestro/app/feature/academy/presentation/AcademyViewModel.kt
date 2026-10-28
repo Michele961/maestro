@@ -279,8 +279,16 @@ public class AcademyViewModel(
             viewModeState.value = AcademyViewMode.ChapterMap
         } else if (currentLesson.isLastStep) {
             viewModelScope.launch {
+                // Il capitolo si chiude solo ora se questa era l'ultima lezione mancante: rigiocare non ripaga.
+                val doneBefore = academyRepository.getProgress().filterValues { it.isCompleted }.keys
                 academyRepository.completeLesson(lesson.id)
                 rewardEngine?.onLessonCompleted(lesson.id.name)
+                val chapter = availableChapters.firstOrNull { c -> c.lessons.any { it.id == lesson.id } }
+                val chapterIds = chapter?.lessons?.map { it.id }.orEmpty()
+                if (chapter != null && chapterIds.all { it in doneBefore + lesson.id } && !chapterIds.all { it in doneBefore }) {
+                    val allIds = availableChapters.flatMap { c -> c.lessons.map { it.id } }
+                    rewardEngine?.onChapterCompleted(academyComplete = allIds.all { it in doneBefore + lesson.id })
+                }
             }
             viewModeState.value = AcademyViewMode.ChapterMap
         } else {

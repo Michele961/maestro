@@ -18,6 +18,7 @@ class AchievementsTest {
                 "first_win", "beat_gigi", "beat_nonna_rosa", "beat_tonino", "beat_don_alfonso", "beat_maestro",
                 "ladder_complete", "first_sweep", "ten_sweeps", "perfect_match", "matches_10", "matches_50",
                 "matches_100", "streak_7", "streak_30", "first_sparring", "puzzle_full_day", "puzzle_week",
+                "student", "academy_complete",
             ),
             AchievementId.entries.map { it.id },
         )
@@ -86,5 +87,14 @@ class AchievementsTest {
         assertEquals(3, repo.addToCounter(AchievementCounter.SWEEPS, 3))
         assertEquals(3, repo.addToCounter(AchievementCounter.SWEEPS, -5))
         assertEquals(1, repo.addToCounter(AchievementCounter.PUZZLES_SOLVED, 1))
+    }
+
+    @Test
+    fun finishingAChapterUnlocksStudentAndTheWholeAcademyUnlocksThePupil() {
+        assertEquals(setOf(AchievementId.STUDENT), achievementsFor(AchievementFacts(chapterCompleted = true)))
+        assertEquals(
+            setOf(AchievementId.STUDENT, AchievementId.ACADEMY_COMPLETE),
+            achievementsFor(AchievementFacts(chapterCompleted = true, academyComplete = true)),
+        )
     }
 }

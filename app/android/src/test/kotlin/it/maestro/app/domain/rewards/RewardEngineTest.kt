@@ -382,4 +382,18 @@ class RewardEngineTest {
         assertEquals(Opponent.GIGI.name, entry.opponent)
         assertEquals(null, entry.sparringObjective)
     }
+
+    @Test
+    fun chapterCompletedGivesFiftyPxAndTheStudentAchievementOnce() = runTest {
+        val achievements = InMemoryAchievementRepository()
+        val e = RewardEngine(wallet, retention, mastery, FakeClock(today), experience = InMemoryExperienceRepository(), achievements = achievements)
+
+        val first = e.onChapterCompleted(academyComplete = false)
+        assertEquals(Experience.CHAPTER_DONE, first.experienceGained)
+        assertEquals(listOf(AchievementId.STUDENT), first.achievementsUnlocked)
+
+        val last = e.onChapterCompleted(academyComplete = true)
+        assertEquals(listOf(AchievementId.ACADEMY_COMPLETE), last.achievementsUnlocked)
+        assertEquals(0, last.creditsEarned)
+    }
 }

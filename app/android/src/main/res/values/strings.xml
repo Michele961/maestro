@@ -281,6 +281,11 @@
     <string name="academy_chapter_number">Capitolo %1$d</string>
     <string name="academy_chapter_recommended">★ Consigliato dal Maestro</string>
     <string name="academy_chapter_progress">%1$d/%2$d Lezioni</string>
+    <string name="academy_ch1_rank">Allievo del Circolo</string>
+    <string name="academy_ch2_rank">Cacciatore di Primiere</string>
+    <string name="academy_ch3_rank">Custode del Banco</string>
+    <string name="academy_ch4_rank">Occhio del Maestro</string>
+    <string name="academy_chapter_rank">Titolo: %1$s</string>
     <string name="academy_chapter_completed">CAPITOLO COMPLETATO</string>
     <string name="academy_lesson_number">Lezione %1$d.%2$d</string>
     <string name="academy_lesson_locked">Completa la lezione precedente per sbloccare</string>
@@ -849,6 +854,10 @@
     <string name="achievement_puzzle_full_day_desc">Risolvi tutti e tre i livelli della Sfida del Giorno nello stesso giorno.</string>
     <string name="achievement_puzzle_week_name">Settimana di sfide</string>
     <string name="achievement_puzzle_week_desc">Risolvi sette Sfide del Giorno.</string>
+    <string name="achievement_student_name">Studente</string>
+    <string name="achievement_student_desc">Finisci il primo capitolo dell\'Accademia.</string>
+    <string name="achievement_academy_complete_name">Allievo del Maestro</string>
+    <string name="achievement_academy_complete_desc">Finisci tutta l\'Accademia.</string>
 
     <!-- F1R-29f: schermata «Oggi» -->
     <string name="today_title">Oggi</string>
