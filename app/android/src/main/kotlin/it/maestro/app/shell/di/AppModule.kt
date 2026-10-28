@@ -12,12 +12,14 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
+import it.maestro.app.data.local.datastore.DataStoreAchievementRepository
 import it.maestro.app.data.local.datastore.DataStoreExperienceRepository
 import it.maestro.app.data.local.datastore.DataStoreOpponentRepository
 import it.maestro.app.data.local.datastore.DataStoreRetentionRepository
 import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.opponents.OpponentRepository
+import it.maestro.app.domain.progress.AchievementRepository
 import it.maestro.app.domain.progress.ExperienceRepository
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
@@ -56,6 +58,7 @@ private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mas
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
 private val Context.opponentsDataStore by preferencesDataStore(name = "maestro_opponents")
 private val Context.experienceDataStore by preferencesDataStore(name = "maestro_experience")
+private val Context.achievementsDataStore by preferencesDataStore(name = "maestro_achievements")
 private val Context.academyDataStore by preferencesDataStore(name = "maestro_academy")
 
 /**
@@ -91,7 +94,7 @@ public val appModule: Module = module {
         DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
     }
 
-    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get()) }
+    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get(), achievements = get()) }
 
     single<MasteryRepository> {
         DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
@@ -107,6 +110,10 @@ public val appModule: Module = module {
 
     single<ExperienceRepository> {
         DataStoreExperienceRepository(dataStore = androidContext().experienceDataStore)
+    }
+
+    single<AchievementRepository> {
+        DataStoreAchievementRepository(dataStore = androidContext().achievementsDataStore)
     }
 
     single<AcademyRepository> {

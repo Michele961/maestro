@@ -24,6 +24,8 @@ import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.data.local.datastore.InMemoryExperienceRepository
+import it.maestro.app.data.local.datastore.InMemoryAchievementRepository
+import it.maestro.app.domain.progress.AchievementId
 import it.maestro.app.domain.progress.Experience
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -302,5 +304,62 @@ class RewardEngineTest {
     fun withoutAnExperienceRepositoryNothingIsGiven() = runTest {
         val summary = engine.onPuzzleSolved(LocalDate.of(2026, 10, 26), tierIndex = 0, tierCredits = 15)
         assertEquals(0, summary.experienceGained)
+    }
+
+    // --- F1R-29e: obiettivi ---
+
+    private val trophies = InMemoryAchievementRepository()
+    private val trophyEngine = RewardEngine(
+        wallet, retention, mastery, FakeClock(today),
+        opponents = InMemoryOpponentRepository(), achievements = trophies,
+    )
+
+    @Test
+    fun winningAgainstGigiUnlocksTheFirstWinAndBeatGigiOnce() = runTest {
+        val log = finishedMatch(Seat.P1)
+        val first = trophyEngine.onMatchFinished(log, analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        assertTrue(AchievementId.FIRST_WIN in first.achievementsUnlocked)
+        assertTrue(AchievementId.BEAT_GIGI in first.achievementsUnlocked)
+        assertTrue(AchievementId.PERFECT_MATCH in first.achievementsUnlocked)
+
+        val again = trophyEngine.onMatchFinished(log, analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        assertFalse(AchievementId.FIRST_WIN in again.achievementsUnlocked, "Un obiettivo si ottiene una volta sola")
+        assertFalse(AchievementId.BEAT_GIGI in again.achievementsUnlocked)
+    }
+
+    @Test
+    fun aLossWithErrorsUnlocksNoWinOrPerfectMatchAchievement() = runTest {
+        val summary = trophyEngine.onMatchFinished(finishedMatch(Seat.P2), analysis(60, 2), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        assertFalse(AchievementId.FIRST_WIN in summary.achievementsUnlocked)
+        assertFalse(AchievementId.PERFECT_MATCH in summary.achievementsUnlocked)
+    }
+
+    @Test
+    fun aSparringMatchUnlocksTheFirstSparring() = runTest {
+        val summary = trophyEngine.onMatchFinished(log, analysis(70, 1), Seat.P1, 2 to 3, TrainingFundamental.SEVENS_COUNT)
+        assertTrue(AchievementId.FIRST_SPARRING in summary.achievementsUnlocked)
+    }
+
+    @Test
+    fun theThirdPuzzleTierUnlocksTheFullDay() = runTest {
+        val date = LocalDate.of(2026, 10, 26)
+        trophyEngine.onPuzzleSolved(date, tierIndex = 0, tierCredits = 15)
+        trophyEngine.onPuzzleSolved(date, tierIndex = 1, tierCredits = 20)
+        val last = trophyEngine.onPuzzleSolved(date, tierIndex = 2, tierCredits = 25)
+        assertTrue(AchievementId.PUZZLE_FULL_DAY in last.achievementsUnlocked)
+    }
+
+    @Test
+    fun sevenSolvedPuzzlesUnlockThePuzzleWeek() = runTest {
+        val start = LocalDate.of(2026, 10, 1)
+        val summaries = (0 until 7).map { trophyEngine.onPuzzleSolved(start.plusDays(it.toLong()), tierIndex = 0, tierCredits = 15) }
+        assertFalse(summaries.take(6).any { AchievementId.PUZZLE_WEEK in it.achievementsUnlocked })
+        assertTrue(AchievementId.PUZZLE_WEEK in summaries.last().achievementsUnlocked)
+    }
+
+    @Test
+    fun withoutAnAchievementRepositoryNothingIsUnlocked() = runTest {
+        val summary = engine.onMatchFinished(log, analysis(95, 0), Seat.P1, null, TrainingFundamental.NONE)
+        assertEquals(emptyList(), summary.achievementsUnlocked)
     }
 }

@@ -10,8 +10,13 @@ import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.progress.AchievementCounter
+import it.maestro.app.domain.progress.AchievementFacts
+import it.maestro.app.domain.progress.AchievementId
+import it.maestro.app.domain.progress.AchievementRepository
 import it.maestro.app.domain.progress.Experience
 import it.maestro.app.domain.progress.ExperienceRepository
+import it.maestro.app.domain.progress.achievementsFor
 import it.maestro.app.domain.retention.MatchMissionStatsExtractor
 import it.maestro.app.domain.retention.missionIncrement
 import it.maestro.app.domain.retention.weakestMissionFocus
@@ -24,6 +29,7 @@ import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ReplayResult
 import it.maestro.game.scopa.replay
 import it.maestro.game.training.TrainingFundamental
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 
 /** Avanzamento di una missione causato da un evento di gioco. */
@@ -49,6 +55,7 @@ public data class MissionAdvance(
  * @property streakAfter giorni di streak dopo l'evento.
  * @property masteryBefore Indice di Maestria prima dell'evento, se l'evento lo cambia.
  * @property masteryAfter Indice di Maestria dopo l'evento.
+ * @property achievementsUnlocked obiettivi ottenuti proprio da questo evento.
  * @property experienceGained punti esperienza dati dall'evento (0 se nessuno).
  * @property freezeTokenEarned l'evento ha completato 7 giorni di serie e ricaricato un Gettone Riposo.
  * @property ladderVictory vittoria sulla scala degli avversari registrata dall'evento (solo partita completa in Classica).
@@ -63,6 +70,7 @@ public data class RewardSummary(
     val ladderVictory: LadderVictory? = null,
     val freezeTokenEarned: Boolean = false,
     val experienceGained: Int = 0,
+    val achievementsUnlocked: List<AchievementId> = emptyList(),
 ) {
     /** Variazione dell'Indice di Maestria, se l'evento lo tocca. */
     val masteryDelta: Int? get() = if (masteryBefore != null && masteryAfter != null) masteryAfter - masteryBefore else null
@@ -81,6 +89,7 @@ public class RewardEngine(
     private val clock: Clock,
     private val opponents: OpponentRepository? = null,
     private val experience: ExperienceRepository? = null,
+    private val achievements: AchievementRepository? = null,
 ) {
 
     /**
@@ -140,10 +149,26 @@ public class RewardEngine(
             null
         }
 
+        val sweepsTotal = achievements?.addToCounter(AchievementCounter.SWEEPS, stats.sweepsCount) ?: 0
+        val unlocked = unlockAchievements(
+            AchievementFacts(
+                winOverOpponent = ladderVictory?.defeated,
+                firstTimeOverOpponent = ladderVictory?.firstTime == true,
+                defeatedOpponents = opponents?.observeProgress()?.first()?.defeated?.size ?: 0,
+                perfectMatch = analysis.accuracy(humanSeat) >= PERFECT_MATCH_ACCURACY &&
+                    analysis.count(humanSeat, MoveGrade.BLUNDER) == 0,
+                matchesPlayed = masteryAfter.matchesPlayed,
+                sweepsTotal = sweepsTotal,
+                streak = streakAfter.currentStreak,
+                sparringPlayed = trainingFundamental != TrainingFundamental.NONE,
+            ),
+        )
+
         return RewardSummary(
             missions = advances(missionsBefore, retention.getDailyMissions(today).missions),
             streakBefore = streakBefore.currentStreak,
             streakAfter = streakAfter.currentStreak,
+            achievementsUnlocked = unlocked,
             masteryBefore = masteryBefore.cognitiveElo,
             masteryAfter = masteryAfter.cognitiveElo,
             ladderVictory = ladderVictory,
@@ -166,11 +191,24 @@ public class RewardEngine(
         val streakAfter = retention.recordGameActivity(today)
         val referenceId = if (tierIndex == 0) dateKey else "$dateKey-tier-$tierIndex"
         val credited = credit(tierCredits, TransactionReason.DAILY_PUZZLE_REWARD, referenceId, "Sfida del Giorno completata: ${tierIndex + 1}")
+        val puzzlesSolved = if (credited > 0 && tierIndex == 0) {
+            achievements?.addToCounter(AchievementCounter.PUZZLES_SOLVED, 1) ?: 0
+        } else {
+            0
+        }
+        val unlocked = unlockAchievements(
+            AchievementFacts(
+                streak = streakAfter.currentStreak,
+                puzzleFullDay = credited > 0 && tierIndex == PUZZLE_LAST_TIER,
+                puzzlesSolved = puzzlesSolved,
+            ),
+        )
         return RewardSummary(
             creditsEarned = credited,
             missions = advances(missionsBefore, retention.getDailyMissions(today).missions),
             streakBefore = streakBefore.currentStreak,
             streakAfter = streakAfter.currentStreak,
+            achievementsUnlocked = unlocked,
             freezeTokenEarned = streakAfter.freezeTokens > streakBefore.freezeTokens,
             experienceGained = if (credited > 0) addExperience(Experience.puzzleTier(tierIndex)) else 0,
         )
@@ -208,6 +246,10 @@ public class RewardEngine(
         retention.recordGameActivity(clock.today())
     }
 
+    /** Sblocca gli obiettivi che [facts] soddisfa e restituisce quelli ottenuti adesso (mai due volte). */
+    private suspend fun unlockAchievements(facts: AchievementFacts): List<AchievementId> =
+        achievements?.unlock(achievementsFor(facts))?.sortedBy { it.ordinal } ?: emptyList()
+
     /** Aggiunge [points] all'esperienza (se il motore ne ha una) e li restituisce. */
     private suspend fun addExperience(points: Int): Int {
         experience?.add(points) ?: return 0
@@ -244,5 +286,11 @@ public class RewardEngine(
 
         /** Partite analizzate prima che il radar scelga la missione adattiva (come il consiglio in preparazione). */
         const val MISSION_FOCUS_MIN_MATCHES = 3
+
+        /** Precisione minima (con nessun errore grave) della «partita perfetta». */
+        const val PERFECT_MATCH_ACCURACY = 90
+
+        /** Indice dell'ultimo livello della Sfida del Giorno. */
+        const val PUZZLE_LAST_TIER = 2
     }
 }
