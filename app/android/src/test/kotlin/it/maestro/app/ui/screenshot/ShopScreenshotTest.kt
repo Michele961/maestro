@@ -7,8 +7,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
-import it.maestro.app.data.local.cosmetics.CosmeticCategory
-import it.maestro.app.data.local.cosmetics.CosmeticItem
+import it.maestro.app.domain.cosmetics.CosmeticCategory
+import it.maestro.app.domain.cosmetics.CosmeticItem
 import it.maestro.app.feature.shop.presentation.ShopItemCardState
 import it.maestro.app.feature.shop.ui.ShopScreenContent
 import it.maestro.app.feature.shop.presentation.ShopUiState
@@ -51,25 +51,25 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
         val items = when (category) {
             CosmeticCategory.TABLE_FELT -> listOf(
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.TABLES[0],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.TABLES[0],
                     isUnlocked = true,
                     isEquipped = true,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.TABLES[1],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.TABLES[1],
                     isUnlocked = true,
                     isEquipped = false,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.TABLES[2],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.TABLES[2],
                     isUnlocked = false,
                     isEquipped = false,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.TABLES[3],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.TABLES[3],
                     isUnlocked = false,
                     isEquipped = false,
                     canAfford = true,
@@ -77,19 +77,19 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
             )
             CosmeticCategory.CARD_BACK -> listOf(
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.CARD_BACKS[0],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.CARD_BACKS[0],
                     isUnlocked = true,
                     isEquipped = true,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.CARD_BACKS[1],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.CARD_BACKS[1],
                     isUnlocked = false,
                     isEquipped = false,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.CARD_BACKS[2],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.CARD_BACKS[2],
                     isUnlocked = false,
                     isEquipped = false,
                     canAfford = true,
@@ -97,19 +97,19 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
             )
             CosmeticCategory.AVATAR -> listOf(
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.AVATARS[0],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.AVATARS[0],
                     isUnlocked = true,
                     isEquipped = true,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.AVATARS[1],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.AVATARS[1],
                     isUnlocked = true,
                     isEquipped = false,
                     canAfford = true,
                 ),
                 ShopItemCardState(
-                    item = it.maestro.app.data.local.cosmetics.CosmeticCatalog.AVATARS[2],
+                    item = it.maestro.app.domain.cosmetics.CosmeticCatalog.AVATARS[2],
                     isUnlocked = false,
                     isEquipped = false,
                     canAfford = true,

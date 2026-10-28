@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.designsystem.theme.WoodSurfaceDark
 import androidx.compose.material3.Text
@@ -68,11 +69,7 @@ internal fun HomeHeader(
     onShopClicked: () -> Unit,
     onNameClicked: () -> Unit = {},
 ) {
-    val avatarRes = when (avatarId) {
-        "avatar_alt" -> R.drawable.avatar_player_alt
-        "avatar_expert" -> R.drawable.avatar_expert
-        else -> R.drawable.avatar_player_default
-    }
+    val avatarRes = CosmeticStyle.avatarDrawable(avatarId)
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.testTag("home_player_profile").clickable(onClick = onProfileClicked)) {
             FramedPortrait(portrait = avatarRes, size = 56.dp)

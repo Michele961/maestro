@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import it.maestro.ai.bot.DifficultyLevel
-import it.maestro.app.data.local.cosmetics.CosmeticCatalog
+import it.maestro.app.domain.cosmetics.CosmeticCatalog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,6 +1,7 @@
 package it.maestro.app.designsystem.components
 
 import androidx.compose.foundation.BorderStroke
+import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -215,21 +216,10 @@ public fun CardBackView(
         deckTheme.getCardBackDrawableResId(context)
     }
 
-    val containerBg = when (cardBackThemeId) {
-        "back_golden_maestro" -> Color(0xFF4A3800)
-        "back_vintage_red" -> Color(0xFF3E0D15)
-        else -> CardBackBackground
-    }
-    val borderCol = when (cardBackThemeId) {
-        "back_golden_maestro" -> Color(0xFFFFD54F)
-        "back_vintage_red" -> Color(0xFFE57373)
-        else -> CardBackBorder
-    }
-    val cardTint = when (cardBackThemeId) {
-        "back_golden_maestro" -> Color(0xFFFFD54F)
-        "back_vintage_red" -> Color(0xFFFF8A80)
-        else -> null
-    }
+    val backStyle = remember(cardBackThemeId) { CosmeticStyle.cardBackStyle(cardBackThemeId) }
+    val containerBg = backStyle.background ?: CardBackBackground
+    val borderCol = backStyle.border ?: CardBackBorder
+    val cardTint = backStyle.tint
 
     Card(
         modifier = modifier

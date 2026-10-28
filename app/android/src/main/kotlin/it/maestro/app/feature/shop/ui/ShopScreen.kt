@@ -54,8 +54,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
-import it.maestro.app.data.local.cosmetics.CosmeticCategory
-import it.maestro.app.data.local.cosmetics.CosmeticItem
+import it.maestro.app.domain.cosmetics.CosmeticCategory
+import it.maestro.app.domain.cosmetics.CosmeticItem
+import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.components.CurrencyPill
 import it.maestro.app.designsystem.components.FramedPortrait
 import it.maestro.app.designsystem.components.MaestroPillButton
@@ -395,16 +396,17 @@ private fun ShopItemRow(
             Spacer(modifier = Modifier.width(12.dp))
 
             // Dettagli (titolo e descrizione)
+            val texts = CosmeticStyle.textsOf(item)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(item.nameRes),
+                    text = stringResource(texts.nameRes),
                     color = Color(0xFFFFF8DC),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = MaestroDisplayFont,
                 )
                 Text(
-                    text = stringResource(item.descriptionRes),
+                    text = stringResource(texts.descriptionRes),
                     color = Color(0xFFE2D9C8),
                     fontSize = 11.sp,
                     lineHeight = 15.sp,
@@ -468,14 +470,11 @@ private fun ShopItemRow(
 @Composable
 private fun CosmeticItemPreview(item: CosmeticItem) {
     val shape = RoundedCornerShape(8.dp)
+    val texts = CosmeticStyle.textsOf(item)
 
     when (item.category) {
         CosmeticCategory.TABLE_FELT -> {
-            val feltTint = when (item.id) {
-                "felt_royal_red" -> Color(0xFFE57373)
-                "felt_noble_blue" -> Color(0xFF64B5F6)
-                else -> null
-            }
+            val feltTint = CosmeticStyle.tableStyle(item.id).feltTint
             Box(
                 modifier = Modifier
                     .size(width = 54.dp, height = 54.dp)
@@ -483,7 +482,7 @@ private fun CosmeticItemPreview(item: CosmeticItem) {
                     .border(1.5.dp, ButtonGoldBorder, shape),
             ) {
                 Image(
-                    painter = painterResource(item.previewDrawableRes),
+                    painter = painterResource(texts.previewDrawableRes),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     colorFilter = feltTint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
@@ -492,11 +491,7 @@ private fun CosmeticItemPreview(item: CosmeticItem) {
             }
         }
         CosmeticCategory.CARD_BACK -> {
-            val cardTint = when (item.id) {
-                "back_golden_maestro" -> Color(0xFFFFD54F)
-                "back_vintage_red" -> Color(0xFFFF8A80)
-                else -> null
-            }
+            val cardTint = CosmeticStyle.cardBackStyle(item.id).tint
             Box(
                 modifier = Modifier
                     .size(width = 42.dp, height = 58.dp)
@@ -504,7 +499,7 @@ private fun CosmeticItemPreview(item: CosmeticItem) {
                     .border(1.5.dp, ButtonGoldBorder, shape),
             ) {
                 Image(
-                    painter = painterResource(item.previewDrawableRes),
+                    painter = painterResource(texts.previewDrawableRes),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     colorFilter = cardTint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
@@ -522,7 +517,7 @@ private fun CosmeticItemPreview(item: CosmeticItem) {
                 contentAlignment = Alignment.Center,
             ) {
                 Image(
-                    painter = painterResource(item.previewDrawableRes),
+                    painter = painterResource(texts.previewDrawableRes),
                     contentDescription = null,
                     modifier = Modifier.size(46.dp),
                 )
