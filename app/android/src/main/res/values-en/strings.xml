@@ -119,12 +119,12 @@
     <string name="training_question_settebello">Where is the Seven of Coins right now?</string>
     <string name="training_question_cards">Who has captured more cards so far?</string>
     <string name="training_option_count_format">%1$d cards</string>
-    <string name="training_option_lead_human">You are leading</string>
-    <string name="training_option_lead_opponent">Opponent is leading</string>
+    <string name="training_option_lead_human">You lead</string>
+    <string name="training_option_lead_opponent">Rival leads</string>
     <string name="training_option_lead_tie">Tied</string>
-    <string name="training_option_settebello_by_me">Captured by you</string>
-    <string name="training_option_settebello_by_opp">Captured by opponent</string>
-    <string name="training_option_settebello_in_play">Still in play / unknown</string>
+    <string name="training_option_settebello_by_me">You took it</string>
+    <string name="training_option_settebello_by_opp">Rival took it</string>
+    <string name="training_option_settebello_in_play">Still in play</string>
     <string name="training_feedback_correct">Correct answer! Great attention.</string>
     <string name="training_feedback_wrong_answer">Not quite: it was “%1$s”.</string>
     <string name="training_feedback_continue">Continue match</string>
