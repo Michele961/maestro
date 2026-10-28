@@ -17,6 +17,7 @@ import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletRepository
 import it.maestro.app.domain.match.MatchRepository
 import it.maestro.app.domain.match.RestoreMatchResult
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.app.domain.time.Clock
@@ -122,6 +123,7 @@ public class ShellViewModel(
         trainingScore: Pair<Int, Int>?,
         trainingFundamental: TrainingFundamental,
         fromHistory: Boolean,
+        opponent: Opponent? = null,
     ) {
         val key = matchLog.toText()
         viewModelScope.launch {
@@ -141,6 +143,7 @@ public class ShellViewModel(
                     humanSeat = humanSeat,
                     trainingScore = trainingScore,
                     trainingFundamental = trainingFundamental,
+                    opponent = opponent,
                 )
             }.getOrDefault(RewardSummary())
             rewards.update { it + (key to reward) }

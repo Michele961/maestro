@@ -87,7 +87,7 @@ public val appModule: Module = module {
         DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
     }
 
-    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get()) }
+    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get()) }
 
     single<MasteryRepository> {
         DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
