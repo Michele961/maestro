@@ -47,6 +47,13 @@ class PlayerTitlesTest {
     }
 
     @Test
+    fun beatingTheLastOpponentEarnsTheMasterTitle() {
+        val everyone = OpponentProgress(Opponent.entries.toSet())
+        assertEquals(Opponent.entries, PlayerTitles.earned(everyone))
+        assertEquals(Opponent.MAESTRO, PlayerTitles.current(everyone, selected = null))
+    }
+
+    @Test
     fun aSelectedEarnedTitleWins() {
         assertEquals(Opponent.GIGI, PlayerTitles.current(twoBeaten, selected = Opponent.GIGI.name))
     }
