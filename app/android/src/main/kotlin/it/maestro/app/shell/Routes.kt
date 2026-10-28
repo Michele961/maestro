@@ -13,13 +13,16 @@ public sealed interface Route {
     @Serializable
     public data object Home : Route
 
-    /** La scala degli avversari: da qui si sceglie contro chi giocare. */
+    /**
+     * La scala degli avversari: da qui si sceglie contro chi giocare. Con [objective] (`name` di
+     * `TrainingFundamental`, dal «Allena questo» del Profilo) la preparazione parte già con quell'obiettivo.
+     */
     @Serializable
-    public data object Ladder : Route
+    public data class Ladder(val objective: String? = null) : Route
 
     /** Preparazione della partita contro [opponent] (`name` dell'enum `Opponent`). */
     @Serializable
-    public data class PreGame(val opponent: String) : Route
+    public data class PreGame(val opponent: String, val objective: String? = null) : Route
 
     /**
      * Tavolo. Con [resume] si riprende la partita salvata invece di iniziarne una nuova.

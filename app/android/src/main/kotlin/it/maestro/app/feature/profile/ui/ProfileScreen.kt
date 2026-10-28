@@ -44,6 +44,8 @@ import it.maestro.app.R
 import it.maestro.app.domain.mastery.MatchHistoryEntry
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.profile.MasteryTrend
+import it.maestro.app.feature.profile.presentation.RadarAxis
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.feature.home.ui.PlayerNameDialog
 import it.maestro.game.scopa.MatchLog
 import it.maestro.app.feature.profile.ui.AbilityRadarChart
@@ -81,6 +83,7 @@ public fun ProfileScreen(
     playerName: String? = null,
     onPlayerNameChanged: (String) -> Unit = {},
     playerNameMaxLength: Int = 20,
+    onTrain: (TrainingFundamental) -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,6 +96,7 @@ public fun ProfileScreen(
         onSelectTitle = viewModel::selectTitle,
         onPlayerNameChanged = onPlayerNameChanged,
         playerNameMaxLength = playerNameMaxLength,
+        onTrain = onTrain,
         modifier = modifier,
     )
 }
@@ -108,6 +112,7 @@ public fun ProfileContent(
     onSelectTitle: (Opponent) -> Unit = {},
     onPlayerNameChanged: (String) -> Unit = {},
     playerNameMaxLength: Int = 20,
+    onTrain: (TrainingFundamental) -> Unit = {},
 ) {
     val profile = uiState.profile
     var editingName by remember { mutableStateOf(false) }
@@ -181,10 +186,14 @@ public fun ProfileContent(
                     )
 
                     // 3. Radar delle Abilità a 5 assi
-                    RadarCard(radar = profile.radar)
+                    RadarCard(radar = profile.radar, weakest = uiState.weakestAxis)
 
                     // 4. Consiglio Socratico del Maestro
-                    MaestroAdviceCard(adviceRes = uiState.maestroAdviceRes)
+                    MaestroAdviceCard(
+                        adviceRes = uiState.maestroAdviceRes,
+                        trainObjective = uiState.trainObjective,
+                        onTrain = onTrain,
+                    )
 
                     // 5. La scala degli avversari (F1R-26c)
                     LadderStrip(ladder = uiState.ladder)
@@ -508,7 +517,8 @@ private fun MasteryIndexCard(
 }
 
 @Composable
-private fun RadarCard(radar: it.maestro.ai.mastery.AbilityRadar) {
+private fun RadarCard(radar: it.maestro.ai.mastery.AbilityRadar, weakest: RadarAxis?) {
+    var opened by remember { mutableStateOf<RadarAxis?>(null) }
     WoodPanel(modifier = Modifier.fillMaxWidth().testTag("profile_radar_panel")) {
         Column(
             modifier = Modifier
@@ -535,13 +545,24 @@ private fun RadarCard(radar: it.maestro.ai.mastery.AbilityRadar) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(290.dp),
+                highlighted = weakest,
+                onAxisClick = { axis -> opened = if (opened == axis) null else axis },
             )
+            opened?.let { axis ->
+                Text(
+                    text = stringResource(axis.explanationRes),
+                    color = Color(0xFFE2D6C6),
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).testTag("profile_radar_explanation"),
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun MaestroAdviceCard(adviceRes: Int) {
+private fun MaestroAdviceCard(adviceRes: Int, trainObjective: TrainingFundamental?, onTrain: (TrainingFundamental) -> Unit) {
     WoodPanel(modifier = Modifier.fillMaxWidth().testTag("profile_maestro_advice_panel")) {
         Row(
             modifier = Modifier
@@ -555,13 +576,22 @@ private fun MaestroAdviceCard(adviceRes: Int) {
                 size = 64.dp,
                 contentDescription = stringResource(R.string.maestro_avatar_description),
             )
-            Box(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 MaestroSpeechBubble(
                     message = stringResource(adviceRes),
                     tail = BubbleTail.START,
                     fontSize = 12.sp,
                     maxLines = 4,
                 )
+                if (trainObjective != null) {
+                    MaestroPillButton(
+                        text = stringResource(R.string.profile_train_button),
+                        onClick = { onTrain(trainObjective) },
+                        testTag = "profile_train_button",
+                        height = 40.dp,
+                        fontSize = 14.sp,
+                    )
+                }
             }
         }
     }
@@ -613,4 +643,13 @@ private val MasteryTrend.labelRes: Int
         MasteryTrend.UP -> R.string.profile_trend_up
         MasteryTrend.FLAT -> R.string.profile_trend_flat
         MasteryTrend.DOWN -> R.string.profile_trend_down
+    }
+
+private val RadarAxis.explanationRes: Int
+    get() = when (this) {
+        RadarAxis.SEVENS -> R.string.radar_axis_sevens_what
+        RadarAxis.DENARI -> R.string.radar_axis_denari_what
+        RadarAxis.PRIMIERA -> R.string.radar_axis_primiera_what
+        RadarAxis.BOARD -> R.string.radar_axis_board_what
+        RadarAxis.ENDGAME -> R.string.radar_axis_endgame_what
     }

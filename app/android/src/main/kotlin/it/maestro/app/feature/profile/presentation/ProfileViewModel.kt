@@ -15,6 +15,8 @@ import it.maestro.app.domain.profile.MasteryTrend
 import it.maestro.app.domain.profile.PlayerTitleRepository
 import it.maestro.app.domain.profile.PlayerTitles
 import it.maestro.app.feature.pregame.presentation.LadderState
+import it.maestro.app.feature.pregame.presentation.ObjectiveAdvisor
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.domain.profile.masteryTrendOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,6 +50,10 @@ public data class ProfileUiState(
     val trend: MasteryTrend = MasteryTrend.FLAT,
     /** La scala degli avversari con lo stato di ciascuno. */
     val ladder: LadderState = LadderState.of(OpponentProgress()),
+    /** L'asse più debole; `null` finché le partite sono troppo poche perché il radar dica qualcosa. */
+    val weakestAxis: RadarAxis? = null,
+    /** L'obiettivo di Sparring da allenare, se l'asse più debole ha un Check («Allena questo»). */
+    val trainObjective: TrainingFundamental? = null,
     val selectedTab: ProfileTab = ProfileTab.MASTERY,
     val isLoading: Boolean = false,
 )
@@ -70,6 +76,7 @@ public class ProfileViewModel(
         opponentRepository?.observeProgress() ?: flowOf(OpponentProgress()),
         titleRepository?.observeSelected() ?: flowOf(null),
     ) { profile, history, tab, progress, selectedTitle ->
+        val weakest = profile.radar.weakestAxis().takeIf { profile.matchesPlayed >= ObjectiveAdvisor.MIN_MATCHES }
         ProfileUiState(
             profile = profile,
             rankTitleRes = mapEloToRankTitle(profile.cognitiveElo),
@@ -79,6 +86,8 @@ public class ProfileViewModel(
             currentTitle = PlayerTitles.current(progress, selectedTitle),
             trend = masteryTrendOf(history),
             ladder = LadderState.of(progress),
+            weakestAxis = weakest,
+            trainObjective = weakest?.objective?.let { ObjectiveAdvisor.suggest(profile) },
             selectedTab = tab,
             isLoading = false,
         )

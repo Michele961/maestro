@@ -232,7 +232,7 @@
     <string name="radar_axis_denari">Denari</string>
     <string name="radar_axis_primiera">Primiera</string>
     <string name="radar_axis_board">Banco</string>
-    <string name="radar_axis_endgame">Endgame</string>
+    <string name="radar_axis_endgame">Finale</string>
     <string name="mastery_rank_principiante">Principiante</string>
     <string name="mastery_rank_dilettante">Dilettante</string>
     <string name="mastery_rank_intermedio">Intermedio</string>
@@ -864,4 +864,12 @@
     <string name="profile_trend_flat">▬ Stabile</string>
     <string name="profile_trend_down">▼ In calo</string>
     <string name="profile_ladder_title">La scala del circolo</string>
+
+    <!-- F1R-26d: radar leggibile e consiglio -->
+    <string name="radar_axis_sevens_what">Quanto bene tieni il conto dei Sette e del Settebello. Si allena con i Check sui Sette nello Sparring.</string>
+    <string name="radar_axis_denari_what">Quanto bene controlli le carte di Denari, che decidono il punto dei Denari. Si allena con i Check sui Denari nello Sparring.</string>
+    <string name="radar_axis_primiera_what">Quanto bene costruisci la Primiera, scegliendo le carte che valgono di più. Si allena con i Check sulla Primiera nello Sparring.</string>
+    <string name="radar_axis_board_what">Quanto bene gestisci il banco: cosa lasci in tavola all\'avversario. Non ha ancora un Check: si allena giocando e rivedendo le partite.</string>
+    <string name="radar_axis_endgame_what">Quanto bene giochi il finale, a mazzo vuoto. Non ha ancora un Check: si allena giocando e rivedendo le partite.</string>
+    <string name="profile_train_button">Allena questo</string>
 </resources>
