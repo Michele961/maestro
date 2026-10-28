@@ -171,21 +171,55 @@ class TrainingChecksTest {
         assertEquals(SeatLead.TIE, determineCardsLead(tie))
     }
 
+    private fun filler(n: Int) = List(n) { card(Rank.DUE, Suit.COPPE) }
+
     @Test
-    fun isCriticalTrainingMomentBehavesAsExpected() {
-        // Non scatta prima di 8 carte giocate
-        val earlyView = createView(playedCards = List(7) { card(Rank.DUE, Suit.COPPE) })
-        assertFalse(isCriticalTrainingMoment(TrainingFundamental.SEVENS_COUNT, earlyView))
+    fun noCheckBeforeTheMinimumNumberOfCards() {
+        val early = createView(playedCards = filler(TRAINING_MIN_CARDS - 1), myCaptures = listOf(card(Rank.SETTE, Suit.DENARI)))
+        TrainingFundamental.entries.forEach { assertFalse(isCriticalTrainingMoment(it, early), "$it") }
+    }
 
-        // Scatta sempre al checkpoint di metà smazzata (>= 18 carte giocate)
-        val midDealView = createView(playedCards = List(18) { card(Rank.DUE, Suit.COPPE) })
-        assertTrue(isCriticalTrainingMoment(TrainingFundamental.SEVENS_COUNT, midDealView))
+    @Test
+    fun everyObjectiveGetsACheckByTheLatestMoment() {
+        val late = createView(playedCards = filler(TRAINING_LATEST_CARDS))
+        TrainingFundamental.entries.filter { it != TrainingFundamental.NONE }
+            .forEach { assertTrue(isCriticalTrainingMoment(it, late), "$it") }
+    }
 
-        // Scatta nei momenti critici (es. Sette appena giocato alla 10ª mossa)
-        val settePlayedView = createView(
-            playedCards = List(9) { card(Rank.DUE, Suit.COPPE) } + listOf(card(Rank.SETTE, Suit.DENARI)),
-        )
-        assertTrue(isCriticalTrainingMoment(TrainingFundamental.SEVENS_COUNT, settePlayedView))
+    @Test
+    fun sevensCheckWaitsForTwoSevensToHavePassed() {
+        val one = createView(playedCards = filler(14), table = listOf(card(Rank.SETTE, Suit.COPPE)))
+        val two = createView(playedCards = filler(14), table = listOf(card(Rank.SETTE, Suit.COPPE), card(Rank.SETTE, Suit.SPADE)))
+        assertFalse(isCriticalTrainingMoment(TrainingFundamental.SEVENS_COUNT, one))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.SEVENS_COUNT, two))
+    }
+
+    @Test
+    fun denariCheckFiresWhenFourDenariPassedOrASevenOrSixOfDenariIsPlayed() {
+        val none = createView(playedCards = filler(14))
+        val four = createView(playedCards = filler(14), table = listOf(Rank.ASSO, Rank.DUE, Rank.TRE, Rank.QUATTRO).map { card(it, Suit.DENARI) })
+        val sixPlayed = createView(playedCards = filler(13) + card(Rank.SEI, Suit.DENARI))
+        assertFalse(isCriticalTrainingMoment(TrainingFundamental.DENARI_COUNT, none))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.DENARI_COUNT, four))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.DENARI_COUNT, sixPlayed))
+    }
+
+    @Test
+    fun settebelloCheckWaitsUntilTheSettebelloHasSurfaced() {
+        val hidden = createView(playedCards = filler(14))
+        val onTable = createView(playedCards = filler(14), table = listOf(card(Rank.SETTE, Suit.DENARI)))
+        val captured = createView(playedCards = filler(14), oppCaptures = listOf(card(Rank.SETTE, Suit.DENARI)))
+        assertFalse(isCriticalTrainingMoment(TrainingFundamental.SETTEBELLO_LOCATION, hidden))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.SETTEBELLO_LOCATION, onTable))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.SETTEBELLO_LOCATION, captured))
+    }
+
+    @Test
+    fun cardsCheckFiresOnlyWhenTheLeadIsShort() {
+        val close = createView(playedCards = filler(14), myCaptures = filler(6), oppCaptures = filler(5))
+        val wide = createView(playedCards = filler(14), myCaptures = filler(10), oppCaptures = filler(4))
+        assertTrue(isCriticalTrainingMoment(TrainingFundamental.CARDS_LEAD, close))
+        assertFalse(isCriticalTrainingMoment(TrainingFundamental.CARDS_LEAD, wide))
     }
 
     @Test

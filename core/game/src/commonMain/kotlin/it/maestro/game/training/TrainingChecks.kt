@@ -131,45 +131,49 @@ public fun determineCardsLead(view: ScopaView): SeatLead {
     }
 }
 
+/** Carte giocate prima delle quali il Check non scatta mai: serve abbastanza storia da ricordare (F1R-25f). */
+public const val TRAINING_MIN_CARDS: Int = 12
+
+/** Carte giocate oltre le quali il Check scatta comunque, così ogni smazzata ha il suo allenamento (F1R-25f). */
+public const val TRAINING_LATEST_CARDS: Int = 24
+
 /**
- * Riconosce se la smazzata si trova in un momento critico o importante per il fondamentale scelto,
- * oppure al punto di controllo di metà partita (turno 18) per attivare la domanda.
+ * Riconosce se è il momento giusto per il Check del [fundamental] (`docs/app/features/coach-in-game.md` §6):
+ * mai prima di [TRAINING_MIN_CARDS] carte giocate, sempre da [TRAINING_LATEST_CARDS] in poi, e nel mezzo solo
+ * quando la posizione è significativa per quell'obiettivo ([isGoodTrainingMoment]).
  */
 public fun isCriticalTrainingMoment(fundamental: TrainingFundamental, view: ScopaView): Boolean {
+    if (fundamental == TrainingFundamental.NONE) return false
     val cardsPlayed = view.playedCards.size
-    // Non interrompere prima di 8 carte giocate (troppo presto per avere senso)
-    if (cardsPlayed < 8) return false
+    if (cardsPlayed < TRAINING_MIN_CARDS) return false
+    if (cardsPlayed >= TRAINING_LATEST_CARDS) return true
+    return isGoodTrainingMoment(fundamental, view)
+}
 
-    // Fallback naturale: a metà smazzata (18 carte giocate su 36)
-    if (cardsPlayed >= 18) return true
-
-    // Momenti critici contestuali tra la 8ª e la 18ª carta:
+/**
+ * La regola del momento «buono» di ogni obiettivo: ciascun obiettivo ha la sua, così una variante o un nuovo
+ * obiettivo aggiunge un ramo qui (la [ScopaView] porta con sé la configurazione) senza toccare il resto.
+ */
+private fun isGoodTrainingMoment(fundamental: TrainingFundamental, view: ScopaView): Boolean {
     val lastCard = view.playedCards.lastOrNull()
     return when (fundamental) {
         TrainingFundamental.NONE -> false
-        TrainingFundamental.SEVENS_COUNT -> {
-            lastCard?.rank == Rank.SETTE || countPassedSevens(view) >= 2
-        }
-        TrainingFundamental.DENARI_COUNT -> {
-            (lastCard?.suit == Suit.DENARI && (lastCard.rank == Rank.SETTE || lastCard.rank == Rank.SEI)) ||
-                countPassedDenari(view) >= 4
-        }
+        // Con meno di due Sette passati la risposta è quasi ovvia.
+        TrainingFundamental.SEVENS_COUNT -> countPassedSevens(view) >= 2
+        TrainingFundamental.DENARI_COUNT ->
+            countPassedDenari(view) >= 4 ||
+                (lastCard?.suit == Suit.DENARI && (lastCard.rank == Rank.SETTE || lastCard.rank == Rank.SEI))
         TrainingFundamental.PRIMIERA_LEAD -> {
-            val myCards = view.capturedBy[view.seat] ?: emptyList()
-            val oppCards = view.capturedBy[view.seat.other()] ?: emptyList()
-            val myPrimiera = calculatePartialPrimiera(myCards)
-            val oppPrimiera = calculatePartialPrimiera(oppCards)
-            // Differenza minima tra i punteggi e almeno un giocatore con punti significativi
+            val myPrimiera = calculatePartialPrimiera(view.capturedBy[view.seat] ?: emptyList())
+            val oppPrimiera = calculatePartialPrimiera(view.capturedBy[view.seat.other()] ?: emptyList())
             kotlin.math.abs(myPrimiera - oppPrimiera) <= 4 && (myPrimiera > 30 || oppPrimiera > 30)
         }
-        TrainingFundamental.SETTEBELLO_LOCATION -> {
+        // Finché il Settebello è in mano a qualcuno la risposta è sempre «ancora in gioco».
+        TrainingFundamental.SETTEBELLO_LOCATION ->
             determineSettebelloLocation(view) != SettebelloLocation.IN_PLAY_OR_UNKNOWN ||
                 view.table.any { it.suit == Suit.DENARI && it.rank == Rank.SETTE }
-        }
-        TrainingFundamental.CARDS_LEAD -> {
-            val diff = kotlin.math.abs((view.capturedBy[view.seat]?.size ?: 0) - (view.capturedBy[view.seat.other()]?.size ?: 0))
-            cardsPlayed >= 12 && diff <= 2
-        }
+        TrainingFundamental.CARDS_LEAD ->
+            kotlin.math.abs((view.capturedBy[view.seat]?.size ?: 0) - (view.capturedBy[view.seat.other()]?.size ?: 0)) <= 2
     }
 }
 
