@@ -112,7 +112,6 @@
     <string name="training_fundamental_primiera">Primiera Lead (Calculation)</string>
     <string name="training_fundamental_settebello">Where is the Settebello? (Attention)</string>
     <string name="training_fundamental_cards">Card Count Lead (Tricks)</string>
-    <string name="training_dialog_title">Maestro\'s Check</string>
     <string name="training_dialog_subtitle">Test your memory and attention</string>
     <string name="training_question_sevens">How many Sevens have appeared so far?</string>
     <string name="training_question_denari">How many Coins (Denari) have appeared so far?</string>
@@ -127,7 +126,7 @@
     <string name="training_option_settebello_by_opp">Captured by opponent</string>
     <string name="training_option_settebello_in_play">Still in play / unknown</string>
     <string name="training_feedback_correct">Correct answer! Great attention.</string>
-    <string name="training_feedback_wrong">Incorrect answer.</string>
+    <string name="training_feedback_wrong_answer">Not quite: it was “%1$s”.</string>
     <string name="training_feedback_continue">Continue match</string>
     <string name="training_score_label">Attention score: %1$d%% (%2$d/%3$d correct)</string>
     <string name="maestro_avatar_description">Maestro Avatar</string>

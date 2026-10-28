@@ -256,6 +256,9 @@ public fun TableContent(
                             onIntent(GameIntent.RequestHint)
                         },
                         onDismissLine = { onIntent(GameIntent.DismissMaestroLine) },
+                        soundManager = soundManager,
+                        onAnswerCheck = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
+                        onContinueCheck = { onIntent(GameIntent.DismissTrainingQuestion) },
                     )
                 }
                 if (scene.busy) {
@@ -274,22 +277,6 @@ public fun TableContent(
             }
 
             SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
-
-            // Dialog Check di allenamento del Maestro (task F1-12): a scena ferma, mai sopra una giocata.
-            val question = uiState.activeTrainingQuestion
-            if (question != null && !scene.busy) {
-                TrainingQuestionDialog(
-                    question = question,
-                    feedback = uiState.trainingQuestionFeedback,
-                    opponentLastMove = uiState.opponentLastMove,
-                    soundManager = soundManager,
-                    onAnswer = { index -> onIntent(GameIntent.AnswerTrainingQuestion(index)) },
-                    onContinue = {
-                        soundManager.play(SoundEffect.BUTTON_CLICK)
-                        onIntent(GameIntent.DismissTrainingQuestion)
-                    },
-                )
-            }
 
             if (uiState.pendingCaptureChoice != null) {
                 CaptureSelectionDialog(

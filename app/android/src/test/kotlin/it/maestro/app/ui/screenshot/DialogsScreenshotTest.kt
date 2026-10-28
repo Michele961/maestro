@@ -15,9 +15,13 @@ import it.maestro.game.model.Suit
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.DealScore
 import it.maestro.game.scopa.ScoreCategory
+import it.maestro.app.feature.table.presentation.TrainingAnswerFeedback
+import it.maestro.game.training.SettebelloLocation
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingOption
 import it.maestro.game.training.TrainingQuestion
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,27 +92,60 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun training_question_dialog_screenshot() {
+    fun training_question_bubble_screenshot() {
         val question = TrainingQuestion(
             fundamental = TrainingFundamental.SEVENS_COUNT,
             options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
             correctIndex = 2,
         )
-        val opponentMove = it.maestro.app.feature.table.presentation.OpponentMoveSummary(
-            card = Card(Rank.SETTE, Suit.DENARI),
-            capture = setOf(Card(Rank.SETTE, Suit.SPADE)),
-            isSweep = false,
+        composeRule.setContent {
+            MaestroTheme {
+                val state = base.copy(phase = DealPhase.PLAYING, isSparring = true, activeTrainingQuestion = question)
+                TableContent(uiState = state, scene = sceneOf(state), onIntent = {})
+            }
+        }
+        captureScreenRoboImage(screen.path("table_check_bubble"))
+    }
+
+    @Test
+    fun training_question_bubble_with_long_answers_screenshot() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SETTEBELLO_LOCATION,
+            options = listOf(
+                TrainingOption.Location(SettebelloLocation.CAPTURED_BY_ME),
+                TrainingOption.Location(SettebelloLocation.CAPTURED_BY_OPPONENT),
+                TrainingOption.Location(SettebelloLocation.IN_PLAY_OR_UNKNOWN),
+            ),
+            correctIndex = 2,
+        )
+        composeRule.setContent {
+            MaestroTheme {
+                val state = base.copy(phase = DealPhase.PLAYING, isSparring = true, activeTrainingQuestion = question)
+                TableContent(uiState = state, scene = sceneOf(state), onIntent = {})
+            }
+        }
+        captureScreenRoboImage(screen.path("table_check_bubble_long"))
+    }
+
+    @Test
+    fun training_wrong_answer_bubble_names_the_right_one_screenshot() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SEVENS_COUNT,
+            options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
+            correctIndex = 2,
         )
         composeRule.setContent {
             MaestroTheme {
                 val state = base.copy(
                     phase = DealPhase.PLAYING,
+                    isSparring = true,
                     activeTrainingQuestion = question,
-                    opponentLastMove = opponentMove,
+                    trainingQuestionFeedback = TrainingAnswerFeedback(selectedIndex = 0, isCorrect = false, correctIndex = 2),
                 )
                 TableContent(uiState = state, scene = sceneOf(state), onIntent = {})
             }
         }
-        captureScreenRoboImage(screen.path("dialog_training_question"))
+        composeRule.onNodeWithTag("training_feedback_banner").assertTextContains("2", substring = true)
+        captureScreenRoboImage(screen.path("table_check_bubble_wrong"))
     }
 }

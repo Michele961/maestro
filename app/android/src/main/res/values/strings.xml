@@ -112,7 +112,6 @@
     <string name="training_fundamental_primiera">Vantaggio Primiera (Calcolo)</string>
     <string name="training_fundamental_settebello">Dov\'è il Settebello? (Attenzione)</string>
     <string name="training_fundamental_cards">Vantaggio Carte (Prese)</string>
-    <string name="training_dialog_title">Check del Maestro</string>
     <string name="training_dialog_subtitle">Metti alla prova la tua memoria e attenzione</string>
     <string name="training_question_sevens">Quanti Sette sono già passati sul tavolo o nelle prese?</string>
     <string name="training_question_denari">Quante carte di Denari sono già passate?</string>
@@ -127,7 +126,7 @@
     <string name="training_option_settebello_by_opp">Preso dall\'avversario</string>
     <string name="training_option_settebello_in_play">Ancora in gioco / sconosciuto</string>
     <string name="training_feedback_correct">Risposta corretta! Ottima attenzione.</string>
-    <string name="training_feedback_wrong">Risposta non corretta.</string>
+    <string name="training_feedback_wrong_answer">Non proprio: era «%1$s».</string>
     <string name="training_feedback_continue">Continua la partita</string>
     <string name="training_score_label">Punteggio di attenzione: %1$d%% (%2$d/%3$d corretti)</string>
     <string name="maestro_avatar_description">Avatar del Maestro</string>
