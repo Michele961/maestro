@@ -66,6 +66,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleUiState
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
+import it.maestro.app.data.local.PuzzleLesson
 import it.maestro.app.feature.puzzle.presentation.PuzzleShareFormatter
 
 /**
@@ -79,6 +80,11 @@ public fun DailyPuzzleScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val shareText = if (uiState.status is DailyPuzzleStatus.Solved) {
+        stringResource(R.string.puzzle_share_solved, uiState.puzzleNumber, maxOf(1, uiState.attemptsCount))
+    } else {
+        stringResource(R.string.puzzle_share_played, uiState.puzzleNumber)
+    }
     // Se l'app torna in primo piano dopo mezzanotte si passa alla sfida del nuovo giorno (F1R-02).
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.refreshDay() }
 
@@ -89,7 +95,7 @@ public fun DailyPuzzleScreen(
         onRetry = { viewModel.retryAttempt() },
         onRequestHint = { viewModel.requestHint() },
         onReplay = { viewModel.replayPuzzle() },
-        onShare = { PuzzleShareFormatter.shareViaIntent(context, uiState.shareText) },
+        onShare = { PuzzleShareFormatter.shareViaIntent(context, shareText) },
         onSelectTier = { viewModel.selectTier(it) },
         onNextTier = { viewModel.nextTier() },
         onNavigateHome = onNavigateHome,
@@ -257,8 +263,7 @@ public fun DailyPuzzleScreenContent(
                 is DailyPuzzleStatus.Solved -> {
                     SolvedCelebrationBanner(
                         attemptsCount = status.attemptsCount,
-                        logicalConcept = uiState.logicalConcept,
-                        goldenRule = uiState.goldenRule,
+                        lesson = uiState.lesson,
                         hasNextTier = uiState.currentTierIndex + 1 < uiState.availableTiers.size,
                         onNextTier = onNextTier,
                         onReplay = onReplay,
@@ -565,8 +570,7 @@ private fun PuzzleTierSelector(
 @Composable
 private fun SolvedCelebrationBanner(
     attemptsCount: Int,
-    logicalConcept: String,
-    goldenRule: String = "",
+    lesson: PuzzleLesson?,
     hasNextTier: Boolean,
     onNextTier: () -> Unit,
     onReplay: () -> Unit,
@@ -610,7 +614,7 @@ private fun SolvedCelebrationBanner(
                 textAlign = TextAlign.Center,
             )
 
-            if (logicalConcept.isNotBlank()) {
+            if (lesson != null) {
                 Surface(
                     color = Color(0xFF122316),
                     shape = RoundedCornerShape(8.dp),
@@ -631,7 +635,7 @@ private fun SolvedCelebrationBanner(
                             fontFamily = MaestroDisplayFont,
                         )
                         Text(
-                            text = logicalConcept,
+                            text = stringResource(lesson.conceptRes),
                             color = Color.White.copy(alpha = 0.95f),
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
@@ -641,7 +645,7 @@ private fun SolvedCelebrationBanner(
                 }
             }
 
-            if (goldenRule.isNotBlank()) {
+            if (lesson != null) {
                 Surface(
                     color = Color(0xFF2A170C),
                     shape = RoundedCornerShape(8.dp),
@@ -662,7 +666,7 @@ private fun SolvedCelebrationBanner(
                             fontFamily = MaestroDisplayFont,
                         )
                         Text(
-                            text = goldenRule,
+                            text = stringResource(lesson.ruleRes),
                             color = Color(0xFFFFF8DC),
                             fontSize = 12.sp,
                             lineHeight = 16.sp,

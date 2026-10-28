@@ -553,6 +553,20 @@
     <string name="puzzle_coach_hint_win_lvl1">Indizio: Conta i punti che ti separano dalla vittoria. C\'è una presa che ti garantisce il traguardo.</string>
     <string name="puzzle_golden_rule_header">Regola d\'oro del Maestro</string>
     <string name="puzzle_explanation_header">Il consiglio del Maestro</string>
+    <string name="puzzle_concept_sweep">Svuotare il tavolo con una Scopa (+1 punto) priva l\'avversario di qualsiasi combinazione e lo obbliga a calare a vuoto nel turno successivo.</string>
+    <string name="puzzle_rule_sweep">Quando puoi ripulire il banco con una Scopa, fallo sempre: costringi l\'avversario a calare a vuoto nel turno dopo.</string>
+    <string name="puzzle_concept_settebello">Il 7 di Denari è la carta sovrana della Scopa: garantisce il punto del Settebello, assegna un Denaro prezioso e vale 21 per la Primiera.</string>
+    <string name="puzzle_rule_settebello">Il Settebello non si regala e non si lascia a terra: è la carta più preziosa del mazzo e assegna un punto secco.</string>
+    <string name="puzzle_concept_seven_or_six">Dare priorità a 7 e 6 (rispettivamente 21 e 18 punti di Primiera) protegge o ribalta il punto più conteso contro le Figure che ne valgono solo 10.</string>
+    <string name="puzzle_rule_seven_or_six">In Primiera un 7 o un 6 valgono più di due Figure: dai sempre la precedenza a 7 e 6 rispetto a Re e Cavalli.</string>
+    <string name="puzzle_concept_denari">Catturare più carte di Denari assicura il controllo dell\'oro e avvicina alla soglia decisiva di 6 Denari per la vittoria del punto.</string>
+    <string name="puzzle_rule_denari">Chi governa i Denari governa la partita: punta dritto alla soglia di 6 ori per blindare il punto di mazzo.</string>
+    <string name="puzzle_concept_win_match">Nella smazzata decisiva ogni carta catturata sposta il saldo: calcolare la mossa che taglia il traguardo prima dell\'avversario garantisce la vittoria finale.</string>
+    <string name="puzzle_rule_win_match">All\'ultima mano conta le prese prima dello stile: fai la giocata che ti assicura il traguardo matematico.</string>
+    <string name="puzzle_concept_balance">Ottimizzare il saldo delle prese massimizza il bottino di carte e impedisce all\'avversario di realizzare combinazioni facili di Scopa.</string>
+    <string name="puzzle_rule_balance">Valuta sempre il saldo delle carte e nega all\'avversario combinazioni facili di presa.</string>
+    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Risolto al %2$d° tentativo!</string>
+    <string name="puzzle_share_played">Maestro Scopa #%1$d — Ho giocato la Sfida del Giorno!</string>
 
     <!-- Stile Comunicativo Socratico Accademia -->
     <string name="academy_advice_header">Il consiglio del Maestro</string>

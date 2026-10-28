@@ -6,6 +6,7 @@ import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
+import it.maestro.app.data.local.PuzzleLesson
 import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
@@ -46,13 +47,11 @@ public data class DailyPuzzleUiState(
     val maestroMood: MaestroMood = MaestroMood.THINKING,
     val maestroMessageResId: Int = R.string.puzzle_coach_initial,
     val goalDescriptionResId: Int = R.string.puzzle_goal_sweep_desc,
-    val shareText: String = "",
     val isAlreadySolvedToday: Boolean = false,
     val currentTierIndex: Int = 0,
     val availableTiers: List<DailyPuzzleTier> = DailyPuzzleProvider.TIERS,
     val solvedTiers: Set<Int> = emptySet(),
-    val logicalConcept: String = "",
-    val goldenRule: String = "",
+    val lesson: PuzzleLesson? = null,
 )
 
 /**
@@ -119,8 +118,7 @@ public class DailyPuzzleViewModel(
         } else {
             DailyPuzzleProvider.getDailyPuzzle(effectiveDate, tierIndex)
         }
-        val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
-        val goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle)
+        val lesson = DailyPuzzleProvider.lessonOf(puzzle)
 
         viewModelScope.launch {
             val record = repository.getDailyPuzzleRecord(dateString)
@@ -153,16 +151,10 @@ public class DailyPuzzleViewModel(
                     maestroMood = MaestroMood.TRIUMPHANT,
                     maestroMessageResId = R.string.puzzle_coach_already_solved,
                     goalDescriptionResId = goalMsg,
-                    shareText = PuzzleShareFormatter.formatShareText(
-                        puzzleNumber = puzzleNumber,
-                        attemptsCount = maxOf(1, record.attemptsToday),
-                        solved = true,
-                    ),
                     isAlreadySolvedToday = true,
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
-                    logicalConcept = concept,
-                    goldenRule = goldenRule,
+                    lesson = lesson,
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
@@ -178,8 +170,7 @@ public class DailyPuzzleViewModel(
                     isAlreadySolvedToday = false,
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
-                    logicalConcept = concept,
-                    goldenRule = goldenRule,
+                    lesson = lesson,
                 )
             }
         }
@@ -200,13 +191,7 @@ public class DailyPuzzleViewModel(
         val newAttempts = currentState.attemptsCount + 1
 
         if (isCorrect) {
-            val shareText = PuzzleShareFormatter.formatShareText(
-                puzzleNumber = currentState.puzzleNumber,
-                attemptsCount = newAttempts,
-                solved = true,
-            )
-            val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
-            val goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle)
+            val lesson = DailyPuzzleProvider.lessonOf(puzzle)
             val updatedSolvedTiers = currentState.solvedTiers + currentState.currentTierIndex
             val currentTier = DailyPuzzleProvider.TIERS.getOrNull(currentState.currentTierIndex)
                 ?: DailyPuzzleProvider.TIERS[0]
@@ -219,10 +204,8 @@ public class DailyPuzzleViewModel(
                 attemptsCount = newAttempts,
                 maestroMood = MaestroMood.TRIUMPHANT,
                 maestroMessageResId = R.string.puzzle_coach_solved,
-                shareText = shareText,
                 solvedTiers = updatedSolvedTiers,
-                logicalConcept = concept,
-                goldenRule = goldenRule,
+                lesson = lesson,
             )
             if (!wasAlreadySolved) {
                 viewModelScope.launch {
@@ -326,8 +309,7 @@ public class DailyPuzzleViewModel(
             maestroMood = MaestroMood.THINKING,
             maestroMessageResId = initialSpeech,
             goalDescriptionResId = goalMsg,
-            logicalConcept = DailyPuzzleProvider.getLogicalConcept(puzzle),
-            goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle),
+            lesson = DailyPuzzleProvider.lessonOf(puzzle),
         )
     }
 }

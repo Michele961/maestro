@@ -553,6 +553,20 @@
     <string name="puzzle_coach_hint_win_lvl1">Hint: Count the points needed to win. There is a capture that mathematically guarantees the finish line.</string>
     <string name="puzzle_golden_rule_header">Maestro\'s Golden Rule</string>
     <string name="puzzle_explanation_header">The Maestro\'s Advice</string>
+    <string name="puzzle_concept_sweep">Clearing the table with a Scopa (+1 point) leaves your opponent with nothing to capture and forces them to play to an empty table next turn.</string>
+    <string name="puzzle_rule_sweep">When you can clear the table with a Scopa, do it: you force your opponent to play to an empty table next turn.</string>
+    <string name="puzzle_concept_settebello">The Seven of Coins is the sovereign card of Scopa: it secures the Settebello point, adds a valuable Coin and is worth 21 for the Primiera.</string>
+    <string name="puzzle_rule_settebello">Never give the Settebello away and never leave it on the table: it is the most precious card in the deck and a sure point.</string>
+    <string name="puzzle_concept_seven_or_six">Giving priority to 7s and 6s (worth 21 and 18 Primiera points) protects or turns around the most contested point against face cards worth only 10.</string>
+    <string name="puzzle_rule_seven_or_six">In Primiera a 7 or a 6 is worth more than two face cards: always prefer 7s and 6s over Kings and Knights.</string>
+    <string name="puzzle_concept_denari">Capturing more Coins gives you control of the gold and brings you closer to the decisive threshold of 6 Coins for the point.</string>
+    <string name="puzzle_rule_denari">Whoever rules the Coins rules the game: head straight for the 6-coin threshold to lock the point.</string>
+    <string name="puzzle_concept_win_match">In the deciding deal every captured card shifts the balance: finding the move that reaches the target before your opponent guarantees the win.</string>
+    <string name="puzzle_rule_win_match">In the last hand, count your captures before thinking of style: play the move that secures the target.</string>
+    <string name="puzzle_concept_balance">Optimizing the balance of captures maximizes your haul of cards and stops your opponent from making easy Scopa combinations.</string>
+    <string name="puzzle_rule_balance">Always weigh the balance of cards and deny your opponent easy captures.</string>
+    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Solved on attempt %2$d!</string>
+    <string name="puzzle_share_played">Maestro Scopa #%1$d — I played the Daily Challenge!</string>
 
     <!-- Socratic Coaching Style Academy -->
     <string name="academy_advice_header">The Maestro\'s Advice</string>

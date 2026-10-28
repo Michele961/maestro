@@ -35,6 +35,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -155,15 +156,8 @@ class DailyPuzzleViewModelTest {
         assertEquals(MaestroMood.TRIUMPHANT, state.maestroMood)
         assertEquals(R.string.puzzle_coach_solved, state.maestroMessageResId)
 
-        // Verifica formato di condivisione senza spoiler
-        assertTrue(
-            state.shareText.contains("Maestro Scopa #"),
-            "Il testo di share deve contenere l'hashtag del puzzle",
-        )
-        assertTrue(
-            state.shareText.contains("Risolto al 1° tentativo!"),
-            "Il testo di share deve celebrare il primo tentativo",
-        )
+        // La spiegazione è un codice di lezione: i testi stanno in strings.xml (ADR-0007)
+        assertNotNull(state.lesson, "A livello risolto la lezione del puzzle deve essere nota")
 
         // Verifica salvataggio nel repository
         val record = repo.getDailyPuzzleRecord("2026-10-26")
