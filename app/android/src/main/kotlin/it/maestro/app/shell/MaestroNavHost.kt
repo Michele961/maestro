@@ -42,15 +42,13 @@ import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
-import it.maestro.app.domain.retention.DailyMissionsState
 import it.maestro.app.domain.retention.StreakState
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.wallet.WalletRepository
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.time.Clock
-import it.maestro.app.feature.missions.ui.DailyMissionsDialog
+import it.maestro.app.feature.missions.ui.TodayScreen
 import it.maestro.app.feature.settings.ui.SettingsDialog
-import it.maestro.app.feature.missions.presentation.DailyMissionsUiState
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.feature.home.ui.HomeScreen
@@ -101,8 +99,6 @@ public fun MaestroNavHost(
 
     val streak by retentionRepository.observeStreak(today)
         .collectAsStateWithLifecycle(initialValue = StreakState.INITIAL)
-    val missions by retentionRepository.observeDailyMissions(today)
-        .collectAsStateWithLifecycle(initialValue = DailyMissionsState(today.toString(), emptyList()))
     val settings by settingsRepository.settingsFlow.collectAsStateWithLifecycle(initialValue = AppSettings())
     // Il nome si chiede solo a impostazioni lette: col valore iniziale il dialogo lampeggerebbe a ogni avvio.
     val loadedFlow = remember(settingsRepository) { settingsRepository.settingsFlow.map { true } }
@@ -113,7 +109,6 @@ public fun MaestroNavHost(
     val mastery by masteryFlow.collectAsStateWithLifecycle(initialValue = null)
 
     var showSettings by rememberSaveable { mutableStateOf(false) }
-    var showMissions by rememberSaveable { mutableStateOf(false) }
     var showWrongRules by rememberSaveable { mutableStateOf(false) }
     var crashReport by rememberSaveable { mutableStateOf(pendingCrashReport) }
 
@@ -147,7 +142,7 @@ public fun MaestroNavHost(
                 onSettingsClicked = { showSettings = true },
                 onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
                 onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
-                onMissionsClicked = { showMissions = true },
+                onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
                 onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
                 onShopClicked = { navController.navigate(Route.Shop) { launchSingleTop = true } },
                 streakCount = streak.currentStreak,
@@ -289,6 +284,9 @@ public fun MaestroNavHost(
         composable<Route.Academy> {
             AcademyScreen(onNavigateHome = { navController.popBackStack() })
         }
+        composable<Route.Today> {
+            TodayScreen(onNavigateHome = { navController.popBackStack() })
+        }
         composable<Route.Shop> {
             ShopScreen(onNavigateHome = { navController.popBackStack() })
         }
@@ -321,14 +319,6 @@ public fun MaestroNavHost(
                     )
                 }
             },
-        )
-    }
-
-    if (showMissions) {
-        DailyMissionsDialog(
-            uiState = DailyMissionsUiState(streak = streak, missionsState = missions),
-            onDismissRequest = { showMissions = false },
-            onClaimReward = { mission -> shell.claimMissionReward(mission) },
         )
     }
 

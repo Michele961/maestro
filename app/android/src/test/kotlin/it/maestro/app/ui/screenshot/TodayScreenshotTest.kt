@@ -8,7 +8,9 @@ import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.retention.DailyMissionsState
 import it.maestro.app.domain.retention.StreakState
-import it.maestro.app.feature.missions.ui.DailyMissionsDialog
+import it.maestro.app.domain.progress.AchievementId
+import it.maestro.app.feature.missions.presentation.ProgressUiState
+import it.maestro.app.feature.missions.ui.TodayScreenContent
 import it.maestro.app.feature.missions.presentation.DailyMissionsUiState
 import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Rule
@@ -19,13 +21,13 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Screenshot test per il Dialog delle Missioni Didattiche Quotidiane e Streak ("Fiamma") (task F2-05).
+ * Screenshot test della schermata «Oggi»: missioni, serie, esperienza e obiettivi (F1R-29f).
  */
 @OptIn(ExperimentalRoborazziApi::class)
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], application = Application::class)
-class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
+class TodayScreenshotTest(private val screen: ScreenConfig) {
 
     companion object {
         @JvmStatic
@@ -41,7 +43,7 @@ class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
     val composeRule = createComposeRule()
 
     @Test
-    fun daily_missions_dialog_active_streak_screenshot() {
+    fun today_active_streak_screenshot() {
         val uiState = DailyMissionsUiState(
             streak = StreakState(
                 currentStreak = 4,
@@ -80,17 +82,19 @@ class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
 
         composeRule.setContent {
             MaestroTheme {
-                DailyMissionsDialog(
-                    uiState = uiState,
-                    onDismissRequest = {},
+                TodayScreenContent(
+                    missions = uiState,
+                    progress = ProgressUiState(points = 310, unlocked = setOf(AchievementId.FIRST_WIN, AchievementId.FIRST_SWEEP)),
+                    onClaimReward = {},
+                    onNavigateHome = {},
                 )
             }
         }
-        captureScreenRoboImage(screen.path("daily_missions_dialog_active_streak"))
+        captureScreenRoboImage(screen.path("today_active_streak"))
     }
 
     @Test
-    fun daily_missions_dialog_all_completed_screenshot() {
+    fun today_all_completed_screenshot() {
         val uiState = DailyMissionsUiState(
             streak = StreakState(
                 currentStreak = 5,
@@ -129,12 +133,29 @@ class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
 
         composeRule.setContent {
             MaestroTheme {
-                DailyMissionsDialog(
-                    uiState = uiState,
-                    onDismissRequest = {},
+                TodayScreenContent(
+                    missions = uiState,
+                    progress = ProgressUiState(points = 2600, unlocked = AchievementId.entries.toSet()),
+                    onClaimReward = {},
+                    onNavigateHome = {},
                 )
             }
         }
-        captureScreenRoboImage(screen.path("daily_missions_dialog_all_completed"))
+        captureScreenRoboImage(screen.path("today_all_completed"))
+    }
+
+    @Test
+    fun today_new_player_screenshot() {
+        composeRule.setContent {
+            MaestroTheme {
+                TodayScreenContent(
+                    missions = DailyMissionsUiState(),
+                    progress = ProgressUiState(),
+                    onClaimReward = {},
+                    onNavigateHome = {},
+                )
+            }
+        }
+        captureScreenRoboImage(screen.path("today_new_player"))
     }
 }

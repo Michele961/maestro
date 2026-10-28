@@ -847,4 +847,13 @@
     <string name="achievement_puzzle_full_day_desc">Solve all three levels of the Daily Challenge on the same day.</string>
     <string name="achievement_puzzle_week_name">Challenge week</string>
     <string name="achievement_puzzle_week_desc">Solve seven Daily Challenges.</string>
+
+    <!-- F1R-29f: Today screen -->
+    <string name="today_title">Today</string>
+    <string name="today_experience_title">Experience</string>
+    <string name="today_level">Level %1$d · %2$s</string>
+    <string name="today_level_max">You have reached the top level.</string>
+    <string name="today_xp_progress">%1$d / %2$d XP</string>
+    <string name="today_achievements_title">Achievements</string>
+    <string name="today_achievements_empty">No achievements yet: the first one is close.</string>
 </resources>

@@ -847,4 +847,13 @@
     <string name="achievement_puzzle_full_day_desc">Risolvi tutti e tre i livelli della Sfida del Giorno nello stesso giorno.</string>
     <string name="achievement_puzzle_week_name">Settimana di sfide</string>
     <string name="achievement_puzzle_week_desc">Risolvi sette Sfide del Giorno.</string>
+
+    <!-- F1R-29f: schermata «Oggi» -->
+    <string name="today_title">Oggi</string>
+    <string name="today_experience_title">Esperienza</string>
+    <string name="today_level">Livello %1$d · %2$s</string>
+    <string name="today_level_max">Hai raggiunto il livello massimo.</string>
+    <string name="today_xp_progress">%1$d / %2$d PX</string>
+    <string name="today_achievements_title">Obiettivi</string>
+    <string name="today_achievements_empty">Nessun obiettivo ancora: il primo è vicino.</string>
 </resources>
