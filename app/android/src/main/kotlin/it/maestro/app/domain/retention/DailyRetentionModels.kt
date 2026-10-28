@@ -1,5 +1,6 @@
 package it.maestro.app.domain.retention
 
+import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.game.rng.SeededRng
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -137,7 +138,8 @@ public enum class DailyMissionType(
         defaultTarget = 1,
         rewardCredits = 15,
     ),
-    ANSWER_SEVENS_CHECKS(
+    /** Risposte giuste ai Check dello Sparring, su qualunque obiettivo (task F1R-29b). */
+    ANSWER_CHECKS(
         defaultTarget = 2,
         rewardCredits = 10,
     ),
@@ -154,6 +156,53 @@ public enum class DailyMissionType(
         defaultTarget = 1,
         rewardCredits = 15,
     ),
+
+    /** Smazzate di una stessa partita in cui il giocatore vince la Primiera (task F1R-29b). */
+    WIN_PRIMIERA(
+        defaultTarget = 2,
+        rewardCredits = 10,
+        scope = MissionScope.PER_MATCH,
+    ),
+}
+
+/**
+ * Asse del radar su cui una missione adattiva può far lavorare il giocatore (task F1R-29b).
+ */
+public enum class MissionFocus { SEVENS, DENARI, PRIMIERA, BOARD, ENDGAME }
+
+/**
+ * Ciò che il generatore sa del giocatore per scegliere le missioni di domani (task F1R-29b).
+ *
+ * @property recentSparring Ha giocato Sparring negli ultimi [RECENT_SPARRING_DAYS] giorni: solo allora
+ *   può capitare la missione dei Check.
+ * @property focus Asse più debole del radar, `null` finché il radar non dice nulla.
+ */
+public data class MissionContext(
+    public val recentSparring: Boolean = false,
+    public val focus: MissionFocus? = null,
+) {
+    public companion object {
+        public val NONE: MissionContext = MissionContext()
+        public const val RECENT_SPARRING_DAYS: Long = 14L
+    }
+}
+
+/** L'asse più debole del radar; a parità vince il primo in ordine Sette, Denari, Primiera, Banco, Finale. */
+public fun AbilityRadar.weakestMissionFocus(): MissionFocus = listOf(
+    MissionFocus.SEVENS to sevens,
+    MissionFocus.DENARI to denari,
+    MissionFocus.PRIMIERA to primiera,
+    MissionFocus.BOARD to board,
+    MissionFocus.ENDGAME to endgame,
+).minBy { it.second }.first
+
+/** La missione che allena [focus], se ne esiste una adatta a chi gioca (o no) in Sparring. */
+public fun adaptiveMissionFor(focus: MissionFocus, recentSparring: Boolean): DailyMissionType? = when (focus) {
+    MissionFocus.SEVENS -> DailyMissionType.ANSWER_CHECKS.takeIf { recentSparring }
+    MissionFocus.DENARI -> DailyMissionType.CAPTURE_DENARI
+    MissionFocus.PRIMIERA -> DailyMissionType.WIN_PRIMIERA
+    MissionFocus.BOARD -> DailyMissionType.MAKE_SWEEPS
+    MissionFocus.ENDGAME -> DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS
 }
 
 /**
@@ -204,13 +253,19 @@ public object DailyMissionGenerator {
 
     private const val MISSIONS_SEED_SALT: Long = 0x4D495353L // "MISS"
 
-    public fun generateForDate(date: LocalDate): List<DailyMission> {
+    /**
+     * Le tre missioni del giorno. Con un [context] una segue l'asse più debole del radar e la missione
+     * dei Check capita solo a chi ha giocato Sparring di recente (task F1R-29b); le altre sono casuali.
+     */
+    public fun generateForDate(date: LocalDate, context: MissionContext = MissionContext.NONE): List<DailyMission> {
         // Seme proprio, diverso da quello della Sfida del Giorno (stessa data).
         val seed = MISSIONS_SEED_SALT xor (date.year * 10000L + date.monthValue * 100L + date.dayOfMonth)
         val rng = SeededRng(seed)
 
         // Mescola deterministicamente le missioni disponibili e seleziona le prime 3
-        val allTypes = DailyMissionType.entries.toMutableList()
+        val allTypes = DailyMissionType.entries
+            .filter { it != DailyMissionType.ANSWER_CHECKS || context.recentSparring }
+            .toMutableList()
         // Fisher-Yates deterministico con SeededRng
         for (i in allTypes.indices.reversed()) {
             val j = ((rng.nextLong() and Long.MAX_VALUE) % (i + 1)).toInt()
@@ -219,7 +274,10 @@ public object DailyMissionGenerator {
             allTypes[j] = tmp
         }
 
-        return allTypes.take(3).mapIndexed { index, type ->
+        val adaptive = context.focus?.let { adaptiveMissionFor(it, context.recentSparring) }
+        val chosen = if (adaptive == null) allTypes.take(3) else listOf(adaptive) + (allTypes - adaptive).take(2)
+
+        return chosen.mapIndexed { index, type ->
             DailyMission(
                 id = "${date}_mission_$index",
                 type = type,

@@ -12,6 +12,8 @@ import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionGenerator
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.retention.DailyMissionsState
+import it.maestro.app.domain.retention.MissionContext
+import it.maestro.app.domain.retention.MissionFocus
 import it.maestro.app.domain.retention.StreakState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +37,8 @@ public class DataStoreRetentionRepository(
         val STREAK_LAST_FREEZE_USED = stringPreferencesKey("streak_last_freeze_used")
 
         val MISSIONS_DATE = stringPreferencesKey("missions_date")
+        val CTX_LAST_SPARRING = stringPreferencesKey("mission_ctx_last_sparring")
+        val CTX_FOCUS = stringPreferencesKey("mission_ctx_focus")
         fun missionType(i: Int) = stringPreferencesKey("mission_${i}_type")
         fun missionProgress(i: Int) = intPreferencesKey("mission_${i}_progress")
         fun missionCompleted(i: Int) = booleanPreferencesKey("mission_${i}_completed")
@@ -132,8 +136,17 @@ public class DataStoreRetentionRepository(
         return claimed
     }
 
+    override suspend fun recordMissionContext(today: LocalDate, sparringPlayed: Boolean, focus: MissionFocus?) {
+        dataStore.edit { preferences ->
+            if (sparringPlayed) preferences[PreferencesKeys.CTX_LAST_SPARRING] = today.toString()
+            if (focus != null) preferences[PreferencesKeys.CTX_FOCUS] = focus.name else preferences.remove(PreferencesKeys.CTX_FOCUS)
+        }
+    }
+
     override suspend fun resetRetentionData() {
         dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.CTX_LAST_SPARRING)
+            preferences.remove(PreferencesKeys.CTX_FOCUS)
             preferences.remove(PreferencesKeys.STREAK_CURRENT)
             preferences.remove(PreferencesKeys.STREAK_BEST)
             preferences.remove(PreferencesKeys.STREAK_LAST_PLAYED)
@@ -187,7 +200,7 @@ public class DataStoreRetentionRepository(
 
         if (savedDate != todayStr) {
             // Genera nuove missioni deterministiche per la data odierna
-            val fresh = DailyMissionGenerator.generateForDate(today)
+            val fresh = DailyMissionGenerator.generateForDate(today, missionContext(preferences, today))
             return DailyMissionsState(date = todayStr, missions = fresh)
         }
 
@@ -216,8 +229,15 @@ public class DataStoreRetentionRepository(
         return if (list.size == 3) {
             DailyMissionsState(date = todayStr, missions = list)
         } else {
-            DailyMissionsState(date = todayStr, missions = DailyMissionGenerator.generateForDate(today))
+            DailyMissionsState(date = todayStr, missions = DailyMissionGenerator.generateForDate(today, missionContext(preferences, today)))
         }
+    }
+
+    private fun missionContext(preferences: Preferences, today: LocalDate): MissionContext {
+        val lastSparring = preferences[PreferencesKeys.CTX_LAST_SPARRING]?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        val recent = lastSparring != null && !lastSparring.isBefore(today.minusDays(MissionContext.RECENT_SPARRING_DAYS))
+        val focus = preferences[PreferencesKeys.CTX_FOCUS]?.let { runCatching { MissionFocus.valueOf(it) }.getOrNull() }
+        return MissionContext(recentSparring = recent, focus = focus)
     }
 }
 
@@ -230,6 +250,8 @@ public class InMemoryRetentionRepository(
 
     private val streakFlow = MutableStateFlow(initialStreak)
     private val missionsFlow = MutableStateFlow<DailyMissionsState?>(null)
+    private var lastSparring: LocalDate? = null
+    private var focus: MissionFocus? = null
 
     override fun observeStreak(today: LocalDate): Flow<StreakState> =
         streakFlow.map { StreakState.evaluate(it, today) }
@@ -257,7 +279,7 @@ public class InMemoryRetentionRepository(
         if (current == null || current.date != todayStr) {
             val fresh = DailyMissionsState(
                 date = todayStr,
-                missions = DailyMissionGenerator.generateForDate(today),
+                missions = DailyMissionGenerator.generateForDate(today, inMemoryContext(today)),
             )
             missionsFlow.value = fresh
             return fresh
@@ -314,8 +336,21 @@ public class InMemoryRetentionRepository(
         return claimed
     }
 
+    override suspend fun recordMissionContext(today: LocalDate, sparringPlayed: Boolean, focus: MissionFocus?) {
+        if (sparringPlayed) lastSparring = today
+        this.focus = focus
+    }
+
+    private fun inMemoryContext(today: LocalDate): MissionContext {
+        val last = lastSparring
+        val recent = last != null && !last.isBefore(today.minusDays(MissionContext.RECENT_SPARRING_DAYS))
+        return MissionContext(recentSparring = recent, focus = focus)
+    }
+
     override suspend fun resetRetentionData() {
         streakFlow.value = StreakState.INITIAL
         missionsFlow.value = null
+        lastSparring = null
+        focus = null
     }
 }

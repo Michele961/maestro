@@ -5,6 +5,7 @@ import it.maestro.game.model.Suit
 import it.maestro.game.scopa.GameEvent
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.PlayResult
+import it.maestro.game.scopa.ScoreCategory
 import it.maestro.game.scopa.newMatch
 import it.maestro.game.scopa.play
 
@@ -15,11 +16,13 @@ import it.maestro.game.scopa.play
  * @property sweepsCount Numero totale di scope messe a segno dal giocatore umano nella partita.
  * @property denariCount Numero totale di carte del seme di Denari catturate dal giocatore umano.
  * @property isWin True se il giocatore umano ha vinto la partita.
+ * @property primieraDeals Smazzate della partita in cui il giocatore umano ha vinto la Primiera.
  */
 public data class MatchMissionStats(
     val sweepsCount: Int,
     val denariCount: Int,
     val isWin: Boolean,
+    val primieraDeals: Int = 0,
 )
 
 /**
@@ -32,6 +35,7 @@ public object MatchMissionStatsExtractor {
         var state = newMatch(config = matchLog.config, seed = matchLog.seed)
         var sweeps = 0
         var denari = 0
+        var primieraDeals = 0
 
         for (move in matchLog.moves) {
             val mover = state.toMove
@@ -47,6 +51,10 @@ public object MatchMissionStatsExtractor {
                         if (move.capture.isNotEmpty()) {
                             denari += (move.capture + move.card).count { it.suit == Suit.DENARI }
                         }
+                    }
+
+                    primieraDeals += result.events.count {
+                        it is GameEvent.DealEnded && it.score.points(humanSeat, ScoreCategory.PRIMIERA) > 0
                     }
 
                     // Se la smazzata si conclude, le carte residue a terra vanno all'ultimo che ha preso
@@ -77,6 +85,7 @@ public object MatchMissionStatsExtractor {
             sweepsCount = sweeps,
             denariCount = denari,
             isWin = isWin,
+            primieraDeals = primieraDeals,
         )
     }
 }

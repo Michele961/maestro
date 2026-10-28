@@ -6,6 +6,9 @@ import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.domain.retention.DailyMissionGenerator
 import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.retention.MissionContext
+import it.maestro.app.domain.retention.adaptiveMissionFor
+import it.maestro.app.domain.retention.weakestMissionFocus
 import it.maestro.app.data.local.datastore.InMemoryOpponentRepository
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.fullState
@@ -141,24 +144,44 @@ class RewardEngineTest {
 
     // --- F1R-25d: il punteggio di attenzione conta per le missioni ---
 
-    private val sevensMissionDay: LocalDate = generateSequence(today) { it.plusDays(1) }.take(60)
-        .first { day -> DailyMissionGenerator.generateForDate(day).any { it.type == DailyMissionType.ANSWER_SEVENS_CHECKS } }
+    private val sparringContext = MissionContext(recentSparring = true)
 
-    private suspend fun sevensMissionProgress(fundamental: TrainingFundamental): Int {
+    private val checksMissionDay: LocalDate = generateSequence(today) { it.plusDays(1) }.take(60)
+        .first { day -> DailyMissionGenerator.generateForDate(day, sparringContext).any { it.type == DailyMissionType.ANSWER_CHECKS } }
+
+    private suspend fun checksMissionProgress(fundamental: TrainingFundamental): Int {
         val retention = InMemoryRetentionRepository()
-        val engine = RewardEngine(InMemoryWalletRepository(), retention, InMemoryMasteryRepository(), FakeClock(sevensMissionDay))
+        retention.recordMissionContext(checksMissionDay.minusDays(1), sparringPlayed = true, focus = null)
+        val engine = RewardEngine(InMemoryWalletRepository(), retention, InMemoryMasteryRepository(), FakeClock(checksMissionDay))
         engine.onMatchFinished(log, analysis(90, 0), Seat.P1, 2 to 3, fundamental)
-        return retention.getDailyMissions(sevensMissionDay).missions.first { it.type == DailyMissionType.ANSWER_SEVENS_CHECKS }.progress
+        return retention.getDailyMissions(checksMissionDay).missions.first { it.type == DailyMissionType.ANSWER_CHECKS }.progress
     }
 
     @Test
-    fun correctSevensChecksAdvanceTheSevensMission() = runTest {
-        assertEquals(2, sevensMissionProgress(TrainingFundamental.SEVENS_COUNT))
+    fun correctChecksOnAnyObjectiveAdvanceTheChecksMission() = runTest {
+        assertEquals(2, checksMissionProgress(TrainingFundamental.SEVENS_COUNT))
+        assertEquals(2, checksMissionProgress(TrainingFundamental.DENARI_COUNT))
+        assertEquals(2, checksMissionProgress(TrainingFundamental.PRIMIERA_LEAD))
     }
 
     @Test
-    fun checksOnAnotherObjectiveDoNotAdvanceTheSevensMission() = runTest {
-        assertEquals(0, sevensMissionProgress(TrainingFundamental.DENARI_COUNT))
+    fun aClassicMatchDoesNotAdvanceTheChecksMission() = runTest {
+        assertEquals(0, checksMissionProgress(TrainingFundamental.NONE))
+    }
+
+    @Test
+    fun afterAMatchTheNextMissionsFollowTheWeakestAxis() = runTest {
+        val repo = InMemoryRetentionRepository()
+        val masteryRepo = InMemoryMasteryRepository()
+        repeat(4) { // oltre la soglia di partite del radar (3)
+            RewardEngine(InMemoryWalletRepository(), repo, masteryRepo, FakeClock(today))
+                .onMatchFinished(log, analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE)
+        }
+        val focus = masteryRepo.getMasteryProfile().radar.weakestMissionFocus()
+        val tomorrow = today.plusDays(1)
+        val adaptive = adaptiveMissionFor(focus, recentSparring = false)
+        val types = repo.getDailyMissions(tomorrow).missions.map { it.type }
+        if (adaptive != null) assertTrue(adaptive in types, "$adaptive manca in $types per $focus")
     }
 
     // --- F1R-18c: vittoria sulla scala degli avversari ---

@@ -12,6 +12,7 @@ import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.retention.MatchMissionStatsExtractor
 import it.maestro.app.domain.retention.missionIncrement
+import it.maestro.app.domain.retention.weakestMissionFocus
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletOperationResult
 import it.maestro.app.domain.wallet.WalletRepository
@@ -106,15 +107,22 @@ public class RewardEngine(
         val stats = MatchMissionStatsExtractor.extract(log, humanSeat)
         advanceByScope(today, missionsBefore, DailyMissionType.MAKE_SWEEPS, stats.sweepsCount)
         advanceByScope(today, missionsBefore, DailyMissionType.CAPTURE_DENARI, stats.denariCount)
+        advanceByScope(today, missionsBefore, DailyMissionType.WIN_PRIMIERA, stats.primieraDeals)
         if (analysis.accuracy(humanSeat) >= ACCURACY_MISSION_THRESHOLD) {
             retention.updateMissionProgress(today, DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80)
         }
         if (analysis.count(humanSeat, MoveGrade.BLUNDER) == 0) {
             retention.updateMissionProgress(today, DailyMissionType.PLAY_MATCH_WITHOUT_BLUNDERS)
         }
-        if (trainingFundamental == TrainingFundamental.SEVENS_COUNT && trainingScore != null) {
-            retention.updateMissionProgress(today, DailyMissionType.ANSWER_SEVENS_CHECKS, trainingScore.first)
+        // Sparring su qualunque obiettivo: le risposte giuste ai Check fanno avanzare la missione dei Check.
+        if (trainingFundamental != TrainingFundamental.NONE && trainingScore != null) {
+            retention.updateMissionProgress(today, DailyMissionType.ANSWER_CHECKS, trainingScore.first)
         }
+        retention.recordMissionContext(
+            today = today,
+            sparringPlayed = trainingFundamental != TrainingFundamental.NONE,
+            focus = masteryAfter.radar.takeIf { masteryAfter.matchesPlayed >= MISSION_FOCUS_MIN_MATCHES }?.weakestMissionFocus(),
+        )
 
         val ladderVictory = if (
             opponent != null && opponents != null && trainingFundamental == TrainingFundamental.NONE &&
@@ -211,5 +219,8 @@ public class RewardEngine(
         const val ACCURACY_MISSION_THRESHOLD = 80
         const val LESSON_CREDITS = 5
         const val WELCOME_BONUS = 50
+
+        /** Partite analizzate prima che il radar scelga la missione adattiva (come il consiglio in preparazione). */
+        const val MISSION_FOCUS_MIN_MATCHES = 3
     }
 }
