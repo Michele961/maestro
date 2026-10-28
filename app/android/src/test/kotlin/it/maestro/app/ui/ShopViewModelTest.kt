@@ -225,4 +225,23 @@ class ShopViewModelTest {
 
         assertEquals(null, viewModel.uiState.value.event)
     }
+
+    @Test
+    fun movements_listTheWalletRegisterNewestFirst_andRecordThePurchaseKey() = runTest {
+        val walletRepo = InMemoryWalletRepository()
+        walletRepo.addCredits(100, TransactionReason.WELCOME_BONUS)
+        val viewModel = ShopViewModel(InMemorySettingsRepository(), walletRepo)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+        assertEquals(listOf(TransactionReason.WELCOME_BONUS), viewModel.uiState.value.movements.map { it.reason })
+
+        viewModel.unlockAndEquip(CosmeticCatalog.TABLES.first { it.id == "felt_royal_red" })
+        advanceUntilIdle()
+
+        val movements = viewModel.uiState.value.movements
+        assertEquals(setOf(TransactionReason.WELCOME_BONUS, TransactionReason.COSMETIC_PURCHASE), movements.map { it.reason }.toSet())
+        val purchase = movements.first { it.reason == TransactionReason.COSMETIC_PURCHASE }
+        assertEquals(-40, purchase.amount)
+        assertEquals("cosmetic_purchase:felt_royal_red", purchase.description)
+    }
 }
