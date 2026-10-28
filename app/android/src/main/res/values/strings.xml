@@ -298,7 +298,7 @@
     <string name="academy_question_prompt">Cosa dice la legge del gioco?</string>
     <string name="academy_card_action_hint">Tocca la carta corretta per giocarla sul tavolo</string>
     <string name="academy_action_wrong_card">Mossa non ottimale. Segui il consiglio del Maestro e scegli la carta indicata!</string>
-    <string name="academy_badge_plus_3_points">+3 Punti</string>
+    <string name="academy_badge_plus_3_points">Settebello +1 pt</string>
     <string name="academy_badge_king_10_pt">Re = 10 pt</string>
     <string name="academy_badge_six_18_pt">Sei = 18 pt</string>
     <string name="academy_badge_plus_15_pt">+15 pt (4° Seme!)</string>
@@ -312,13 +312,13 @@
     <string name="academy_ch1_desc">Padroneggia la presa singola obbligatoria, il valore del Settebello e l\'economia dei punti di mazzo.</string>
 
     <string name="academy_l1_1_title">La Presa Singola</string>
-    <string name="academy_l1_1_subtitle">La Regola Ferrea dell\'Articolo 3</string>
+    <string name="academy_l1_1_subtitle">La Regola Ferrea della Carta Uguale</string>
     <string name="academy_l1_1_desc">La carta sola comanda sul mucchio: la priorità assoluta sulla carta singola.</string>
     <string name="academy_l1_1_rule">La carta singola ha sempre la precedenza assoluta su qualsiasi somma a terra.</string>
     <string name="academy_l1_1_speech_q">Al circolo vige una legge ferrea: sul tavolo ci sono un 7 di Spade, un 4 di Coppe e un 3 di Bastoni. In mano hai il 7 di Denari. Puoi scegliere di prendere 4 e 3 lasciando il 7?</string>
     <string name="academy_l1_1_badge_q">Presa singola obbligatoria</string>
     <string name="academy_l1_1_opt1">No, la legge impone la presa sulla carta singola</string>
-    <string name="academy_l1_1_fb1">Esatto! Articolo 3 del regolamento: la carta singola comanda sempre sul mucchio!</string>
+    <string name="academy_l1_1_fb1">Esatto! Al tavolo la carta uguale comanda sempre sul mucchio: la somma non si tocca finché c\'è lei!</string>
     <string name="academy_l1_1_opt2">Sì, posso scegliere liberamente cosa prendere</string>
     <string name="academy_l1_1_fb2">Errore comune! Se c\'è una carta di valore pari, la presa singola è obbligatoria per legge.</string>
     <string name="academy_l1_1_speech_sum">Regola fondamentale imparata! Ricorda sempre: la carta pari a terra ha precedenza assoluta su qualsiasi somma.</string>
@@ -335,11 +335,11 @@
     <string name="academy_l1_2_fb2">Attento: con 5 e 5 il punto è pari e non viene assegnato a nessuno!</string>
     <string name="academy_l1_2_speech_sum">Eccellente! Conoscere le soglie numeriche permette di calcolare i sacrifici necessari per conquistare l\'oro.</string>
 
-    <string name="academy_l1_3_title">Il Re dei Denari</string>
-    <string name="academy_l1_3_subtitle">Il Triplo Valore del Settebello</string>
-    <string name="academy_l1_3_desc">Perché il 7 di Denari da solo può ribaltare fino a 3 punti su 4.</string>
-    <string name="academy_l1_3_rule">Il Settebello vale 1 punto secco, 1 denaro e 21 punti di Primiera: difendilo sempre.</string>
-    <string name="academy_l1_3_speech_act">Il Settebello vale da solo fino a 3 punti di mazzo su 4: punto secco, oro per i Denari e 21 per la Primiera. Catturalo subito con il tuo 7 di Bastoni!</string>
+    <string name="academy_l1_3_title">Il Settebello</string>
+    <string name="academy_l1_3_subtitle">Un punto, e una mano a Denari e Primiera</string>
+    <string name="academy_l1_3_desc">Perché il 7 di Denari è la carta più preziosa del mazzo.</string>
+    <string name="academy_l1_3_rule">Il Settebello vale 1 punto, conta come denaro e come 21 della Primiera: difendilo.</string>
+    <string name="academy_l1_3_speech_act">Il Settebello vale 1 punto tutto suo e in più ti dà un denaro e 21 punti di primiera: prendilo subito col tuo 7 di Bastoni!</string>
     <string name="academy_l1_3_badge_act">Cattura il Settebello!</string>
     <string name="academy_l1_3_speech_sum">Bravissimo! Presa magistrale: il Settebello è al sicuro nella tua cassa!</string>
 
@@ -379,15 +379,15 @@
     <string name="academy_l2_2_speech_q">Come si calcola il punteggio della Primiera a fine smazzata?</string>
     <string name="academy_l2_2_badge_q">I 4 semi del mazzo</string>
     <string name="academy_l2_2_opt1">Sommando la carta più alta per ciascuno dei 4 semi</string>
-    <string name="academy_l2_2_fb1">Esatto! È fondamentale avere almeno una carta per ogni seme per non azzerare il punteggio.</string>
+    <string name="academy_l2_2_fb1">Esatto! Senza una carta per ogni seme non puoi vincere la Primiera.</string>
     <string name="academy_l2_2_opt2">Sommando tutte le carte di valore 7 prese</string>
     <string name="academy_l2_2_fb2">Sbagliato: i 7 sono preziosi, ma se manca un seme il loro valore viene sprecato!</string>
     <string name="academy_l2_2_speech_sum">Regola preziosa: una Primiera con tutti i 4 semi coperti è una fortezza inespugnabile.</string>
 
     <string name="academy_l2_3_title">La Trappola del Seme Vuoto</string>
-    <string name="academy_l2_3_subtitle">Evitare lo Zero Fatale</string>
+    <string name="academy_l2_3_subtitle">Il Seme Mancante</string>
     <string name="academy_l2_3_desc">Perché avere tre 7 e zero Bastoni fa perdere la Primiera contro carte modeste.</string>
-    <string name="academy_l2_3_rule">Un seme vuoto assegna 0 punti: chiudere tutti i 4 semi ha priorità assoluta su qualsiasi presa ordinaria.</string>
+    <string name="academy_l2_3_rule">Senza almeno una carta per seme non puoi vincere la Primiera: i sette da soli non bastano!</string>
     <string name="academy_l2_3_speech_act">Hai già preso tre Sette (Spade, Coppe e Denari), ma zero Bastoni! Sul tavolo c\'è il 5 di Bastoni. Catturalo subito con il 5 di Spade per chiudere il quarto seme!</string>
     <string name="academy_l2_3_badge_act">Proteggi i 4 semi</string>
     <string name="academy_l2_3_speech_sum">Bravissimo! Con il 5 di Bastoni hai chiuso la Primiera a 78 punti ed evitato la disfatta!</string>
@@ -444,13 +444,13 @@
     <string name="academy_l3_4_title">L\'Ultima Mano del Mazziere</string>
     <string name="academy_l3_4_subtitle">Il Privilegio del Finale</string>
     <string name="academy_l3_4_desc">La Scopa non è consentita all\'ultima giocata: come massimizzare il bottino.</string>
-    <string name="academy_l3_4_rule">All\'ultima giocata della smazzata la Scopa è vietata per legge: l\'ultima presa raccoglie tutte le carte rimaste.</string>
+    <string name="academy_l3_4_rule">Sull\'ultima giocata della smazzata la Scopa non vale: le carte rimaste vanno a chi ha fatto l\'ultima presa.</string>
     <string name="academy_l3_4_speech_q">Siamo all\'ultimissima giocata della smazzata. L\'avversario o tu prendete tutte le carte a terra. Conta come Scopa?</string>
     <string name="academy_l3_4_badge_q">Ultima presa della smazzata</string>
-    <string name="academy_l3_4_opt1">No, per legge l\'ultima presa non vale mai come Scopa</string>
-    <string name="academy_l3_4_fb1">Regola fondamentale del circolo! All\'ultima mano non si assegnano mai Scope: le carte a terra vanno a chi fa l\'ultima presa.</string>
+    <string name="academy_l3_4_opt1">No, sull\'ultima giocata della smazzata la Scopa non vale mai</string>
+    <string name="academy_l3_4_fb1">Regola da circolo! Sull\'ultima giocata non si segna Scopa; le carte rimaste vanno a chi ha fatto l\'ultima presa.</string>
     <string name="academy_l3_4_opt2">Sì, se il tavolo viene svuotato è sempre Scopa</string>
-    <string name="academy_l3_4_fb2">Falso! L\'articolo finale del regolamento vieta espressamente la Scopa sull\'ultima giocata.</string>
+    <string name="academy_l3_4_fb2">Falso! Sull\'ultima giocata della smazzata la Scopa non vale mai, neanche se svuoti il tavolo.</string>
     <string name="academy_l3_4_speech_sum">Terzo Capitolo conquistato! Sei ormai uno stratega difensivo del circolo.</string>
 
     <!-- CAPITOLO 4 -->

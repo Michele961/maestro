@@ -27,6 +27,7 @@ public object AcademyContent {
                 // 1.1: La Presa Singola
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_1_1_PRESA_SINGOLA,
+                    specRefs = listOf("4.2", "4.3", "4.4"),
                     chapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
                     lessonNumber = 1,
                     titleRes = R.string.academy_l1_1_title,
@@ -81,6 +82,7 @@ public object AcademyContent {
                 // 1.2: I Quattro Punti di Mazzo
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_1_2_PUNTI_MAZZO,
+                    specRefs = listOf("6.2"),
                     chapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
                     lessonNumber = 2,
                     titleRes = R.string.academy_l1_2_title,
@@ -132,6 +134,7 @@ public object AcademyContent {
                 // 1.3: Il Re dei Denari
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_1_3_SETTEBELLO,
+                    specRefs = listOf("6.2", "6.3", "4.2"),
                     chapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
                     lessonNumber = 3,
                     titleRes = R.string.academy_l1_3_title,
@@ -177,6 +180,7 @@ public object AcademyContent {
                 // 1.4: La Scelta tra Somme
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_1_4_SCELTA_SOMME,
+                    specRefs = listOf("4.3", "4.8"),
                     chapterId = AcademyChapterId.CHAPTER_1_FONDAMENTI,
                     lessonNumber = 4,
                     titleRes = R.string.academy_l1_4_title,
@@ -246,6 +250,7 @@ public object AcademyContent {
                 // 2.1: Il Paradosso del Re
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_2_1_SCALA_VALORI,
+                    specRefs = listOf("6.3", "1.2"),
                     chapterId = AcademyChapterId.CHAPTER_2_PRIMIERA,
                     lessonNumber = 1,
                     titleRes = R.string.academy_l2_1_title,
@@ -300,6 +305,7 @@ public object AcademyContent {
                 // 2.2: La Formula dei 4 Semi
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_2_2_FORMULA_SEMI,
+                    specRefs = listOf("6.3"),
                     chapterId = AcademyChapterId.CHAPTER_2_PRIMIERA,
                     lessonNumber = 2,
                     titleRes = R.string.academy_l2_2_title,
@@ -351,6 +357,7 @@ public object AcademyContent {
                 // 2.3: La Trappola del Seme Vuoto
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_2_3_TRAPPOLA_SEME_VUOTO,
+                    specRefs = listOf("6.3", "4.2"),
                     chapterId = AcademyChapterId.CHAPTER_2_PRIMIERA,
                     lessonNumber = 3,
                     titleRes = R.string.academy_l2_3_title,
@@ -396,6 +403,7 @@ public object AcademyContent {
                 // 2.4: La Conta dei Sette e dei Sei
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_2_4_CONTA_SETTE_SEI,
+                    specRefs = listOf("6.3"),
                     chapterId = AcademyChapterId.CHAPTER_2_PRIMIERA,
                     lessonNumber = 4,
                     titleRes = R.string.academy_l2_4_title,
@@ -462,6 +470,7 @@ public object AcademyContent {
                 // 3.1: La Soglia del Dieci
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_3_1_SOGLIA_DIECI,
+                    specRefs = listOf("5.1", "1.2", "4.2", "4.3"),
                     chapterId = AcademyChapterId.CHAPTER_3_DIFESA,
                     lessonNumber = 1,
                     titleRes = R.string.academy_l3_1_title,
@@ -515,6 +524,7 @@ public object AcademyContent {
                 // 3.2: Blindare il Banco
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_3_2_BLINDARE_BANCO,
+                    specRefs = listOf("5.1", "4.5", "1.2"),
                     chapterId = AcademyChapterId.CHAPTER_3_DIFESA,
                     lessonNumber = 2,
                     titleRes = R.string.academy_l3_2_title,
@@ -559,6 +569,7 @@ public object AcademyContent {
                 // 3.3: La Regola del Dispari
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_3_3_REGOLA_DISPARI,
+                    specRefs = listOf("4.5", "5.1", "6.2", "6.3"),
                     chapterId = AcademyChapterId.CHAPTER_3_DIFESA,
                     lessonNumber = 3,
                     titleRes = R.string.academy_l3_3_title,
@@ -609,6 +620,7 @@ public object AcademyContent {
                 // 3.4: L'Ultima Mano del Mazziere
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_3_4_ULTIMA_MANO,
+                    specRefs = listOf("5.2", "6.1", "3.5", "4.1"),
                     chapterId = AcademyChapterId.CHAPTER_3_DIFESA,
                     lessonNumber = 4,
                     titleRes = R.string.academy_l3_4_title,
@@ -673,6 +685,7 @@ public object AcademyContent {
                 // 4.1: La Memoria dei Sette
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_4_1_MEMORIA_SETTE,
+                    specRefs = listOf("6.2", "5.1", "4.4"),
                     chapterId = AcademyChapterId.CHAPTER_4_MAESTRIA,
                     lessonNumber = 1,
                     titleRes = R.string.academy_l4_1_title,
@@ -723,6 +736,7 @@ public object AcademyContent {
                 // 4.2: La Lettura delle Carte Nascoste
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_4_2_DEDUZIONE_MANO,
+                    specRefs = listOf("4.3", "4.4"),
                     chapterId = AcademyChapterId.CHAPTER_4_MAESTRIA,
                     lessonNumber = 2,
                     titleRes = R.string.academy_l4_2_title,
@@ -773,6 +787,7 @@ public object AcademyContent {
                 // 4.3: Il Finale a Mazzo Vuoto
                 AcademyLesson(
                     id = AcademyLessonId.LESSON_4_3_ENDGAME_MAZZO_VUOTO,
+                    specRefs = listOf("3.4", "3.5", "6.1", "4.2", "6.2"),
                     chapterId = AcademyChapterId.CHAPTER_4_MAESTRIA,
                     lessonNumber = 3,
                     titleRes = R.string.academy_l4_3_title,

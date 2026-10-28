@@ -95,6 +95,8 @@ public data class AcademyLesson(
     @DrawableRes public val iconRes: Int,
     @StringRes public val goldenRuleRes: Int,
     public val steps: List<AcademyStep>,
+    /** Paragrafi di `docs/rules/scopa.md` (es. "6.2") che la lezione usa: li controlla `AcademyContentTest`. */
+    public val specRefs: List<String> = emptyList(),
 )
 
 /**
