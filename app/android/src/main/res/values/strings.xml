@@ -774,4 +774,14 @@
     <string name="ladder_beaten">Battuto</string>
     <string name="ladder_locked_hint">Batti %1$s per sbloccarlo</string>
     <string name="ladder_locked">Bloccato</string>
+    <!-- Titoli guadagnati battendo gli avversari e battute del Maestro allo sblocco (F1R-18e, [bozza] da approvare) -->
+    <string name="opponent_gigi_earned">Promosso al bar</string>
+    <string name="opponent_rosa_earned">Il nipote prediletto</string>
+    <string name="opponent_tonino_earned">Re del bancone</string>
+    <string name="opponent_alfonso_earned">Domatore del terrore</string>
+    <string name="opponent_maestro_earned">Allievo del Maestro</string>
+    <string name="ladder_new_title">Nuovo titolo: %1$s</string>
+    <string name="ladder_unlocked_line">Sbloccato: %1$s</string>
+    <string name="post_match_maestro_unlocked">Ottimo lavoro! Hai battuto %1$s: ora puoi sfidare %2$s. Stai attento, è più forte.</string>
+    <string name="post_match_maestro_ladder_done">Hai battuto tutti gli avversari del circolo. Sono fiero di te!</string>
 </resources>

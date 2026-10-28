@@ -17,6 +17,8 @@ import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.rewards.MissionAdvance
+import it.maestro.app.domain.opponents.LadderVictory
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.app.feature.review.presentation.PostMatchFixtures
 import it.maestro.app.feature.review.presentation.PostMatchStep
@@ -119,6 +121,30 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent { MaestroTheme { PostMatchScreen(state = state) } }
         composeRule.onNodeWithTag("reward_mastery_delta", useUnmergedTree = true).assertTextContains("−9")
     }
+
+    private val unlockReward = RewardSummary(
+        masteryBefore = 1200,
+        masteryAfter = 1218,
+        ladderVictory = LadderVictory(Opponent.GIGI, firstTime = true, newlyUnlocked = Opponent.NONNA_ROSA),
+    )
+
+    @Test
+    fun post_match_first_win_over_an_opponent_shows_title_and_unlock() {
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = postMatchState(PostMatchStep.READY, reward = unlockReward)) } }
+        composeRule.onNodeWithTag("reward_ladder_title", useUnmergedTree = true).assertTextContains("Promosso al bar", substring = true)
+        composeRule.onNodeWithTag("reward_ladder_unlocked", useUnmergedTree = true).assertTextContains("Nonna Rosa", substring = true)
+        composeRule.onNodeWithTag("post_match_maestro_line", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun post_match_a_repeated_win_over_an_opponent_shows_no_new_title() {
+        val repeat = unlockReward.copy(ladderVictory = LadderVictory(Opponent.GIGI, firstTime = false, newlyUnlocked = null))
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = postMatchState(PostMatchStep.READY, reward = repeat)) } }
+        composeRule.onNodeWithTag("reward_ladder_title", useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun post_match_ladder_unlock_screenshot() = shotPostMatch("post_match_unlock", postMatchState(PostMatchStep.READY, reward = unlockReward))
 
     private val completedMission = DailyMission(id = "m1", type = DailyMissionType.MAKE_SWEEPS, progress = 3, target = 3)
     private val missionReward = RewardSummary(

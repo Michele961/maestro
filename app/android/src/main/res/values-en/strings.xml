@@ -774,4 +774,14 @@
     <string name="ladder_beaten">Beaten</string>
     <string name="ladder_locked_hint">Beat %1$s to unlock</string>
     <string name="ladder_locked">Locked</string>
+    <!-- Titles earned by beating opponents and Maestro lines on unlock (F1R-18e, [draft] to approve) -->
+    <string name="opponent_gigi_earned">Promoted at the bar</string>
+    <string name="opponent_rosa_earned">Favourite grandchild</string>
+    <string name="opponent_tonino_earned">King of the counter</string>
+    <string name="opponent_alfonso_earned">Terror tamer</string>
+    <string name="opponent_maestro_earned">Pupil of the Maestro</string>
+    <string name="ladder_new_title">New title: %1$s</string>
+    <string name="ladder_unlocked_line">Unlocked: %1$s</string>
+    <string name="post_match_maestro_unlocked">Great job! You beat %1$s: now you can challenge %2$s. Careful, they are stronger.</string>
+    <string name="post_match_maestro_ladder_done">You have beaten every opponent at the club. I am proud of you!</string>
 </resources>
