@@ -136,7 +136,8 @@ private fun LadderRow(entry: LadderEntry, onClick: () -> Unit) {
                         modifier = Modifier.testTag("ladder_locked_hint_${entry.opponent.name}"),
                     )
                 } else {
-                    Text(text = stringResource(style.title), color = textColor, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2)
+                    val subtitle = if (entry.status == LadderStatus.BEATEN) style.earnedTitle else style.title
+                    Text(text = stringResource(subtitle), color = textColor, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2)
                 }
             }
             when (entry.status) {

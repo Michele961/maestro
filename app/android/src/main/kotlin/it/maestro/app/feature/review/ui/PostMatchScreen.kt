@@ -34,6 +34,7 @@ import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.ConfettiCelebration
 import it.maestro.app.designsystem.components.FramedPortrait
 import it.maestro.app.designsystem.components.MaestroDialogueBox
+import it.maestro.app.feature.pregame.ui.style
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.domain.retention.DailyMission
@@ -110,15 +111,22 @@ private fun MaestroLine(state: PostMatchUiState, analysis: MatchAnalysis?) {
         state.won -> R.drawable.maestro_triumphant
         else -> R.drawable.maestro_encouraging
     }
+    val ladder = state.reward?.ladderVictory?.takeIf { it.firstTime && !state.fromHistory }
     val message = when {
         waiting -> R.string.post_match_analyzing
+        ladder != null -> if (ladder.newlyUnlocked != null) R.string.post_match_maestro_unlocked else R.string.post_match_maestro_ladder_done
         blunders == 0 -> R.string.post_match_maestro_clean
         else -> R.string.post_match_maestro_review
     }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().testTag(if (waiting) "analysis_loading_indicator" else "post_match_maestro_line")) {
         FramedPortrait(portrait = portrait, size = 68.dp, background = Color(0xFF7D3F19))
         Spacer(modifier = Modifier.width(8.dp))
-        MaestroDialogueBox(title = stringResource(id = R.string.game_player_maestro), message = stringResource(id = message), modifier = Modifier.weight(1f))
+        val text = if (ladder?.newlyUnlocked != null) {
+            stringResource(message, stringResource(ladder.defeated.style().name), stringResource(ladder.newlyUnlocked.style().name))
+        } else {
+            stringResource(message)
+        }
+        MaestroDialogueBox(title = stringResource(id = R.string.game_player_maestro), message = text, modifier = Modifier.weight(1f))
     }
 }
 
@@ -158,4 +166,4 @@ private fun Actions(state: PostMatchUiState, analysis: MatchAnalysis, onReview: 
 
 /** `true` se la ricompensa ha qualcosa da mostrare: altrimenti non si disegna un riquadro vuoto. */
 private fun it.maestro.app.domain.rewards.RewardSummary.hasContent(): Boolean =
-    missions.isNotEmpty() || masteryDelta != null || (streakAfter ?: 0) > 0
+    ladderVictory?.firstTime == true || missions.isNotEmpty() || masteryDelta != null || (streakAfter ?: 0) > 0

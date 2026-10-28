@@ -33,6 +33,7 @@ import it.maestro.app.designsystem.components.NineSliceBox
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.rewards.MissionAdvance
+import it.maestro.app.feature.pregame.ui.style
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.PillButtonVariant
@@ -148,6 +149,23 @@ internal fun RewardCard(
                         fontWeight = FontWeight.Bold,
                         color = if (delta >= 0) Color(0xFF2E7D32) else Color(0xFFB23A2B),
                         modifier = Modifier.testTag("reward_mastery_delta"),
+                    )
+                }
+            }
+            reward.ladderVictory?.takeIf { it.firstTime }?.let { victory ->
+                Text(
+                    text = stringResource(R.string.ladder_new_title, stringResource(victory.defeated.style().earnedTitle)),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = InkText,
+                    modifier = Modifier.testTag("reward_ladder_title"),
+                )
+                victory.newlyUnlocked?.let { next ->
+                    Text(
+                        text = stringResource(R.string.ladder_unlocked_line, stringResource(next.style().name)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = InkText,
+                        modifier = Modifier.testTag("reward_ladder_unlocked"),
                     )
                 }
             }
