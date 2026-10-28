@@ -12,9 +12,11 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
+import it.maestro.app.data.local.datastore.DataStoreOpponentRepository
 import it.maestro.app.data.local.datastore.DataStoreRetentionRepository
 import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
 import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
@@ -48,6 +50,7 @@ private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
 private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
+private val Context.opponentsDataStore by preferencesDataStore(name = "maestro_opponents")
 private val Context.academyDataStore by preferencesDataStore(name = "maestro_academy")
 
 /**
@@ -91,6 +94,10 @@ public val appModule: Module = module {
 
     single<RetentionRepository> {
         DataStoreRetentionRepository(dataStore = androidContext().retentionDataStore)
+    }
+
+    single<OpponentRepository> {
+        DataStoreOpponentRepository(dataStore = androidContext().opponentsDataStore)
     }
 
     single<AcademyRepository> {
