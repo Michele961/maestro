@@ -218,4 +218,46 @@ class AcademyViewModelTest {
         assertEquals(5, walletRepo.getBalance(), "Completare una lezione dell'Accademia deve accreditare 5 crediti")
         assertTrue(walletRepo.hasClaimed(TransactionReason.ACADEMY_LESSON_REWARD, AcademyLessonId.LESSON_1_1_PRESA_SINGOLA.name))
     }
+
+    @Test
+    fun flashReviewShowsQuestionAndRuleWithoutCreditsAndMarksReviewedToday() = runTest {
+        val clock = FakeClock(java.time.LocalDate.of(2026, 10, 28))
+        val repo = InMemoryAcademyRepository(
+            initialCompleted = setOf(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA),
+            clock = clock,
+        )
+        val walletRepo = InMemoryWalletRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            rewardEngine = RewardEngine(walletRepo, InMemoryRetentionRepository(), InMemoryMasteryRepository(), clock),
+            clock = clock,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+        val before = walletRepo.getBalance()
+        assertFalse(viewModel.uiState.value.chapters[0].lessons[0].isReviewedToday)
+
+        viewModel.openReview(AcademyLessonId.LESSON_1_1_PRESA_SINGOLA)
+        advanceUntilIdle()
+        val review = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
+        assertTrue(review.isReview)
+        assertEquals(2, review.lesson.steps.size)
+
+        viewModel.selectOption("c1_l1_opt1")
+        viewModel.nextStep()
+        advanceUntilIdle()
+        assertTrue((viewModel.uiState.value.viewMode as AcademyViewMode.Lesson).isReview)
+        viewModel.nextStep()
+        advanceUntilIdle()
+
+        assertEquals(AcademyViewMode.ChapterMap, viewModel.uiState.value.viewMode)
+        assertTrue(viewModel.uiState.value.chapters[0].lessons[0].isReviewedToday)
+        assertEquals(before, walletRepo.getBalance())
+
+        clock.date = clock.date.plusDays(1)
+        val next = AcademyViewModel(academyRepository = repo, clock = clock)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { next.uiState.collect() }
+        advanceUntilIdle()
+        assertFalse(next.uiState.value.chapters[0].lessons[0].isReviewedToday)
+    }
 }

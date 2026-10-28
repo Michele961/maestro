@@ -11,6 +11,7 @@ import it.maestro.app.data.local.academy.AcademyPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.time.Clock
@@ -24,6 +25,9 @@ public interface AcademyRepository {
     public suspend fun getProgress(): Map<AcademyLessonId, AcademyLessonProgress>
     public suspend fun completeLesson(lessonId: AcademyLessonId)
     public suspend fun resetProgress()
+
+    /** Segna la lezione come ripassata oggi (ripasso lampo, senza crediti). */
+    public suspend fun markReviewed(lessonId: AcademyLessonId)
 }
 
 /**
@@ -36,6 +40,7 @@ public class DataStoreAcademyRepository(
 
     private fun completedKey(id: AcademyLessonId) = booleanPreferencesKey("academy_lesson_completed_${id.name}")
     private fun timestampKey(id: AcademyLessonId) = longPreferencesKey("academy_lesson_completed_at_${id.name}")
+    private fun reviewedKey(id: AcademyLessonId) = longPreferencesKey("academy_lesson_reviewed_day_${id.name}")
 
     override fun observeProgress(): Flow<Map<AcademyLessonId, AcademyLessonProgress>> =
         dataStore.data.map { preferences ->
@@ -55,11 +60,17 @@ public class DataStoreAcademyRepository(
         }
     }
 
+    override suspend fun markReviewed(lessonId: AcademyLessonId) {
+        val day = clock.today().toEpochDay()
+        dataStore.edit { prefs -> prefs[reviewedKey(lessonId)] = day }
+    }
+
     override suspend fun resetProgress() {
         dataStore.edit { prefs ->
             AcademyLessonId.entries.forEach { id ->
                 prefs.remove(completedKey(id))
                 prefs.remove(timestampKey(id))
+                prefs.remove(reviewedKey(id))
             }
         }
     }
@@ -73,6 +84,7 @@ public class DataStoreAcademyRepository(
                 isUnlocked = lessonId in unlocked,
                 isCompleted = lessonId in completed,
                 completedAt = preferences[timestampKey(lessonId)] ?: 0L,
+                reviewedEpochDay = preferences[reviewedKey(lessonId)] ?: AcademyLessonProgress.NEVER_REVIEWED,
             )
         }
     }
@@ -88,11 +100,10 @@ public class InMemoryAcademyRepository(
 
     private val completedLessons = MutableStateFlow(initialCompleted)
     private val completedTimes = mutableMapOf<AcademyLessonId, Long>()
+    private val reviewedDays = MutableStateFlow<Map<AcademyLessonId, Long>>(emptyMap())
 
     override fun observeProgress(): Flow<Map<AcademyLessonId, AcademyLessonProgress>> =
-        completedLessons.asStateFlow().map { completed ->
-            buildProgressMap(completed)
-        }
+        combine(completedLessons, reviewedDays) { completed, _ -> buildProgressMap(completed) }
 
     override suspend fun getProgress(): Map<AcademyLessonId, AcademyLessonProgress> =
         buildProgressMap(completedLessons.value)
@@ -102,8 +113,13 @@ public class InMemoryAcademyRepository(
         completedLessons.value = completedLessons.value + lessonId
     }
 
+    override suspend fun markReviewed(lessonId: AcademyLessonId) {
+        reviewedDays.value = reviewedDays.value + (lessonId to clock.today().toEpochDay())
+    }
+
     override suspend fun resetProgress() {
         completedTimes.clear()
+        reviewedDays.value = emptyMap()
         completedLessons.value = emptySet()
     }
 
@@ -115,6 +131,7 @@ public class InMemoryAcademyRepository(
                 isUnlocked = lessonId in unlocked,
                 isCompleted = lessonId in completed,
                 completedAt = completedTimes[lessonId] ?: 0L,
+                reviewedEpochDay = reviewedDays.value[lessonId] ?: AcademyLessonProgress.NEVER_REVIEWED,
             )
         }
     }
