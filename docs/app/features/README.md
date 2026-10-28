@@ -18,7 +18,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 1 | Partita al tavolo | `table.md` | Ondata A, F1R-08…F1R-11 | da fare |
 | 2 | Fine partita e ricompense | `post-match.md` | F1R-14 | da fare |
 | 3 | Game Review e Rigioca l'errore | `review.md` (approvato) | F1R-10, F1R-16 | da fare |
-| 4 | Suggerimenti e Check in partita | `coach-in-game.md` | F1R-16 | da fare |
+| 4 | Suggerimenti e Check in partita | `coach-in-game.md` (bozza) | F1R-16 | da approvare |
 | 5 | Pre-partita e avversari | `pre-game.md` | D11 | da fare |
 | 6 | Home | `home.md` (bozza) | F1R-04 | da fare |
 | 7 | Sfida del giorno | `daily-puzzle.md` | F1R-02, F1R-10 | da fare |
