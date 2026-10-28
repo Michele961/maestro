@@ -1,5 +1,6 @@
 package it.maestro.app.data.local
 
+import androidx.annotation.StringRes
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.ai.puzzle.TacticalPuzzleGenerator
@@ -89,9 +90,10 @@ public object DailyPuzzleProvider {
     }
 
     /**
-     * Fornisce la spiegazione logica e pedagogica del concetto tattico illustrato dal puzzle.
+     * Il codice della lezione che il puzzle illustra: dice cosa insegna la mossa giusta. I testi (concetto e
+     * regola d'oro) stanno in `strings.xml`, non qui (ADR-0007).
      */
-    public fun getLogicalConcept(puzzle: TacticalPuzzle): String {
+    public fun lessonOf(puzzle: TacticalPuzzle): PuzzleLesson {
         val first = puzzle.firstMove
         val card = first.card
         val capture = first.capture
@@ -102,57 +104,25 @@ public object DailyPuzzleProvider {
         val takesSettebello = capture.contains(settebello) || (card == settebello && capture.isNotEmpty())
 
         return when {
-            isSweep || puzzle.goal == PuzzleGoal.MAKE_SWEEP ->
-                "Svuotare il tavolo con una Scopa (+1 punto) priva l'avversario di qualsiasi combinazione e lo obbliga a calare a vuoto nel turno successivo."
-
-            takesSettebello ->
-                "Il 7 di Denari è la carta sovrana della Scopa: garantisce il punto del Settebello, assegna un Denaro prezioso e vale 21 per la Primiera."
-
-            capture.any { it.rank == Rank.SETTE || it.rank == Rank.SEI } ->
-                "Dare priorità a 7 e 6 (rispettivamente 21 e 18 punti di Primiera) protegge o ribalta il punto più conteso contro le Figure che ne valgono solo 10."
-
-            capture.count { it.suit == Suit.DENARI } >= 2 ->
-                "Catturare più carte di Denari assicura il controllo dell'oro e avvicina alla soglia decisiva di 6 Denari per la vittoria del punto."
-
-            puzzle.goal == PuzzleGoal.WIN_MATCH ->
-                "Nella smazzata decisiva ogni carta catturata sposta il saldo: calcolare la mossa che taglia il traguardo prima dell'avversario garantisce la vittoria finale."
-
-            else ->
-                "Ottimizzare il saldo delle prese massimizza il bottino di carte e impedisce all'avversario di realizzare combinazioni facili di Scopa."
+            isSweep || puzzle.goal == PuzzleGoal.MAKE_SWEEP -> PuzzleLesson.SWEEP
+            takesSettebello -> PuzzleLesson.SETTEBELLO
+            capture.any { it.rank == Rank.SETTE || it.rank == Rank.SEI } -> PuzzleLesson.SEVEN_OR_SIX
+            capture.count { it.suit == Suit.DENARI } >= 2 -> PuzzleLesson.DENARI
+            puzzle.goal == PuzzleGoal.WIN_MATCH -> PuzzleLesson.WIN_MATCH
+            else -> PuzzleLesson.BALANCE
         }
     }
+}
 
-    /**
-     * Fornisce la regola d'oro e massima strategica del Maestro per il puzzle risolto.
-     */
-    public fun getGoldenRule(puzzle: TacticalPuzzle): String {
-        val first = puzzle.firstMove
-        val card = first.card
-        val capture = first.capture
-        val table = puzzle.initialView.table
-
-        val isSweep = table.isNotEmpty() && capture.containsAll(table) && table.containsAll(capture)
-        val settebello = Card(Rank.SETTE, Suit.DENARI)
-        val takesSettebello = capture.contains(settebello) || (card == settebello && capture.isNotEmpty())
-
-        return when {
-            isSweep || puzzle.goal == PuzzleGoal.MAKE_SWEEP ->
-                "Quando puoi ripulire il banco con una Scopa, fallo sempre: costringi l'avversario a calare a vuoto nel turno dopo."
-
-            takesSettebello ->
-                "Il Settebello non si regala e non si lascia a terra: è la carta più preziosa del mazzo e assegna un punto secco."
-
-            capture.any { it.rank == Rank.SETTE || it.rank == Rank.SEI } ->
-                "In Primiera un 7 o un 6 valgono più di due Figure: dai sempre la precedenza a 7 e 6 rispetto a Re e Cavalli."
-
-            capture.count { it.suit == Suit.DENARI } >= 2 ->
-                "Chi governa i Denari governa la partita: punta dritto alla soglia di 6 ori per blindare il punto di mazzo."
-
-            puzzle.goal == PuzzleGoal.WIN_MATCH ->
-                "All'ultima mano conta le prese prima dello stile: fai la giocata che ti assicura il traguardo matematico."
-
-            else ->
-                "Valuta sempre il saldo delle carte e nega all'avversario combinazioni facili di presa."
-        }
-    }
+/** Cosa insegna un puzzle risolto, con il testo del concetto tattico e quello della regola d'oro del Maestro. */
+public enum class PuzzleLesson(
+    @StringRes public val conceptRes: Int,
+    @StringRes public val ruleRes: Int,
+) {
+    SWEEP(R.string.puzzle_concept_sweep, R.string.puzzle_rule_sweep),
+    SETTEBELLO(R.string.puzzle_concept_settebello, R.string.puzzle_rule_settebello),
+    SEVEN_OR_SIX(R.string.puzzle_concept_seven_or_six, R.string.puzzle_rule_seven_or_six),
+    DENARI(R.string.puzzle_concept_denari, R.string.puzzle_rule_denari),
+    WIN_MATCH(R.string.puzzle_concept_win_match, R.string.puzzle_rule_win_match),
+    BALANCE(R.string.puzzle_concept_balance, R.string.puzzle_rule_balance),
 }

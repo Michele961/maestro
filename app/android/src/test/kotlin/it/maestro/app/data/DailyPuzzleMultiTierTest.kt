@@ -2,6 +2,7 @@ package it.maestro.app.data
 
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.app.data.local.DailyPuzzleProvider
+import it.maestro.app.data.local.PuzzleLesson
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,32 +47,19 @@ class DailyPuzzleMultiTierTest {
     }
 
     @Test
-    fun dailyPuzzle_logicalConcept_returnsPedagogicalAdvice() {
-        val tier0 = DailyPuzzleProvider.getDailyPuzzle(testDate, 0)
-        val concept0 = DailyPuzzleProvider.getLogicalConcept(tier0)
-        assertTrue(concept0.isNotBlank(), "Il concetto logico del puzzle tier 0 non deve essere vuoto")
-
-        val tier1 = DailyPuzzleProvider.getDailyPuzzle(testDate, 1)
-        val concept1 = DailyPuzzleProvider.getLogicalConcept(tier1)
-        assertTrue(concept1.isNotBlank(), "Il concetto logico del puzzle tier 1 non deve essere vuoto")
-
-        val tier2 = DailyPuzzleProvider.getDailyPuzzle(testDate, 2)
-        val concept2 = DailyPuzzleProvider.getLogicalConcept(tier2)
-        assertTrue(concept2.isNotBlank(), "Il concetto logico del puzzle tier 2 non deve essere vuoto")
+    fun dailyPuzzle_everyTierHasALessonWithConceptAndGoldenRuleTexts() {
+        // I testi stanno in strings.xml (ADR-0007): il provider restituisce solo il codice della lezione.
+        (0..2).forEach { tierIndex ->
+            val lesson = DailyPuzzleProvider.lessonOf(DailyPuzzleProvider.getDailyPuzzle(testDate, tierIndex))
+            assertTrue(lesson.conceptRes != 0 && lesson.ruleRes != 0, "Il livello $tierIndex deve avere i testi di lezione")
+        }
     }
 
     @Test
-    fun dailyPuzzle_goldenRule_returnsStrategicTakeaway() {
-        val tier0 = DailyPuzzleProvider.getDailyPuzzle(testDate, 0)
-        val rule0 = DailyPuzzleProvider.getGoldenRule(tier0)
-        assertTrue(rule0.isNotBlank(), "La regola d'oro del puzzle tier 0 non deve essere vuota")
-
-        val tier1 = DailyPuzzleProvider.getDailyPuzzle(testDate, 1)
-        val rule1 = DailyPuzzleProvider.getGoldenRule(tier1)
-        assertTrue(rule1.isNotBlank(), "La regola d'oro del puzzle tier 1 non deve essere vuota")
-
-        val tier2 = DailyPuzzleProvider.getDailyPuzzle(testDate, 2)
-        val rule2 = DailyPuzzleProvider.getGoldenRule(tier2)
-        assertTrue(rule2.isNotBlank(), "La regola d'oro del puzzle tier 2 non deve essere vuota")
+    fun puzzleLesson_everyCodeHasItsOwnTexts() {
+        val concepts = PuzzleLesson.entries.map { it.conceptRes }
+        val rules = PuzzleLesson.entries.map { it.ruleRes }
+        assertEquals(PuzzleLesson.entries.size, concepts.distinct().size)
+        assertEquals(PuzzleLesson.entries.size, rules.distinct().size)
     }
 }

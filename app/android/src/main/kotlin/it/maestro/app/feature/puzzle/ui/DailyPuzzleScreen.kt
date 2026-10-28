@@ -66,6 +66,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleUiState
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
+import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.feature.table.ui.phrasesText
 import it.maestro.app.feature.puzzle.presentation.PuzzleShareFormatter
 
 /**
@@ -79,6 +81,12 @@ public fun DailyPuzzleScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val symbols = PuzzleShareFormatter.tierSymbols(uiState.solvedTiers, uiState.availableTiers.size)
+    val shareText = if (uiState.status is DailyPuzzleStatus.Solved) {
+        stringResource(R.string.puzzle_share_solved, uiState.puzzleNumber, symbols)
+    } else {
+        stringResource(R.string.puzzle_share_played, uiState.puzzleNumber)
+    }
     // Se l'app torna in primo piano dopo mezzanotte si passa alla sfida del nuovo giorno (F1R-02).
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.refreshDay() }
 
@@ -88,8 +96,9 @@ public fun DailyPuzzleScreen(
         onPlayCard = { viewModel.playCard(it) },
         onRetry = { viewModel.retryAttempt() },
         onRequestHint = { viewModel.requestHint() },
+        onShowSolution = { viewModel.showSolution() },
         onReplay = { viewModel.replayPuzzle() },
-        onShare = { PuzzleShareFormatter.shareViaIntent(context, uiState.shareText) },
+        onShare = { PuzzleShareFormatter.shareViaIntent(context, shareText) },
         onSelectTier = { viewModel.selectTier(it) },
         onNextTier = { viewModel.nextTier() },
         onNavigateHome = onNavigateHome,
@@ -106,6 +115,7 @@ public fun DailyPuzzleScreenContent(
     onPlayCard: (Card) -> Unit = {},
     onRetry: () -> Unit = {},
     onRequestHint: () -> Unit = {},
+    onShowSolution: () -> Unit = {},
     onReplay: () -> Unit = {},
     onShare: () -> Unit = {},
     onSelectTier: (Int) -> Unit = {},
@@ -148,6 +158,7 @@ public fun DailyPuzzleScreenContent(
             PuzzleCoachArea(
                 uiState = uiState,
                 onRequestHint = onRequestHint,
+                onShowSolution = onShowSolution,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 14.dp, vertical = 4.dp),
@@ -257,8 +268,7 @@ public fun DailyPuzzleScreenContent(
                 is DailyPuzzleStatus.Solved -> {
                     SolvedCelebrationBanner(
                         attemptsCount = status.attemptsCount,
-                        logicalConcept = uiState.logicalConcept,
-                        goldenRule = uiState.goldenRule,
+                        lesson = uiState.lesson,
                         hasNextTier = uiState.currentTierIndex + 1 < uiState.availableTiers.size,
                         onNextTier = onNextTier,
                         onReplay = onReplay,
@@ -355,6 +365,7 @@ private fun PuzzleGoalBanner(
 private fun PuzzleCoachArea(
     uiState: DailyPuzzleUiState,
     onRequestHint: () -> Unit = {},
+    onShowSolution: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isSolved = uiState.status is DailyPuzzleStatus.Solved
@@ -385,12 +396,25 @@ private fun PuzzleCoachArea(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 MaestroSpeechBubble(
-                    message = stringResource(uiState.maestroMessageResId),
+                    message = if (uiState.maestroPhrases.isEmpty()) {
+                        stringResource(uiState.maestroMessageResId)
+                    } else {
+                        phrasesText(uiState.maestroPhrases)
+                    },
                     tail = BubbleTail.START,
                     fontSize = 12.sp,
                     maxLines = 6,
                     modifier = Modifier.fillMaxWidth().testTag("puzzle_coach_bubble"),
                 )
+                if (uiState.solutionShown && uiState.lesson != null) {
+                    Text(
+                        text = stringResource(uiState.lesson.conceptRes),
+                        color = Color.White.copy(alpha = 0.95f),
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        modifier = Modifier.testTag("puzzle_solution_concept"),
+                    )
+                }
                 if (!isSolved) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -404,6 +428,16 @@ private fun PuzzleCoachArea(
                             fontSize = 11.sp,
                             contentPadding = PaddingValues(horizontal = 10.dp),
                             testTag = "puzzle_coach_hint_button",
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        MaestroPillButton(
+                            text = stringResource(R.string.puzzle_button_solution).uppercase(),
+                            onClick = onShowSolution,
+                            variant = PillButtonVariant.WOOD,
+                            height = 26.dp,
+                            fontSize = 11.sp,
+                            contentPadding = PaddingValues(horizontal = 10.dp),
+                            testTag = "puzzle_coach_solution_button",
                         )
                     }
                 }
@@ -565,8 +599,7 @@ private fun PuzzleTierSelector(
 @Composable
 private fun SolvedCelebrationBanner(
     attemptsCount: Int,
-    logicalConcept: String,
-    goldenRule: String = "",
+    lesson: PuzzleLesson?,
     hasNextTier: Boolean,
     onNextTier: () -> Unit,
     onReplay: () -> Unit,
@@ -610,7 +643,7 @@ private fun SolvedCelebrationBanner(
                 textAlign = TextAlign.Center,
             )
 
-            if (logicalConcept.isNotBlank()) {
+            if (lesson != null) {
                 Surface(
                     color = Color(0xFF122316),
                     shape = RoundedCornerShape(8.dp),
@@ -631,7 +664,7 @@ private fun SolvedCelebrationBanner(
                             fontFamily = MaestroDisplayFont,
                         )
                         Text(
-                            text = logicalConcept,
+                            text = stringResource(lesson.conceptRes),
                             color = Color.White.copy(alpha = 0.95f),
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
@@ -641,7 +674,7 @@ private fun SolvedCelebrationBanner(
                 }
             }
 
-            if (goldenRule.isNotBlank()) {
+            if (lesson != null) {
                 Surface(
                     color = Color(0xFF2A170C),
                     shape = RoundedCornerShape(8.dp),
@@ -662,7 +695,7 @@ private fun SolvedCelebrationBanner(
                             fontFamily = MaestroDisplayFont,
                         )
                         Text(
-                            text = goldenRule,
+                            text = stringResource(lesson.ruleRes),
                             color = Color(0xFFFFF8DC),
                             fontSize = 12.sp,
                             lineHeight = 16.sp,

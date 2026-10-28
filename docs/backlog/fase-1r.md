@@ -311,7 +311,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-27 — Sfida del Giorno
 
-- **Stato:** da fare (dossier `docs/app/features/daily-puzzle.md` approvato il 2026-10-28)
+- **Stato:** in corso (dossier `docs/app/features/daily-puzzle.md` approvato il 2026-10-28). 27a fatto: concetto tattico, regola d'oro e testo di condivisione sono in `strings.xml` it/en (`PuzzleLesson` è il codice calcolato dal provider; nessuna stringa italiana in Kotlin; la condivisione senza tentativi arriva con 27c). 27b fatto: indizio 1 nomina una carta della posizione, indizio 2 è una domanda sulla ragione, «Mostrami la soluzione» nomina la carta giusta e spiega perché (`PuzzleCoach` sopra `HintComposer`; testi [bozza] in `strings.xml`). Non assegna crediti da sola: per quelli si gioca la carta (domanda per Michele: la sfida risolta dopo aver visto la soluzione deve pagare i crediti?). 27c fatto: il testo condiviso è «Maestro Scopa #N — Sfida risolta!» più i tre livelli in simboli (✔ ✔ ○), senza tentativi, da `strings.xml`.
 - **Riferimenti:** `docs/app/features/daily-puzzle.md`, F1R-02, F1R-10
 - **Sotto-task:** 27a testi fuori dal codice, 27b indizio e «Mostrami la soluzione» con la voce del Maestro, 27c condivisione senza spoiler né errori, 27d mini-tavolo sulla regia, 27e flusso e stati con livello consigliato dal radar e serie di sfide distinta dalla serie di giorni. Archivio dei giorni passati: fuori (a pagamento).
 - **Domande aperte:** —

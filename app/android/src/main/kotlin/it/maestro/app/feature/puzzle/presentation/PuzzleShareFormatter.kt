@@ -8,31 +8,14 @@ import android.content.Intent
 /**
  * Formattatore e gestore della condivisione social per la "Sfida del Giorno" (task F2-03).
  *
- * Genera stringhe formattate senza spoiler in stile Wordle ("Maestro Scopa #14 — Risolto al 1° tentativo!")
- * e attiva l'Intent standard di Android [Intent.ACTION_SEND].
+ * Copia il testo di condivisione (che viene da `strings.xml`) negli appunti e attiva l'Intent standard di
+ * Android [Intent.ACTION_SEND].
  */
 public object PuzzleShareFormatter {
 
-    /**
-     * Genera la stringa di condivisione senza rivelare le carte o la soluzione.
-     */
-    public fun formatShareText(
-        puzzleNumber: Int,
-        attemptsCount: Int,
-        solved: Boolean = true,
-    ): String {
-        return if (solved) {
-            val attemptSuffix = when (attemptsCount) {
-                1 -> "1°"
-                2 -> "2°"
-                3 -> "3°"
-                else -> "${attemptsCount}°"
-            }
-            "Maestro Scopa #$puzzleNumber — Risolto al $attemptSuffix tentativo!"
-        } else {
-            "Maestro Scopa #$puzzleNumber — Ho giocato la Sfida del Giorno!"
-        }
-    }
+    /** I livelli del giorno in simboli, senza dire quanti tentativi sono serviti: «✔ ✔ ○». */
+    public fun tierSymbols(solvedTiers: Set<Int>, tierCount: Int): String =
+        (0 until tierCount).joinToString(" ") { if (it in solvedTiers) "✔" else "○" }
 
     private const val CLIP_LABEL: String = "Maestro Scopa"
 

@@ -6,6 +6,9 @@ import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
+import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.domain.coach.Phrase
+import it.maestro.app.domain.coach.PuzzleCoach
 import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
@@ -46,13 +49,15 @@ public data class DailyPuzzleUiState(
     val maestroMood: MaestroMood = MaestroMood.THINKING,
     val maestroMessageResId: Int = R.string.puzzle_coach_initial,
     val goalDescriptionResId: Int = R.string.puzzle_goal_sweep_desc,
-    val shareText: String = "",
     val isAlreadySolvedToday: Boolean = false,
     val currentTierIndex: Int = 0,
     val availableTiers: List<DailyPuzzleTier> = DailyPuzzleProvider.TIERS,
     val solvedTiers: Set<Int> = emptySet(),
-    val logicalConcept: String = "",
-    val goldenRule: String = "",
+    val lesson: PuzzleLesson? = null,
+    /** Battuta del Maestro composta con le carte della posizione (indizio o soluzione); vuota = vale [maestroMessageResId]. */
+    val maestroPhrases: List<Phrase> = emptyList(),
+    /** `true` dopo «Mostrami la soluzione»: il Maestro ha spiegato la mossa. */
+    val solutionShown: Boolean = false,
 )
 
 /**
@@ -119,8 +124,7 @@ public class DailyPuzzleViewModel(
         } else {
             DailyPuzzleProvider.getDailyPuzzle(effectiveDate, tierIndex)
         }
-        val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
-        val goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle)
+        val lesson = DailyPuzzleProvider.lessonOf(puzzle)
 
         viewModelScope.launch {
             val record = repository.getDailyPuzzleRecord(dateString)
@@ -153,16 +157,12 @@ public class DailyPuzzleViewModel(
                     maestroMood = MaestroMood.TRIUMPHANT,
                     maestroMessageResId = R.string.puzzle_coach_already_solved,
                     goalDescriptionResId = goalMsg,
-                    shareText = PuzzleShareFormatter.formatShareText(
-                        puzzleNumber = puzzleNumber,
-                        attemptsCount = maxOf(1, record.attemptsToday),
-                        solved = true,
-                    ),
                     isAlreadySolvedToday = true,
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
-                    logicalConcept = concept,
-                    goldenRule = goldenRule,
+                    lesson = lesson,
+                    maestroPhrases = emptyList(),
+                    solutionShown = false,
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
@@ -178,8 +178,9 @@ public class DailyPuzzleViewModel(
                     isAlreadySolvedToday = false,
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
-                    logicalConcept = concept,
-                    goldenRule = goldenRule,
+                    lesson = lesson,
+                    maestroPhrases = emptyList(),
+                    solutionShown = false,
                 )
             }
         }
@@ -200,13 +201,7 @@ public class DailyPuzzleViewModel(
         val newAttempts = currentState.attemptsCount + 1
 
         if (isCorrect) {
-            val shareText = PuzzleShareFormatter.formatShareText(
-                puzzleNumber = currentState.puzzleNumber,
-                attemptsCount = newAttempts,
-                solved = true,
-            )
-            val concept = DailyPuzzleProvider.getLogicalConcept(puzzle)
-            val goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle)
+            val lesson = DailyPuzzleProvider.lessonOf(puzzle)
             val updatedSolvedTiers = currentState.solvedTiers + currentState.currentTierIndex
             val currentTier = DailyPuzzleProvider.TIERS.getOrNull(currentState.currentTierIndex)
                 ?: DailyPuzzleProvider.TIERS[0]
@@ -219,10 +214,9 @@ public class DailyPuzzleViewModel(
                 attemptsCount = newAttempts,
                 maestroMood = MaestroMood.TRIUMPHANT,
                 maestroMessageResId = R.string.puzzle_coach_solved,
-                shareText = shareText,
                 solvedTiers = updatedSolvedTiers,
-                logicalConcept = concept,
-                goldenRule = goldenRule,
+                lesson = lesson,
+                maestroPhrases = emptyList(),
             )
             if (!wasAlreadySolved) {
                 viewModelScope.launch {
@@ -241,21 +235,14 @@ public class DailyPuzzleViewModel(
             }
         } else {
             val hintLevel = if (newAttempts == 1) 1 else 2
-            val hintResId = when (hintLevel) {
-                1 -> R.string.puzzle_coach_hint_level1
-                else -> when (puzzle.goal) {
-                    PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_coach_hint_sweep
-                    PuzzleGoal.WIN_MATCH -> R.string.puzzle_coach_hint_win
-                    PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_coach_hint_points
-                }
-            }
+            val hint = PuzzleCoach.hint(puzzle.firstMove, puzzle.initialView.table, hintLevel)
             val mood = if (hintLevel == 1) MaestroMood.ENCOURAGING else MaestroMood.THINKING
 
             _uiState.value = currentState.copy(
                 status = DailyPuzzleStatus.WrongAttempt(attemptNumber = newAttempts, hintLevel = hintLevel),
                 attemptsCount = newAttempts,
                 maestroMood = mood,
-                maestroMessageResId = hintResId,
+                maestroPhrases = hint.phrases,
             )
         }
     }
@@ -270,20 +257,29 @@ public class DailyPuzzleViewModel(
 
         val currentLevel = when (val s = currentState.status) {
             is DailyPuzzleStatus.WrongAttempt -> s.hintLevel
-            else -> if (currentState.maestroMessageResId == R.string.puzzle_coach_hint_level1) 1 else 0
+            else -> if (currentState.maestroPhrases.firstOrNull()?.id == "puzzle_hint_card") 1 else 0
         }
         val nextLevel = (currentLevel + 1).coerceAtMost(2)
-        val hintResId = when (nextLevel) {
-            1 -> R.string.puzzle_coach_hint_level1
-            else -> when (puzzle.goal) {
-                PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_coach_hint_sweep
-                PuzzleGoal.WIN_MATCH -> R.string.puzzle_coach_hint_win
-                PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_coach_hint_points
-            }
-        }
+        val hint = PuzzleCoach.hint(puzzle.firstMove, puzzle.initialView.table, nextLevel)
         _uiState.value = currentState.copy(
             maestroMood = MaestroMood.ENCOURAGING,
-            maestroMessageResId = hintResId,
+            maestroPhrases = hint.phrases,
+        )
+    }
+
+    /**
+     * «Mostrami la soluzione»: il Maestro nomina la carta giusta e spiega perché. Non risolve la sfida: per i crediti
+     * si gioca comunque la carta.
+     */
+    public fun showSolution() {
+        val currentState = _uiState.value
+        if (currentState.status is DailyPuzzleStatus.Solved) return
+        val puzzle = currentState.puzzle ?: return
+        val solution = PuzzleCoach.solution(puzzle.firstMove, puzzle.initialView.table)
+        _uiState.value = currentState.copy(
+            maestroMood = MaestroMood.PLEASED,
+            maestroPhrases = solution.phrases,
+            solutionShown = true,
         )
     }
 
@@ -326,8 +322,9 @@ public class DailyPuzzleViewModel(
             maestroMood = MaestroMood.THINKING,
             maestroMessageResId = initialSpeech,
             goalDescriptionResId = goalMsg,
-            logicalConcept = DailyPuzzleProvider.getLogicalConcept(puzzle),
-            goldenRule = DailyPuzzleProvider.getGoldenRule(puzzle),
+            lesson = DailyPuzzleProvider.lessonOf(puzzle),
+            maestroPhrases = emptyList(),
+            solutionShown = false,
         )
     }
 }
