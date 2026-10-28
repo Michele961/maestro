@@ -236,10 +236,10 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-18 — Avversari come personaggi
 
-- **Stato:** da fare
-- **Riferimenti:** decisione D11 (`docs/roadmap.md` §3)
-- **Obiettivo:** ogni livello di difficoltà è un avversario con nome, ritratto e frase; scelta nella modale pre-partita secondo D11.
-- **Domande aperte:** nomi e ritratti dei personaggi (Michele).
+- **Stato:** da fare (dossier `docs/app/features/pre-game.md` approvato il 2026-10-28; sotto-task 18a–e)
+- **Riferimenti:** decisione D11 (`docs/roadmap.md` §3), `docs/app/features/pre-game.md`, prompt asset in `docs/art/asset-prompts.md` (Set Avversari)
+- **Obiettivo:** cinque avversari con nome, titolo e ritratto in una scala di sfida: si sblocca il successivo battendo il precedente in una partita completa in Classica. Progressi in DataStore; ricompense: titoli (esperienza e obiettivi quando esisteranno), nessuna moneta.
+- **Domande aperte:** nomi e titoli definitivi (proposte nel prompt degli asset); asset di Michele per F1R-18d.
 
 ## F1R-19 — Home senza voci finte
 

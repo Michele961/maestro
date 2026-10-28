@@ -55,3 +55,83 @@ objects, not touching, front view, no text:
    sides (the pedestal under the main play button);
 4) a small hanging Italian tricolor cloth banner on a wooden rod.
 ```
+
+## Set Avversari (task F1R-18d)
+
+Cinque avversari del circolo, dal più debole al più forte (livelli del motore: Principiante, Dilettante, Intermedio, Avanzato, Maestro). **Nomi e titoli sono proposte**: cambiali pure prima di generare, ma il titolo non compare nell'immagine (niente testo), lo mette il codice.
+
+| # | Livello | Nome (proposta) | Titolo (proposta) | Carattere |
+| --- | --- | --- | --- | --- |
+| 1 | Principiante | Gigi | «L'ultimo arrivato» | Ragazzo imbranato, entusiasta, berretto di lana |
+| 2 | Dilettante | Nonna Rosa | «Campionessa del pianerottolo» | Signora allegra, scialle, occhiali sul naso |
+| 3 | Intermedio | Tonino | «Il migliore del bar» | Cinquantenne sicuro di sé, baffi, camicia a maniche rimboccate |
+| 4 | Avanzato | Don Alfonso | «Il terrore del circolo» | Signore elegante e severo, coppola, sigaro spento |
+| 5 | Maestro | Il Maestro | «Il Maestro» | Il coach (vedi `style-guide.md` §3), qui nella veste di sfidante finale |
+
+### Regole specifiche
+
+- **Stessa conversazione** dei mockup approvati e dell'avatar del Maestro (`maestro_avatar_v1.jpg`): stesso pennello, stessa cornice.
+- Ritratto = mezzo busto in **cornice circolare in ottone**, sguardo verso chi guarda, luce calda di taverna. Il fondo fuori dalla cornice è piatto: verde `#00FF00` (se usi il verde nel personaggio, magenta `#FF00FF`).
+- Niente testo, niente scritte sulle cornici e sugli stemmi.
+- Un'immagine per set, oggetti **separati e non a contatto**. Se la coerenza dei volti cala, genera un personaggio per immagine ripartendo dalla riga del personaggio.
+
+### Set 4 — Ritratti, espressione neutra (fondo verde)
+
+```
+In the same painted style as the Maestro avatar above, on a plain flat bright green background
+(#00FF00), draw 5 separate round portrait avatars, not touching, each a half-length bust of a
+different Italian card-club character inside an ornate circular polished brass frame, warm tavern
+lighting, friendly caricature-leaning style, front view, no text, no letters:
+1) Gigi: a clumsy enthusiastic young man in his early 20s, wool beanie, wide eager smile, slightly
+   oversized sweater;
+2) Nonna Rosa: a cheerful elderly woman with grey bun, shawl and glasses low on her nose, mischievous smile;
+3) Tonino: a confident man in his 50s with a thick moustache, shirt with rolled-up sleeves, smug half-smile;
+4) Don Alfonso: an elegant stern older gentleman, flat cap (coppola), unlit cigar in the corner of
+   his mouth, one raised eyebrow;
+5) the Maestro: the wise elderly coach, short white hair and trimmed beard, dark green vest over a
+   linen shirt, calm warm smile.
+All five faces must clearly differ in age, hair and expression. No robots, no neon, no sci-fi.
+```
+
+### Set 5 — Ritratti, vittoria e sconfitta (fondo verde)
+
+Uno per personaggio (5 immagini), ripartendo dal ritratto neutro dello stesso personaggio.
+
+```
+Same character as in the previous image (<NOME>), same circular brass frame, same style, on a
+plain flat bright green background (#00FF00). Draw 2 separate round portraits, not touching:
+1) the character delighted after winning the game, triumphant grin, fist pumped;
+2) the character defeated after losing the game, rueful smile, hand on forehead.
+No text.
+```
+
+### Set 6 — Stemmi (fondo magenta)
+
+Uno stemma per avversario, mostrato accanto al ritratto sulla scala. Medaglione di ottone con un emblema, **senza lettere**.
+
+```
+In the same painted style, on a plain flat magenta background (#FF00FF), draw 5 separate round
+brass crest medallions, not touching, front view, no text, no letters, each with a different
+emblem embossed in the center:
+1) a small wool beanie over a single playing card;
+2) a ball of yarn with knitting needles crossed over a cup;
+3) a coffee cup and a deck of cards on a bar counter;
+4) a flat cap and an unlit cigar crossed over a sword;
+5) a laurel wreath around a gold coin (the Settebello Denari symbol).
+Increasing richness: crest 1 is plain bronze, crest 5 is ornate gold with a red ribbon.
+```
+
+### Set 7 — Stato bloccato (fondo verde)
+
+Il codice oscura il ritratto per l'avversario bloccato; serve solo il lucchetto.
+
+```
+In the same painted style, on a plain flat bright green background (#00FF00), draw 2 separate
+objects, not touching: 1) a heavy brass padlock, closed, with a small dark wood backing disk;
+2) the same padlock, open. No text.
+```
+
+### Dopo la generazione
+
+Nomi di file attesi (`docs/art/asset-catalog.md` va aggiornato dal task F1R-18d):
+`opponent_1..5_neutral|win|lose`, `crest_1..5`, `lock_closed`, `lock_open`. Passare i ritagli da `scripts/prepare_assets.py` come per gli altri asset.
