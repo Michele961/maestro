@@ -289,6 +289,8 @@
     <string name="academy_module_completed_badge">COMPLETED</string>
     <string name="academy_button_start">START LESSON</string>
     <string name="academy_button_review">REPLAY LESSON</string>
+    <string name="academy_button_flash_review">QUICK REVIEW</string>
+    <string name="academy_button_reviewed">REVIEWED TODAY ✓</string>
     <string name="academy_button_locked">LOCKED</string>
     <string name="academy_button_next_step">NEXT STEP</string>
     <string name="academy_button_complete">CLAIM BADGE</string>

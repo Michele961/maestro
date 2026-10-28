@@ -289,6 +289,8 @@
     <string name="academy_module_completed_badge">COMPLETATO</string>
     <string name="academy_button_start">INIZIA LEZIONE</string>
     <string name="academy_button_review">RIGIOCA LEZIONE</string>
+    <string name="academy_button_flash_review">RIPASSO LAMPO</string>
+    <string name="academy_button_reviewed">RIPASSATA OGGI ✓</string>
     <string name="academy_button_locked">BLOCCATA</string>
     <string name="academy_button_next_step">PROSSIMO PASSO</string>
     <string name="academy_button_complete">CONQUISTA DISTINTIVO</string>

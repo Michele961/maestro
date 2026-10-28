@@ -210,6 +210,7 @@ public val appModule: Module = module {
             academyRepository = get(),
             rewardEngine = get(),
             masteryRepository = get(),
+            clock = get(),
         )
     }
 

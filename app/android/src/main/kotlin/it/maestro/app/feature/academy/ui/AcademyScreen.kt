@@ -100,6 +100,7 @@ public fun AcademyScreen(
                 onNavigateHome = onNavigateHome,
                 modifier = modifier,
                 recommendedChapterId = uiState.recommendedChapterId,
+                onOpenReview = { viewModel.openReview(it) },
             )
         }
         is AcademyViewMode.Lesson -> {
@@ -127,6 +128,7 @@ public fun AcademyChapterMapContent(
     onNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
     recommendedChapterId: AcademyChapterId? = null,
+    onOpenReview: (AcademyLessonId) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -202,6 +204,7 @@ public fun AcademyChapterMapContent(
                         isRecommended = recommendedChapterId == chapterState.chapter.id,
                         onToggle = { onToggleChapter(chapterState.chapter.id) },
                         onOpenLesson = onOpenLesson,
+                        onOpenReview = onOpenReview,
                     )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
@@ -221,6 +224,7 @@ private fun AcademyChapterCard(
     onOpenLesson: (AcademyLessonId) -> Unit,
     modifier: Modifier = Modifier,
     isRecommended: Boolean = false,
+    onOpenReview: (AcademyLessonId) -> Unit = {},
 ) {
     val chapter = chapterState.chapter
     val isUnlocked = chapterState.isUnlocked
@@ -413,6 +417,7 @@ private fun AcademyChapterCard(
                             lessonState = lessonState,
                             chapterNumber = chapter.number,
                             onOpenLesson = { onOpenLesson(lessonState.lesson.id) },
+                            onOpenReview = { onOpenReview(lessonState.lesson.id) },
                         )
                     }
                 }
@@ -430,6 +435,7 @@ private fun AcademyLessonTile(
     chapterNumber: Int,
     onOpenLesson: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenReview: () -> Unit = {},
 ) {
     val lesson = lessonState.lesson
     val progress = lessonState.progress
@@ -509,6 +515,18 @@ private fun AcademyLessonTile(
                     testTag = "academy_lesson_action_${chapterNumber}_${lesson.lessonNumber}",
                 )
             } else if (isCompleted) {
+                MaestroPillButton(
+                    text = stringResource(
+                        if (lessonState.isReviewedToday) R.string.academy_button_reviewed else R.string.academy_button_flash_review,
+                    ),
+                    onClick = onOpenReview,
+                    enabled = true,
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 38.dp,
+                    fontSize = 13.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "academy_lesson_flash_${chapterNumber}_${lesson.lessonNumber}",
+                )
                 MaestroPillButton(
                     text = stringResource(R.string.academy_button_review),
                     onClick = onOpenLesson,

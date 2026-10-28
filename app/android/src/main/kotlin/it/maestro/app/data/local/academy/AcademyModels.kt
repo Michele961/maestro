@@ -121,4 +121,11 @@ public data class AcademyLessonProgress(
     public val isUnlocked: Boolean = false,
     public val isCompleted: Boolean = false,
     public val completedAt: Long = 0L,
-)
+    /** Giorno (giorni dall'epoca) dell'ultimo ripasso lampo; [NEVER_REVIEWED] se mai ripassata. */
+    public val reviewedEpochDay: Long = NEVER_REVIEWED,
+) {
+    public companion object {
+        /** Valore di [reviewedEpochDay] per una lezione mai ripassata. */
+        public const val NEVER_REVIEWED: Long = -1L
+    }
+}

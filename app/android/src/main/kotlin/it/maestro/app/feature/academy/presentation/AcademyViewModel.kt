@@ -17,6 +17,8 @@ import it.maestro.app.feature.profile.presentation.weakestAxis
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.data.local.datastore.AcademyRepository
 import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
@@ -57,6 +59,8 @@ public fun recommendedChapter(
 public data class AcademyLessonCardState(
     public val lesson: AcademyLesson,
     public val progress: AcademyLessonProgress,
+    /** `true` se la lezione è stata ripassata (ripasso lampo) oggi. */
+    public val isReviewedToday: Boolean = false,
 )
 
 /**
@@ -85,6 +89,8 @@ public sealed interface AcademyViewMode {
         public val isCardActionCompleted: Boolean = false,
         @StringRes public val feedbackRes: Int? = null,
         public val dynamicMaestroMood: MaestroMood? = null,
+        /** Ripasso lampo: una domanda e la regola d'oro, senza crediti. */
+        public val isReview: Boolean = false,
     ) : AcademyViewMode {
         public val currentStep: AcademyStep
             get() = lesson.steps.getOrElse(currentStepIndex) { lesson.steps.first() }
@@ -124,6 +130,7 @@ public class AcademyViewModel(
     private val rewardEngine: RewardEngine? = null,
     private val availableChapters: List<AcademyChapter> = AcademyContent.CHAPTERS,
     private val masteryRepository: MasteryRepository? = null,
+    private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
     private val viewModeState = MutableStateFlow<AcademyViewMode>(AcademyViewMode.ChapterMap)
@@ -145,6 +152,7 @@ public class AcademyViewModel(
                 AcademyLessonCardState(
                     lesson = lesson,
                     progress = progress,
+                    isReviewedToday = progress.reviewedEpochDay == clock.today().toEpochDay(),
                 )
             }
             val completedCount = lessonStates.count { it.progress.isCompleted }
@@ -191,6 +199,22 @@ public class AcademyViewModel(
         viewModeState.value = AcademyViewMode.Lesson(
             lesson = lesson,
             currentStepIndex = 0,
+        )
+    }
+
+    /**
+     * Apre il ripasso lampo di una lezione: la domanda di verifica e la regola d'oro (nessun credito).
+     */
+    public fun openReview(lessonId: AcademyLessonId) {
+        val lesson = AcademyContent.ALL_LESSONS.firstOrNull { it.id == lessonId } ?: return
+        val summary = lesson.steps.lastOrNull { it.type == AcademyStepType.SUMMARY_AND_BADGE } ?: return
+        val question = lesson.steps.firstOrNull { it.type == AcademyStepType.INTERACTIVE_QUESTION }
+            ?: lesson.steps.first { it.type != AcademyStepType.SUMMARY_AND_BADGE }
+        val flash = lesson.copy(steps = listOf(question, summary))
+        viewModeState.value = AcademyViewMode.Lesson(
+            lesson = flash,
+            currentStepIndex = 0,
+            isReview = true,
         )
     }
 
@@ -250,7 +274,10 @@ public class AcademyViewModel(
         val currentLesson = viewModeState.value as? AcademyViewMode.Lesson ?: return
         val lesson = currentLesson.lesson
 
-        if (currentLesson.isLastStep) {
+        if (currentLesson.isLastStep && currentLesson.isReview) {
+            viewModelScope.launch { academyRepository.markReviewed(lesson.id) }
+            viewModeState.value = AcademyViewMode.ChapterMap
+        } else if (currentLesson.isLastStep) {
             viewModelScope.launch {
                 academyRepository.completeLesson(lesson.id)
                 rewardEngine?.onLessonCompleted(lesson.id.name)
@@ -262,6 +289,7 @@ public class AcademyViewModel(
                 lesson = lesson,
                 currentStepIndex = nextIndex,
                 dynamicMaestroMood = lesson.steps[nextIndex].maestroMood,
+                isReview = currentLesson.isReview,
             )
         }
     }
