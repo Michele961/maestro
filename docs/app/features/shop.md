@@ -1,7 +1,7 @@
 # Bottega e wallet — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-30 (da creare dopo l'approvazione), F1R-14, F2-11
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**.
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-30 (da creare dopo l'approvazione), F1R-14, F2-11
+Procedimento: `docs/app/features/README.md`. Approvato da Michele il 2026-10-28 con le decisioni del §6; i punti segnati **[proposta]** nel §3 valgono come approvati salvo diversa indicazione del §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -59,12 +59,11 @@ Resta una schermata sola, con tre tab, ma ogni oggetto si vede come sarà.
 | F1R-30e | Ritratto da Maestro dalla scala | Sblocco dalla vittoria sull'ultimo avversario (`RewardEngine`/`OpponentRepository`); test su una volta sola |
 | F1R-30f | Divisione del file e matrice finale | Nessun file sopra 400 righe; screenshot degli stati di §3 |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Provalo prima di comprare**: ti torna il riquadro con il mini-tavolo, o preferisci l'acquisto diretto come oggi ma con anteprime vere?
-2. **Conferma d'acquisto**: la vuoi sempre, o solo oltre una certa cifra?
-3. **Ritratto da Maestro**: sbloccato battendo l'ultimo avversario invece che a 75 crediti? Oppure resta a crediti?
-4. **Movimenti**: li vuoi nella Bottega, o li considero poco utili per ora?
-5. **Catalogo**: i dieci oggetti attuali e i prezzi (35…75) sono provvisori. Li confermi, o cambi quantità e prezzi? Nuovi tavoli o dorsi richiedono grafica che non posso inventare: me li indichi tu.
-6. **Dove si guadagnano i crediti**: oggi solo benvenuto, sfida del giorno, lezioni e missioni (D19: le partite non ne danno). Con la Bottega così, un giocatore che compra tutto impiega alcune settimane: ti sta bene, o va ritoccata l'economia nel dossier Missioni?
-7. **Fuori da questa feature**: confermi che pacchetti di crediti, annunci e abbonamento restano alla Fase 2 (F2-08…F2-10)?
+1. **«Provalo»**: sì. **Conferma d'acquisto**: sempre.
+2. **Ritratto da Maestro** dopo l'ultimo avversario: sì, ma probabilmente come **stemma o titolo**, non come ritratto (si definisce nel task F1R-30e insieme ai titoli del Profilo).
+3. **Movimenti**: utili se necessari; da valutare nel task F1R-30d (non bloccano le altre parti).
+4. **Catalogo**: da ampliare. L'agente prepara la **lista di tutti i contenuti da produrre** (`docs/app/features/shop-assets.md`); Michele genera le immagini.
+5. **Crediti**: come descritto; in futuro si guadagneranno anche con partite, tornei e classifiche settimanali. Quindi la Bottega non assume che i crediti arrivino solo dalle fonti attuali.
+6. **Fuori da questa feature**: acquisti a pagamento e annunci.

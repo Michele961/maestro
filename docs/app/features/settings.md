@@ -1,7 +1,7 @@
 # Impostazioni e audio — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-31 (da creare dopo l'approvazione), F1R-20 (audio a tre livelli), F1R-09
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**.
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-31 (da creare dopo l'approvazione), F1R-20 (audio a tre livelli), F1R-09
+Procedimento: `docs/app/features/README.md`. Approvato da Michele il 2026-10-28 con le decisioni del §6; i punti segnati **[proposta]** nel §3 valgono come approvati salvo diversa indicazione del §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -55,12 +55,11 @@ Da dialogo a **schermata** raggiungibile dall'icona di Home, a sezioni con titol
 | F1R-20 | Musica e ambiente | Con gli asset di Michele; cursori mostrati solo se gli asset esistono |
 | F1R-31e | Divisione dei file e matrice finale | Nessun file sopra 400 righe; screenshot degli stati di §3 |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Schermata o dialogo**: va bene passare a una schermata a sezioni, o preferisci tenere il dialogo e aggiungere solo le voci?
-2. **Lingua**: la vuoi tra le impostazioni (Sistema/Italiano/English), o per ora l'app segue il telefono?
-3. **Vibrazione**: la vuoi come interruttore a parte?
-4. **Volumi**: tre cursori separati come in `game-feel.md` §7 (dopo che esistono musica e ambiente), o ti basta un volume generale più l'interruttore?
-5. **Informazioni e privacy**: serve per il Play Store; il testo della privacy e il contatto per le segnalazioni li fornisci tu? Io preparo il posto e non invento il contenuto legale.
-6. **Musica e ambiente**: quando prevedi di fornire gli asset (F1R-20)? Nel frattempo i due cursori non compaiono.
-7. **«Chiacchiere»**: restano nelle Impostazioni, oppure vuoi un accesso rapido anche al tavolo?
+1. **Schermata a sezioni** al posto del dialogo: approvata.
+2. **Lingua** (Sistema/Italiano/English): sì.
+3. **Vibrazione, volumi, informazioni**: l'agente sceglie come da proposta (§3).
+4. **Musica e ambiente**: l'agente fornisce i **prompt** (`docs/app/features/audio-prompts.md`); Michele genera gli asset.
+5. **«Chiacchiere» dal tavolo**: interessante, da fare se fattibile (accesso rapido dal tavolo; valutato nel task F1R-31a).
+6. **Privacy/contatti**: l'agente prepara il posto; testo legale da Michele quando serve.

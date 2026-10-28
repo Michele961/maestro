@@ -21,12 +21,12 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 4 | Suggerimenti e Check in partita | `coach-in-game.md` | F1R-16 | approvato (2026-10-28) |
 | 5 | Pre-partita e avversari | `pre-game.md` | D11 | approvato (2026-10-28) |
 | 6 | Home | `home.md` (bozza) | F1R-04 | da fare |
-| 7 | Sfida del giorno | `daily-puzzle.md` (bozza) | F1R-02, F1R-10 | da approvare |
-| 8 | Accademia | `academy.md` (bozza) | F1R-10, F1R-21 | da approvare |
-| 9 | Profilo, Maestria e Radar | `profile.md` (bozza) | F1R-14 | da approvare |
-| 10 | Missioni, serie, esperienza e obiettivi | `missions.md` (bozza) | F1R-14 | da approvare |
-| 11 | Bottega e wallet | `shop.md` (bozza) | F1R-03, F1R-14 | da approvare |
-| 12 | Impostazioni e audio | `settings.md` (bozza) | F1R-09, F1R-20 | da approvare |
+| 7 | Sfida del giorno | `daily-puzzle.md` | F1R-02, F1R-10 | approvato (2026-10-28) |
+| 8 | Accademia | `academy.md` | F1R-10, F1R-21 | approvato (2026-10-28) |
+| 9 | Profilo, Maestria e Radar | `profile.md` | F1R-14 | approvato (2026-10-28) |
+| 10 | Missioni, serie, esperienza e obiettivi | `missions.md` | F1R-14 | approvato (2026-10-28) |
+| 11 | Bottega e wallet | `shop.md` | F1R-03, F1R-14 | approvato (2026-10-28) |
+| 12 | Impostazioni e audio | `settings.md` | F1R-09, F1R-20 | approvato (2026-10-28) |
 
 L'ordine segue l'impatto sul giocatore: prima ciò che si usa in ogni sessione.
 

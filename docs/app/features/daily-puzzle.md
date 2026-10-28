@@ -1,7 +1,7 @@
 # Sfida del Giorno — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-27 (da creare dopo l'approvazione), F1R-14, F1R-16
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**.
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-27 (da creare dopo l'approvazione), F1R-14, F1R-16
+Procedimento: `docs/app/features/README.md`. Approvato da Michele il 2026-10-28 con le decisioni del §6; i punti segnati **[proposta]** nel §3 valgono come approvati salvo diversa indicazione del §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -61,11 +61,11 @@ Ogni giorno, in cinque minuti, risolve un piccolo problema di Scopa: una posizio
 | F1R-27d | Mini-tavolo sulla regia | Tempi da `MotionSpec`; nessun `delay` nuovo; test di sequenza |
 | F1R-27e | Flusso e stati della schermata | Primo livello da fare in evidenza, stato dei tre livelli, serie di sfide; file sotto 400 righe; matrice a 4 configurazioni |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Errori**: ti torna che l'errore non tolga nulla e che il numero dei tentativi **non** compaia nel testo condiviso? Oggi compare («Risolto al 3° tentativo»).
-2. **Indizi e soluzione**: vuoi un pulsante «Mostrami la soluzione» (con spiegazione), oppure basta l'indizio in due livelli e poi si riprova all'infinito?
-3. **Archivio dei giorni passati**: confermi che resta fuori da questa feature (piano a pagamento)?
-4. **Livello consigliato dal radar** (punto 6): lo vuoi, o i tre livelli restano un percorso fisso Riscaldamento → Tattica → Maestro?
-5. **Serie di sfide**: la vuoi distinta dalla serie di giorni dell'app, o basta quella già esistente?
-6. **Crediti** 15/20/25 per livello: restano così? Le monete hanno ancora «un valore blando» (decisione 5 di `pre-game.md`) e la Bottega non è solida.
+1. **Errori** che non tolgono nulla e niente tentativi nel testo condiviso: confermato.
+2. **«Mostrami la soluzione»** con spiegazione: sì, utile.
+3. **Archivio dei giorni passati**: a pagamento, fuori da questa feature.
+4. **Livello consigliato dal radar**: sì.
+5. **Serie di sfide**: la sceglie l'agente (decisione: distinta dalla serie di giorni, perché misura una cosa diversa).
+6. **Crediti** 15/20/25: restano per ora; il valore dipenderà dall'economia, da rivedere dopo.
