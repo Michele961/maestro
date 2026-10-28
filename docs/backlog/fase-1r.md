@@ -321,6 +321,8 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Stato:** da fare (dossier `docs/app/features/academy.md` approvato il 2026-10-28)
 - **Riferimenti:** `docs/app/features/academy.md`, F1R-21
 - **Sotto-task:** 28a contenuti coerenti con la specifica (revisione F1R-21 a cura dell'agente), 28b percorso libero dal capitolo 2 e capitolo consigliato dal radar, 28c ripasso lampo, 28d titoli di capitolo, 28e mini-tavolo sulla regia, 28f divisione dei file e matrice finale. Moduli a pagamento: fuori.
+- **Stato avanzamento:** 28a fatto: corretti gli errori certi (articoli inesistenti, Settebello a +3 punti, «Re dei Denari», seme mancante come «0 punti», scopa all'ultima giocata, nomi inglesi Clubs/Knight); ogni lezione dichiara i paragrafi della specifica (`specRefs`) e `AcademyContentTest` li controlla.
+- **Da rileggere (Michele, testi [bozza]):** le lezioni 4.1 e 4.2 parlano di deduzioni «con certezza» (il giocatore può giocare qualunque carta, §4.4); la 4.3 dice che il Fante di Coppe «assicura l'ultima presa» (l'Asso resta a terra); i titoli «La Regola del Dispari» (3.3) e «L'Ultima Mano del Mazziere» (3.4) non corrispondono a regole della specifica; alcuni «sempre» sono consigli, non regole (1.4, 2.4, 3.2).
 - **Domande aperte:** —
 
 ## F1R-29 — Missioni, serie, esperienza e obiettivi

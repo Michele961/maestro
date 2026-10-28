@@ -298,7 +298,7 @@
     <string name="academy_question_prompt">What do the rules say?</string>
     <string name="academy_card_action_hint">Tap the correct card to play it on the table</string>
     <string name="academy_action_wrong_card">Suboptimal play. Follow the Maestro\'s advice and choose the designated card!</string>
-    <string name="academy_badge_plus_3_points">+3 Points</string>
+    <string name="academy_badge_plus_3_points">Settebello +1 pt</string>
     <string name="academy_badge_king_10_pt">King = 10 pt</string>
     <string name="academy_badge_six_18_pt">Six = 18 pt</string>
     <string name="academy_badge_plus_15_pt">+15 pt (4th Suit!)</string>
@@ -312,13 +312,13 @@
     <string name="academy_ch1_desc">Master mandatory single captures, the value of Settebello, and deck point economics.</string>
 
     <string name="academy_l1_1_title">The Single Capture</string>
-    <string name="academy_l1_1_subtitle">The Iron Rule of Article 3</string>
+    <string name="academy_l1_1_subtitle">The Iron Rule of the Matching Card</string>
     <string name="academy_l1_1_desc">The lone card commands over the pile: absolute priority on single matching cards.</string>
     <string name="academy_l1_1_rule">A single matching card always takes absolute precedence over any sum on the table.</string>
-    <string name="academy_l1_1_speech_q">A strict rule applies at the club: on the table lie a 7 of Swords, a 4 of Cups, and a 3 of Batons. In hand you hold the 7 of Coins. May you choose to take 4 and 3, leaving the 7?</string>
+    <string name="academy_l1_1_speech_q">A strict rule applies at the club: on the table lie a 7 of Swords, a 4 of Cups, and a 3 of Clubs. In hand you hold the 7 of Coins. May you choose to take 4 and 3, leaving the 7?</string>
     <string name="academy_l1_1_badge_q">Mandatory single capture</string>
     <string name="academy_l1_1_opt1">No, the rules require capturing the single card</string>
-    <string name="academy_l1_1_fb1">Correct! Rule 3: the single card always commands over any combination!</string>
+    <string name="academy_l1_1_fb1">Correct! A matching card always beats a sum: you must take that card!</string>
     <string name="academy_l1_1_opt2">Yes, I can freely choose what to take</string>
     <string name="academy_l1_1_fb2">Common mistake! If a matching single card is present, capturing it is mandatory by law.</string>
     <string name="academy_l1_1_speech_sum">Fundamental rule learned! Always remember: a matching single card on board takes precedence over any sum.</string>
@@ -335,11 +335,11 @@
     <string name="academy_l1_2_fb2">Careful: with 5 and 5 the point is tied and awarded to no one!</string>
     <string name="academy_l1_2_speech_sum">Excellent! Knowing the numerical thresholds allows calculating sacrifices needed to win the gold.</string>
 
-    <string name="academy_l1_3_title">The King of Coins</string>
-    <string name="academy_l1_3_subtitle">The Triple Value of Settebello</string>
-    <string name="academy_l1_3_desc">Why the 7 of Coins alone can flip up to 3 points out of 4.</string>
-    <string name="academy_l1_3_rule">The Settebello is worth 1 clean point, 1 coin, and 21 Primiera points: always protect it.</string>
-    <string name="academy_l1_3_speech_act">The Settebello alone is worth up to 3 deck points out of 4: clean point, gold for Coins, and 21 for Primiera. Capture it now with your 7 of Batons!</string>
+    <string name="academy_l1_3_title">The Settebello</string>
+    <string name="academy_l1_3_subtitle">One point, plus a hand for Coins and Primiera</string>
+    <string name="academy_l1_3_desc">Why the 7 of Coins is the most precious card in the deck.</string>
+    <string name="academy_l1_3_rule">The Settebello is worth 1 point, counts as a coin and as 21 Primiera points: protect it.</string>
+    <string name="academy_l1_3_speech_act">The Settebello is worth 1 point of its own, plus a coin and 21 Primiera points: capture it now with your 7 of Clubs!</string>
     <string name="academy_l1_3_badge_act">Capture the Settebello!</string>
     <string name="academy_l1_3_speech_sum">Well done! Masterful capture: the Settebello is secure in your treasury!</string>
 
@@ -375,22 +375,22 @@
     <string name="academy_l2_2_title">The Four Suits Formula</string>
     <string name="academy_l2_2_subtitle">The Value of Complete Coverage</string>
     <string name="academy_l2_2_desc">Primiera sums the top card of each suit: leave no empty holes.</string>
-    <string name="academy_l2_2_rule">Primiera is calculated by summing the best card per suit: Swords + Cups + Coins + Batons.</string>
+    <string name="academy_l2_2_rule">Primiera is calculated by summing the best card per suit: Swords + Cups + Coins + Clubs.</string>
     <string name="academy_l2_2_speech_q">How is the Primiera score calculated at the end of the deal?</string>
     <string name="academy_l2_2_badge_q">The 4 suits of the deck</string>
     <string name="academy_l2_2_opt1">By summing the highest card for each of the 4 suits</string>
-    <string name="academy_l2_2_fb1">Exactly! Having at least one card in every suit is essential to avoid a zero score.</string>
+    <string name="academy_l2_2_fb1">Exactly! Without a card in every suit you can\'t win Primiera.</string>
     <string name="academy_l2_2_opt2">By summing all captured cards of rank 7</string>
     <string name="academy_l2_2_fb2">Wrong: Sevens are valuable, but if a suit is missing, their value is wasted!</string>
     <string name="academy_l2_2_speech_sum">Golden rule: a Primiera with all 4 suits covered is an impregnable fortress.</string>
 
     <string name="academy_l2_3_title">The Empty Suit Trap</string>
-    <string name="academy_l2_3_subtitle">Avoiding the Fatal Zero</string>
-    <string name="academy_l2_3_desc">Why three 7s and zero Batons loses Primiera against modest cards.</string>
-    <string name="academy_l2_3_rule">An empty suit awards 0 points: covering all 4 suits takes absolute priority over ordinary captures.</string>
-    <string name="academy_l2_3_speech_act">You already captured three Sevens (Swords, Cups, and Coins), but zero Batons! On the table lies the 5 of Batons. Capture it immediately with your 5 of Swords to cover the fourth suit!</string>
+    <string name="academy_l2_3_subtitle">The Missing Suit</string>
+    <string name="academy_l2_3_desc">Why three 7s and zero Clubs loses Primiera against modest cards.</string>
+    <string name="academy_l2_3_rule">Without at least one card in every suit you can\'t win Primiera: sevens alone won\'t save you!</string>
+    <string name="academy_l2_3_speech_act">You already captured three Sevens (Swords, Cups, and Coins), but zero Clubs! On the table lies the 5 of Clubs. Capture it immediately with your 5 of Swords to cover the fourth suit!</string>
     <string name="academy_l2_3_badge_act">Protect all 4 suits</string>
-    <string name="academy_l2_3_speech_sum">Well done! With the 5 of Batons you locked Primiera at 78 points and avoided defeat!</string>
+    <string name="academy_l2_3_speech_sum">Well done! With the 5 of Clubs you locked Primiera at 78 points and avoided defeat!</string>
 
     <string name="academy_l2_4_title">Counting Sevens and Sixes</string>
     <string name="academy_l2_4_subtitle">Rapid Primiera Calculation</string>
@@ -425,7 +425,7 @@
     <string name="academy_l3_2_subtitle">The Art of Safe Drops</string>
     <string name="academy_l3_2_desc">How to select a high card to avoid unpleasant surprises.</string>
     <string name="academy_l3_2_rule">Drop a face card on a medium card to fortify the board and extinguish any Sweep hopes.</string>
-    <string name="academy_l3_2_speech_act">On the board lies a 6 of Batons. You have no valid captures. Play the Horse (9) to push the total to 15 and prevent gifting a Sweep!</string>
+    <string name="academy_l3_2_speech_act">On the board lies a 6 of Clubs. You have no valid captures. Play the Knight (9) to push the total to 15 and prevent gifting a Sweep!</string>
     <string name="academy_l3_2_badge_act">Exceed 10</string>
     <string name="academy_l3_2_speech_sum">Flawless maneuver! Sum 15: the board is fortified and the opponent cannot make a Sweep.</string>
 
@@ -444,13 +444,13 @@
     <string name="academy_l3_4_title">The Dealer\'s Final Hand</string>
     <string name="academy_l3_4_subtitle">The Endgame Privilege</string>
     <string name="academy_l3_4_desc">Sweeps are not allowed on the final trick: how to maximize your haul.</string>
-    <string name="academy_l3_4_rule">On the final trick of the deal Sweeps are forbidden by law: the last capture sweeps up all remaining cards.</string>
+    <string name="academy_l3_4_rule">On the last play of the deal a Sweep doesn\'t count: the remaining cards go to whoever made the last capture.</string>
     <string name="academy_l3_4_speech_q">We are at the very last play of the deal. Either you or your opponent captures all cards on the table. Does it count as a Sweep?</string>
     <string name="academy_l3_4_badge_q">Final capture of the deal</string>
-    <string name="academy_l3_4_opt1">No, by law the last capture of the deal never counts as a Sweep</string>
-    <string name="academy_l3_4_fb1">Fundamental club rule! On the final trick, Sweeps are never awarded: remaining cards go to whoever made the last capture.</string>
+    <string name="academy_l3_4_opt1">No, on the last play of the deal a Sweep never counts</string>
+    <string name="academy_l3_4_fb1">Club rule! On the last play no Sweep is scored; the remaining cards go to whoever made the last capture.</string>
     <string name="academy_l3_4_opt2">Yes, emptying the table is always a Sweep</string>
-    <string name="academy_l3_4_fb2">False! The final rule expressly forbids awarding a Sweep on the last play.</string>
+    <string name="academy_l3_4_fb2">False! On the very last play of the deal a Sweep never counts, even if you clear the table.</string>
     <string name="academy_l3_4_speech_sum">Third Chapter conquered! You are now a seasoned defensive strategist.</string>
 
     <!-- CHAPTER 4 -->
@@ -462,7 +462,7 @@
     <string name="academy_l4_1_subtitle">The Club\'s Flash Check</string>
     <string name="academy_l4_1_desc">Mentally counting the four Sevens to know exactly where the Settebello lies.</string>
     <string name="academy_l4_1_rule">Whoever tracks the flow of Sevens always knows if the Settebello is in the deck, on board, or in enemy hands.</string>
-    <string name="academy_l4_1_speech_q">The 7 of Swords, 7 of Cups, and 7 of Batons have already been played. On board lie a 4 and a 3. The opponent plays an Ace. What can you deduce with certainty?</string>
+    <string name="academy_l4_1_speech_q">The 7 of Swords, 7 of Cups, and 7 of Clubs have already been played. On board lie a 4 and a 3. The opponent plays an Ace. What can you deduce with certainty?</string>
     <string name="academy_l4_1_badge_q">Three Sevens already played</string>
     <string name="academy_l4_1_opt1">The opponent does NOT hold the Settebello, or they would have scored a Sweep on 4+3</string>
     <string name="academy_l4_1_fb1">Masterful deduction! Having declined a Sweep on 7, the Settebello is still in the deck or in your hand!</string>
@@ -486,7 +486,7 @@
     <string name="academy_l4_3_subtitle">The Battle for the Final Capture</string>
     <string name="academy_l4_3_desc">In the final three hands with an exhausted deck, keep initiative and clear the board.</string>
     <string name="academy_l4_3_rule">In the empty deck endgame, making the last capture collects all remaining cards and decides Cards and Coins.</string>
-    <string name="academy_l4_3_speech_act">Empty deck, final cards: on board lie a Jack (8 of Batons) and an Ace of Coins. You hold the Jack of Cups. Play it now to secure the last capture and collect all remaining cards!</string>
+    <string name="academy_l4_3_speech_act">Empty deck, final cards: on board lie a Jack (8 of Clubs) and an Ace of Coins. You hold the Jack of Cups. Play it now to secure the last capture and collect all remaining cards!</string>
     <string name="academy_l4_3_badge_act">Deciding final hand</string>
     <string name="academy_l4_3_speech_sum">Absolute triumph! You completed the entire Academy curriculum: you are a true Club Master!</string>
 
