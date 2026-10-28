@@ -214,7 +214,6 @@
     <string name="profile_tab_mastery">Maestria &amp; Radar</string>
     <string name="profile_tab_history">Cronologia Partite</string>
     <string name="profile_history_empty">Nessuna partita giocata finora. Gioca la tua prima partita per registrare lo storico delle prestazioni e vedere come cambia la tua Maestria!</string>
-    <string name="profile_history_vs_bot">Partita vs Maestro</string>
     <string name="profile_history_win">Vittoria</string>
     <string name="profile_history_loss">Sconfitta</string>
     <string name="profile_history_accuracy">%1$d%% precisione</string>
@@ -872,4 +871,11 @@
     <string name="radar_axis_board_what">Quanto bene gestisci il banco: cosa lasci in tavola all\'avversario. Non ha ancora un Check: si allena giocando e rivedendo le partite.</string>
     <string name="radar_axis_endgame_what">Quanto bene giochi il finale, a mazzo vuoto. Non ha ancora un Check: si allena giocando e rivedendo le partite.</string>
     <string name="profile_train_button">Allena questo</string>
+
+    <!-- F1R-26e: statistiche e partite -->
+    <string name="profile_history_unknown_opponent">Avversario non registrato</string>
+    <string name="profile_history_classic">Classica</string>
+    <string name="profile_history_sparring">Sparring · %1$s</string>
+    <string name="profile_recent_record">Ultime %1$d partite: %2$d vittorie, %3$d sconfitte</string>
+    <string name="profile_streak_days">Serie di giorni: %1$d (record %2$d)</string>
 </resources>
