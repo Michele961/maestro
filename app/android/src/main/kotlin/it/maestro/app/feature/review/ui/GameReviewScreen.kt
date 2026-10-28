@@ -501,6 +501,7 @@ private fun MoveEvaluationBanner(
                     variant = PillButtonVariant.EDUCATIONAL_BLUE,
                     height = 36.dp,
                     fontSize = 14.sp,
+                    contentPadding = PaddingValues(horizontal = 12.dp),
                     modifier = Modifier.fillMaxWidth().testTag("review_why_button"),
                 )
                 if (showWhy) {
