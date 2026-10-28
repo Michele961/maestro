@@ -68,12 +68,15 @@ public fun PreGameScreen(
     opponent: Opponent = Opponent.GIGI,
     initialTargetScore: Int = 11,
     initialFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
+    suggestedObjective: TrainingFundamental? = null,
     onStartGame: (it.maestro.ai.bot.DifficultyLevel, Int, TrainingFundamental) -> Unit = { _, _, _ -> },
     onNavigateBack: () -> Unit = {},
 ) {
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
     var sparring by remember { mutableStateOf(initialFundamental != TrainingFundamental.NONE) }
-    var objective by remember { mutableStateOf(initialFundamental.takeIf { it != TrainingFundamental.NONE } ?: TrainingFundamental.SEVENS_COUNT) }
+    var objective by remember(suggestedObjective) {
+        mutableStateOf(suggestedObjective ?: initialFundamental.takeIf { it != TrainingFundamental.NONE } ?: TrainingFundamental.SEVENS_COUNT)
+    }
 
     ClubBackground(modifier = modifier.testTag("pre_game_screen"), feltFraction = 0.5f) {
         Box(modifier = Modifier.fillMaxSize().background(Color(0x99000000)))
@@ -147,7 +150,7 @@ public fun PreGameScreen(
                             )
                         }
                     }
-                    if (sparring) ObjectivePicker(selected = objective, onSelect = { objective = it })
+                    if (sparring) ObjectivePicker(selected = objective, suggested = suggestedObjective, onSelect = { objective = it })
                 }
                 // Le due carte sulla targa in cima, come nel mockup
                 NineSliceBox(
@@ -194,8 +197,18 @@ public fun PreGameScreen(
 
 /** Gli obiettivi del Check in Sparring: nome semplice e, per quello scelto, una riga che dice cosa allena. */
 @Composable
-private fun ObjectivePicker(selected: TrainingFundamental, onSelect: (TrainingFundamental) -> Unit) {
+private fun ObjectivePicker(selected: TrainingFundamental, suggested: TrainingFundamental?, onSelect: (TrainingFundamental) -> Unit) {
     RibbonHeader(stringResource(id = R.string.pre_game_objective_title))
+    suggested?.objectiveText()?.let { (name, _) ->
+        Text(
+            text = stringResource(id = R.string.pre_game_objective_suggested, stringResource(name)),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2B1A10),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).testTag("objective_suggestion"),
+        )
+    }
     Column(modifier = Modifier.fillMaxWidth().testTag("objective_selector"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         for (fundamental in TrainingFundamental.entries) {
             val text = fundamental.objectiveText() ?: continue

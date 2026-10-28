@@ -96,4 +96,15 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent { MaestroTheme { PreGameScreen(initialFundamental = TrainingFundamental.DENARI_COUNT) } }
         composeRule.onRoot().captureRoboImage(screen.path("pre_game_objectives"))
     }
+
+    @Test
+    fun the_suggested_objective_is_preselected_and_announced() {
+        var chosen: TrainingFundamental? = null
+        composeRule.setContent {
+            MaestroTheme { PreGameScreen(suggestedObjective = TrainingFundamental.DENARI_COUNT, onStartGame = { _, _, f -> chosen = f }) }
+        }
+        composeRule.onNodeWithTag("objective_suggestion").performScrollTo().assertTextContains("Conta i Denari", substring = true)
+        composeRule.onNodeWithTag("start_game_button").performClick()
+        assertEquals(TrainingFundamental.DENARI_COUNT, chosen)
+    }
 }
