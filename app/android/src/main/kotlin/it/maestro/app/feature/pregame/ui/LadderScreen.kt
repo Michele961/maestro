@@ -110,11 +110,11 @@ private fun LadderRow(entry: LadderEntry, onClick: () -> Unit) {
         corner = 18.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 76.dp)
+            .heightIn(min = 68.dp)
             .alpha(if (locked) 0.7f else 1f)
             .clickable(enabled = !locked, onClick = onClick)
             .testTag("ladder_row_${entry.opponent.name}"),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp, vertical = 6.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -122,22 +122,24 @@ private fun LadderRow(entry: LadderEntry, onClick: () -> Unit) {
                 painter = painterResource(style.portrait),
                 contentDescription = null,
                 colorFilter = if (locked) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) else null,
-                modifier = Modifier.size(56.dp).clip(CircleShape),
+                modifier = Modifier.size(52.dp).clip(CircleShape),
             )
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 val textColor = if (next) Cream else Ink
-                Text(text = name, color = textColor, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = stringResource(style.title), color = textColor, fontSize = 12.sp, maxLines = 2)
+                Text(text = name, color = textColor, fontSize = 17.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (locked) {
+                    // Un avversario bloccato dice solo chi battere: una riga in meno, le cinque righe stanno nello schermo.
                     val by = entry.unlockedBy?.let { stringResource(it.style().name) }.orEmpty()
                     Text(
                         text = stringResource(R.string.ladder_locked_hint, by),
                         color = Ink,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
+                        lineHeight = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.testTag("ladder_locked_hint_${entry.opponent.name}"),
                     )
                 } else {
+                    Text(text = stringResource(style.title), color = textColor, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2)
                     DifficultyDots(style.difficulty, textColor)
                 }
             }
