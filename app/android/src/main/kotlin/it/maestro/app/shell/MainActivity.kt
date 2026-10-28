@@ -1,5 +1,6 @@
 package it.maestro.app.shell
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,6 +19,10 @@ import it.maestro.app.designsystem.theme.MaestroTheme
  * [MaestroNavHost] e nel `ShellViewModel` (task F1R-04).
  */
 public class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

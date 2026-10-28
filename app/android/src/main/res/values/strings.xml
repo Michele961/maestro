@@ -941,4 +941,9 @@
     <string name="profile_history_sparring">Sparring · %1$s</string>
     <string name="profile_recent_record">Ultime %1$d partite: %2$d vittorie, %3$d sconfitte</string>
     <string name="profile_streak_days">Serie di giorni: %1$d (record %2$d)</string>
+    <string name="settings_language">Lingua</string>
+    <string name="settings_language_subtitle">Cambia la lingua dell\'app.</string>
+    <string name="settings_language_system">Sistema</string>
+    <string name="settings_language_italian">Italiano</string>
+    <string name="settings_language_english">English</string>
 </resources>

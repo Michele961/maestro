@@ -941,4 +941,9 @@
     <string name="profile_history_sparring">Sparring · %1$s</string>
     <string name="profile_recent_record">Last %1$d matches: %2$d wins, %3$d losses</string>
     <string name="profile_streak_days">Day streak: %1$d (best %2$d)</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_subtitle">Change the app language.</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_italian">Italian</string>
+    <string name="settings_language_english">English</string>
 </resources>

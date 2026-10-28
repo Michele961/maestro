@@ -4,11 +4,13 @@ import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.designsystem.audio.NoOpSoundManager
 import it.maestro.app.designsystem.audio.SoundEffect
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.settings.AppLanguage
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.feature.settings.presentation.SettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -94,5 +96,20 @@ class SettingsViewModelTest {
         viewModel.setHapticsEnabled(false)
         advanceUntilIdle()
         assertEquals(false, viewModel.uiState.value.hapticsEnabled)
+    }
+
+    @Test
+    fun language_isSavedAndUnknownTagFollowsSystem() = runTest {
+        val repository = InMemorySettingsRepository()
+        val viewModel = SettingsViewModel(repository)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+        assertEquals(AppLanguage.SYSTEM, viewModel.uiState.value.language)
+
+        viewModel.setLanguage(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+        assertEquals(AppLanguage.ENGLISH, viewModel.uiState.value.language)
+        assertEquals("en", repository.settingsFlow.first().language)
+        assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTag("fr"))
     }
 }
