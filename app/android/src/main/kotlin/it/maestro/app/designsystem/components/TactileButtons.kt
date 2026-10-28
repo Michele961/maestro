@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -133,7 +134,12 @@ public fun MaestroPillButton(
             letterSpacing = 0.5.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = TextStyle(shadow = Shadow(Color(0x99000000), Offset(0f, 3f), 4f)),
+            // Altezza di riga fissa e centrata: il testo sta a metà del tasto, non più in basso per via del font.
+            lineHeight = fontSize * 1.2f,
+            style = TextStyle(
+                shadow = Shadow(Color(0x99000000), Offset(0f, 3f), 4f),
+                lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
+            ),
         )
     }
 }

@@ -58,10 +58,49 @@ internal fun TableStage(
     onDismissLine: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Box(modifier = modifier) {
+        StageBoard(
+            model = model,
+            geometry = geometry,
+            canPlay = canPlay,
+            atRest = atRest,
+            stepKey = stepKey,
+            stepMillis = stepMillis,
+            opponentSweepCards = uiState.opponentSweepCards,
+            humanSweepCards = uiState.humanSweepCards,
+            suggestedCapture = uiState.suggestedMove?.capture.orEmpty(),
+            suggestedCard = uiState.suggestedMove?.card,
+            onPlay = onPlay,
+        )
+        RaceOrBubble(model, uiState, geometry, showRace = showPointsRace, onDismissLine = onDismissLine)
+        MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
+    }
+}
+
+/**
+ * Il tavolo senza Maestro: mani, pile, mazzo, carte a terra e carte in volo di [model] nelle zone di [geometry].
+ * Non conosce la partita né i consigli, quindi lo usa anche la revisione (`docs/app/features/review.md` §3).
+ * [suggestedCapture] e [suggestedCard] evidenziano una mossa in azzurro.
+ */
+@Composable
+internal fun StageBoard(
+    model: StageModel,
+    geometry: TableGeometry,
+    canPlay: Boolean,
+    atRest: Boolean,
+    stepKey: Any?,
+    stepMillis: Int,
+    opponentSweepCards: List<Card>,
+    humanSweepCards: List<Card>,
+    suggestedCapture: Set<Card>,
+    suggestedCard: Card?,
+    onPlay: (Card) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val zones = geometry.zones
     // Le scope già in pila restano visibili durante la presa: la nuova compare solo a scena finita.
-    val opponentSweepCards = restingValue(uiState.opponentSweepCards, atRest)
-    val humanSweepCards = restingValue(uiState.humanSweepCards, atRest)
+    val opponentSweeps = restingValue(opponentSweepCards, atRest)
+    val humanSweeps = restingValue(humanSweepCards, atRest)
     Box(modifier = modifier.testTag("felt_layout")) {
         // Avversario: mano coperta e le sue prese davanti a lui.
         Zone(zones.opponentHand, Alignment.Center, Modifier.testTag("opponent_zone")) {
@@ -74,7 +113,7 @@ internal fun TableStage(
         Zone(zones.opponentPile, Alignment.Center) {
             CapturePile(
                 count = model.opponentCaptured,
-                sweepCards = opponentSweepCards,
+                sweepCards = opponentSweeps,
                 sweeps = model.opponentSweeps,
                 width = pileCardWidth(zones.opponentPile),
                 tag = "opponent_captures",
@@ -86,19 +125,19 @@ internal fun TableStage(
         Zone(zones.humanPile, Alignment.Center) {
             CapturePile(
                 count = model.humanCaptured,
-                sweepCards = humanSweepCards,
+                sweepCards = humanSweeps,
                 sweeps = model.humanSweeps,
                 width = pileCardWidth(zones.humanPile),
                 tag = "human_captures",
             )
         }
-        PlayArea(model, suggested = uiState.suggestedMove?.capture.orEmpty(), geometry = geometry, millis = stepMillis)
+        PlayArea(model, suggested = suggestedCapture, geometry = geometry, millis = stepMillis)
         Zone(zones.hand, Alignment.BottomCenter, Modifier.testTag("player_zone")) {
             PlayerHand(
                 cards = model.hand,
                 cardWidth = geometry.handCardWidth,
                 canPlay = canPlay,
-                suggestedCard = uiState.suggestedMove?.card,
+                suggestedCard = suggestedCard,
                 onPlay = onPlay,
             )
         }
@@ -109,8 +148,6 @@ internal fun TableStage(
                 FlightCard(from, to, stepMillis, geometry.opponentCardWidth, geometry.opponentCardHeight)
             }
         }
-        RaceOrBubble(model, uiState, geometry, showRace = showPointsRace, onDismissLine = onDismissLine)
-        MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
 

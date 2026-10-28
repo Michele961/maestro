@@ -67,6 +67,7 @@ Layout: contenuti in colonna centrata, che occupa lo schermo (nessun panno vuoto
 4. **Pulsanti**: «Rivedi partita» primaria, poi «Rivincita» e «Menu»; radar nel Profilo.
 5. **Vittoria/sconfitta**: festa per la vittoria e gesto di incoraggiamento per la sconfitta, o sobrio: **decide l'agente**. Scelta: vittoria con foglie d'oro e Maestro festante (come la scopa, ma più breve); sconfitta sobria, il Maestro incoraggia, mai teatrale.
 6. **Ordine dei lavori**: prima la voce del Maestro (F1R-24), poi questa feature (F1R-15), poi la revisione. Le ricompense (crediti di partita, economia) si decidono con l'economia di gioco, il multiplayer e le modalità di gioco: qui restano maestria, missioni e streak.
+7. **Dopo la prova sul telefono** (2026-10-27): la sequenza a passi (targa, poi scheda, poi ricompensa, poi azioni) dava l'effetto di componenti che compaiono in ordine sparso, anche riaprendo la partita dalla cronologia. **Cambia**: finché l'analisi (e, per una partita appena giocata, la ricompensa) non è pronta c'è solo il Maestro che analizza; poi la schermata compare intera, tutta insieme. Niente pause tra i passi e niente salto con un tocco; l'ordine dei contenuti dall'alto in basso resta quello del §3. Michele ha approvato l'aggiornamento di questo documento.
 
 ## 7. La revisione (Game Review) non è in questa feature
 

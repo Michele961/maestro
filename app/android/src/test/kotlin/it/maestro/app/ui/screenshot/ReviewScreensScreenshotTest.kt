@@ -212,7 +212,10 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("review_retry_button").performClick()
         val currentStep = viewModel.uiState.value.currentStep!!
         val bestCard = currentStep.analysis.bestMove.card
-        composeRule.onNodeWithTag("review_retry_card_${bestCard.suit.name}_${bestCard.rank.name}").performClick()
+        val tag = "card_${bestCard.suit.name}_${bestCard.rank.name}"
+        composeRule.onNodeWithTag(tag).performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(tag).performClick()
         composeRule.waitForIdle()
         composeRule.onRoot().captureRoboImage(screen.path("game_review_retry_solved"))
     }
