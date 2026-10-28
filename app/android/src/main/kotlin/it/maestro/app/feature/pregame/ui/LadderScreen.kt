@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,8 +33,6 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -140,7 +137,6 @@ private fun LadderRow(entry: LadderEntry, onClick: () -> Unit) {
                     )
                 } else {
                     Text(text = stringResource(style.title), color = textColor, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2)
-                    DifficultyDots(style.difficulty, textColor)
                 }
             }
             when (entry.status) {
@@ -155,22 +151,6 @@ private fun LadderRow(entry: LadderEntry, onClick: () -> Unit) {
                     Text(text = stringResource(R.string.ladder_beaten), color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
-        }
-    }
-}
-
-/** Cinque pallini, quelli pieni dicono la difficoltà (sostituiscono l'Elo, `pre-game.md` decisione 4). */
-@Composable
-private fun DifficultyDots(filled: Int, color: Color) {
-    val description = stringResource(R.string.ladder_difficulty, filled)
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.semantics { contentDescription = description }) {
-        repeat(5) { index ->
-            Spacer(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(if (index < filled) color else color.copy(alpha = 0.25f)),
-            )
         }
     }
 }

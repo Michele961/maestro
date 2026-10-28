@@ -773,6 +773,5 @@
     <string name="ladder_next">Da battere</string>
     <string name="ladder_beaten">Battuto</string>
     <string name="ladder_locked_hint">Batti %1$s per sbloccarlo</string>
-    <string name="ladder_difficulty">Difficoltà %1$d su 5</string>
     <string name="ladder_locked">Bloccato</string>
 </resources>
