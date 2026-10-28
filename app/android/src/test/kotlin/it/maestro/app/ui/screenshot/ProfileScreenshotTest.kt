@@ -11,12 +11,15 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
+import it.maestro.app.feature.profile.presentation.RadarAxis
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.opponents.OpponentProgress
 import it.maestro.app.feature.pregame.presentation.LadderState
 import it.maestro.app.feature.profile.ui.ProfileContent
 import it.maestro.app.feature.profile.presentation.ProfileUiState
 import it.maestro.app.designsystem.theme.MaestroTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -154,5 +157,50 @@ class ProfileScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("profile_ladder_detail").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("profile_ladder_MAESTRO").performScrollTo().performClick()
         composeRule.onRoot().captureRoboImage(screen.path("profile_screen_ladder_new_player"))
+    }
+
+    @Test
+    fun captureProfileScreen_weakAxisWithTrainButtonAndExplanation() {
+        val state = ProfileUiState(
+            profile = MasteryProfile(
+                matchesPlayed = 6,
+                accuracyEma = 70.0,
+                cognitiveElo = 1300,
+                radar = AbilityRadar(sevens = 80, denari = 35, primiera = 70, board = 60, endgame = 75),
+            ),
+            maestroAdviceRes = R.string.profile_advice_denari,
+            weakestAxis = RadarAxis.DENARI,
+            trainObjective = TrainingFundamental.DENARI_COUNT,
+        )
+        var trained: TrainingFundamental? = null
+
+        composeRule.setContent {
+            MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}, onTrain = { trained = it }) }
+        }
+
+        composeRule.onNodeWithTag("radar_axis_endgame").performScrollTo().performClick()
+        composeRule.onNodeWithTag("profile_radar_explanation").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_train_button").performScrollTo().assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_weak_axis_train"))
+        composeRule.onNodeWithTag("profile_train_button").performClick()
+        assertEquals(TrainingFundamental.DENARI_COUNT, trained)
+    }
+
+    @Test
+    fun captureProfileScreen_weakBoardAxisHasNoTrainButton() {
+        val state = ProfileUiState(
+            profile = MasteryProfile(
+                matchesPlayed = 6,
+                radar = AbilityRadar(sevens = 80, denari = 75, primiera = 70, board = 30, endgame = 75),
+            ),
+            maestroAdviceRes = R.string.profile_advice_board,
+            weakestAxis = RadarAxis.BOARD,
+        )
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_maestro_advice_panel").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_train_button").assertDoesNotExist()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_weak_board_no_train"))
     }
 }

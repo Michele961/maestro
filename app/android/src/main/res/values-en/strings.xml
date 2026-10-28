@@ -864,4 +864,12 @@
     <string name="profile_trend_flat">▬ Steady</string>
     <string name="profile_trend_down">▼ Falling</string>
     <string name="profile_ladder_title">The club ladder</string>
+
+    <!-- F1R-26d: radar leggibile e consiglio -->
+    <string name="radar_axis_sevens_what">How well you keep track of the sevens and the Settebello. Train it with the Sevens Checks in Sparring.</string>
+    <string name="radar_axis_denari_what">How well you control the coin cards, which decide the coins point. Train it with the Coins Checks in Sparring.</string>
+    <string name="radar_axis_primiera_what">How well you build the primiera by picking the highest-value cards. Train it with the Primiera Checks in Sparring.</string>
+    <string name="radar_axis_board_what">How well you manage the board: what you leave on the table for your opponent. It has no Check yet: train it by playing and reviewing your matches.</string>
+    <string name="radar_axis_endgame_what">How well you play the endgame, with the deck empty. It has no Check yet: train it by playing and reviewing your matches.</string>
+    <string name="profile_train_button">Train this</string>
 </resources>

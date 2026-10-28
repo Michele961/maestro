@@ -138,7 +138,7 @@ public fun MaestroNavHost(
                         }
                     }
                 },
-                onStartGameClicked = { navController.navigate(Route.Ladder) { launchSingleTop = true } },
+                onStartGameClicked = { navController.navigate(Route.Ladder()) { launchSingleTop = true } },
                 onSettingsClicked = { showSettings = true },
                 onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
                 onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
@@ -157,13 +157,14 @@ public fun MaestroNavHost(
                 mastery = mastery,
             )
         }
-        composable<Route.Ladder> {
+        composable<Route.Ladder> { entry ->
+            val ladderRoute = entry.toRoute<Route.Ladder>()
             val viewModel: LadderViewModel = koinViewModel()
             val ladder by viewModel.state.collectAsStateWithLifecycle()
             LadderScreen(
                 state = ladder,
                 onOpponentClick = { opponent ->
-                    navController.navigate(Route.PreGame(opponent.name)) { launchSingleTop = true }
+                    navController.navigate(Route.PreGame(opponent.name, ladderRoute.objective)) { launchSingleTop = true }
                 },
                 onNavigateBack = { navController.popBackStack() },
             )
@@ -174,7 +175,7 @@ public fun MaestroNavHost(
             val suggested by preGameViewModel.suggestedObjective.collectAsStateWithLifecycle()
             PreGameScreen(
                 opponent = Opponent.valueOf(route.opponent),
-                suggestedObjective = suggested,
+                suggestedObjective = route.objective?.let(TrainingFundamental::valueOf) ?: suggested,
                 onStartGame = { level, targetScore, fundamental ->
                     navController.navigate(
                         Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),
@@ -271,6 +272,7 @@ public fun MaestroNavHost(
                 playerName = settings.playerName,
                 onPlayerNameChanged = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
                 playerNameMaxLength = MAX_PLAYER_NAME,
+                onTrain = { objective -> navController.navigate(Route.Ladder(objective.name)) { launchSingleTop = true } },
                 onReviewMatch = { log ->
                     navController.navigate(
                         Route.PostMatch(

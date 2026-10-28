@@ -1,6 +1,7 @@
 package it.maestro.app.feature.profile.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.app.R
 import it.maestro.app.designsystem.theme.BrassRivetGold
 import it.maestro.app.designsystem.theme.MaestroDisplayFont
+import it.maestro.app.feature.profile.presentation.RadarAxis
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
@@ -55,6 +57,8 @@ private val NodeBorderColor = Color(0xFFFFFFFF)
 public fun AbilityRadarChart(
     radar: AbilityRadar,
     modifier: Modifier = Modifier,
+    highlighted: RadarAxis? = null,
+    onAxisClick: (RadarAxis) -> Unit = {},
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -148,30 +152,40 @@ public fun AbilityRadarChart(
                 title = stringResource(R.string.radar_axis_sevens),
                 value = "${radar.sevens}%",
                 testTag = "radar_axis_sevens",
+                highlighted = highlighted == RadarAxis.SEVENS,
+                onClick = { onAxisClick(RadarAxis.SEVENS) },
                 modifier = Modifier.align(Alignment.TopCenter).offset(y = (-4).dp),
             )
             AxisLabel(
                 title = stringResource(R.string.radar_axis_denari),
                 value = "${radar.denari}%",
                 testTag = "radar_axis_denari",
+                highlighted = highlighted == RadarAxis.DENARI,
+                onClick = { onAxisClick(RadarAxis.DENARI) },
                 modifier = Modifier.align(Alignment.TopEnd).offset(x = 6.dp, y = 46.dp),
             )
             AxisLabel(
                 title = stringResource(R.string.radar_axis_primiera),
                 value = "${radar.primiera}%",
                 testTag = "radar_axis_primiera",
+                highlighted = highlighted == RadarAxis.PRIMIERA,
+                onClick = { onAxisClick(RadarAxis.PRIMIERA) },
                 modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-4).dp, y = 2.dp),
             )
             AxisLabel(
                 title = stringResource(R.string.radar_axis_board),
                 value = "${radar.board}%",
                 testTag = "radar_axis_board",
+                highlighted = highlighted == RadarAxis.BOARD,
+                onClick = { onAxisClick(RadarAxis.BOARD) },
                 modifier = Modifier.align(Alignment.BottomStart).offset(x = 4.dp, y = 2.dp),
             )
             AxisLabel(
                 title = stringResource(R.string.radar_axis_endgame),
                 value = "${radar.endgame}%",
                 testTag = "radar_axis_endgame",
+                highlighted = highlighted == RadarAxis.ENDGAME,
+                onClick = { onAxisClick(RadarAxis.ENDGAME) },
                 modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = 46.dp),
             )
         }
@@ -183,15 +197,17 @@ private fun AxisLabel(
     title: String,
     value: String,
     testTag: String,
+    highlighted: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.testTag(testTag),
+        modifier = modifier.clickable(onClick = onClick).testTag(testTag),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = title.uppercase(),
-            color = BrassRivetGold,
+            color = if (highlighted) Color(0xFFFF8A65) else BrassRivetGold,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = MaestroDisplayFont,
