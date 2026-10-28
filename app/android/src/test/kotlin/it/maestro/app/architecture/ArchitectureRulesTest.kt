@@ -22,12 +22,10 @@ class ArchitectureRulesTest {
     private val knownExceptions: Map<Pair<String, Rule>, String> = mapOf(
         // Layer: la presentazione parla con i repository solo tramite interfacce del dominio.
         // Restano i cataloghi di contenuto con risorse (cosmetici, Accademia, sfida): li sposta la revisione della loro feature.
-        ex("feature/shop/presentation/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/puzzle/presentation/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/puzzle/ui/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/academy/presentation/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-21",
         ex("feature/academy/ui/AcademyScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-21",
-        ex("designsystem/audio/SoundManager.kt", Rule.UI_IMPORTS_DATA) to "F1R-20",
     )
 
     @Test

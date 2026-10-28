@@ -38,17 +38,17 @@ import androidx.navigation.toRoute
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.shell.crash.CrashReporter
-import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
 import it.maestro.app.domain.retention.RetentionRepository
-import it.maestro.app.data.local.datastore.SettingsRepository
+import it.maestro.app.domain.settings.SettingsRepository
 import it.maestro.app.domain.retention.StreakState
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.wallet.WalletRepository
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.feature.missions.ui.TodayScreen
-import it.maestro.app.feature.settings.ui.SettingsDialog
+import it.maestro.app.feature.settings.ui.SettingsScreen
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.feature.home.ui.HomeScreen
@@ -108,7 +108,6 @@ public fun MaestroNavHost(
     val masteryFlow = remember(masteryRepository) { masteryRepository.observeMasteryProfile().map { it.cognitiveElo } }
     val mastery by masteryFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    var showSettings by rememberSaveable { mutableStateOf(false) }
     var showWrongRules by rememberSaveable { mutableStateOf(false) }
     var crashReport by rememberSaveable { mutableStateOf(pendingCrashReport) }
 
@@ -139,7 +138,7 @@ public fun MaestroNavHost(
                     }
                 },
                 onStartGameClicked = { navController.navigate(Route.Ladder()) { launchSingleTop = true } },
-                onSettingsClicked = { showSettings = true },
+                onSettingsClicked = { navController.navigate(Route.Settings) { launchSingleTop = true } },
                 onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
                 onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
                 onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
@@ -294,36 +293,26 @@ public fun MaestroNavHost(
         composable<Route.Shop> {
             ShopScreen(onNavigateHome = { navController.popBackStack() })
         }
-    }
-
-    if (showSettings) {
-        SettingsDialog(
-            soundEnabled = settings.soundEnabled,
-            onSoundToggled = { enabled -> scope.launch { settingsRepository.updateSoundEnabled(enabled) } },
-            gameSpeed = settings.gameSpeed,
-            onGameSpeedChanged = { speed -> scope.launch { settingsRepository.updateGameSpeed(speed) } },
-            maestroChattiness = settings.maestroChattiness,
-            onMaestroChattinessChanged = { level -> scope.launch { settingsRepository.updateMaestroChattiness(level) } },
-            showPointsRace = settings.showPointsRace,
-            onShowPointsRaceToggled = { show -> scope.launch { settingsRepository.updateShowPointsRace(show) } },
-            onTriggerTestCrash = { crashReporter.triggerTestCrash() },
-            onDismiss = { showSettings = false },
-            onStartTestEndgameMatch = {
-                showSettings = false
-                scope.launch {
-                    val log = shell.prepareTestEndgameMatch()
-                    navController.navigate(
-                        Route.Table(
-                            level = DifficultyLevel.INTERMEDIO.name,
-                            targetScore = log.config.targetScore,
-                            fundamental = TrainingFundamental.NONE.name,
-                            seed = log.seed,
-                            resume = true,
-                        ),
-                    )
-                }
-            },
-        )
+        composable<Route.Settings> {
+            SettingsScreen(
+                onTriggerTestCrash = { crashReporter.triggerTestCrash() },
+                onStartTestEndgameMatch = {
+                    scope.launch {
+                        val log = shell.prepareTestEndgameMatch()
+                        navController.navigate(
+                            Route.Table(
+                                level = DifficultyLevel.INTERMEDIO.name,
+                                targetScore = log.config.targetScore,
+                                fundamental = TrainingFundamental.NONE.name,
+                                seed = log.seed,
+                                resume = true,
+                            ),
+                        )
+                    }
+                },
+                onNavigateHome = { navController.popBackStack() },
+            )
+        }
     }
 
     if (showWrongRules) {

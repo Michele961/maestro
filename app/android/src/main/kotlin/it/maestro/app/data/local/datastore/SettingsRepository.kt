@@ -14,55 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.domain.settings.GameSpeed
-
-/**
- * Impostazioni utente dell'applicazione Maestro (task F1-08).
- */
-public data class AppSettings(
-    val language: String = "system",
-    val soundEnabled: Boolean = true,
-    val gameSpeed: GameSpeed = GameSpeed.NORMAL,
-    /** Quanto parla il Maestro (impostazione «Chiacchiere», `docs/app/features/maestro-voice.md` §3.4). */
-    val maestroChattiness: Chattiness = Chattiness.NORMAL,
-    /** Il giocatore ha già chiesto almeno un consiglio: il Maestro non glielo introduce più. */
-    val hintEverUsed: Boolean = false,
-    /** Nome scelto dal giocatore; `null` finché non l'ha detto (si chiede e si può cambiare, `docs/app/features/home.md`). */
-    val playerName: String? = null,
-    /** Il nome è già stato chiesto (anche se il giocatore ha saltato): non si richiede a ogni avvio. */
-    val playerNameAsked: Boolean = false,
-    /** Mostra al tavolo la corsa ai punti (Carte, Denari, Settebello, Primiera): spenta di default, è un aiuto. */
-    val showPointsRace: Boolean = false,
-    val preferredLevel: DifficultyLevel = DifficultyLevel.INTERMEDIO,
-    val preferredTargetScore: Int = 11,
-    val selectedTableTheme: String = "felt_classic_green",
-    val selectedCardBackTheme: String = "back_classic_trevigiano",
-    val selectedAvatar: String = "avatar_default",
-    val unlockedCosmetics: Set<String> = CosmeticCatalog.DEFAULT_UNLOCKED_IDS,
-)
-
-/**
- * Interfaccia per l'accesso e la modifica delle impostazioni.
- */
-public interface SettingsRepository {
-    public val settingsFlow: Flow<AppSettings>
-    public suspend fun updateLanguage(language: String)
-    public suspend fun updateSoundEnabled(enabled: Boolean)
-    public suspend fun updateGameSpeed(speed: GameSpeed)
-    public suspend fun updateMaestroChattiness(chattiness: Chattiness)
-    public suspend fun updateShowPointsRace(show: Boolean)
-    public suspend fun updatePlayerName(name: String)
-
-    /** Ricorda che il nome è stato chiesto, anche se il giocatore ha preferito non dirlo. */
-    public suspend fun markPlayerNameAsked()
-    public suspend fun markHintUsed()
-    public suspend fun updatePreferredLevel(level: DifficultyLevel)
-    public suspend fun updatePreferredTargetScore(targetScore: Int)
-    public suspend fun updateSelectedTableTheme(tableThemeId: String)
-    public suspend fun updateSelectedCardBackTheme(cardBackThemeId: String)
-    public suspend fun updateSelectedAvatar(avatarId: String)
-    public suspend fun unlockCosmetic(cosmeticId: String)
-}
+import it.maestro.app.domain.settings.SettingsRepository
 
 /**
  * Implementazione su DataStore Preferences (ADR-0012, task F1-08).

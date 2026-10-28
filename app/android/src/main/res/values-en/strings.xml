@@ -138,6 +138,11 @@
     <string name="settings_crash_title">Stability Diagnostics</string>
     <string name="settings_crash_button">Trigger test crash (Crashlytics)</string>
     <string name="settings_crash_warning">This action will force the app to crash to verify Crashlytics.</string>
+    <string name="settings_section_audio">Audio</string>
+    <string name="settings_section_game">Game</string>
+    <string name="settings_section_developer">Developer</string>
+    <string name="settings_game_speed_subtitle">How long animations and pauses last at the table.</string>
+    <string name="settings_maestro_chat_subtitle">How often the Maestro comments on his own during a match.</string>
     <string name="settings_close">Close</string>
     <string name="home_settings_button">Settings</string>
     <!-- Home (F1-18): decorative entries with fixed values until the features exist -->

@@ -69,4 +69,7 @@ public sealed interface Route {
 
     @Serializable
     public data object Today : Route
+
+    @Serializable
+    public data object Settings : Route
 }
