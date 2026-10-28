@@ -136,7 +136,7 @@ objects, not touching: 1) a heavy brass padlock, closed, with a small dark wood 
 Nomi di file attesi (`docs/art/asset-catalog.md` va aggiornato dal task F1R-18d):
 `opponent_1..5_neutral|win|lose`, `crest_1..5`, `lock_closed`, `lock_open`. Passare i ritagli da `scripts/prepare_assets.py` come per gli altri asset.
 
-### Set 5 bis — Le due espressioni mancanti (fondo verde)
+### Set 5 bis — Le due espressioni mancanti (fondo verde) — fatto il 2026-10-28
 
 Dal primo giro mancano `opponent_5_win` (il Maestro che vince: il foglio mostrava un ritratto senza cornice, con la pelle verde) e `opponent_3_lose` (Tonino che perde: il foglio ne aveva uno sorridente). Stessa conversazione, ripartendo dai ritratti neutri.
 
