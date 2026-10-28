@@ -299,3 +299,46 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Obiettivo:** battute spontanee del Maestro dinamiche (fatti → momenti → battuta componibile), nei momenti chiave e con ritmo controllato, più consiglio dinamico e offerta d'aiuto, e la stessa voce dinamica con tuning nella revisione (Game Review). Il dossier propone la suddivisione in F1R-24a…g.
 - **Criteri di accettazione:** definiti dal dossier dopo l'approvazione di Michele.
 - **Domande aperte:** vedi §6 del dossier.
+
+## F1R-26 — Profilo, Maestria e Radar
+
+- **Stato:** da fare (dossier `docs/app/features/profile.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/profile.md` §3–§6, F1R-14, F1R-18e
+- **Sotto-task:** 26a storico con avversario e modalità, 26b scheda giocatore e titolo scelto dall'utente, 26c la scala nel Profilo, 26d radar leggibile e consiglio che porta all'allenamento, 26e statistiche e tab «Partite», 26f divisione del file e matrice finale. Ordine delle sezioni: opzione B (radar dopo la scheda), modificabile.
+- **Dipendenze:** esperienza e obiettivi arrivano da F1R-29.
+- **Domande aperte:** —
+
+## F1R-27 — Sfida del Giorno
+
+- **Stato:** da fare (dossier `docs/app/features/daily-puzzle.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/daily-puzzle.md`, F1R-02, F1R-10
+- **Sotto-task:** 27a testi fuori dal codice, 27b indizio e «Mostrami la soluzione» con la voce del Maestro, 27c condivisione senza spoiler né errori, 27d mini-tavolo sulla regia, 27e flusso e stati con livello consigliato dal radar e serie di sfide distinta dalla serie di giorni. Archivio dei giorni passati: fuori (a pagamento).
+- **Domande aperte:** —
+
+## F1R-28 — Accademia
+
+- **Stato:** da fare (dossier `docs/app/features/academy.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/academy.md`, F1R-21
+- **Sotto-task:** 28a contenuti coerenti con la specifica (revisione F1R-21 a cura dell'agente), 28b percorso libero dal capitolo 2 e capitolo consigliato dal radar, 28c ripasso lampo, 28d titoli di capitolo, 28e mini-tavolo sulla regia, 28f divisione dei file e matrice finale. Moduli a pagamento: fuori.
+- **Domande aperte:** —
+
+## F1R-29 — Missioni, serie, esperienza e obiettivi
+
+- **Stato:** da fare (dossier `docs/app/features/missions.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/missions.md`, F1R-14
+- **Sotto-task:** 29a missioni vere, 29b missioni dei Check e adattive, 29c Gettone Riposo e serie, 29d esperienza (livelli del §6), 29e obiettivi (elenco esteso del §6, identificatori stabili per Google Play Games, aggancio futuro), 29f schermata «Oggi».
+- **Domande aperte:** —
+
+## F1R-30 — Bottega e wallet
+
+- **Stato:** da fare (dossier `docs/app/features/shop.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/shop.md`, `docs/app/features/shop-assets.md`
+- **Sotto-task:** 30a catalogo nel dominio e stile dal catalogo, 30b anteprime vere e «Provalo», 30c acquisto con conferma sempre e eventi tipizzati, 30d movimenti (da valutare), 30e premio dall'ultimo avversario come stemma o titolo, 30f divisione del file e matrice finale. Acquisti a pagamento e annunci: fuori.
+- **Domande aperte:** nuovi contenuti grafici (li genera Michele dalla lista di `shop-assets.md`).
+
+## F1R-31 — Impostazioni
+
+- **Stato:** da fare (dossier `docs/app/features/settings.md` approvato il 2026-10-28)
+- **Riferimenti:** `docs/app/features/settings.md`, F1R-20, `docs/app/features/audio-prompts.md`
+- **Sotto-task:** 31a schermata a sezioni e `SettingsViewModel` (con accesso rapido a «Chiacchiere» dal tavolo, se fattibile), 31b volumi e vibrazione, 31c lingua, 31d informazioni, privacy e segnalazioni, 31e divisione dei file e matrice finale. Musica e ambiente: F1R-20, con asset generati da Michele.
+- **Domande aperte:** asset audio di Michele.

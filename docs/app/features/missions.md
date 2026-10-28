@@ -1,6 +1,6 @@
 # Missioni, serie, esperienza e obiettivi — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-29 (da creare dopo l'approvazione), F1R-14 (`RewardEngine`), F1R-18e (titoli), `docs/app/features/pre-game.md` (decisione 5)
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-29 (da creare dopo l'approvazione), F1R-14 (`RewardEngine`), F1R-18e (titoli), `docs/app/features/pre-game.md` (decisione 5)
 Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**; i numeri sono **[da calibrare]**.
 
 ## 1. Cosa fa per il giocatore
@@ -103,12 +103,47 @@ Gli dà un motivo per tornare ogni giorno e un senso di crescita: tre piccole mi
 | F1R-29e | Obiettivi | `AchievementId`, repository, sblocco da `RewardEngine`, avviso breve; test su ogni obiettivo |
 | F1R-29f | Schermata «Oggi» | Missioni, serie, esperienza e ultimi obiettivi in una pagina; badge in Home; matrice a 4 configurazioni |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Esperienza**: ti torna l'idea di un solo contatore che sale con le cose già esistenti (vittorie sugli avversari, capitoli, sfida, missioni)? I numeri di §3.3 sono solo un punto di partenza.
-2. **Nome e livelli** dell'esperienza: li scrivo io come [bozza] nello stile degli avversari («Novellino del bar»…), o hai un'idea?
-3. **Obiettivi**: l'elenco di §3.4 va bene come inizio? Cosa aggiungeresti o toglieresti? Gli identificatori restano stabili per Google Play Games.
-4. **Missioni adattive** dal radar: le vuoi, o preferisci missioni uguali per tutti?
-5. **Gettone Riposo**: uno ogni 7 giorni di serie, massimo 2: ti torna?
-6. **Crediti delle missioni** (10–15): restano? Con la Bottega ancora da definire potrebbero perdere senso; in alternativa si dà solo esperienza.
-7. **Dialogo o schermata «Oggi»**: confermi che le missioni diventano una pagina?
+1. **Esperienza**: un solo contatore che sale con gli eventi già esistenti, approvato. Nomi e livelli li scrive l'agente (sotto, [bozza]).
+2. **Obiettivi**: elenco approvato, ma **più numeroso**; identificatori stabili in vista dell'aggancio a Google Play Games (task futuro). L'elenco esteso è nel §3.4 bis.
+3. **Missioni adattive** dal radar: sì.
+4. **Gettone Riposo**: sì, ricarica ogni 7 giorni di serie, massimo 2.
+5. **Crediti delle missioni**: il valore dipenderà dall'uso che l'utente potrà farne; per ora restano 10–15 e l'economia verrà ritoccata dopo.
+6. **Schermata «Oggi»** al posto del dialogo: confermata.
+
+### 3.3 bis Nomi dei livelli di esperienza [bozza, da calibrare]
+
+Un livello ogni 250 PX; i nomi seguono lo stile del circolo e si rivedono quando si calibrano i PX.
+
+| Livello | PX | Nome |
+| --- | --- | --- |
+| 1 | 0 | Curioso del bar |
+| 2 | 250 | Spettatore |
+| 3 | 500 | Giocatore della domenica |
+| 4 | 750 | Habitué |
+| 5 | 1000 | Fine osservatore |
+| 6 | 1250 | Veterano del circolo |
+| 7 | 1500 | Campione di quartiere |
+| 8 | 1750 | Maestro di mano |
+| 9 | 2000 | Gran Maestro del banco |
+| 10 | 2250 | Leggenda del circolo |
+
+### 3.4 bis Obiettivi aggiuntivi [bozza]
+
+Oltre all'elenco di §3.4, ciascuno legato a un evento già misurabile da `RewardEngine` (quelli che richiedono un dato non ancora registrato sono segnati ✱ e si fanno solo quando il dato esiste):
+
+| Obiettivo | Evento |
+| --- | --- |
+| Dieci partite / Cinquanta / Cento | partite finite |
+| Settebello in tasca (×20) | Settebello catturato, totale |
+| Un mese | serie di 30 giorni |
+| Sparring: primo allenamento | prima partita Sparring finita |
+| Tutti i fondamentali | un Check corretto per ciascun obiettivo di Sparring |
+| Rigioca l'errore (×10) | errori ripetuti correttamente |
+| Sfida sette giorni | 7 sfide del giorno risolte |
+| Senza suggerimenti | battere l'ultimo avversario senza chiedere consigli ✱ |
+| Collezionista | un oggetto per categoria nella Bottega |
+| Studente modello | tutte le 15 lezioni |
+| Rimonta | vincere una partita dopo essere stati sotto di 5 punti o più ✱ |
+| Primo titolo scelto | scegliere un titolo nel Profilo |

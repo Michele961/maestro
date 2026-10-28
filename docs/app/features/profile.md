@@ -1,7 +1,7 @@
 # Profilo, Maestria e Radar — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-26 (da creare dopo l'approvazione), F1R-18e (titoli), F1R-25e (obiettivo consigliato), F1R-14
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**.
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-26 (da creare dopo l'approvazione), F1R-18e (titoli), F1R-25e (obiettivo consigliato), F1R-14
+Procedimento: `docs/app/features/README.md`. Approvato da Michele il 2026-10-28 con le decisioni del §6; i punti segnati **[proposta]** nel §3 valgono come approvati salvo diversa indicazione del §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -72,14 +72,12 @@ Una pagina che scorre, con due tab: **«Io»** e **«Partite»**.
 | F1R-26e | Statistiche e tab «Partite» | Statistiche senza doppioni con serie di giorni; storico con ritratto, modalità e obiettivo |
 | F1R-26f | Divisione del file e matrice finale | Nessun file sopra 400 righe; screenshot degli stati elencati in §3 |
 
-## 6. Decisioni di Michele (2026-10-28) e domande residue
+## 6. Decisioni di Michele (2026-10-28)
 
-Decise:
-1. **Titolo**: selezionabile dall'utente tra quelli guadagnati, anche in futuro per sfide, classifiche e altri titoli.
-2. **Nome dell'Indice**: «Maestria» va bene.
-3. **Esperienza e obiettivi**: rimandati al dossier Missioni.
-4. **Partite senza avversario**: «Avversario non registrato» va bene; nessuna preoccupazione per dati precedenti (app non uscita).
-
-Residua:
-- **Ordine delle sezioni** di §3 (scheda, scala, radar, consiglio, statistiche): da decidere insieme. Opzioni: (A) l'ordine attuale, identità e progressi prima; (B) radar subito dopo la scheda, perché è il dato più «mio» e porta al consiglio; (C) consiglio in cima, come azione del giorno.
-- **Asse «Finale» e «Banco»**: i nomi italiani e l'assenza di «Allena questo» per questi due assi non sono stati contestati; li considero confermati salvo tua indicazione.
+Decise il 2026-10-28:
+1. **Titolo** selezionabile dall'utente tra quelli guadagnati (anche in futuro per sfide, classifiche e altri titoli).
+2. **Nome dell'Indice**: «Maestria».
+3. **Esperienza e obiettivi**: nel dossier Missioni (approvato).
+4. **Partite senza avversario**: «Avversario non registrato»; nessuna gestione di dati precedenti (app non uscita).
+5. **Ordine delle sezioni**: lascia la scelta all'agente, si cambia dopo. Scelta: **opzione B** — scheda giocatore, **radar**, il Maestro consiglia, la scala, statistiche (e a seguire esperienza e obiettivi). Motivo: il radar è il dato più personale e porta direttamente al consiglio e all'allenamento.
+6. **Asse «Finale» e «Banco»**: nomi italiani e assenza di «Allena questo» confermati (non contestati).

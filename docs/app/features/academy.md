@@ -1,7 +1,7 @@
 # Accademia — dossier
 
-Stato: **bozza** (da approvare) · 2026-10-28 · task collegati: F1R-23 (dossier), F1R-28 (da creare dopo l'approvazione), F1R-21 (revisione dei contenuti, di Michele), F1R-14, F1R-16
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano. Le proposte non approvate sono segnate **[proposta]**.
+Stato: **approvato** (Michele, 2026-10-28) · bozza del 2026-10-28 · task collegati: F1R-23 (dossier), F1R-28 (da creare dopo l'approvazione), F1R-21 (revisione dei contenuti, di Michele), F1R-14, F1R-16
+Procedimento: `docs/app/features/README.md`. Approvato da Michele il 2026-10-28 con le decisioni del §6; i punti segnati **[proposta]** nel §3 valgono come approvati salvo diversa indicazione del §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -62,11 +62,11 @@ Gli insegna le tecniche della Scopa con brevi lezioni interattive guidate dal Ma
 | F1R-28e | Mini-tavolo sulla regia | Tempi da `MotionSpec`, nessun `delay` nuovo |
 | F1R-28f | Divisione dei file e matrice finale | Schermata e contenuti sotto 400 righe per file; screenshot degli stati di §3 |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Revisione dei contenuti (F1R-21)**: la fai tu, con un elenco dei testi che ti preparo? Io non riscrivo le lezioni: correggo solo gli errori certi contro la specifica (Settebello a 1 punto, niente «Articolo») e ti sottopongo i testi nuovi.
-2. **Percorso libero dal capitolo 2**: ti torna, o vuoi tutto in sequenza come oggi?
-3. **Capitolo consigliato dal radar**: lo vuoi (con la corrispondenza asse → capitolo di §3)? Se sì, controlliamo insieme la corrispondenza.
-4. **Ripasso lampo** senza crediti: va bene, o deve dare qualcosa (per esempio un segno)?
-5. **Titoli di capitolo**: li vuoi? Quali nomi, nello stile degli avversari («Promosso al bar»)? Propongo di scriverli io come [bozza] da approvare.
-6. **Moduli a pagamento** (`docs/vision.md`: «moduli di studio avanzati» a crediti): restano fuori da questa feature?
+1. **Revisione dei contenuti (F1R-21)**: la fa l'agente con un agente ad hoc (non Michele); si correggono gli errori certi contro la specifica (`docs/rules/scopa.md`) e i testi nuovi restano marcati per una rilettura finale.
+2. **Percorso libero dal capitolo 2**: sì.
+3. **Capitolo consigliato dal radar**: sì, con la corrispondenza asse → capitolo di §3.
+4. **Ripasso lampo** senza crediti: va bene.
+5. **Titoli di capitolo**: li scrive e gestisce l'agente; si ritoccano dopo.
+6. **Moduli a pagamento**: fuori da questa feature per ora.
