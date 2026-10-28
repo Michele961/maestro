@@ -64,19 +64,23 @@ internal fun CheckBubble(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (feedback == null) {
+            if (feedback == null || feedback.retryAvailable) {
                 BubbleText(
-                    text = stringResource(questionTextRes(question.fundamental)),
-                    modifier = Modifier.testTag("training_question_text"),
+                    text = if (feedback == null) {
+                        stringResource(questionTextRes(question.fundamental))
+                    } else {
+                        stringResource(hintTextRes(question.fundamental))
+                    },
+                    modifier = Modifier.testTag(if (feedback == null) "training_question_text" else "training_hint_text"),
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     question.options.forEachIndexed { index, option ->
-                        val label = optionLabel(option)
+                        if (feedback != null && index in feedback.triedIndexes) return@forEachIndexed
                         CheckChip(
-                            text = label,
+                            text = optionLabel(option),
                             modifier = Modifier.weight(1f).fillMaxHeight().testTag("training_option_$index"),
                             onClick = {
                                 soundManager.play(SoundEffect.BUTTON_CLICK)
@@ -87,15 +91,22 @@ internal fun CheckBubble(
                 }
             } else {
                 val correctLabel = optionLabel(question.options[feedback.correctIndex])
+                val firstTry = feedback.triedIndexes.size == 1
                 BubbleText(
-                    text = if (feedback.isCorrect) {
-                        stringResource(R.string.training_feedback_correct)
-                    } else {
-                        stringResource(R.string.training_feedback_wrong_answer, correctLabel)
+                    text = when {
+                        feedback.isCorrect && firstTry -> stringResource(R.string.training_feedback_correct)
+                        feedback.isCorrect -> stringResource(R.string.training_feedback_correct_retry)
+                        else -> stringResource(R.string.training_feedback_wrong_answer, correctLabel)
                     },
                     color = if (feedback.isCorrect) CheckRight else CheckWrong,
                     modifier = Modifier.testTag("training_feedback_banner"),
                 )
+                if (!feedback.isCorrect) {
+                    BubbleText(
+                        text = explanationText(question.fundamental, feedback.explanationValues),
+                        modifier = Modifier.testTag("training_explanation"),
+                    )
+                }
                 CheckChip(
                     text = stringResource(R.string.training_feedback_continue),
                     modifier = Modifier.testTag("training_continue_button"),
@@ -118,7 +129,7 @@ private fun BubbleText(text: String, modifier: Modifier = Modifier, color: Color
         lineHeight = 14.sp,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
-        maxLines = 3,
+        maxLines = 4,
         modifier = modifier,
     )
 }
@@ -156,6 +167,22 @@ private fun questionTextRes(fundamental: TrainingFundamental): Int = when (funda
     TrainingFundamental.SETTEBELLO_LOCATION -> R.string.training_question_settebello
     TrainingFundamental.CARDS_LEAD -> R.string.training_question_cards
     TrainingFundamental.NONE -> R.string.training_dialog_subtitle
+}
+
+private fun hintTextRes(fundamental: TrainingFundamental): Int = when (fundamental) {
+    TrainingFundamental.SEVENS_COUNT -> R.string.training_hint_sevens
+    else -> R.string.training_hint_denari
+}
+
+/** Perché la risposta è quella, in una riga: i numeri arrivano dalla stessa vista della domanda. */
+@Composable
+private fun explanationText(fundamental: TrainingFundamental, values: List<Int>): String = when (fundamental) {
+    TrainingFundamental.PRIMIERA_LEAD ->
+        stringResource(R.string.training_explain_primiera, values.getOrElse(0) { 0 }, values.getOrElse(1) { 0 })
+    TrainingFundamental.CARDS_LEAD ->
+        stringResource(R.string.training_explain_cards, values.getOrElse(0) { 0 }, values.getOrElse(1) { 0 })
+    TrainingFundamental.SETTEBELLO_LOCATION -> stringResource(R.string.training_explain_settebello)
+    else -> stringResource(R.string.training_explain_count)
 }
 
 @Composable

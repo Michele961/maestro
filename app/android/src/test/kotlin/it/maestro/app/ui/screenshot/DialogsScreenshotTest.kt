@@ -148,4 +148,32 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("training_feedback_banner").assertTextContains("2", substring = true)
         captureScreenRoboImage(screen.path("table_check_bubble_wrong"))
     }
+
+    @Test
+    fun training_hint_bubble_screenshot() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SEVENS_COUNT,
+            options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
+            correctIndex = 2,
+        )
+        composeRule.setContent {
+            MaestroTheme {
+                val state = base.copy(
+                    phase = DealPhase.PLAYING,
+                    isSparring = true,
+                    activeTrainingQuestion = question,
+                    trainingQuestionFeedback = TrainingAnswerFeedback(
+                        selectedIndex = 0,
+                        isCorrect = false,
+                        correctIndex = 2,
+                        retryAvailable = true,
+                    ),
+                )
+                TableContent(uiState = state, scene = sceneOf(state), onIntent = {})
+            }
+        }
+        composeRule.onNodeWithTag("training_hint_text").assertExists()
+        composeRule.onNodeWithTag("training_option_0").assertDoesNotExist()
+        captureScreenRoboImage(screen.path("table_check_bubble_hint"))
+    }
 }

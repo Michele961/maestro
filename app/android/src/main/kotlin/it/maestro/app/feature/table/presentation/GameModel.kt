@@ -37,12 +37,16 @@ public data class TrainingCheckResult(
 
 /**
  * Feedback mostrato all'utente subito dopo aver risposto al quesito di allenamento (task F1-12).
+ * Se [retryAvailable] il Maestro dà un indizio e la domanda resta aperta per un secondo tentativo, senza le
+ * risposte già provate ([triedIndexes]); l'esito per il punteggio di attenzione è quello del primo tentativo.
  */
 public data class TrainingAnswerFeedback(
     val selectedIndex: Int,
     val isCorrect: Boolean,
     val correctIndex: Int,
     val explanationValues: List<Int> = emptyList(),
+    val retryAvailable: Boolean = false,
+    val triedIndexes: Set<Int> = setOf(selectedIndex),
 )
 
 /**
