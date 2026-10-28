@@ -312,4 +312,36 @@ class DailyPuzzleViewModelTest {
         advanceUntilIdle()
         assertEquals(it.maestro.app.domain.settings.GameSpeed.INSTANT, viewModel.uiState.value.speed)
     }
+
+    @Test
+    fun entersOnTheFirstTierNotYetSolvedToday() = runTest {
+        val repo = InMemoryDailyPuzzleRepository(
+            initialRecord = DailyPuzzleRecord(lastCompletedDate = "2026-10-26", isSolvedToday = true, streak = 1, solvedTiersToday = setOf(0)),
+        )
+        val viewModel = DailyPuzzleViewModel(repository = repo, customDate = LocalDate.of(2026, 10, 26))
+        advanceUntilIdle()
+        assertEquals(1, viewModel.uiState.value.currentTierIndex)
+    }
+
+    @Test
+    fun recommendsTheTierThatTrainsTheWeakestRadarAxisOnlyWithEnoughMatches() = runTest {
+        fun profile(matches: Int, radar: it.maestro.ai.mastery.AbilityRadar) =
+            it.maestro.ai.mastery.MasteryProfile(matchesPlayed = matches, radar = radar)
+        val strong = it.maestro.ai.mastery.AbilityRadar(80, 80, 80, 80, 80)
+        suspend fun recommended(profile: it.maestro.ai.mastery.MasteryProfile): Int? {
+            val vm = DailyPuzzleViewModel(
+                repository = InMemoryDailyPuzzleRepository(),
+                customDate = LocalDate.of(2026, 10, 26),
+                masteryRepository = InMemoryMasteryRepository(initialProfile = profile),
+            )
+            advanceUntilIdle()
+            return vm.uiState.value.recommendedTierIndex
+        }
+        assertEquals(null, recommended(profile(2, strong.copy(board = 10))))
+        assertEquals(0, recommended(profile(5, strong.copy(board = 10))))
+        assertEquals(1, recommended(profile(5, strong.copy(primiera = 10))))
+        assertEquals(1, recommended(profile(5, strong.copy(sevens = 10))))
+        assertEquals(1, recommended(profile(5, strong.copy(denari = 10))))
+        assertEquals(2, recommended(profile(5, strong.copy(endgame = 10))))
+    }
 }

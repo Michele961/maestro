@@ -8,6 +8,9 @@ import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
 import it.maestro.app.data.local.PuzzleLesson
 import it.maestro.app.domain.coach.Phrase
+import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.feature.profile.presentation.RadarAxis
+import it.maestro.app.feature.profile.presentation.weakestAxis
 import it.maestro.app.domain.coach.PuzzleCoach
 import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
@@ -63,6 +66,10 @@ public data class DailyPuzzleUiState(
     val solutionShown: Boolean = false,
     /** Velocità di gioco scelta nelle Impostazioni: il mini-tavolo la rispetta (F1R-27d). */
     val speed: GameSpeed = GameSpeed.NORMAL,
+    /** Giorni consecutivi con almeno un livello risolto: la serie di sfide (non la serie di giorni di gioco). */
+    val challengeStreak: Int = 0,
+    /** Il livello che allena l'asse più debole del radar; `null` con meno di 3 partite. */
+    val recommendedTierIndex: Int? = null,
 )
 
 /**
@@ -75,6 +82,7 @@ public class DailyPuzzleViewModel(
     private val customPuzzle: TacticalPuzzle? = null,
     private val clock: Clock = SystemClock,
     gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
+    private val masteryRepository: MasteryRepository? = null,
 ) : ViewModel() {
 
     // Il giorno si rilegge con refreshDay() (ritorno in primo piano), salvo una data fissata dai test.
@@ -91,7 +99,8 @@ public class DailyPuzzleViewModel(
     public val uiState: StateFlow<DailyPuzzleUiState> = _uiState.asStateFlow()
 
     init {
-        loadTier(0)
+        loadStartingTier()
+        loadRecommendedTier()
         viewModelScope.launch { gameSpeed.collect { speed -> _uiState.value = _uiState.value.copy(speed = speed) } }
     }
 
@@ -104,7 +113,40 @@ public class DailyPuzzleViewModel(
         if (today == effectiveDate) return
         effectiveDate = today
         _uiState.value = DailyPuzzleUiState(puzzleNumber = puzzleNumber, dateString = dateString, speed = _uiState.value.speed)
-        loadTier(0)
+        loadStartingTier()
+        loadRecommendedTier()
+    }
+
+    /** Si entra sul primo livello di oggi non ancora risolto (il primo se sono tutti risolti). */
+    private fun loadStartingTier() {
+        viewModelScope.launch {
+            val record = repository.getDailyPuzzleRecord(dateString)
+            // Un record senza livelli registrati (formato precedente) resta sul primo livello, come prima.
+            val first = if (record.solvedTiersToday.isEmpty()) {
+                0
+            } else {
+                DailyPuzzleProvider.TIERS.indices.firstOrNull { it !in record.solvedTiersToday } ?: 0
+            }
+            loadTier(first)
+        }
+    }
+
+    /** Il livello consigliato: Banco→Riscaldamento (Scopa), Sette/Denari/Primiera→Tattica, Finale→Maestro. */
+    private fun loadRecommendedTier() {
+        val mastery = masteryRepository ?: return
+        viewModelScope.launch {
+            val profile = mastery.getMasteryProfile()
+            val tier = if (profile.matchesPlayed < MIN_MATCHES_FOR_RECOMMENDATION) {
+                null
+            } else {
+                when (profile.radar.weakestAxis()) {
+                    RadarAxis.BOARD -> 0
+                    RadarAxis.ENDGAME -> 2
+                    RadarAxis.SEVENS, RadarAxis.DENARI, RadarAxis.PRIMIERA -> 1
+                }
+            }
+            _uiState.value = _uiState.value.copy(recommendedTierIndex = tier)
+        }
     }
 
     /**
@@ -170,6 +212,7 @@ public class DailyPuzzleViewModel(
                     lesson = lesson,
                     maestroPhrases = emptyList(),
                     solutionShown = false,
+                    challengeStreak = record.streak,
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
@@ -188,6 +231,7 @@ public class DailyPuzzleViewModel(
                     lesson = lesson,
                     maestroPhrases = emptyList(),
                     solutionShown = false,
+                    challengeStreak = record.streak,
                 )
             }
         }
@@ -237,6 +281,9 @@ public class DailyPuzzleViewModel(
                         date = effectiveDate,
                         tierIndex = currentState.currentTierIndex,
                         tierCredits = currentTier.rewardCredits,
+                    )
+                    _uiState.value = _uiState.value.copy(
+                        challengeStreak = repository.getDailyPuzzleRecord(dateString).streak,
                     )
                 }
             }
@@ -335,3 +382,6 @@ public class DailyPuzzleViewModel(
         )
     }
 }
+
+/** Partite minime perché il radar abbia senso per consigliare un livello. */
+private const val MIN_MATCHES_FOR_RECOMMENDATION = 3

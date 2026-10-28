@@ -136,6 +136,7 @@ public fun DailyPuzzleScreenContent(
             // Intestazione schermata
             PuzzleHeader(
                 puzzleNumber = uiState.puzzleNumber,
+                challengeStreak = uiState.challengeStreak,
                 onNavigateHome = onNavigateHome,
             )
 
@@ -144,6 +145,7 @@ public fun DailyPuzzleScreenContent(
                 tiers = uiState.availableTiers,
                 currentTierIndex = uiState.currentTierIndex,
                 solvedTiers = uiState.solvedTiers,
+                recommendedTierIndex = uiState.recommendedTierIndex,
                 onSelectTier = onSelectTier,
             )
 
@@ -288,6 +290,7 @@ public fun DailyPuzzleScreenContent(
 @Composable
 private fun PuzzleHeader(
     puzzleNumber: Int,
+    challengeStreak: Int,
     onNavigateHome: () -> Unit,
 ) {
     WoodPanel(
@@ -321,11 +324,13 @@ private fun PuzzleHeader(
                     maxLines = 1,
                 )
                 Text(
-                    text = stringResource(R.string.puzzle_number_format, puzzleNumber),
+                    text = stringResource(R.string.puzzle_number_format, puzzleNumber) +
+                        if (challengeStreak > 0) " · " + stringResource(R.string.puzzle_challenge_streak, challengeStreak) else "",
                     color = Color.White.copy(alpha = 0.85f),
                     fontSize = 11.sp,
                     fontFamily = MaestroDisplayFont,
                     maxLines = 1,
+                    modifier = Modifier.testTag("puzzle_header_subtitle"),
                 )
             }
         }
@@ -521,6 +526,7 @@ private fun PuzzleTierSelector(
     tiers: List<DailyPuzzleTier>,
     currentTierIndex: Int,
     solvedTiers: Set<Int>,
+    recommendedTierIndex: Int?,
     onSelectTier: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -589,6 +595,16 @@ private fun PuzzleTierSelector(
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
+                    if (recommendedTierIndex == tier.index) {
+                        Text(
+                            text = stringResource(R.string.puzzle_tier_recommended),
+                            color = Color.White.copy(alpha = 0.95f),
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            modifier = Modifier.testTag("puzzle_tier_recommended_${tier.index}"),
+                        )
+                    }
                 }
             }
         }
