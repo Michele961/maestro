@@ -23,7 +23,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 6 | Home | `home.md` (bozza) | F1R-04 | da fare |
 | 7 | Sfida del giorno | `daily-puzzle.md` | F1R-02, F1R-10 | da fare |
 | 8 | Accademia | `academy.md` | F1R-10, F1R-21 | da fare |
-| 9 | Profilo, Maestria e Radar | `profile.md` | F1R-14 | da fare |
+| 9 | Profilo, Maestria e Radar | `profile.md` (bozza) | F1R-14 | da approvare |
 | 10 | Missioni e streak | `missions.md` | F1R-14 | da fare |
 | 11 | Bottega e wallet | `shop.md` | F1R-03, F1R-14 | da fare |
 | 12 | Impostazioni e audio | `settings.md` | F1R-09, F1R-20 | da fare |
