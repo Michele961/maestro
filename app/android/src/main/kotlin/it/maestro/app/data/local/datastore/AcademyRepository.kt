@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import it.maestro.app.data.local.academy.AcademyLessonId
-import it.maestro.app.data.local.academy.AcademyLessonProgress
+import it.maestro.app.domain.academy.AcademyLessonId
+import it.maestro.app.domain.academy.AcademyLessonProgress
 import it.maestro.app.data.local.academy.AcademyPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

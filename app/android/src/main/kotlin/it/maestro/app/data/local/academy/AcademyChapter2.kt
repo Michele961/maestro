@@ -1,5 +1,13 @@
 package it.maestro.app.data.local.academy
 
+import it.maestro.app.domain.academy.AcademyChapterId
+import it.maestro.app.domain.academy.AcademyLessonId
+import it.maestro.app.domain.academy.AcademyStepType
+import it.maestro.app.domain.academy.AcademyOption
+import it.maestro.app.domain.academy.AcademyStep
+import it.maestro.app.domain.academy.AcademyLesson
+import it.maestro.app.domain.academy.AcademyChapter
+
 import it.maestro.app.R
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card

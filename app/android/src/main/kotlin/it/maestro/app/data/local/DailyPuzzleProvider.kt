@@ -1,5 +1,8 @@
 package it.maestro.app.data.local
 
+import it.maestro.app.domain.puzzle.PuzzleLesson
+import it.maestro.app.domain.puzzle.DailyPuzzleTier
+
 import androidx.annotation.StringRes
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
@@ -10,16 +13,6 @@ import it.maestro.game.model.Rank
 import it.maestro.game.model.Suit
 import it.maestro.app.domain.time.SystemClock
 import java.time.LocalDate
-
-/**
- * Modello descrittivo per i livelli di difficoltà progressivi della Sfida del Giorno.
- */
-public data class DailyPuzzleTier(
-    val index: Int,
-    val titleRes: Int,
-    val subtitleRes: Int,
-    val rewardCredits: Int,
-)
 
 /**
  * Provider deterministico per la selezione e generazione della "Sfida del Giorno" (task F2-03).
@@ -112,17 +105,4 @@ public object DailyPuzzleProvider {
             else -> PuzzleLesson.BALANCE
         }
     }
-}
-
-/** Cosa insegna un puzzle risolto, con il testo del concetto tattico e quello della regola d'oro del Maestro. */
-public enum class PuzzleLesson(
-    @StringRes public val conceptRes: Int,
-    @StringRes public val ruleRes: Int,
-) {
-    SWEEP(R.string.puzzle_concept_sweep, R.string.puzzle_rule_sweep),
-    SETTEBELLO(R.string.puzzle_concept_settebello, R.string.puzzle_rule_settebello),
-    SEVEN_OR_SIX(R.string.puzzle_concept_seven_or_six, R.string.puzzle_rule_seven_or_six),
-    DENARI(R.string.puzzle_concept_denari, R.string.puzzle_rule_denari),
-    WIN_MATCH(R.string.puzzle_concept_win_match, R.string.puzzle_rule_win_match),
-    BALANCE(R.string.puzzle_concept_balance, R.string.puzzle_rule_balance),
 }

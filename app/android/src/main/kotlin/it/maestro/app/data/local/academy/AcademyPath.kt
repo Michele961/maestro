@@ -1,5 +1,7 @@
 package it.maestro.app.data.local.academy
 
+import it.maestro.app.domain.academy.AcademyLessonId
+
 /**
  * Regole del percorso dell'Accademia (task F1R-28).
  *

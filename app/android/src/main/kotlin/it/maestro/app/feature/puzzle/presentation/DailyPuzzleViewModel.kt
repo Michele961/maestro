@@ -6,13 +6,13 @@ import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
-import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.domain.puzzle.PuzzleLesson
 import it.maestro.app.domain.coach.Phrase
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.feature.profile.presentation.RadarAxis
 import it.maestro.app.feature.profile.presentation.weakestAxis
 import it.maestro.app.domain.coach.PuzzleCoach
-import it.maestro.app.data.local.DailyPuzzleTier
+import it.maestro.app.domain.puzzle.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.domain.retention.RetentionRepository

@@ -1,5 +1,8 @@
 package it.maestro.app.data.local.academy
 
+import it.maestro.app.domain.academy.AcademyLesson
+import it.maestro.app.domain.academy.AcademyChapter
+
 /**
  * Contenuti formativi completi dell'Accademia del Maestro: 4 Macro-Moduli (Capitoli) e 15 Sotto-Moduli (Lezioni).
  * Un file per capitolo: `AcademyChapter1.kt` … `AcademyChapter4.kt`.

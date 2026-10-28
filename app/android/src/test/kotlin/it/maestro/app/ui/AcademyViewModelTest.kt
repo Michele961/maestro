@@ -4,9 +4,9 @@ import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.domain.time.FakeClock
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
 import it.maestro.app.domain.rewards.RewardEngine
-import it.maestro.app.data.local.academy.AcademyChapterId
+import it.maestro.app.domain.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyLessonId
+import it.maestro.app.domain.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.domain.wallet.TransactionReason

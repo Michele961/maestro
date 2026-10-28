@@ -1,7 +1,5 @@
-package it.maestro.app.data.local.academy
+package it.maestro.app.domain.academy
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 
@@ -58,8 +56,8 @@ public enum class AcademyStepType {
  */
 public data class AcademyOption(
     public val id: String,
-    @StringRes public val textRes: Int,
-    @StringRes public val feedbackRes: Int,
+    public val textRes: Int,
+    public val feedbackRes: Int,
     public val isCorrect: Boolean,
 )
 
@@ -70,16 +68,16 @@ public data class AcademyStep(
     public val id: String,
     public val stepNumber: Int,
     public val type: AcademyStepType,
-    @StringRes public val titleRes: Int,
+    public val titleRes: Int,
     public val maestroMood: MaestroMood,
-    @StringRes public val maestroSpeechRes: Int,
+    public val maestroSpeechRes: Int,
     public val tableCards: List<Card> = emptyList(),
     public val handCards: List<Card> = emptyList(),
     public val cardBadges: Map<Card, Int> = emptyMap(),
-    @StringRes public val tableBadgeRes: Int? = null,
+    public val tableBadgeRes: Int? = null,
     public val options: List<AcademyOption> = emptyList(),
     public val targetCard: Card? = null,
-    @StringRes public val goldenRuleRes: Int? = null,
+    public val goldenRuleRes: Int? = null,
 )
 
 /**
@@ -89,11 +87,11 @@ public data class AcademyLesson(
     public val id: AcademyLessonId,
     public val chapterId: AcademyChapterId,
     public val lessonNumber: Int,
-    @StringRes public val titleRes: Int,
-    @StringRes public val subtitleRes: Int,
-    @StringRes public val descriptionRes: Int,
-    @DrawableRes public val iconRes: Int,
-    @StringRes public val goldenRuleRes: Int,
+    public val titleRes: Int,
+    public val subtitleRes: Int,
+    public val descriptionRes: Int,
+    public val iconRes: Int,
+    public val goldenRuleRes: Int,
     public val steps: List<AcademyStep>,
     /** Paragrafi di `docs/rules/scopa.md` (es. "6.2") che la lezione usa: li controlla `AcademyContentTest`. */
     public val specRefs: List<String> = emptyList(),
@@ -105,13 +103,13 @@ public data class AcademyLesson(
 public data class AcademyChapter(
     public val id: AcademyChapterId,
     public val number: Int,
-    @StringRes public val titleRes: Int,
-    @StringRes public val subtitleRes: Int,
-    @StringRes public val descriptionRes: Int,
-    @DrawableRes public val iconRes: Int,
-    @DrawableRes public val badgeRes: Int,
+    public val titleRes: Int,
+    public val subtitleRes: Int,
+    public val descriptionRes: Int,
+    public val iconRes: Int,
+    public val badgeRes: Int,
     /** Titolo che il capitolo finito assegna (si deriva dalle lezioni completate, non si salva). */
-    @StringRes public val rankTitleRes: Int,
+    public val rankTitleRes: Int,
     public val lessons: List<AcademyLesson>,
 )
 
