@@ -28,6 +28,12 @@ public data class StreakState(
     public companion object {
         public const val INITIAL_FREEZE_TOKENS: Int = 1
 
+        /** Ogni quanti giorni consecutivi di serie si guadagna un Gettone Riposo (task F1R-29c). */
+        public const val FREEZE_RECHARGE_DAYS: Int = 7
+
+        /** Gettoni Riposo che si possono tenere insieme. */
+        public const val MAX_FREEZE_TOKENS: Int = 2
+
         public val INITIAL: StreakState = StreakState(
             currentStreak = 0,
             bestStreak = 0,
@@ -102,10 +108,15 @@ public data class StreakState(
                 1
             }
 
+            // Ogni 7 giorni di serie si ricarica un Gettone Riposo, fino al massimo (task F1R-29c).
+            val earnsToken = newStreak > evaluated.currentStreak && newStreak % FREEZE_RECHARGE_DAYS == 0
+            val tokens = if (earnsToken) minOf(MAX_FREEZE_TOKENS, evaluated.freezeTokens + 1) else evaluated.freezeTokens
+
             return evaluated.copy(
                 currentStreak = newStreak,
                 bestStreak = max(evaluated.bestStreak, newStreak),
                 lastPlayedDate = todayStr,
+                freezeTokens = tokens,
             )
         }
     }

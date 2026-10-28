@@ -47,6 +47,7 @@ public data class MissionAdvance(
  * @property streakAfter giorni di streak dopo l'evento.
  * @property masteryBefore Indice di Maestria prima dell'evento, se l'evento lo cambia.
  * @property masteryAfter Indice di Maestria dopo l'evento.
+ * @property freezeTokenEarned l'evento ha completato 7 giorni di serie e ricaricato un Gettone Riposo.
  * @property ladderVictory vittoria sulla scala degli avversari registrata dall'evento (solo partita completa in Classica).
  */
 public data class RewardSummary(
@@ -57,6 +58,7 @@ public data class RewardSummary(
     val masteryBefore: Int? = null,
     val masteryAfter: Int? = null,
     val ladderVictory: LadderVictory? = null,
+    val freezeTokenEarned: Boolean = false,
 ) {
     /** Variazione dell'Indice di Maestria, se l'evento lo tocca. */
     val masteryDelta: Int? get() = if (masteryBefore != null && masteryAfter != null) masteryAfter - masteryBefore else null
@@ -140,6 +142,7 @@ public class RewardEngine(
             masteryBefore = masteryBefore.cognitiveElo,
             masteryAfter = masteryAfter.cognitiveElo,
             ladderVictory = ladderVictory,
+            freezeTokenEarned = streakAfter.freezeTokens > streakBefore.freezeTokens,
         )
     }
 
@@ -161,6 +164,7 @@ public class RewardEngine(
             missions = advances(missionsBefore, retention.getDailyMissions(today).missions),
             streakBefore = streakBefore.currentStreak,
             streakAfter = streakAfter.currentStreak,
+            freezeTokenEarned = streakAfter.freezeTokens > streakBefore.freezeTokens,
         )
     }
 
