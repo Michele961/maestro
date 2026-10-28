@@ -12,7 +12,11 @@ import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.academy.AcademyLessonProgress
 import it.maestro.app.data.local.academy.AcademyStep
 import it.maestro.app.data.local.academy.AcademyStepType
+import it.maestro.app.feature.profile.presentation.RadarAxis
+import it.maestro.app.feature.profile.presentation.weakestAxis
+import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.data.local.datastore.AcademyRepository
+import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
@@ -21,8 +25,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+/** Partite minime perché il radar abbia senso per consigliare un capitolo. */
+public const val ACADEMY_MIN_MATCHES: Int = 3
+
+/**
+ * Il capitolo che il Maestro consiglia in base al radar: Primiera→2, Banco→3, Sette e Finale→4,
+ * Denari→1 (se non finito) altrimenti 2. `null` con meno di [ACADEMY_MIN_MATCHES] partite.
+ * Se il capitolo 1 non è completato, il consiglio è sempre il capitolo 1 (gli altri sono chiusi).
+ */
+public fun recommendedChapter(
+    profile: MasteryProfile,
+    completed: Set<AcademyLessonId>,
+): AcademyChapterId? {
+    if (profile.matchesPlayed < ACADEMY_MIN_MATCHES) return null
+    val firstDone = AcademyContent.CHAPTERS.first().lessons.all { it.id in completed }
+    if (!firstDone) return AcademyChapterId.CHAPTER_1_FONDAMENTI
+    return when (profile.radar.weakestAxis()) {
+        RadarAxis.PRIMIERA, RadarAxis.DENARI -> AcademyChapterId.CHAPTER_2_PRIMIERA
+        RadarAxis.BOARD -> AcademyChapterId.CHAPTER_3_DIFESA
+        RadarAxis.SEVENS, RadarAxis.ENDGAME -> AcademyChapterId.CHAPTER_4_MAESTRIA
+    }
+}
 
 /**
  * Stato della card di una singola lezione (sotto-modulo) all'interno di un capitolo.
@@ -85,6 +112,8 @@ public data class AcademyUiState(
     public val chapters: List<AcademyChapterCardState> = emptyList(),
     public val expandedChapterId: AcademyChapterId? = AcademyChapterId.CHAPTER_1_FONDAMENTI,
     public val viewMode: AcademyViewMode = AcademyViewMode.ChapterMap,
+    /** Il capitolo consigliato dal Maestro in base al radar; `null` senza abbastanza partite. */
+    public val recommendedChapterId: AcademyChapterId? = null,
 )
 
 /**
@@ -94,6 +123,7 @@ public class AcademyViewModel(
     private val academyRepository: AcademyRepository,
     private val rewardEngine: RewardEngine? = null,
     private val availableChapters: List<AcademyChapter> = AcademyContent.CHAPTERS,
+    private val masteryRepository: MasteryRepository? = null,
 ) : ViewModel() {
 
     private val viewModeState = MutableStateFlow<AcademyViewMode>(AcademyViewMode.ChapterMap)
@@ -103,7 +133,8 @@ public class AcademyViewModel(
         academyRepository.observeProgress(),
         viewModeState,
         expandedChapterState,
-    ) { progressMap, currentViewMode, expandedChapterId ->
+        masteryRepository?.observeMasteryProfile() ?: flowOf(null),
+    ) { progressMap, currentViewMode, expandedChapterId, mastery ->
         val chapterStates = availableChapters.map { chapter ->
             val lessonStates = chapter.lessons.map { lesson ->
                 val progress = progressMap[lesson.id] ?: AcademyLessonProgress(
@@ -135,6 +166,9 @@ public class AcademyViewModel(
             chapters = chapterStates,
             expandedChapterId = expandedChapterId,
             viewMode = currentViewMode,
+            recommendedChapterId = mastery?.let {
+                recommendedChapter(it, progressMap.filterValues { p -> p.isCompleted }.keys)
+            },
         )
     }.stateIn(
         scope = viewModelScope,

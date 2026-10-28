@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import it.maestro.app.data.local.academy.AcademyLessonId
 import it.maestro.app.data.local.academy.AcademyLessonProgress
+import it.maestro.app.data.local.academy.AcademyPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,26 +65,16 @@ public class DataStoreAcademyRepository(
     }
 
     private fun mapPreferencesToProgress(preferences: Preferences): Map<AcademyLessonId, AcademyLessonProgress> {
-        val entries = AcademyLessonId.entries
-        val result = mutableMapOf<AcademyLessonId, AcademyLessonProgress>()
-        var previousCompleted = true // La primissima lezione è sempre sbloccata
-
-        entries.forEachIndexed { index, lessonId ->
-            val isCompleted = preferences[completedKey(lessonId)] ?: false
-            val completedAt = preferences[timestampKey(lessonId)] ?: 0L
-            val isUnlocked = index == 0 || previousCompleted
-
-            result[lessonId] = AcademyLessonProgress(
+        val completed = AcademyLessonId.entries.filter { preferences[completedKey(it)] ?: false }.toSet()
+        val unlocked = AcademyPath.unlocked(completed)
+        return AcademyLessonId.entries.associateWith { lessonId ->
+            AcademyLessonProgress(
                 lessonId = lessonId,
-                isUnlocked = isUnlocked,
-                isCompleted = isCompleted,
-                completedAt = completedAt,
+                isUnlocked = lessonId in unlocked,
+                isCompleted = lessonId in completed,
+                completedAt = preferences[timestampKey(lessonId)] ?: 0L,
             )
-
-            previousCompleted = isCompleted
         }
-
-        return result
     }
 }
 
@@ -117,24 +108,14 @@ public class InMemoryAcademyRepository(
     }
 
     private fun buildProgressMap(completed: Set<AcademyLessonId>): Map<AcademyLessonId, AcademyLessonProgress> {
-        val entries = AcademyLessonId.entries
-        val result = mutableMapOf<AcademyLessonId, AcademyLessonProgress>()
-        var previousCompleted = true
-
-        entries.forEachIndexed { index, lessonId ->
-            val isCompleted = completed.contains(lessonId)
-            val isUnlocked = index == 0 || previousCompleted
-
-            result[lessonId] = AcademyLessonProgress(
+        val unlocked = AcademyPath.unlocked(completed)
+        return AcademyLessonId.entries.associateWith { lessonId ->
+            AcademyLessonProgress(
                 lessonId = lessonId,
-                isUnlocked = isUnlocked,
-                isCompleted = isCompleted,
+                isUnlocked = lessonId in unlocked,
+                isCompleted = lessonId in completed,
                 completedAt = completedTimes[lessonId] ?: 0L,
             )
-
-            previousCompleted = isCompleted
         }
-
-        return result
     }
 }

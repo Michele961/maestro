@@ -279,6 +279,7 @@
     <string name="academy_screen_subtitle">The Club\'s Educational Path</string>
     <string name="academy_nav_title">Academy</string>
     <string name="academy_chapter_number">Chapter %1$d</string>
+    <string name="academy_chapter_recommended">★ Recommended by the Maestro</string>
     <string name="academy_chapter_progress">%1$d/%2$d Lessons</string>
     <string name="academy_chapter_completed">CHAPTER COMPLETED</string>
     <string name="academy_lesson_number">Lesson %1$d.%2$d</string>

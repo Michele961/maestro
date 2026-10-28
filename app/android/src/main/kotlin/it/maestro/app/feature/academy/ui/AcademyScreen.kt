@@ -99,6 +99,7 @@ public fun AcademyScreen(
                 onOpenLesson = { viewModel.openLesson(it) },
                 onNavigateHome = onNavigateHome,
                 modifier = modifier,
+                recommendedChapterId = uiState.recommendedChapterId,
             )
         }
         is AcademyViewMode.Lesson -> {
@@ -125,6 +126,7 @@ public fun AcademyChapterMapContent(
     onOpenLesson: (AcademyLessonId) -> Unit,
     onNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
+    recommendedChapterId: AcademyChapterId? = null,
 ) {
     Box(
         modifier = modifier
@@ -197,6 +199,7 @@ public fun AcademyChapterMapContent(
                     AcademyChapterCard(
                         chapterState = chapterState,
                         isExpanded = expandedChapterId == chapterState.chapter.id,
+                        isRecommended = recommendedChapterId == chapterState.chapter.id,
                         onToggle = { onToggleChapter(chapterState.chapter.id) },
                         onOpenLesson = onOpenLesson,
                     )
@@ -217,6 +220,7 @@ private fun AcademyChapterCard(
     onToggle: () -> Unit,
     onOpenLesson: (AcademyLessonId) -> Unit,
     modifier: Modifier = Modifier,
+    isRecommended: Boolean = false,
 ) {
     val chapter = chapterState.chapter
     val isUnlocked = chapterState.isUnlocked
@@ -265,6 +269,16 @@ private fun AcademyChapterCard(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
+                    if (isRecommended) {
+                        Text(
+                            text = stringResource(R.string.academy_chapter_recommended),
+                            color = Color(0xFFFFF8DC),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = MaestroDisplayFont,
+                            modifier = Modifier.testTag("academy_chapter_recommended_${chapter.number}"),
+                        )
+                    }
                     Text(
                         text = stringResource(R.string.academy_chapter_number, chapter.number).uppercase(),
                         color = BrassRivetGold,
