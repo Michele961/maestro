@@ -53,6 +53,12 @@ public enum class MotionToken(public val baseMillis: Long) {
 
     /** Passaggio tra schermate. */
     SCREEN_TRANSITION(300),
+
+    /** Conteggio del saldo crediti verso il nuovo valore dopo un acquisto. */
+    BALANCE_COUNT(500),
+
+    /** Tempo di lettura della battuta del Maestro dopo un acquisto. */
+    PURCHASE_NOTE(2400),
 }
 
 /** Durate effettive dei [MotionToken] alla velocità di gioco scelta. */

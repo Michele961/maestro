@@ -6,6 +6,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -32,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -67,6 +70,9 @@ import it.maestro.app.designsystem.theme.ButtonGoldBorder
 import it.maestro.app.designsystem.theme.MaestroDisplayFont
 import it.maestro.app.designsystem.theme.WoodSurfaceDark
 import org.koin.androidx.compose.koinViewModel
+import it.maestro.app.designsystem.motion.MotionSpec
+import it.maestro.app.designsystem.motion.MotionToken
+import it.maestro.app.feature.shop.presentation.ShopEvent
 import it.maestro.app.feature.shop.presentation.ShopItemCardState
 import it.maestro.app.feature.shop.presentation.ShopUiState
 import it.maestro.app.feature.shop.presentation.ShopViewModel
@@ -90,6 +96,7 @@ public fun ShopScreen(
         onUnlockItem = viewModel::unlockAndEquip,
         onPreviewItem = viewModel::openPreview,
         onDismissPreview = viewModel::closePreview,
+        onConsumeEvent = viewModel::consumeEvent,
         onNavigateHome = onNavigateHome,
         modifier = modifier,
     )
@@ -105,7 +112,21 @@ public fun ShopScreenContent(
     modifier: Modifier = Modifier,
     onPreviewItem: (CosmeticItem) -> Unit = {},
     onDismissPreview: () -> Unit = {},
+    onConsumeEvent: () -> Unit = {},
 ) {
+    val balanceMillis = MotionSpec.millis(MotionToken.BALANCE_COUNT, uiState.gameSpeed).toInt()
+    val shownBalance by animateIntAsState(
+        targetValue = uiState.creditsBalance,
+        animationSpec = tween(durationMillis = balanceMillis),
+        label = "shop_balance",
+    )
+    val event = uiState.event
+    LaunchedEffect(event) {
+        if (event != null) {
+            MotionSpec.pause(MotionSpec.millis(MotionToken.PURCHASE_NOTE, uiState.gameSpeed))
+            onConsumeEvent()
+        }
+    }
     uiState.previewCard?.let { preview ->
         TryItemDialog(
             uiState = uiState,
@@ -168,10 +189,23 @@ public fun ShopScreenContent(
                     }
                     CurrencyPill(
                         icon = R.drawable.icon_coin,
-                        value = uiState.creditsBalance.toString(),
+                        value = shownBalance.toString(),
                         modifier = Modifier.testTag("shop_credits_pill"),
                     )
                 }
+            }
+
+            // Esito dell'ultimo acquisto: battuta del Maestro o crediti mancanti (F1R-30c)
+            when (event) {
+                is ShopEvent.Unlocked -> ShopNote(
+                    text = stringResource(R.string.shop_maestro_bought),
+                    testTag = "shop_note_unlocked",
+                )
+                is ShopEvent.NotEnoughCredits -> ShopNote(
+                    text = stringResource(R.string.shop_try_missing, event.missing),
+                    testTag = "shop_note_missing",
+                )
+                null -> Unit
             }
 
             // Tab di selezione categoria
@@ -216,7 +250,6 @@ public fun ShopScreenContent(
                     ShopItemRow(
                         card = card,
                         onEquip = { onEquipItem(card.item) },
-                        onUnlock = { onUnlockItem(card.item) },
                         onPreview = { onPreviewItem(card.item) },
                     )
                 }
@@ -380,6 +413,22 @@ private fun ShopTabButton(
     }
 }
 
+/** Riga di testo sotto l'intestazione per l'esito di un acquisto. */
+@Composable
+private fun ShopNote(text: String, testTag: String) {
+    Text(
+        text = text,
+        color = BrassRivetGold,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 4.dp)
+            .testTag(testTag),
+    )
+}
+
 /**
  * Riga di un elemento cosmetico nel catalogo.
  */
@@ -387,7 +436,6 @@ private fun ShopTabButton(
 private fun ShopItemRow(
     card: ShopItemCardState,
     onEquip: () -> Unit,
-    onUnlock: () -> Unit,
     onPreview: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -456,7 +504,7 @@ private fun ShopItemRow(
                 card.canAfford -> {
                     MaestroPillButton(
                         text = stringResource(R.string.shop_action_unlock, item.priceCredits),
-                        onClick = onUnlock,
+                        onClick = onPreview,
                         variant = PillButtonVariant.PRIMARY_GREEN,
                         height = 36.dp,
                         fontSize = 11.sp,

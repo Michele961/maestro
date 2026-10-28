@@ -221,6 +221,7 @@ public val appModule: Module = module {
         ShopViewModel(
             settingsRepository = get(),
             walletRepository = get(),
+            soundManager = get(),
         )
     }
 }
