@@ -513,6 +513,10 @@
     <string name="shop_action_insufficient_funds">CREDITI INSUFFICIENTI</string>
     <string name="shop_unlock_success">Elemento sbloccato ed equipaggiato!</string>
     <string name="shop_credits_label">%1$d Crediti</string>
+    <string name="shop_try_title">Provalo</string>
+    <string name="shop_try_close">CHIUDI</string>
+    <string name="shop_try_missing">Ti mancano %1$d crediti.</string>
+    <string name="shop_try_earn">Li guadagni con le missioni e la Sfida del Giorno.</string>
 
     <string name="cosmetic_table_green_title">Panno Verde Classico</string>
     <string name="cosmetic_table_green_desc">Il feltro verde tradizionale del circolo, elegante e rilassante.</string>

@@ -34,6 +34,11 @@ public data class ShopUiState(
     val items: List<ShopItemCardState> = emptyList(),
     val creditsBalance: Int = 0,
     val feedbackMessage: String? = null,
+    /** Oggetto aperto nel riquadro «Provalo» (F1R-30b); `null` se il riquadro è chiuso. */
+    val previewCard: ShopItemCardState? = null,
+    val equippedTableId: String = CosmeticCatalog.TABLES.first().id,
+    val equippedCardBackId: String = CosmeticCatalog.CARD_BACKS.first().id,
+    val equippedAvatarId: String = CosmeticCatalog.AVATARS.first().id,
 )
 
 /**
@@ -46,13 +51,15 @@ public class ShopViewModel(
 
     private val categoryState = MutableStateFlow(CosmeticCategory.TABLE_FELT)
     private val feedbackState = MutableStateFlow<String?>(null)
+    private val previewId = MutableStateFlow<String?>(null)
 
     public val uiState: StateFlow<ShopUiState> = combine(
         categoryState,
         settingsRepository.settingsFlow,
         walletRepository.observeBalance(),
         feedbackState,
-    ) { category, settings, balance, feedback ->
+        previewId,
+    ) { category, settings, balance, feedback, preview ->
         val categoryItems = when (category) {
             CosmeticCategory.TABLE_FELT -> CosmeticCatalog.TABLES
             CosmeticCategory.CARD_BACK -> CosmeticCatalog.CARD_BACKS
@@ -79,6 +86,10 @@ public class ShopViewModel(
             items = cards,
             creditsBalance = balance,
             feedbackMessage = feedback,
+            previewCard = cards.firstOrNull { it.item.id == preview },
+            equippedTableId = settings.selectedTableTheme,
+            equippedCardBackId = settings.selectedCardBackTheme,
+            equippedAvatarId = settings.selectedAvatar,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -88,6 +99,16 @@ public class ShopViewModel(
 
     public fun selectCategory(category: CosmeticCategory) {
         categoryState.value = category
+        previewId.value = null
+    }
+
+    /** Apre il riquadro «Provalo» sull'oggetto (F1R-30b). */
+    public fun openPreview(item: CosmeticItem) {
+        previewId.value = item.id
+    }
+
+    public fun closePreview() {
+        previewId.value = null
     }
 
     public fun clearFeedback() {

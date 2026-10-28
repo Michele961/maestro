@@ -513,6 +513,10 @@
     <string name="shop_action_insufficient_funds">INSUFFICIENT CREDITS</string>
     <string name="shop_unlock_success">Item unlocked and equipped!</string>
     <string name="shop_credits_label">%1$d Credits</string>
+    <string name="shop_try_title">Try it</string>
+    <string name="shop_try_close">CLOSE</string>
+    <string name="shop_try_missing">You need %1$d more credits.</string>
+    <string name="shop_try_earn">Earn them with missions and the Daily Challenge.</string>
 
     <string name="cosmetic_table_green_title">Classic Green Felt</string>
     <string name="cosmetic_table_green_desc">The traditional club green felt, elegant and relaxing.</string>

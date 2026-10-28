@@ -335,7 +335,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-30 — Bottega e wallet
 
-- **Stato:** in corso (dossier `docs/app/features/shop.md` approvato il 2026-10-28). Fatto: 30a (catalogo in `domain/cosmetics`, `CosmeticStyle` nel design system come unica fonte per tavolo, dorso e avatar; tolta l'eccezione di architettura di `ShopScreen`).
+- **Stato:** in corso (dossier `docs/app/features/shop.md` approvato il 2026-10-28). Fatto: 30a (catalogo in `domain/cosmetics`, `CosmeticStyle` nel design system come unica fonte per tavolo, dorso e avatar; tolta l'eccezione di architettura di `ShopScreen`). 30b fatto: un tocco sulla scheda apre «Provalo» (`TryItemDialog`) con mini-tavolo, carte e dorso veri e l'oggetto applicato; Equipaggia / Sblocca per N / «Ti mancano N crediti» con rimando a missioni e Sfida. Lo sblocco dal riquadro resta diretto fino alla conferma di 30c. Testi [bozza] da rileggere.
 - **Riferimenti:** `docs/app/features/shop.md`, `docs/app/features/shop-assets.md`
 - **Sotto-task:** 30a catalogo nel dominio e stile dal catalogo, 30b anteprime vere e «Provalo», 30c acquisto con conferma sempre e eventi tipizzati, 30d movimenti (da valutare), 30e premio dall'ultimo avversario come stemma o titolo, 30f divisione del file e matrice finale. Acquisti a pagamento e annunci: fuori.
 - **Domande aperte:** nuovi contenuti grafici (li genera Michele dalla lista di `shop-assets.md`).
