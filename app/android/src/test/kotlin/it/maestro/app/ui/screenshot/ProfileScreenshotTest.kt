@@ -241,4 +241,14 @@ class ProfileScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("profile_stats_card").performScrollTo().assertIsDisplayed()
         composeRule.onRoot().captureRoboImage(screen.path("profile_screen_stats_streak"))
     }
+
+    @Test
+    fun captureProfileScreen_emptyHistory() {
+        val state = ProfileUiState(selectedTab = ProfileTab.HISTORY)
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_history_empty_card").assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_history_empty"))
+    }
 }
