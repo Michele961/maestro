@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.training.TrainingFundamental
@@ -49,18 +50,26 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun pre_game_shows_the_chosen_opponent() {
+        composeRule.setContent { MaestroTheme { PreGameScreen(opponent = Opponent.DON_ALFONSO) } }
+        composeRule.onNodeWithTag("pre_game_opponent").assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game_alfonso"))
+    }
+
+    @Test
     fun start_passes_the_selected_options() {
         // Difetto noto sugli schermi bassi (D1 in docs/app/features/layout-defects-f1r06.md): resta sulla configurazione
         // su cui è nato il test finché il dossier della schermata non lo corregge.
         assumeTrue(screen == ScreenConfig.MEDIUM || screen == ScreenConfig.PIXEL_10_PRO)
         var chosen: Triple<DifficultyLevel, Int, TrainingFundamental>? = null
         composeRule.setContent {
-            MaestroTheme { PreGameScreen(onStartGame = { l, t, f -> chosen = Triple(l, t, f) }) }
+            MaestroTheme {
+                PreGameScreen(opponent = Opponent.TONINO, onStartGame = { l, t, f -> chosen = Triple(l, t, f) })
+            }
         }
         composeRule.onNodeWithTag("target_score_option_21").performClick()
-        composeRule.onNodeWithTag("level_option_MAESTRO").performClick()
         composeRule.onNodeWithTag("mode_option_classic").performClick()
         composeRule.onNodeWithTag("start_game_button").performClick()
-        assertEquals(Triple(DifficultyLevel.MAESTRO, 21, TrainingFundamental.NONE), chosen)
+        assertEquals(Triple(DifficultyLevel.INTERMEDIO, 21, TrainingFundamental.NONE), chosen)
     }
 }
