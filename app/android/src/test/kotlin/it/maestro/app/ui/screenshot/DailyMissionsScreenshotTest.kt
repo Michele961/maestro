@@ -62,7 +62,7 @@ class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
                     ),
                     DailyMission(
                         id = "sevens_1",
-                        type = DailyMissionType.ANSWER_SEVENS_CHECKS,
+                        type = DailyMissionType.ANSWER_CHECKS,
                         progress = 1,
                         target = 2,
                         isCompleted = false,
@@ -111,7 +111,7 @@ class DailyMissionsScreenshotTest(private val screen: ScreenConfig) {
                     ),
                     DailyMission(
                         id = "sevens_1",
-                        type = DailyMissionType.ANSWER_SEVENS_CHECKS,
+                        type = DailyMissionType.ANSWER_CHECKS,
                         progress = 2,
                         target = 2,
                         isCompleted = true,

@@ -324,7 +324,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-29 — Missioni, serie, esperienza e obiettivi
 
-- **Stato:** in corso (dossier `docs/app/features/missions.md` approvato il 2026-10-28). Fatto: 29a missioni vere (ambito per partita o per giorno, estrazione uniforme con seme proprio; il Check su ogni obiettivo è 29b)
+- **Stato:** in corso (dossier `docs/app/features/missions.md` approvato il 2026-10-28). Fatto: 29a missioni vere (ambito per partita o per giorno, estrazione uniforme con seme proprio), 29b missione dei Check su ogni obiettivo (solo a chi ha giocato Sparring negli ultimi 14 giorni) e una missione al giorno che segue l'asse più debole del radar (con almeno 3 partite; nuova missione «Re della Primiera»)
 - **Riferimenti:** `docs/app/features/missions.md`, F1R-14
 - **Sotto-task:** 29a missioni vere, 29b missioni dei Check e adattive, 29c Gettone Riposo e serie, 29d esperienza (livelli del §6), 29e obiettivi (elenco esteso del §6, identificatori stabili per Google Play Games, aggancio futuro), 29f schermata «Oggi».
 - **Domande aperte:** —

@@ -1,5 +1,6 @@
 package it.maestro.app.domain.retention
 
+import it.maestro.ai.mastery.AbilityRadar
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -65,12 +66,12 @@ class MissionScopeTest {
         val start = LocalDate.of(2026, 1, 1)
         val days = 720
         repeat(days) { offset ->
-            DailyMissionGenerator.generateForDate(start.plusDays(offset.toLong())).forEach {
+            DailyMissionGenerator.generateForDate(start.plusDays(offset.toLong()), MissionContext(recentSparring = true)).forEach {
                 counts[it.type] = counts.getValue(it.type) + 1
             }
         }
-        // Tre missioni su sei tipi: ciascun tipo esce in metà dei giorni.
-        val expected = days / 2
+        // Tre missioni su sette tipi: ciascun tipo esce in tre giorni su sette.
+        val expected = days * 3 / DailyMissionType.entries.size
         counts.forEach { (type, n) ->
             assertTrue(n in (expected * 80 / 100)..(expected * 120 / 100), "$type uscito $n volte su $days giorni")
         }
@@ -82,5 +83,44 @@ class MissionScopeTest {
         val puzzleSeed = date.year * 10000L + date.monthValue * 100L + date.dayOfMonth
         val missionSeed = 0x4D495353L xor puzzleSeed
         assertNotEquals(puzzleSeed, missionSeed)
+    }
+
+    private val adaptiveDate = LocalDate.of(2026, 10, 28)
+
+    @Test
+    fun checksMissionNeverAppearsWithoutRecentSparring() {
+        repeat(200) { offset ->
+            val types = DailyMissionGenerator.generateForDate(adaptiveDate.plusDays(offset.toLong())).map { it.type }
+            assertTrue(DailyMissionType.ANSWER_CHECKS !in types)
+        }
+    }
+
+    @Test
+    fun oneMissionFollowsTheWeakestAxis() {
+        MissionFocus.entries.forEach { focus ->
+            val expected = adaptiveMissionFor(focus, recentSparring = true)!!
+            repeat(60) { offset ->
+                val missions = DailyMissionGenerator.generateForDate(
+                    adaptiveDate.plusDays(offset.toLong()),
+                    MissionContext(recentSparring = true, focus = focus),
+                )
+                assertEquals(3, missions.map { it.type }.distinct().size)
+                assertEquals(expected, missions.first().type)
+            }
+        }
+    }
+
+    @Test
+    fun sevensAxisWithoutSparringGivesNoAdaptiveMission() {
+        assertEquals(null, adaptiveMissionFor(MissionFocus.SEVENS, recentSparring = false))
+    }
+
+    @Test
+    fun weakestAxisBreaksTiesInTheFixedOrder() {
+        assertEquals(MissionFocus.SEVENS, AbilityRadar.DEFAULT.weakestMissionFocus())
+        assertEquals(
+            MissionFocus.BOARD,
+            AbilityRadar(sevens = 60, denari = 60, primiera = 60, board = 30, endgame = 30).weakestMissionFocus(),
+        )
     }
 }

@@ -17,5 +17,11 @@ public interface RetentionRepository {
     public suspend fun setMissionCompleted(today: LocalDate, type: DailyMissionType)
     public suspend fun claimMissionReward(today: LocalDate, type: DailyMissionType): Boolean
 
+    /**
+     * Ricorda ciò che serve a scegliere le missioni dei prossimi giorni (task F1R-29b): se oggi è stato
+     * giocato Sparring e quale asse del radar è il più debole. Non cambia le missioni già assegnate.
+     */
+    public suspend fun recordMissionContext(today: LocalDate, sparringPlayed: Boolean, focus: MissionFocus?)
+
     public suspend fun resetRetentionData()
 }
