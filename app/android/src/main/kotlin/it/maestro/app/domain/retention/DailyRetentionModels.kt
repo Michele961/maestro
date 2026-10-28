@@ -111,11 +111,23 @@ public data class StreakState(
 }
 
 /**
+ * Ambito in cui si misura una missione (task F1R-29a): la descrizione dice ciò che si misura.
+ */
+public enum class MissionScope {
+    /** Conta il risultato di una singola partita (il migliore del giorno), non la somma delle partite. */
+    PER_MATCH,
+
+    /** Somma i risultati di tutte le partite e le attività del giorno. */
+    PER_DAY,
+}
+
+/**
  * Tipologie di missioni didattiche quotidiane (task F2-05).
  */
 public enum class DailyMissionType(
     public val defaultTarget: Int,
     public val rewardCredits: Int,
+    public val scope: MissionScope = MissionScope.PER_DAY,
 ) {
     SOLVE_DAILY_PUZZLE(
         defaultTarget = 1,
@@ -136,6 +148,7 @@ public enum class DailyMissionType(
     CAPTURE_DENARI(
         defaultTarget = 6,
         rewardCredits = 10,
+        scope = MissionScope.PER_MATCH,
     ),
     PLAY_MATCH_WITHOUT_BLUNDERS(
         defaultTarget = 1,
@@ -176,19 +189,31 @@ public data class DailyMissionsState(
 }
 
 /**
+ * Di quanto avanza [mission] dopo un risultato di [value]: nell'ambito [MissionScope.PER_MATCH] conta
+ * solo il miglior risultato di una partita (task F1R-29a), in [MissionScope.PER_DAY] si somma.
+ */
+public fun missionIncrement(mission: DailyMission, value: Int): Int = when (mission.type.scope) {
+    MissionScope.PER_DAY -> value
+    MissionScope.PER_MATCH -> (value - mission.progress).coerceAtLeast(0)
+}
+
+/**
  * Generatore deterministico delle 3 missioni didattiche del giorno (task F2-05).
  */
 public object DailyMissionGenerator {
 
+    private const val MISSIONS_SEED_SALT: Long = 0x4D495353L // "MISS"
+
     public fun generateForDate(date: LocalDate): List<DailyMission> {
-        val seed = date.year * 10000L + date.monthValue * 100L + date.dayOfMonth
+        // Seme proprio, diverso da quello della Sfida del Giorno (stessa data).
+        val seed = MISSIONS_SEED_SALT xor (date.year * 10000L + date.monthValue * 100L + date.dayOfMonth)
         val rng = SeededRng(seed)
 
         // Mescola deterministicamente le missioni disponibili e seleziona le prime 3
         val allTypes = DailyMissionType.entries.toMutableList()
         // Fisher-Yates deterministico con SeededRng
         for (i in allTypes.indices.reversed()) {
-            val j = (rng.nextLong() and Long.MAX_VALUE % (i + 1)).toInt()
+            val j = ((rng.nextLong() and Long.MAX_VALUE) % (i + 1)).toInt()
             val tmp = allTypes[i]
             allTypes[i] = allTypes[j]
             allTypes[j] = tmp
