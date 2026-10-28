@@ -122,6 +122,12 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("reward_mastery_delta", useUnmergedTree = true).assertTextContains("−9")
     }
 
+    @Test
+    fun post_match_shows_the_attention_score_of_the_checks() {
+        composeRule.setContent { MaestroTheme { PostMatchScreen(state = postMatchState(PostMatchStep.READY), trainingScore = 2 to 3) } }
+        composeRule.onNodeWithTag("match_over_attention_score", useUnmergedTree = true).assertTextContains("66", substring = true)
+    }
+
     private val unlockReward = RewardSummary(
         masteryBefore = 1200,
         masteryAfter = 1218,

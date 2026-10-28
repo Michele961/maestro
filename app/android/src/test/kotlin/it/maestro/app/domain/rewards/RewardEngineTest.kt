@@ -4,6 +4,7 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
+import it.maestro.app.domain.retention.DailyMissionGenerator
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.data.local.datastore.InMemoryOpponentRepository
 import it.maestro.app.domain.opponents.Opponent
@@ -136,6 +137,28 @@ class RewardEngineTest {
         assertEquals(50, wallet.getBalance())
         assertFalse(engine.grantWelcomeBonus())
         assertEquals(50, wallet.getBalance())
+    }
+
+    // --- F1R-25d: il punteggio di attenzione conta per le missioni ---
+
+    private val sevensMissionDay: LocalDate = generateSequence(today) { it.plusDays(1) }.take(60)
+        .first { day -> DailyMissionGenerator.generateForDate(day).any { it.type == DailyMissionType.ANSWER_SEVENS_CHECKS } }
+
+    private suspend fun sevensMissionProgress(fundamental: TrainingFundamental): Int {
+        val retention = InMemoryRetentionRepository()
+        val engine = RewardEngine(InMemoryWalletRepository(), retention, InMemoryMasteryRepository(), FakeClock(sevensMissionDay))
+        engine.onMatchFinished(log, analysis(90, 0), Seat.P1, 2 to 3, fundamental)
+        return retention.getDailyMissions(sevensMissionDay).missions.first { it.type == DailyMissionType.ANSWER_SEVENS_CHECKS }.progress
+    }
+
+    @Test
+    fun correctSevensChecksAdvanceTheSevensMission() = runTest {
+        assertEquals(2, sevensMissionProgress(TrainingFundamental.SEVENS_COUNT))
+    }
+
+    @Test
+    fun checksOnAnotherObjectiveDoNotAdvanceTheSevensMission() = runTest {
+        assertEquals(0, sevensMissionProgress(TrainingFundamental.DENARI_COUNT))
     }
 
     // --- F1R-18c: vittoria sulla scala degli avversari ---
