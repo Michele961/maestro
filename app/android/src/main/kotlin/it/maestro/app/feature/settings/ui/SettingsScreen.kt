@@ -50,6 +50,7 @@ import it.maestro.app.designsystem.theme.BrassRivetGold
 import it.maestro.app.designsystem.theme.MaestroDisplayFont
 import it.maestro.app.designsystem.theme.WoodSurfaceDark
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.settings.AppLanguage
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.feature.settings.presentation.SettingsUiState
 import it.maestro.app.feature.settings.presentation.SettingsViewModel
@@ -81,6 +82,7 @@ public fun SettingsScreen(
         onGameSpeedChanged = viewModel::setGameSpeed,
         onMaestroChattinessChanged = viewModel::setMaestroChattiness,
         onShowPointsRaceToggled = viewModel::setShowPointsRace,
+        onLanguageChanged = viewModel::setLanguage,
         onEffectsVolumeChange = viewModel::previewEffectsVolume,
         onEffectsVolumeCommitted = viewModel::commitEffectsVolume,
         onHapticsToggled = viewModel::setHapticsEnabled,
@@ -107,6 +109,7 @@ public fun SettingsScreenContent(
     onEffectsVolumeChange: (Int) -> Unit = {},
     onEffectsVolumeCommitted: (Int) -> Unit = {},
     onHapticsToggled: (Boolean) -> Unit = {},
+    onLanguageChanged: (AppLanguage) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -208,6 +211,16 @@ public fun SettingsScreenContent(
                         onSelected = onMaestroChattinessChanged,
                         rowTag = "maestro_chat_row",
                         choiceTag = { "maestro_chat_${it.name.lowercase()}" },
+                    )
+                    ChoiceRow(
+                        title = stringResource(R.string.settings_language),
+                        subtitle = stringResource(R.string.settings_language_subtitle),
+                        choices = AppLanguage.entries,
+                        selected = state.language,
+                        label = { stringResource(it.labelRes()) },
+                        onSelected = onLanguageChanged,
+                        rowTag = "language_row",
+                        choiceTag = { "language_${it.name.lowercase()}" },
                     )
                 }
                 // Strumenti di sviluppo solo nelle build debuggabili (task F1R-05).
@@ -370,4 +383,10 @@ private fun Chattiness.labelRes(): Int = when (this) {
     Chattiness.NORMAL -> R.string.settings_maestro_chat_normal
     Chattiness.QUIET -> R.string.settings_maestro_chat_quiet
     Chattiness.OFF -> R.string.settings_maestro_chat_off
+}
+
+private fun AppLanguage.labelRes(): Int = when (this) {
+    AppLanguage.SYSTEM -> R.string.settings_language_system
+    AppLanguage.ITALIAN -> R.string.settings_language_italian
+    AppLanguage.ENGLISH -> R.string.settings_language_english
 }

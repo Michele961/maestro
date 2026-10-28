@@ -6,6 +6,7 @@ import it.maestro.app.designsystem.audio.SoundEffect
 import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.domain.audio.AudioMixer
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.settings.AppLanguage
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.settings.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +23,7 @@ public data class SettingsUiState(
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
     val showPointsRace: Boolean = false,
+    val language: AppLanguage = AppLanguage.SYSTEM,
 )
 
 /**
@@ -42,6 +44,7 @@ public class SettingsViewModel(
                 gameSpeed = settings.gameSpeed,
                 maestroChattiness = settings.maestroChattiness,
                 showPointsRace = settings.showPointsRace,
+                language = AppLanguage.fromTag(settings.language),
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
@@ -77,5 +80,9 @@ public class SettingsViewModel(
 
     public fun setShowPointsRace(show: Boolean) {
         viewModelScope.launch { settingsRepository.updateShowPointsRace(show) }
+    }
+
+    public fun setLanguage(language: AppLanguage) {
+        viewModelScope.launch { settingsRepository.updateLanguage(language.tag) }
     }
 }

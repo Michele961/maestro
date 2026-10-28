@@ -1,5 +1,8 @@
 package it.maestro.app.shell
 
+import android.app.Activity
+import it.maestro.app.domain.settings.AppLanguage
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -117,6 +120,11 @@ public fun MaestroNavHost(
         navController.navigate(Route.Home) { popUpTo(Route.Home) { inclusive = true } }
     }
 
+    // La lingua si applica solo a impostazioni lette davvero: il valore iniziale non deve cambiarla (F1R-31c).
+    val activity = LocalContext.current as? Activity
+    LaunchedEffect(settingsLoaded, settings.language) {
+        if (settingsLoaded && activity != null) AppLocale.apply(activity, AppLanguage.fromTag(settings.language))
+    }
     CompositionLocalProvider(LocalHapticsEnabled provides settings.hapticsEnabled) {
         NavHost(navController = navController, startDestination = Route.Home) {
             composable<Route.Home> {
