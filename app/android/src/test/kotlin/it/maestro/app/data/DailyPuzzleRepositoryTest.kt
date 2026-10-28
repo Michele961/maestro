@@ -4,6 +4,8 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.InMemoryDailyPuzzleRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import it.maestro.app.data.local.datastore.liveChallengeStreak
+import it.maestro.app.data.local.datastore.nextChallengeStreak
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -73,5 +75,19 @@ class DailyPuzzleRepositoryTest {
         val flowRecord = repo.observeDailyPuzzle(newDay).first()
         assertEquals(3, flowRecord.streak)
         assertEquals("2026-10-25", flowRecord.lastCompletedDate)
+    }
+
+    @Test
+    fun challengeStreakContinuesOnConsecutiveDaysAndRestartsAfterAGap() {
+        assertEquals(1, nextChallengeStreak("", 0, "2026-10-26"))
+        assertEquals(4, nextChallengeStreak("2026-10-25", 3, "2026-10-26"))
+        assertEquals(1, nextChallengeStreak("2026-10-23", 3, "2026-10-26"), "Un giorno saltato azzera la serie")
+    }
+
+    @Test
+    fun challengeStreakShownIsZeroOnceADayIsMissed() {
+        assertEquals(3, liveChallengeStreak("2026-10-26", 3, "2026-10-26"))
+        assertEquals(3, liveChallengeStreak("2026-10-25", 3, "2026-10-26"))
+        assertEquals(0, liveChallengeStreak("2026-10-24", 3, "2026-10-26"))
     }
 }

@@ -29,6 +29,20 @@ public data class DailyPuzzleRecord(
 )
 
 /**
+ * Serie di sfide dopo aver risolto il primo livello di [today]: continua se l'ultimo giorno risolto è ieri, altrimenti
+ * riparte da 1. Misura una cosa diversa dalla serie di giorni di gioco (`RetentionRepository`): qui conta solo la Sfida.
+ */
+public fun nextChallengeStreak(lastCompletedDate: String, previousStreak: Int, today: String): Int =
+    if (isDayBefore(lastCompletedDate, today)) previousStreak + 1 else 1
+
+/** Serie di sfide da mostrare oggi: viva se l'ultima sfida risolta è di oggi o di ieri, altrimenti 0. */
+public fun liveChallengeStreak(lastCompletedDate: String, streak: Int, today: String): Int =
+    if (lastCompletedDate == today || isDayBefore(lastCompletedDate, today)) streak else 0
+
+private fun isDayBefore(earlier: String, later: String): Boolean =
+    runCatching { java.time.LocalDate.parse(earlier).plusDays(1) == java.time.LocalDate.parse(later) }.getOrDefault(false)
+
+/**
  * Repository per la persistenza e osservazione dello stato della "Sfida del Giorno".
  */
 public interface DailyPuzzleRepository {
@@ -97,7 +111,7 @@ public class DataStoreDailyPuzzleRepository(
                     preferences[PreferencesKeys.IS_SOLVED] = true
 
                     val previousStreak = preferences[PreferencesKeys.STREAK] ?: 0
-                    preferences[PreferencesKeys.STREAK] = previousStreak + 1
+                    preferences[PreferencesKeys.STREAK] = nextChallengeStreak(previousCompleted, previousStreak, todayDate)
                 }
             }
         }
@@ -112,7 +126,7 @@ public class DataStoreDailyPuzzleRepository(
         } else {
             0
         }
-        val streak = preferences[PreferencesKeys.STREAK] ?: 0
+        val streak = liveChallengeStreak(lastCompleted, preferences[PreferencesKeys.STREAK] ?: 0, todayDate)
         val storedTiers = if (lastCompleted == todayDate) {
             preferences[PreferencesKeys.SOLVED_TIERS].orEmpty()
                 .split(",")
@@ -157,7 +171,7 @@ public class InMemoryDailyPuzzleRepository(
     ) {
         val current = _recordFlow.value
         val isFirstSolveToday = solved && current.lastCompletedDate != todayDate
-        val newStreak = if (isFirstSolveToday) current.streak + 1 else current.streak
+        val newStreak = if (isFirstSolveToday) nextChallengeStreak(current.lastCompletedDate, current.streak, todayDate) else current.streak
         val newTiers = if (solved) {
             if (current.lastCompletedDate == todayDate) current.solvedTiersToday + tierIndex else setOf(tierIndex)
         } else {

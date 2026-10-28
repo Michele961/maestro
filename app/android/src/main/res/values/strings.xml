@@ -209,6 +209,8 @@
     <string name="puzzle_concept_label">Concetto tattico:</string>
     <string name="puzzle_button_next">PROSSIMA SFIDA</string>
     <string name="puzzle_tier_reward">+%1$d Crediti</string>
+    <string name="puzzle_challenge_streak">Serie di sfide: %1$d</string>
+    <string name="puzzle_tier_recommended">★ Consigliato</string>
     <string name="home_daily_puzzle_button">Sfida del giorno</string>
     <string name="profile_title">Profilo &amp; Maestria</string>
     <string name="profile_tab_mastery">Maestria &amp; Radar</string>
