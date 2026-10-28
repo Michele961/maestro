@@ -7,6 +7,8 @@ import it.maestro.ai.puzzle.TacticalPuzzle
 import it.maestro.app.R
 import it.maestro.app.data.local.DailyPuzzleProvider
 import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.domain.coach.Phrase
+import it.maestro.app.domain.coach.PuzzleCoach
 import it.maestro.app.data.local.DailyPuzzleTier
 import it.maestro.app.data.local.datastore.DailyPuzzleRecord
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
@@ -52,6 +54,10 @@ public data class DailyPuzzleUiState(
     val availableTiers: List<DailyPuzzleTier> = DailyPuzzleProvider.TIERS,
     val solvedTiers: Set<Int> = emptySet(),
     val lesson: PuzzleLesson? = null,
+    /** Battuta del Maestro composta con le carte della posizione (indizio o soluzione); vuota = vale [maestroMessageResId]. */
+    val maestroPhrases: List<Phrase> = emptyList(),
+    /** `true` dopo «Mostrami la soluzione»: il Maestro ha spiegato la mossa. */
+    val solutionShown: Boolean = false,
 )
 
 /**
@@ -155,6 +161,8 @@ public class DailyPuzzleViewModel(
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
                     lesson = lesson,
+                    maestroPhrases = emptyList(),
+                    solutionShown = false,
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
@@ -171,6 +179,8 @@ public class DailyPuzzleViewModel(
                     currentTierIndex = tierIndex,
                     solvedTiers = record.solvedTiersToday,
                     lesson = lesson,
+                    maestroPhrases = emptyList(),
+                    solutionShown = false,
                 )
             }
         }
@@ -206,6 +216,7 @@ public class DailyPuzzleViewModel(
                 maestroMessageResId = R.string.puzzle_coach_solved,
                 solvedTiers = updatedSolvedTiers,
                 lesson = lesson,
+                maestroPhrases = emptyList(),
             )
             if (!wasAlreadySolved) {
                 viewModelScope.launch {
@@ -224,21 +235,14 @@ public class DailyPuzzleViewModel(
             }
         } else {
             val hintLevel = if (newAttempts == 1) 1 else 2
-            val hintResId = when (hintLevel) {
-                1 -> R.string.puzzle_coach_hint_level1
-                else -> when (puzzle.goal) {
-                    PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_coach_hint_sweep
-                    PuzzleGoal.WIN_MATCH -> R.string.puzzle_coach_hint_win
-                    PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_coach_hint_points
-                }
-            }
+            val hint = PuzzleCoach.hint(puzzle.firstMove, puzzle.initialView.table, hintLevel)
             val mood = if (hintLevel == 1) MaestroMood.ENCOURAGING else MaestroMood.THINKING
 
             _uiState.value = currentState.copy(
                 status = DailyPuzzleStatus.WrongAttempt(attemptNumber = newAttempts, hintLevel = hintLevel),
                 attemptsCount = newAttempts,
                 maestroMood = mood,
-                maestroMessageResId = hintResId,
+                maestroPhrases = hint.phrases,
             )
         }
     }
@@ -253,20 +257,29 @@ public class DailyPuzzleViewModel(
 
         val currentLevel = when (val s = currentState.status) {
             is DailyPuzzleStatus.WrongAttempt -> s.hintLevel
-            else -> if (currentState.maestroMessageResId == R.string.puzzle_coach_hint_level1) 1 else 0
+            else -> if (currentState.maestroPhrases.firstOrNull()?.id == "puzzle_hint_card") 1 else 0
         }
         val nextLevel = (currentLevel + 1).coerceAtMost(2)
-        val hintResId = when (nextLevel) {
-            1 -> R.string.puzzle_coach_hint_level1
-            else -> when (puzzle.goal) {
-                PuzzleGoal.MAKE_SWEEP -> R.string.puzzle_coach_hint_sweep
-                PuzzleGoal.WIN_MATCH -> R.string.puzzle_coach_hint_win
-                PuzzleGoal.MAXIMIZE_POINTS -> R.string.puzzle_coach_hint_points
-            }
-        }
+        val hint = PuzzleCoach.hint(puzzle.firstMove, puzzle.initialView.table, nextLevel)
         _uiState.value = currentState.copy(
             maestroMood = MaestroMood.ENCOURAGING,
-            maestroMessageResId = hintResId,
+            maestroPhrases = hint.phrases,
+        )
+    }
+
+    /**
+     * «Mostrami la soluzione»: il Maestro nomina la carta giusta e spiega perché. Non risolve la sfida: per i crediti
+     * si gioca comunque la carta.
+     */
+    public fun showSolution() {
+        val currentState = _uiState.value
+        if (currentState.status is DailyPuzzleStatus.Solved) return
+        val puzzle = currentState.puzzle ?: return
+        val solution = PuzzleCoach.solution(puzzle.firstMove, puzzle.initialView.table)
+        _uiState.value = currentState.copy(
+            maestroMood = MaestroMood.PLEASED,
+            maestroPhrases = solution.phrases,
+            solutionShown = true,
         )
     }
 
@@ -310,6 +323,8 @@ public class DailyPuzzleViewModel(
             maestroMessageResId = initialSpeech,
             goalDescriptionResId = goalMsg,
             lesson = DailyPuzzleProvider.lessonOf(puzzle),
+            maestroPhrases = emptyList(),
+            solutionShown = false,
         )
     }
 }

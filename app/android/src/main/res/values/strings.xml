@@ -538,6 +538,7 @@
     <!-- Rigioca Sfida del Giorno -->
     <string name="puzzle_button_replay">Rigioca sfida</string>
     <string name="puzzle_button_hint">Indizio</string>
+    <string name="puzzle_button_solution">Mostrami la soluzione</string>
 
     <!-- Obiettivi Chiari Sfida del Giorno -->
     <string name="puzzle_goal_sweep_desc">Obiettivo: ripulisci il tavolo con una Scopa! Calcola bene le somme per azzerare il banco.</string>
@@ -565,7 +566,7 @@
     <string name="puzzle_rule_win_match">All\'ultima mano conta le prese prima dello stile: fai la giocata che ti assicura il traguardo matematico.</string>
     <string name="puzzle_concept_balance">Ottimizzare il saldo delle prese massimizza il bottino di carte e impedisce all\'avversario di realizzare combinazioni facili di Scopa.</string>
     <string name="puzzle_rule_balance">Valuta sempre il saldo delle carte e nega all\'avversario combinazioni facili di presa.</string>
-    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Risolto al %2$d° tentativo!</string>
+    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Sfida risolta!\n%2$s</string>
     <string name="puzzle_share_played">Maestro Scopa #%1$d — Ho giocato la Sfida del Giorno!</string>
 
     <!-- Stile Comunicativo Socratico Accademia -->
@@ -660,6 +661,8 @@
     <string name="voice_tail_3">Ragiona, poi decidi.</string>
     <string name="settings_points_race">Mostra la corsa ai punti</string>
     <string name="settings_points_race_subtitle">Carte, Denari, Settebello e Primiera sempre in vista sul tavolo.</string>
+    <string name="puzzle_hint_card">Guarda il %1$s sul tavolo: è lì che si decide.</string>
+    <string name="puzzle_hint_no_capture">Qui non si prende niente: pensa a quale carta lasciare a terra.</string>
     <string name="voice_hint_take_one_1">Gioca il %1$s e prendi il %2$s.</string>
     <string name="voice_hint_take_one_2">Il %1$s sul %2$s: la mossa che farei io.</string>
     <string name="voice_hint_take_many_1">Gioca il %1$s e porta a casa %2$d carte in un colpo.</string>

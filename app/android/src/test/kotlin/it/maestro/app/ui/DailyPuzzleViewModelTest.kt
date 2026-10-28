@@ -32,6 +32,7 @@ import kotlinx.coroutines.test.setMain
 import java.time.LocalDate
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import it.maestro.app.domain.coach.VoiceArg
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -119,7 +120,11 @@ class DailyPuzzleViewModelTest {
         assertEquals(1, status1.attemptNumber)
         assertEquals(1, status1.hintLevel)
         assertEquals(MaestroMood.ENCOURAGING, stateAfter1.maestroMood)
-        assertEquals(R.string.puzzle_coach_hint_level1, stateAfter1.maestroMessageResId)
+        assertEquals(
+            listOf("puzzle_hint_card"),
+            stateAfter1.maestroPhrases.map { it.id },
+            "Il primo indizio nomina una carta della posizione",
+        )
 
         // Riprova
         viewModel.retryAttempt()
@@ -132,7 +137,10 @@ class DailyPuzzleViewModelTest {
         assertEquals(2, status2.attemptNumber)
         assertEquals(2, status2.hintLevel)
         assertEquals(MaestroMood.THINKING, stateAfter2.maestroMood)
-        assertEquals(R.string.puzzle_coach_hint_sweep, stateAfter2.maestroMessageResId)
+        assertTrue(
+            stateAfter2.maestroPhrases.first().id.startsWith("voice_hint_nudge_"),
+            "Il secondo indizio è una domanda sulla ragione della mossa",
+        )
     }
 
     @Test
@@ -259,12 +267,32 @@ class DailyPuzzleViewModelTest {
 
         // 1. Richiedi primo indizio
         viewModel.requestHint()
-        assertEquals(R.string.puzzle_coach_hint_level1, viewModel.uiState.value.maestroMessageResId)
+        assertEquals("puzzle_hint_card", viewModel.uiState.value.maestroPhrases.first().id)
         assertEquals(MaestroMood.ENCOURAGING, viewModel.uiState.value.maestroMood)
 
         // 2. Richiedi secondo indizio (tematico sulla Scopa per samplePuzzle)
         viewModel.requestHint()
-        assertEquals(R.string.puzzle_coach_hint_sweep, viewModel.uiState.value.maestroMessageResId)
+        assertTrue(viewModel.uiState.value.maestroPhrases.first().id.startsWith("voice_hint_nudge_"))
         assertEquals(MaestroMood.ENCOURAGING, viewModel.uiState.value.maestroMood)
+    }
+
+    @Test
+    fun showSolution_namesTheRightCardWithoutSolvingOrPayingCredits() = runTest {
+        val walletRepo = it.maestro.app.data.local.wallet.InMemoryWalletRepository()
+        val viewModel = DailyPuzzleViewModel(
+            repository = InMemoryDailyPuzzleRepository(),
+            customDate = LocalDate.of(2026, 10, 26),
+            customPuzzle = samplePuzzle,
+        )
+        advanceUntilIdle()
+
+        viewModel.showSolution()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.solutionShown)
+        assertEquals(DailyPuzzleStatus.Playing, state.status)
+        val lead = state.maestroPhrases.first()
+        assertTrue(lead.args.contains(VoiceArg.CardArg(samplePuzzle.firstMove.card)))
+        assertEquals(0, walletRepo.getBalance())
     }
 }

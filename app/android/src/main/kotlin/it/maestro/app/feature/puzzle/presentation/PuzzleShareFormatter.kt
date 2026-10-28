@@ -13,6 +13,10 @@ import android.content.Intent
  */
 public object PuzzleShareFormatter {
 
+    /** I livelli del giorno in simboli, senza dire quanti tentativi sono serviti: «✔ ✔ ○». */
+    public fun tierSymbols(solvedTiers: Set<Int>, tierCount: Int): String =
+        (0 until tierCount).joinToString(" ") { if (it in solvedTiers) "✔" else "○" }
+
     private const val CLIP_LABEL: String = "Maestro Scopa"
 
     /**

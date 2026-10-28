@@ -67,6 +67,7 @@ import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleUiState
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.feature.table.ui.phrasesText
 import it.maestro.app.feature.puzzle.presentation.PuzzleShareFormatter
 
 /**
@@ -80,8 +81,9 @@ public fun DailyPuzzleScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val symbols = PuzzleShareFormatter.tierSymbols(uiState.solvedTiers, uiState.availableTiers.size)
     val shareText = if (uiState.status is DailyPuzzleStatus.Solved) {
-        stringResource(R.string.puzzle_share_solved, uiState.puzzleNumber, maxOf(1, uiState.attemptsCount))
+        stringResource(R.string.puzzle_share_solved, uiState.puzzleNumber, symbols)
     } else {
         stringResource(R.string.puzzle_share_played, uiState.puzzleNumber)
     }
@@ -94,6 +96,7 @@ public fun DailyPuzzleScreen(
         onPlayCard = { viewModel.playCard(it) },
         onRetry = { viewModel.retryAttempt() },
         onRequestHint = { viewModel.requestHint() },
+        onShowSolution = { viewModel.showSolution() },
         onReplay = { viewModel.replayPuzzle() },
         onShare = { PuzzleShareFormatter.shareViaIntent(context, shareText) },
         onSelectTier = { viewModel.selectTier(it) },
@@ -112,6 +115,7 @@ public fun DailyPuzzleScreenContent(
     onPlayCard: (Card) -> Unit = {},
     onRetry: () -> Unit = {},
     onRequestHint: () -> Unit = {},
+    onShowSolution: () -> Unit = {},
     onReplay: () -> Unit = {},
     onShare: () -> Unit = {},
     onSelectTier: (Int) -> Unit = {},
@@ -154,6 +158,7 @@ public fun DailyPuzzleScreenContent(
             PuzzleCoachArea(
                 uiState = uiState,
                 onRequestHint = onRequestHint,
+                onShowSolution = onShowSolution,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 14.dp, vertical = 4.dp),
@@ -360,6 +365,7 @@ private fun PuzzleGoalBanner(
 private fun PuzzleCoachArea(
     uiState: DailyPuzzleUiState,
     onRequestHint: () -> Unit = {},
+    onShowSolution: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isSolved = uiState.status is DailyPuzzleStatus.Solved
@@ -390,12 +396,25 @@ private fun PuzzleCoachArea(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 MaestroSpeechBubble(
-                    message = stringResource(uiState.maestroMessageResId),
+                    message = if (uiState.maestroPhrases.isEmpty()) {
+                        stringResource(uiState.maestroMessageResId)
+                    } else {
+                        phrasesText(uiState.maestroPhrases)
+                    },
                     tail = BubbleTail.START,
                     fontSize = 12.sp,
                     maxLines = 6,
                     modifier = Modifier.fillMaxWidth().testTag("puzzle_coach_bubble"),
                 )
+                if (uiState.solutionShown && uiState.lesson != null) {
+                    Text(
+                        text = stringResource(uiState.lesson.conceptRes),
+                        color = Color.White.copy(alpha = 0.95f),
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        modifier = Modifier.testTag("puzzle_solution_concept"),
+                    )
+                }
                 if (!isSolved) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -409,6 +428,16 @@ private fun PuzzleCoachArea(
                             fontSize = 11.sp,
                             contentPadding = PaddingValues(horizontal = 10.dp),
                             testTag = "puzzle_coach_hint_button",
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        MaestroPillButton(
+                            text = stringResource(R.string.puzzle_button_solution).uppercase(),
+                            onClick = onShowSolution,
+                            variant = PillButtonVariant.WOOD,
+                            height = 26.dp,
+                            fontSize = 11.sp,
+                            contentPadding = PaddingValues(horizontal = 10.dp),
+                            testTag = "puzzle_coach_solution_button",
                         )
                     }
                 }

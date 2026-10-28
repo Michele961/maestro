@@ -538,6 +538,7 @@
     <!-- Replay Daily Puzzle -->
     <string name="puzzle_button_replay">Replay challenge</string>
     <string name="puzzle_button_hint">Hint</string>
+    <string name="puzzle_button_solution">Show me the solution</string>
 
     <!-- Clear Goals Daily Puzzle -->
     <string name="puzzle_goal_sweep_desc">Goal: sweep the table clean! Calculate the sums carefully to empty the board.</string>
@@ -565,7 +566,7 @@
     <string name="puzzle_rule_win_match">In the last hand, count your captures before thinking of style: play the move that secures the target.</string>
     <string name="puzzle_concept_balance">Optimizing the balance of captures maximizes your haul of cards and stops your opponent from making easy Scopa combinations.</string>
     <string name="puzzle_rule_balance">Always weigh the balance of cards and deny your opponent easy captures.</string>
-    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Solved on attempt %2$d!</string>
+    <string name="puzzle_share_solved">Maestro Scopa #%1$d — Challenge solved!\n%2$s</string>
     <string name="puzzle_share_played">Maestro Scopa #%1$d — I played the Daily Challenge!</string>
 
     <!-- Socratic Coaching Style Academy -->
@@ -660,6 +661,8 @@
     <string name="voice_tail_3">Reason it out, then decide.</string>
     <string name="settings_points_race">Show the points race</string>
     <string name="settings_points_race_subtitle">Cards, Coins, Settebello and Primiera always visible on the table.</string>
+    <string name="puzzle_hint_card">Look at the %1$s on the table: that is where it is decided.</string>
+    <string name="puzzle_hint_no_capture">Nothing to capture here: think about which card to leave on the table.</string>
     <string name="voice_hint_take_one_1">Play the %1$s and take the %2$s.</string>
     <string name="voice_hint_take_one_2">The %1$s on the %2$s: the move I\'d make.</string>
     <string name="voice_hint_take_many_1">Play the %1$s and bring home %2$d cards in one go.</string>
