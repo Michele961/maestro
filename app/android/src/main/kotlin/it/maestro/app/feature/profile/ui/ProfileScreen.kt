@@ -186,7 +186,10 @@ public fun ProfileContent(
                     // 4. Consiglio Socratico del Maestro
                     MaestroAdviceCard(adviceRes = uiState.maestroAdviceRes)
 
-                    // 5. Statistiche complessive
+                    // 5. La scala degli avversari (F1R-26c)
+                    LadderStrip(ladder = uiState.ladder)
+
+                    // 6. Statistiche complessive
                     PlayerStatsCard(
                         matchesPlayed = profile.matchesPlayed,
                         accuracyPercentage = profile.accuracyPercentage,

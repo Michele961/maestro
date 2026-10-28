@@ -14,6 +14,7 @@ import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.profile.MasteryTrend
 import it.maestro.app.domain.profile.PlayerTitleRepository
 import it.maestro.app.domain.profile.PlayerTitles
+import it.maestro.app.feature.pregame.presentation.LadderState
 import it.maestro.app.domain.profile.masteryTrendOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -45,6 +46,8 @@ public data class ProfileUiState(
     /** Titolo mostrato; `null` finché non ha battuto nessuno. */
     val currentTitle: Opponent? = null,
     val trend: MasteryTrend = MasteryTrend.FLAT,
+    /** La scala degli avversari con lo stato di ciascuno. */
+    val ladder: LadderState = LadderState.of(OpponentProgress()),
     val selectedTab: ProfileTab = ProfileTab.MASTERY,
     val isLoading: Boolean = false,
 )
@@ -75,6 +78,7 @@ public class ProfileViewModel(
             earnedTitles = PlayerTitles.earned(progress),
             currentTitle = PlayerTitles.current(progress, selectedTitle),
             trend = masteryTrendOf(history),
+            ladder = LadderState.of(progress),
             selectedTab = tab,
             isLoading = false,
         )

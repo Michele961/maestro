@@ -11,6 +11,9 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.domain.opponents.OpponentProgress
+import it.maestro.app.feature.pregame.presentation.LadderState
 import it.maestro.app.feature.profile.ui.ProfileContent
 import it.maestro.app.feature.profile.presentation.ProfileUiState
 import it.maestro.app.designsystem.theme.MaestroTheme
@@ -123,5 +126,33 @@ class ProfileScreenshotTest(private val screen: ScreenConfig) {
         // Torna in cima: lo screenshot mostra la schermata come appare all'apertura.
         composeRule.onNodeWithTag("profile_identity_card").performScrollTo()
         composeRule.onRoot().captureRoboImage(screen.path("profile_screen_advanced"))
+    }
+
+    @Test
+    fun captureProfileScreen_ladderCompleteWithOpenDetail() {
+        val state = ProfileUiState(
+            profile = MasteryProfile.INITIAL,
+            earnedTitles = Opponent.entries,
+            currentTitle = Opponent.MAESTRO,
+            ladder = LadderState.of(OpponentProgress(Opponent.entries.toSet())),
+        )
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_ladder_TONINO").performScrollTo().performClick()
+        composeRule.onNodeWithTag("profile_ladder_detail").performScrollTo().assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_ladder_complete"))
+    }
+
+    @Test
+    fun captureProfileScreen_newPlayerLadderShowsLocks() {
+        val state = ProfileUiState(ladder = LadderState.of(OpponentProgress()))
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_ladder_GIGI").performScrollTo().performClick()
+        composeRule.onNodeWithTag("profile_ladder_detail").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_ladder_MAESTRO").performScrollTo().performClick()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_ladder_new_player"))
     }
 }

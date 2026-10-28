@@ -863,4 +863,5 @@
     <string name="profile_trend_up">▲ In crescita</string>
     <string name="profile_trend_flat">▬ Stabile</string>
     <string name="profile_trend_down">▼ In calo</string>
+    <string name="profile_ladder_title">La scala del circolo</string>
 </resources>
