@@ -4,6 +4,9 @@ import it.maestro.ai.analysis.MatchAnalysis
 import it.maestro.ai.analysis.MoveGrade
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.opponents.LadderVictory
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
@@ -14,6 +17,8 @@ import it.maestro.app.domain.wallet.WalletRepository
 import it.maestro.app.domain.time.Clock
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
+import it.maestro.game.scopa.ReplayResult
+import it.maestro.game.scopa.replay
 import it.maestro.game.training.TrainingFundamental
 import java.time.LocalDate
 
@@ -40,6 +45,7 @@ public data class MissionAdvance(
  * @property streakAfter giorni di streak dopo l'evento.
  * @property masteryBefore Indice di Maestria prima dell'evento, se l'evento lo cambia.
  * @property masteryAfter Indice di Maestria dopo l'evento.
+ * @property ladderVictory vittoria sulla scala degli avversari registrata dall'evento (solo partita completa in Classica).
  */
 public data class RewardSummary(
     val creditsEarned: Int = 0,
@@ -48,6 +54,7 @@ public data class RewardSummary(
     val streakAfter: Int? = null,
     val masteryBefore: Int? = null,
     val masteryAfter: Int? = null,
+    val ladderVictory: LadderVictory? = null,
 ) {
     /** Variazione dell'Indice di Maestria, se l'evento lo tocca. */
     val masteryDelta: Int? get() = if (masteryBefore != null && masteryAfter != null) masteryAfter - masteryBefore else null
@@ -64,11 +71,14 @@ public class RewardEngine(
     private val retention: RetentionRepository,
     private val mastery: MasteryRepository,
     private val clock: Clock,
+    private val opponents: OpponentRepository? = null,
 ) {
 
     /**
      * Registra una partita finita e analizzata: Maestria, attività del giorno e missioni. Nessun credito:
      * la spec non assegna crediti alla partita, solo alle missioni riscosse (`docs/app/game-feel.md` §6).
+     * Se [opponent] è dato, la partita è in Classica (nessun fondamentale) e l'umano l'ha vinta, la vittoria
+     * si registra sulla scala degli avversari (`docs/app/features/pre-game.md`).
      */
     public suspend fun onMatchFinished(
         log: MatchLog,
@@ -76,6 +86,7 @@ public class RewardEngine(
         humanSeat: Seat,
         trainingScore: Pair<Int, Int>?,
         trainingFundamental: TrainingFundamental,
+        opponent: Opponent? = null,
     ): RewardSummary {
         val today = clock.today()
         val masteryBefore = mastery.getMasteryProfile()
@@ -104,12 +115,22 @@ public class RewardEngine(
             retention.updateMissionProgress(today, DailyMissionType.ANSWER_SEVENS_CHECKS, trainingScore.first)
         }
 
+        val ladderVictory = if (
+            opponent != null && opponents != null && trainingFundamental == TrainingFundamental.NONE &&
+            (replay(log) as? ReplayResult.Ok)?.state?.winner == humanSeat
+        ) {
+            opponents.recordVictory(opponent)
+        } else {
+            null
+        }
+
         return RewardSummary(
             missions = advances(missionsBefore, retention.getDailyMissions(today).missions),
             streakBefore = streakBefore.currentStreak,
             streakAfter = streakAfter.currentStreak,
             masteryBefore = masteryBefore.cognitiveElo,
             masteryAfter = masteryAfter.cognitiveElo,
+            ladderVictory = ladderVictory,
         )
     }
 

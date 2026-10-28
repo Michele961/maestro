@@ -216,7 +216,10 @@ public fun MaestroNavHost(
             val training = if (route.trainingTotal >= 0) route.trainingCorrect to route.trainingTotal else null
             val fundamental = TrainingFundamental.valueOf(route.fundamental)
             LaunchedEffect(route) {
-                shell.startPostMatch(matchLog, Seat.P1, training, fundamental, route.fromHistory)
+                shell.startPostMatch(
+                    matchLog, Seat.P1, training, fundamental, route.fromHistory,
+                    opponent = Opponent.forLevel(DifficultyLevel.valueOf(route.level)),
+                )
             }
             val viewModel: PostMatchViewModel = koinViewModel(key = route.matchLog) {
                 parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))

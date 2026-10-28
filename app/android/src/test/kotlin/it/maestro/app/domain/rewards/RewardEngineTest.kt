@@ -5,6 +5,14 @@ import it.maestro.ai.analysis.MoveGrade
 import it.maestro.app.data.local.datastore.InMemoryMasteryRepository
 import it.maestro.app.data.local.datastore.InMemoryRetentionRepository
 import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.data.local.datastore.InMemoryOpponentRepository
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.fullState
+import it.maestro.app.feature.table.presentation.TestMatchGenerator
+import it.maestro.game.scopa.MatchLog
+import it.maestro.game.scopa.PlayResult
+import it.maestro.game.scopa.legalMoves
+import it.maestro.game.scopa.play
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.time.FakeClock
@@ -128,5 +136,61 @@ class RewardEngineTest {
         assertEquals(50, wallet.getBalance())
         assertFalse(engine.grantWelcomeBonus())
         assertEquals(50, wallet.getBalance())
+    }
+
+    // --- F1R-18c: vittoria sulla scala degli avversari ---
+
+    private val ladder = InMemoryOpponentRepository()
+    private val ladderEngine = RewardEngine(wallet, retention, mastery, FakeClock(today), opponents = ladder)
+
+    /** Una partita finita in cui vince [winner] (cercata tra i seed, il generatore è deterministico). */
+    private fun finishedMatch(winner: Seat): MatchLog {
+        for (seed in 1L..200L) {
+            val session = TestMatchGenerator.generateEndgameMatch(seed)
+            val state = session.fullState()
+            val first = legalMoves(state).first()
+            val afterFirst = (play(state, first) as PlayResult.Applied).state
+            val second = legalMoves(afterFirst).first()
+            val end = (play(afterFirst, second) as PlayResult.Applied).state
+            if (end.winner == winner) return session.log.copy(moves = session.log.moves + listOf(first, second))
+        }
+        error("nessun seed con vincitore $winner")
+    }
+
+    private suspend fun finish(log: MatchLog, fundamental: TrainingFundamental, opponent: Opponent? = Opponent.GIGI) =
+        ladderEngine.onMatchFinished(log, analysis(90, 0), Seat.P1, null, fundamental, opponent)
+
+    @Test
+    fun winningClassicaUnlocksTheNextOpponent() = runTest {
+        val summary = finish(finishedMatch(Seat.P1), TrainingFundamental.NONE)
+
+        val victory = assertNotNull(summary.ladderVictory)
+        assertEquals(Opponent.GIGI, victory.defeated)
+        assertTrue(victory.firstTime)
+        assertEquals(Opponent.NONNA_ROSA, victory.newlyUnlocked)
+    }
+
+    @Test
+    fun losingDoesNotRecordAVictory() = runTest {
+        assertEquals(null, finish(finishedMatch(Seat.P2), TrainingFundamental.NONE).ladderVictory)
+    }
+
+    @Test
+    fun sparringDoesNotRecordAVictory() = runTest {
+        assertEquals(null, finish(finishedMatch(Seat.P1), TrainingFundamental.SEVENS_COUNT).ladderVictory)
+    }
+
+    @Test
+    fun noOpponentMeansNoLadderVictory() = runTest {
+        assertEquals(null, finish(finishedMatch(Seat.P1), TrainingFundamental.NONE, opponent = null).ladderVictory)
+    }
+
+    @Test
+    fun beatingTheSameOpponentAgainIsNotAFirstTime() = runTest {
+        val log = finishedMatch(Seat.P1)
+        finish(log, TrainingFundamental.NONE)
+        val again = assertNotNull(finish(log, TrainingFundamental.NONE).ladderVictory)
+        assertFalse(again.firstTime)
+        assertEquals(null, again.newlyUnlocked)
     }
 }
