@@ -516,6 +516,10 @@
     <string name="shop_try_title">Try it</string>
     <string name="shop_try_close">CLOSE</string>
     <string name="shop_try_missing">You need %1$d more credits.</string>
+    <string name="shop_confirm_text">Spend %1$d credits on “%2$s”?</string>
+    <string name="shop_confirm_yes">CONFIRM</string>
+    <string name="shop_confirm_no">CANCEL</string>
+    <string name="shop_maestro_bought">Nice pick. You can tell you have taste.</string>
     <string name="shop_try_earn">Earn them with missions and the Daily Challenge.</string>
 
     <string name="cosmetic_table_green_title">Classic Green Felt</string>

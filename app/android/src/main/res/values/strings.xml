@@ -516,6 +516,10 @@
     <string name="shop_try_title">Provalo</string>
     <string name="shop_try_close">CHIUDI</string>
     <string name="shop_try_missing">Ti mancano %1$d crediti.</string>
+    <string name="shop_confirm_text">Spendere %1$d crediti per «%2$s»?</string>
+    <string name="shop_confirm_yes">CONFERMA</string>
+    <string name="shop_confirm_no">ANNULLA</string>
+    <string name="shop_maestro_bought">Bella scelta. Si vede subito chi ha gusto.</string>
     <string name="shop_try_earn">Li guadagni con le missioni e la Sfida del Giorno.</string>
 
     <string name="cosmetic_table_green_title">Panno Verde Classico</string>

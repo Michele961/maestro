@@ -9,6 +9,8 @@ import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.app.domain.cosmetics.CosmeticCategory
 import it.maestro.app.domain.cosmetics.CosmeticItem
+import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.feature.shop.presentation.ShopEvent
 import it.maestro.app.feature.shop.presentation.ShopItemCardState
 import it.maestro.app.feature.shop.ui.ShopScreenContent
 import it.maestro.app.feature.shop.presentation.ShopUiState
@@ -218,9 +220,59 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("shop_equip_button_felt_royal_red").performClick()
         assertEquals("felt_royal_red", equippedItem?.id)
 
-        // The third table is locked: can click unlock button
+        // Lo sblocco non spende dalla lista: serve la conferma nel riquadro (F1R-30c)
         composeRule.onNodeWithTag("shop_unlock_button_felt_noble_blue").performClick()
+        assertEquals(null, unlockedItem)
+    }
+
+    @Test
+    fun unlock_spends_only_after_confirming_in_the_dialog() {
+        var unlockedItem: CosmeticItem? = null
+        val base = sampleStateForCategory(CosmeticCategory.TABLE_FELT)
+        composeRule.setContent {
+            MaestroTheme {
+                ShopScreenContent(
+                    uiState = base.copy(previewCard = base.items[2]),
+                    onSelectCategory = {},
+                    onEquipItem = {},
+                    onUnlockItem = { unlockedItem = it },
+                    onNavigateHome = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag("shop_try_unlock").performClick()
+        assertEquals(null, unlockedItem)
+        composeRule.onNodeWithTag("shop_try_confirm_text").assertExists()
+
+        composeRule.onNodeWithTag("shop_try_cancel").performClick()
+        assertEquals(null, unlockedItem)
+        composeRule.onNodeWithTag("shop_try_unlock").performClick()
+        composeRule.onNodeWithTag("shop_try_confirm").performClick()
         assertEquals("felt_noble_blue", unlockedItem?.id)
+    }
+
+    @Test
+    fun purchase_outcome_shows_the_maestro_line_then_is_consumed() {
+        var consumed = false
+        val base = sampleStateForCategory(CosmeticCategory.TABLE_FELT)
+        composeRule.setContent {
+            MaestroTheme {
+                ShopScreenContent(
+                    uiState = base.copy(
+                        event = ShopEvent.Unlocked(base.items[2].item),
+                        gameSpeed = GameSpeed.INSTANT,
+                    ),
+                    onSelectCategory = {},
+                    onEquipItem = {},
+                    onUnlockItem = {},
+                    onNavigateHome = {},
+                    onConsumeEvent = { consumed = true },
+                )
+            }
+        }
+        composeRule.onNodeWithTag("shop_note_unlocked").assertExists()
+        composeRule.waitForIdle()
+        assertTrue(consumed)
     }
 
     @Test

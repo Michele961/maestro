@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +67,8 @@ internal fun TryItemDialog(
 ) {
     val card = uiState.previewCard ?: return
     val item = card.item
+    // Lo sblocco chiede sempre conferma, qui nel riquadro (F1R-30c).
+    var confirming by remember(item.id) { mutableStateOf(false) }
     val tableId = if (item.category == CosmeticCategory.TABLE_FELT) item.id else uiState.equippedTableId
     val backId = if (item.category == CosmeticCategory.CARD_BACK) item.id else uiState.equippedCardBackId
     val avatarId = if (item.category == CosmeticCategory.AVATAR) item.id else uiState.equippedAvatarId
@@ -87,7 +92,19 @@ internal fun TryItemDialog(
                     fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                if (!card.isUnlocked && !card.canAfford) {
+                if (confirming) {
+                    Text(
+                        text = stringResource(
+                            R.string.shop_confirm_text,
+                            item.priceCredits,
+                            stringResource(CosmeticStyle.textsOf(item).nameRes),
+                        ),
+                        color = ParchmentInk,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        modifier = Modifier.testTag("shop_try_confirm_text"),
+                    )
+                } else if (!card.isUnlocked && !card.canAfford) {
                     val missing = item.priceCredits - uiState.creditsBalance
                     Text(
                         text = stringResource(R.string.shop_try_missing, missing),
@@ -106,16 +123,24 @@ internal fun TryItemDialog(
         },
         dismissButton = {
             MaestroPillButton(
-                text = stringResource(R.string.shop_try_close),
-                onClick = onDismiss,
+                text = stringResource(if (confirming) R.string.shop_confirm_no else R.string.shop_try_close),
+                onClick = { if (confirming) confirming = false else onDismiss() },
                 variant = PillButtonVariant.WOOD,
                 height = 36.dp,
                 fontSize = 11.sp,
-                testTag = "shop_try_close",
+                testTag = if (confirming) "shop_try_cancel" else "shop_try_close",
             )
         },
         confirmButton = {
             when {
+                confirming -> MaestroPillButton(
+                    text = stringResource(R.string.shop_confirm_yes),
+                    onClick = onUnlock,
+                    variant = PillButtonVariant.PRIMARY_GREEN,
+                    height = 36.dp,
+                    fontSize = 11.sp,
+                    testTag = "shop_try_confirm",
+                )
                 card.isEquipped -> MaestroPillButton(
                     text = stringResource(R.string.shop_action_equipped),
                     onClick = {},
@@ -134,7 +159,7 @@ internal fun TryItemDialog(
                 )
                 card.canAfford -> MaestroPillButton(
                     text = stringResource(R.string.shop_action_unlock, item.priceCredits),
-                    onClick = onUnlock,
+                    onClick = { confirming = true },
                     variant = PillButtonVariant.PRIMARY_GREEN,
                     height = 36.dp,
                     fontSize = 11.sp,

@@ -6,6 +6,9 @@ import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository
 import it.maestro.app.domain.wallet.TransactionReason
+import it.maestro.app.designsystem.audio.NoOpSoundManager
+import it.maestro.app.designsystem.audio.SoundEffect
+import it.maestro.app.feature.shop.presentation.ShopEvent
 import it.maestro.app.feature.shop.presentation.ShopViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -134,7 +137,7 @@ class ShopViewModelTest {
         // 50 - 40 = 10 crediti residui
         assertEquals(10, walletRepo.getBalance())
         assertEquals(10, viewModel.uiState.value.creditsBalance)
-        assertEquals("felt_royal_red", viewModel.uiState.value.feedbackMessage)
+        assertEquals(ShopEvent.Unlocked(redItem), viewModel.uiState.value.event)
 
         val updatedRed = viewModel.uiState.value.items.first { it.item.id == "felt_royal_red" }
         assertTrue(updatedRed.isUnlocked)
@@ -158,7 +161,7 @@ class ShopViewModelTest {
         // Saldo intatto a 20 e item ancora bloccato
         assertEquals(20, walletRepo.getBalance())
         assertEquals(20, viewModel.uiState.value.creditsBalance)
-        assertEquals("insufficient_funds", viewModel.uiState.value.feedbackMessage)
+        assertEquals(ShopEvent.NotEnoughCredits(missing = 20), viewModel.uiState.value.event)
 
         val updatedRed = viewModel.uiState.value.items.first { it.item.id == "felt_royal_red" }
         assertFalse(updatedRed.isUnlocked)
@@ -187,5 +190,39 @@ class ShopViewModelTest {
         viewModel.closePreview()
         advanceUntilIdle()
         assertEquals(null, viewModel.uiState.value.previewCard)
+    }
+
+    @Test
+    fun unlockAndEquip_tappedTwice_chargesOnlyOnce_andPlaysSoundOnce() = runTest {
+        val walletRepo = InMemoryWalletRepository()
+        walletRepo.addCredits(100, TransactionReason.WELCOME_BONUS)
+        val sound = NoOpSoundManager()
+        val viewModel = ShopViewModel(InMemorySettingsRepository(), walletRepo, sound)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+
+        val red = CosmeticCatalog.TABLES.first { it.id == "felt_royal_red" }
+        viewModel.unlockAndEquip(red)
+        viewModel.unlockAndEquip(red)
+        advanceUntilIdle()
+
+        assertEquals(60, walletRepo.getBalance())
+        assertEquals(listOf(SoundEffect.CHECK_CORRECT), sound.playedEffects)
+    }
+
+    @Test
+    fun consumeEvent_clearsTheOutcome() = runTest {
+        val walletRepo = InMemoryWalletRepository()
+        walletRepo.addCredits(100, TransactionReason.WELCOME_BONUS)
+        val viewModel = ShopViewModel(InMemorySettingsRepository(), walletRepo)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+
+        viewModel.unlockAndEquip(CosmeticCatalog.TABLES.first { it.id == "felt_royal_red" })
+        advanceUntilIdle()
+        viewModel.consumeEvent()
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.uiState.value.event)
     }
 }
