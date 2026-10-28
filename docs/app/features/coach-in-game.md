@@ -1,7 +1,7 @@
 # Suggerimenti e Check in partita — dossier
 
-Stato: **bozza** · 2026-10-28 · task collegati: F1R-24 (suggerimenti, già fatti con la voce del Maestro), F1R-23
-Procedimento: `docs/app/features/README.md`. Va approvato da Michele prima che i task partano.
+Stato: **approvato** (Michele, 2026-10-28) · 2026-10-28 · task collegati: F1R-24 (suggerimenti, già fatti con la voce del Maestro), F1R-23
+Procedimento: `docs/app/features/README.md`. Decisioni in §6.
 
 ## 1. Cosa fa per il giocatore
 
@@ -50,11 +50,17 @@ In partita (Sparring) il Maestro aiuta in due modi: **su richiesta** con il cons
 | F1R-25b | Feedback con la voce del Maestro | Risposta giusta spiegata con le carte; testi it/en da approvare; test su posizioni note |
 | F1R-25c | Scelta dell'obiettivo | Nomi semplici e una riga che dice cosa allena, in pre-partita |
 | F1R-25d | Punteggio di attenzione collegato | Scheda di fine partita, missioni e radar; nessun credito |
+| F1R-25e | Obiettivi adattivi | Nuovi obiettivi scelti da livello e lacune; elenco approvato prima del codice |
 
-## 6. Domande per Michele
+## 6. Decisioni di Michele (2026-10-28)
 
-1. **Fumetto al posto della finestra**: va bene che il Check non copra il tavolo? Proposta: sì, è il motivo per cui oggi non si riesce a contare.
-2. **Se sbagli**: il Maestro dice subito la risposta giusta con la spiegazione, oppure prima dà un indizio e poi la risposta (come il consiglio a due livelli)? Proposta: indizio al primo errore della partita, risposta e spiegazione dal secondo.
-3. **Obiettivi**: i cinque di oggi bastano o ne vuoi altri (es. «Quante carte restano», «Chi ha più Denari»)? Servirebbero solo se sono regole di conteggio già nella specifica.
-4. **Frequenza**: un Check per smazzata è giusto, o meno (ogni due smazzate) per non pesare?
-5. **Classica**: i Check restano solo in Sparring (come oggi) e mai in Classica? Proposta: sì.
+1. **Fumetto al posto della finestra**: approvato.
+2. **Se sbagli**: la forma può dipendere dalla domanda; si struttura come **indizio + risposta** (indizio prima, poi risposta con spiegazione).
+3. **Obiettivi**: oltre ai cinque di oggi, se ne aggiungono altri **scelti in base al livello del giocatore e alle sue lacune** (dati di Maestria/radar), per spronarlo a migliorare e tenerlo in esercizio. Ogni nuovo obiettivo deve essere una regola di conteggio già nella specifica.
+4. **Frequenza**: **per smazzata**; resta da definire il momento giusto in cui proporre il Check (vedi «Aperto»).
+5. **Classica**: i Check restano **solo in Sparring**.
+
+### Aperto
+
+- **Momento del Check nella smazzata** (a quale mano/turno): da proporre nel task F1R-25a con i dati di una simulazione, senza coprire scene della regia né battute spontanee.
+- **Scelta degli obiettivi adattivi**: elenco dei nuovi obiettivi e regola con cui si sceglie in base alle lacune (F1R-25e): proposta da approvare prima del codice.
