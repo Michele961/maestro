@@ -50,83 +50,8 @@ import it.maestro.app.designsystem.theme.WoodSurfaceDark
 
 private val CompletedGreen = Color(0xFF2E7D32)
 
-/**
- * Dialog/Pannello delle Missioni Didattiche quotidiane e della Streak ("Fiamma") (task F2-05).
- */
 @Composable
-public fun DailyMissionsDialog(
-    uiState: DailyMissionsUiState,
-    onDismissRequest: () -> Unit,
-    onClaimReward: (DailyMission) -> Unit = {},
-    modifier: Modifier = Modifier,
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Surface(
-            modifier = modifier
-                .fillMaxWidth(0.92f)
-                .heightIn(max = 660.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .testTag("daily_missions_dialog"),
-            color = Color.Transparent,
-        ) {
-            WoodPanel(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 10.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    // Header con Titolo e tasto di chiusura
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.retention_missions_title).uppercase(),
-                            color = BrassRivetGold,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = MaestroDisplayFont,
-                            modifier = Modifier.weight(1f).padding(start = 4.dp),
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.button_close),
-                            contentDescription = stringResource(R.string.pre_game_back_button),
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clickable(onClick = onDismissRequest)
-                                .testTag("missions_close_button"),
-                        )
-                    }
-
-                    // 1. Fiamma della Streak e Gettone Riposo
-                    StreakBanner(
-                        currentStreak = uiState.streak.currentStreak,
-                        bestStreak = uiState.streak.bestStreak,
-                        freezeTokens = uiState.streak.freezeTokens,
-                    )
-
-                    // 2. Le 3 Missioni Didattiche Giornaliere
-                    uiState.missionsState.missions.forEachIndexed { index, mission ->
-                        MissionItemCard(
-                            mission = mission,
-                            onClaimReward = onClaimReward,
-                            modifier = Modifier.testTag("daily_mission_item_$index"),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StreakBanner(
+internal fun StreakBanner(
     currentStreak: Int,
     bestStreak: Int,
     freezeTokens: Int,
@@ -233,7 +158,7 @@ private fun StreakBanner(
 }
 
 @Composable
-private fun MissionItemCard(
+internal fun MissionItemCard(
     mission: DailyMission,
     onClaimReward: (DailyMission) -> Unit,
     modifier: Modifier = Modifier,

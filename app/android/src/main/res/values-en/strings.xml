@@ -799,4 +799,61 @@
     <string name="objective_settebello_line">Trains attention: always know where the Settebello is.</string>
     <string name="objective_cards_name">Who has more cards</string>
     <string name="objective_cards_line">Trains captures: see who leads the card count.</string>
+
+    <!-- F1R-29f: nomi dei livelli di esperienza e degli obiettivi (testi [bozza] da approvare) -->
+    <string name="experience_level_1">Bar curious</string>
+    <string name="experience_level_2">Onlooker</string>
+    <string name="experience_level_3">Sunday player</string>
+    <string name="experience_level_4">Regular</string>
+    <string name="experience_level_5">Keen observer</string>
+    <string name="experience_level_6">Club veteran</string>
+    <string name="experience_level_7">Neighbourhood champion</string>
+    <string name="experience_level_8">Master of the hand</string>
+    <string name="experience_level_9">Grand Master of the table</string>
+    <string name="experience_level_10">Legend of the club</string>
+    <string name="achievement_first_win_name">First win</string>
+    <string name="achievement_first_win_desc">Win a full match in Classic.</string>
+    <string name="achievement_beat_gigi_name">Gigi beaten</string>
+    <string name="achievement_beat_gigi_desc">Beat Gigi for the first time.</string>
+    <string name="achievement_beat_nonna_rosa_name">Nonna Rosa beaten</string>
+    <string name="achievement_beat_nonna_rosa_desc">Beat Nonna Rosa for the first time.</string>
+    <string name="achievement_beat_tonino_name">Tonino beaten</string>
+    <string name="achievement_beat_tonino_desc">Beat Tonino for the first time.</string>
+    <string name="achievement_beat_don_alfonso_name">Don Alfonso beaten</string>
+    <string name="achievement_beat_don_alfonso_desc">Beat Don Alfonso for the first time.</string>
+    <string name="achievement_beat_maestro_name">Maestro beaten</string>
+    <string name="achievement_beat_maestro_desc">Beat the Maestro for the first time.</string>
+    <string name="achievement_ladder_complete_name">Ladder complete</string>
+    <string name="achievement_ladder_complete_desc">Beat all five opponents of the club.</string>
+    <string name="achievement_first_sweep_name">First sweep</string>
+    <string name="achievement_first_sweep_desc">Make your first sweep.</string>
+    <string name="achievement_ten_sweeps_name">Ten sweeps</string>
+    <string name="achievement_ten_sweeps_desc">Make ten sweeps in total.</string>
+    <string name="achievement_perfect_match_name">Perfect match</string>
+    <string name="achievement_perfect_match_desc">Finish a match with accuracy of at least ninety out of a hundred and no serious mistake.</string>
+    <string name="achievement_matches_10_name">Ten matches</string>
+    <string name="achievement_matches_10_desc">Play ten matches.</string>
+    <string name="achievement_matches_50_name">Fifty matches</string>
+    <string name="achievement_matches_50_desc">Play fifty matches.</string>
+    <string name="achievement_matches_100_name">One hundred matches</string>
+    <string name="achievement_matches_100_desc">Play one hundred matches.</string>
+    <string name="achievement_streak_7_name">One week</string>
+    <string name="achievement_streak_7_desc">Play seven days in a row.</string>
+    <string name="achievement_streak_30_name">One month</string>
+    <string name="achievement_streak_30_desc">Play thirty days in a row.</string>
+    <string name="achievement_first_sparring_name">First training</string>
+    <string name="achievement_first_sparring_desc">Play your first Sparring match.</string>
+    <string name="achievement_puzzle_full_day_name">Full challenge</string>
+    <string name="achievement_puzzle_full_day_desc">Solve all three levels of the Daily Challenge on the same day.</string>
+    <string name="achievement_puzzle_week_name">Challenge week</string>
+    <string name="achievement_puzzle_week_desc">Solve seven Daily Challenges.</string>
+
+    <!-- F1R-29f: Today screen -->
+    <string name="today_title">Today</string>
+    <string name="today_experience_title">Experience</string>
+    <string name="today_level">Level %1$d · %2$s</string>
+    <string name="today_level_max">You have reached the top level.</string>
+    <string name="today_xp_progress">%1$d / %2$d XP</string>
+    <string name="today_achievements_title">Achievements</string>
+    <string name="today_achievements_empty">No achievements yet: the first one is close.</string>
 </resources>

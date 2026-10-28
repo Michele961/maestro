@@ -799,4 +799,61 @@
     <string name="objective_settebello_line">Allena l\'attenzione: sai sempre dov\'è il Settebello.</string>
     <string name="objective_cards_name">Chi ha più carte</string>
     <string name="objective_cards_line">Allena le prese: capisci chi è avanti nel numero di carte.</string>
+
+    <!-- F1R-29f: nomi dei livelli di esperienza e degli obiettivi (testi [bozza] da approvare) -->
+    <string name="experience_level_1">Curioso del bar</string>
+    <string name="experience_level_2">Spettatore</string>
+    <string name="experience_level_3">Giocatore della domenica</string>
+    <string name="experience_level_4">Habitué</string>
+    <string name="experience_level_5">Fine osservatore</string>
+    <string name="experience_level_6">Veterano del circolo</string>
+    <string name="experience_level_7">Campione di quartiere</string>
+    <string name="experience_level_8">Maestro di mano</string>
+    <string name="experience_level_9">Gran Maestro del banco</string>
+    <string name="experience_level_10">Leggenda del circolo</string>
+    <string name="achievement_first_win_name">Prima vittoria</string>
+    <string name="achievement_first_win_desc">Vinci una partita completa in Classica.</string>
+    <string name="achievement_beat_gigi_name">Gigi battuto</string>
+    <string name="achievement_beat_gigi_desc">Batti Gigi per la prima volta.</string>
+    <string name="achievement_beat_nonna_rosa_name">Nonna Rosa battuta</string>
+    <string name="achievement_beat_nonna_rosa_desc">Batti Nonna Rosa per la prima volta.</string>
+    <string name="achievement_beat_tonino_name">Tonino battuto</string>
+    <string name="achievement_beat_tonino_desc">Batti Tonino per la prima volta.</string>
+    <string name="achievement_beat_don_alfonso_name">Don Alfonso battuto</string>
+    <string name="achievement_beat_don_alfonso_desc">Batti Don Alfonso per la prima volta.</string>
+    <string name="achievement_beat_maestro_name">Maestro battuto</string>
+    <string name="achievement_beat_maestro_desc">Batti il Maestro per la prima volta.</string>
+    <string name="achievement_ladder_complete_name">Scala completa</string>
+    <string name="achievement_ladder_complete_desc">Batti tutti e cinque gli avversari del circolo.</string>
+    <string name="achievement_first_sweep_name">Prima scopa</string>
+    <string name="achievement_first_sweep_desc">Metti a segno la tua prima scopa.</string>
+    <string name="achievement_ten_sweeps_name">Dieci scope</string>
+    <string name="achievement_ten_sweeps_desc">Metti a segno dieci scope in totale.</string>
+    <string name="achievement_perfect_match_name">Partita perfetta</string>
+    <string name="achievement_perfect_match_desc">Concludi una partita con precisione di almeno novanta su cento e nessun errore grave.</string>
+    <string name="achievement_matches_10_name">Dieci partite</string>
+    <string name="achievement_matches_10_desc">Gioca dieci partite.</string>
+    <string name="achievement_matches_50_name">Cinquanta partite</string>
+    <string name="achievement_matches_50_desc">Gioca cinquanta partite.</string>
+    <string name="achievement_matches_100_name">Cento partite</string>
+    <string name="achievement_matches_100_desc">Gioca cento partite.</string>
+    <string name="achievement_streak_7_name">Una settimana</string>
+    <string name="achievement_streak_7_desc">Gioca sette giorni di fila.</string>
+    <string name="achievement_streak_30_name">Un mese</string>
+    <string name="achievement_streak_30_desc">Gioca trenta giorni di fila.</string>
+    <string name="achievement_first_sparring_name">Primo allenamento</string>
+    <string name="achievement_first_sparring_desc">Gioca la tua prima partita di Sparring.</string>
+    <string name="achievement_puzzle_full_day_name">Sfida piena</string>
+    <string name="achievement_puzzle_full_day_desc">Risolvi tutti e tre i livelli della Sfida del Giorno nello stesso giorno.</string>
+    <string name="achievement_puzzle_week_name">Settimana di sfide</string>
+    <string name="achievement_puzzle_week_desc">Risolvi sette Sfide del Giorno.</string>
+
+    <!-- F1R-29f: schermata «Oggi» -->
+    <string name="today_title">Oggi</string>
+    <string name="today_experience_title">Esperienza</string>
+    <string name="today_level">Livello %1$d · %2$s</string>
+    <string name="today_level_max">Hai raggiunto il livello massimo.</string>
+    <string name="today_xp_progress">%1$d / %2$d PX</string>
+    <string name="today_achievements_title">Obiettivi</string>
+    <string name="today_achievements_empty">Nessun obiettivo ancora: il primo è vicino.</string>
 </resources>

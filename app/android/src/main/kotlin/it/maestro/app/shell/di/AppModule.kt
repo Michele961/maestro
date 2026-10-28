@@ -31,6 +31,7 @@ import it.maestro.app.domain.match.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
+import it.maestro.app.feature.missions.presentation.ProgressViewModel
 import it.maestro.app.feature.pregame.presentation.LadderViewModel
 import it.maestro.app.feature.pregame.presentation.PreGameViewModel
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
@@ -190,6 +191,8 @@ public val appModule: Module = module {
             clock = get(),
         )
     }
+
+    viewModel { ProgressViewModel(experience = get(), achievements = get()) }
 
     viewModel {
         AcademyViewModel(
