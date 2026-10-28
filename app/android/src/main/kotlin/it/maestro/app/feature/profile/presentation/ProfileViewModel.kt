@@ -8,12 +8,21 @@ import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.mastery.MatchHistoryEntry
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.domain.opponents.OpponentProgress
+import it.maestro.app.domain.opponents.OpponentRepository
+import it.maestro.app.domain.profile.MasteryTrend
+import it.maestro.app.domain.profile.PlayerTitleRepository
+import it.maestro.app.domain.profile.PlayerTitles
+import it.maestro.app.domain.profile.masteryTrendOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * Tab selezionabile nella schermata Profilo.
@@ -31,6 +40,11 @@ public data class ProfileUiState(
     @get:StringRes val rankTitleRes: Int = R.string.mastery_rank_principiante,
     @get:StringRes val maestroAdviceRes: Int = R.string.profile_advice_default,
     val matchHistory: List<MatchHistoryEntry> = emptyList(),
+    /** Titoli guadagnati, nell'ordine della scala. */
+    val earnedTitles: List<Opponent> = emptyList(),
+    /** Titolo mostrato; `null` finché non ha battuto nessuno. */
+    val currentTitle: Opponent? = null,
+    val trend: MasteryTrend = MasteryTrend.FLAT,
     val selectedTab: ProfileTab = ProfileTab.MASTERY,
     val isLoading: Boolean = false,
 )
@@ -40,6 +54,8 @@ public data class ProfileUiState(
  */
 public class ProfileViewModel(
     private val masteryRepository: MasteryRepository,
+    private val opponentRepository: OpponentRepository? = null,
+    private val titleRepository: PlayerTitleRepository? = null,
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(ProfileTab.MASTERY)
@@ -48,12 +64,17 @@ public class ProfileViewModel(
         masteryRepository.observeMasteryProfile(),
         masteryRepository.observeMatchHistory(),
         _selectedTab,
-    ) { profile, history, tab ->
+        opponentRepository?.observeProgress() ?: flowOf(OpponentProgress()),
+        titleRepository?.observeSelected() ?: flowOf(null),
+    ) { profile, history, tab, progress, selectedTitle ->
         ProfileUiState(
             profile = profile,
             rankTitleRes = mapEloToRankTitle(profile.cognitiveElo),
             maestroAdviceRes = computeMaestroAdvice(profile.radar, profile.matchesPlayed),
             matchHistory = history,
+            earnedTitles = PlayerTitles.earned(progress),
+            currentTitle = PlayerTitles.current(progress, selectedTitle),
+            trend = masteryTrendOf(history),
             selectedTab = tab,
             isLoading = false,
         )
@@ -65,6 +86,11 @@ public class ProfileViewModel(
 
     public fun selectTab(tab: ProfileTab) {
         _selectedTab.value = tab
+    }
+
+    /** Il giocatore sceglie quale tra i titoli guadagnati mostrare. */
+    public fun selectTitle(opponent: Opponent) {
+        viewModelScope.launch { titleRepository?.select(opponent.name) }
     }
 
     public companion object {

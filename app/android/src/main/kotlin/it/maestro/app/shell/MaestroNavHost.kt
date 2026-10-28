@@ -269,6 +269,8 @@ public fun MaestroNavHost(
             ProfileScreen(
                 onBackClicked = { navController.popBackStack() },
                 playerName = settings.playerName,
+                onPlayerNameChanged = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
+                playerNameMaxLength = MAX_PLAYER_NAME,
                 onReviewMatch = { log ->
                     navController.navigate(
                         Route.PostMatch(

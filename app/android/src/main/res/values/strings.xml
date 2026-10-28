@@ -213,15 +213,15 @@
     <string name="profile_title">Profilo &amp; Maestria</string>
     <string name="profile_tab_mastery">Maestria &amp; Radar</string>
     <string name="profile_tab_history">Cronologia Partite</string>
-    <string name="profile_history_empty">Nessuna partita giocata finora. Gioca la tua prima partita per registrare lo storico delle prestazioni e vedere l\'impatto sul tuo Elo!</string>
+    <string name="profile_history_empty">Nessuna partita giocata finora. Gioca la tua prima partita per registrare lo storico delle prestazioni e vedere come cambia la tua Maestria!</string>
     <string name="profile_history_vs_bot">Partita vs Maestro</string>
     <string name="profile_history_win">Vittoria</string>
     <string name="profile_history_loss">Sconfitta</string>
     <string name="profile_history_accuracy">%1$d%% precisione</string>
-    <string name="profile_history_elo_delta_plus">+%1$d ELO</string>
-    <string name="profile_history_elo_delta_minus">%1$d ELO</string>
+    <string name="profile_history_elo_delta_plus">+%1$d</string>
+    <string name="profile_history_elo_delta_minus">%1$d</string>
     <string name="profile_history_review_button">Rivedi analisi</string>
-    <string name="profile_elo_badge">%1$d ELO</string>
+    <string name="profile_elo_badge">Maestria %1$d</string>
     <string name="profile_accuracy_label">Precisione media: %1$d%%</string>
     <string name="profile_elo_explanation">Indice di Maestria calcolato sulla precisione matematica delle tue scelte, indipendente dalla fortuna delle carte.</string>
     <string name="profile_radar_title">Radar delle Abilità</string>
@@ -856,4 +856,11 @@
     <string name="today_xp_progress">%1$d / %2$d PX</string>
     <string name="today_achievements_title">Obiettivi</string>
     <string name="today_achievements_empty">Nessun obiettivo ancora: il primo è vicino.</string>
+
+    <!-- F1R-26b: scheda giocatore -->
+    <string name="profile_title_none">Nuovo al circolo</string>
+    <string name="profile_title_pick">Scegli il tuo titolo</string>
+    <string name="profile_trend_up">▲ In crescita</string>
+    <string name="profile_trend_flat">▬ Stabile</string>
+    <string name="profile_trend_down">▼ In calo</string>
 </resources>

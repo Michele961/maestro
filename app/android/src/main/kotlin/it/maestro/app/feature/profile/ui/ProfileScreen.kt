@@ -26,6 +26,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +42,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
 import it.maestro.app.domain.mastery.MatchHistoryEntry
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.domain.profile.MasteryTrend
+import it.maestro.app.feature.home.ui.PlayerNameDialog
 import it.maestro.game.scopa.MatchLog
 import it.maestro.app.feature.profile.ui.AbilityRadarChart
 import it.maestro.app.designsystem.components.BubbleTail
@@ -73,6 +79,8 @@ public fun ProfileScreen(
     modifier: Modifier = Modifier,
     onReviewMatch: (MatchLog) -> Unit = {},
     playerName: String? = null,
+    onPlayerNameChanged: (String) -> Unit = {},
+    playerNameMaxLength: Int = 20,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -82,6 +90,9 @@ public fun ProfileScreen(
         onSelectTab = { viewModel.selectTab(it) },
         onReviewMatch = onReviewMatch,
         playerName = playerName,
+        onSelectTitle = viewModel::selectTitle,
+        onPlayerNameChanged = onPlayerNameChanged,
+        playerNameMaxLength = playerNameMaxLength,
         modifier = modifier,
     )
 }
@@ -94,8 +105,20 @@ public fun ProfileContent(
     onSelectTab: (ProfileTab) -> Unit = {},
     onReviewMatch: (MatchLog) -> Unit = {},
     playerName: String? = null,
+    onSelectTitle: (Opponent) -> Unit = {},
+    onPlayerNameChanged: (String) -> Unit = {},
+    playerNameMaxLength: Int = 20,
 ) {
     val profile = uiState.profile
+    var editingName by remember { mutableStateOf(false) }
+    if (editingName) {
+        PlayerNameDialog(
+            currentName = playerName,
+            maxLength = playerNameMaxLength,
+            onConfirm = { editingName = false; onPlayerNameChanged(it) },
+            onDismiss = { editingName = false },
+        )
+    }
 
     ClubBackground(modifier = modifier.testTag("profile_screen"), feltFraction = 0.5f) {
         Column(
@@ -142,14 +165,19 @@ public fun ProfileContent(
                 if (uiState.selectedTab == ProfileTab.MASTERY) {
                     // 1. Scheda Giocatore con Avatar, Nome e Livello di Maestria
                     PlayerIdentityCard(
-                        rankTitleRes = uiState.rankTitleRes,
                         playerName = playerName,
+                        currentTitle = uiState.currentTitle,
+                        earnedTitles = uiState.earnedTitles,
+                        onSelectTitle = onSelectTitle,
+                        onEditName = { editingName = true },
                     )
 
                     // 2. Indice di Maestria (Elo Cognitivo)
                     MasteryIndexCard(
                         cognitiveElo = profile.cognitiveElo,
                         accuracyPercentage = profile.accuracyPercentage,
+                        rankTitleRes = uiState.rankTitleRes,
+                        trend = uiState.trend,
                     )
 
                     // 3. Radar delle Abilità a 5 assi
@@ -422,56 +450,11 @@ private fun ProfileHeader(onBackClicked: () -> Unit) {
 }
 
 @Composable
-private fun PlayerIdentityCard(rankTitleRes: Int, playerName: String?) {
-    WoodPanel(modifier = Modifier.fillMaxWidth().testTag("profile_identity_card")) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Box {
-                FramedPortrait(portrait = R.drawable.avatar_player_default, size = 68.dp)
-                Image(
-                    painter = painterResource(R.drawable.icon_shield_fleur),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd),
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = playerName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.home_player_default_name),
-                    color = BrassRivetGold,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = MaestroDisplayFont,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF1E3A5F),
-                    border = BorderStroke(1.dp, Color(0xFF64B5F6)),
-                    modifier = Modifier.testTag("profile_rank_badge"),
-                ) {
-                    Text(
-                        text = stringResource(rankTitleRes).uppercase(),
-                        color = Color.White,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = MaestroDisplayFont,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun MasteryIndexCard(
     cognitiveElo: Int,
     accuracyPercentage: Int,
+    rankTitleRes: Int,
+    trend: MasteryTrend,
 ) {
     NineSliceBox(
         skin = R.drawable.skin_score_plaque,
@@ -492,6 +475,13 @@ private fun MasteryIndexCard(
                 fontWeight = FontWeight.Black,
                 fontFamily = MaestroDisplayFont,
                 modifier = Modifier.testTag("profile_elo_text"),
+            )
+            Text(
+                text = stringResource(rankTitleRes).uppercase() + " · " + stringResource(trend.labelRes),
+                color = CreamText,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.testTag("profile_mastery_trend"),
             )
             Text(
                 text = stringResource(R.string.profile_accuracy_label, accuracyPercentage).uppercase(),
@@ -614,3 +604,10 @@ private fun PlayerStatsCard(
         }
     }
 }
+
+private val MasteryTrend.labelRes: Int
+    get() = when (this) {
+        MasteryTrend.UP -> R.string.profile_trend_up
+        MasteryTrend.FLAT -> R.string.profile_trend_flat
+        MasteryTrend.DOWN -> R.string.profile_trend_down
+    }
