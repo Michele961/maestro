@@ -286,6 +286,12 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
     - [ ] Michele ha approvato il dossier (stato `approvato`) prima che i task entrino nel backlog.
 - **Domande aperte:** —
 
+## F1R-25 — Suggerimenti e Check in partita
+
+- **Stato:** da fare (dossier `docs/app/features/coach-in-game.md` approvato il 2026-10-28). Sotto-task: 25a Check come fumetto (con scelta del momento nella smazzata), 25b feedback a indizio + risposta con la voce del Maestro, 25c scelta obiettivo con nomi semplici, 25d punteggio di attenzione collegato, 25e obiettivi adattivi (elenco da approvare prima del codice). Check solo in Sparring, uno per smazzata
+- **Riferimenti:** `docs/app/features/coach-in-game.md`, F1R-24, F1R-16
+- **Domande aperte:** momento del Check nella smazzata; elenco degli obiettivi adattivi (25e)
+
 ## F1R-24 — La voce del Maestro
 
 - **Stato:** in corso (dossier approvato il 2026-10-27; viene prima di F1R-15). Fatti: 24a `MatchFacts`, 24b `MomentDirector`, 24c prontuario (bozza testi it/en da approvare) e `VoiceComposer`. 24d fumetto al tavolo, impostazione «Chiacchiere» e suggerimento ricordato. 24f trascrizioni (test che scrive `app/android/build/maestro-transcripts/*.md`). 24e consiglio dinamico (`HintComposer`: nomina le carte e la ragione; livelli maieutici da decidere con Michele). 24g parte 1: `ReviewCoach` (spiegazioni in codici, vere nella posizione, che ammettono quando la mano non basta; «Riprova la mano» non si propone con 1–2 scelte) e simulazione delle spiegazioni (`ReviewSimulationTest` → `app/android/build/review-simulation/`). 24g parte 2 (in parte): le differenze trascurabili (perdita ≤ 0,10) non sono errori né «mossa migliore» ma «Buona mossa» (`ReviewVerdict`). Dopo la prova di Michele (2026-10-27): consiglio a **due livelli** (stimolo, poi soluzione al secondo tocco) e Maestro più proattivo e vario (nuovi momenti: Settebello in mano, banco vuoto, grossa presa, avanti/indietro, «colore»; più battute per smazzata; varianti non ripetute). Da fare: altre simulazioni e messa a punto, punteggi senza decimali nella schermata con F1R-17
