@@ -9,9 +9,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
-import it.maestro.app.data.local.academy.AcademyChapterId
+import it.maestro.app.domain.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyLessonProgress
+import it.maestro.app.domain.academy.AcademyLessonProgress
 import it.maestro.app.feature.academy.presentation.AcademyChapterCardState
 import it.maestro.app.feature.academy.ui.AcademyChapterMapContent
 import it.maestro.app.feature.academy.presentation.AcademyLessonCardState

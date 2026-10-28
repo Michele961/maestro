@@ -2,7 +2,7 @@ package it.maestro.app.data
 
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.app.data.local.DailyPuzzleProvider
-import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.domain.puzzle.PuzzleLesson
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals

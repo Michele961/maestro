@@ -1,6 +1,6 @@
 package it.maestro.app.data
 
-import it.maestro.app.data.local.academy.AcademyLessonId
+import it.maestro.app.domain.academy.AcademyLessonId
 import it.maestro.app.data.local.datastore.InMemoryAcademyRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

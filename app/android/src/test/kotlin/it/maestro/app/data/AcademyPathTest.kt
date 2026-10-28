@@ -2,9 +2,9 @@ package it.maestro.app.data
 
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
-import it.maestro.app.data.local.academy.AcademyChapterId
+import it.maestro.app.domain.academy.AcademyChapterId
 import it.maestro.app.data.local.academy.AcademyContent
-import it.maestro.app.data.local.academy.AcademyLessonId
+import it.maestro.app.domain.academy.AcademyLessonId
 import it.maestro.app.data.local.academy.AcademyPath
 import it.maestro.app.feature.academy.presentation.recommendedChapter
 import kotlin.test.Test
