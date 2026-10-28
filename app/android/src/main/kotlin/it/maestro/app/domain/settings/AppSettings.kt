@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.Flow
 public data class AppSettings(
     val language: String = "system",
     val soundEnabled: Boolean = true,
+    /** Volume degli effetti sonori, 0–100 (task F1R-31b). */
+    val effectsVolume: Int = 100,
+    /** Volume della musica, 0–100; la musica arriva con F1R-20, il valore si conserva già. */
+    val musicVolume: Int = 40,
+    /** Volume dell'ambiente, 0–100; arriva con F1R-20. */
+    val ambientVolume: Int = 40,
+    /** Vibrazione nelle celebrazioni (Scopa, riepilogo smazzata). */
+    val hapticsEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     /** Quanto parla il Maestro (impostazione «Chiacchiere», `docs/app/features/maestro-voice.md` §3.4). */
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
@@ -37,6 +45,10 @@ public interface SettingsRepository {
     public val settingsFlow: Flow<AppSettings>
     public suspend fun updateLanguage(language: String)
     public suspend fun updateSoundEnabled(enabled: Boolean)
+    public suspend fun updateEffectsVolume(volume: Int)
+    public suspend fun updateMusicVolume(volume: Int)
+    public suspend fun updateAmbientVolume(volume: Int)
+    public suspend fun updateHapticsEnabled(enabled: Boolean)
     public suspend fun updateGameSpeed(speed: GameSpeed)
     public suspend fun updateMaestroChattiness(chattiness: Chattiness)
     public suspend fun updateShowPointsRace(show: Boolean)

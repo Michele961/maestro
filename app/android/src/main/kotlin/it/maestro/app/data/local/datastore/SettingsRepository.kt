@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.audio.AudioMixer
 import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.settings.SettingsRepository
@@ -28,6 +29,10 @@ public class DataStoreSettingsRepository(
     private object PreferencesKeys {
         val LANGUAGE = stringPreferencesKey("app_language")
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
+        val EFFECTS_VOLUME = intPreferencesKey("effects_volume")
+        val MUSIC_VOLUME = intPreferencesKey("music_volume")
+        val AMBIENT_VOLUME = intPreferencesKey("ambient_volume")
+        val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
         val GAME_SPEED = stringPreferencesKey("game_speed")
         val MAESTRO_CHATTINESS = stringPreferencesKey("maestro_chattiness")
         val HINT_EVER_USED = booleanPreferencesKey("hint_ever_used")
@@ -43,6 +48,7 @@ public class DataStoreSettingsRepository(
     }
 
     override val settingsFlow: Flow<AppSettings> = dataStore.data.map { preferences ->
+        val defaults = AppSettings()
         val lang = preferences[PreferencesKeys.LANGUAGE] ?: "system"
         val sound = preferences[PreferencesKeys.SOUND_ENABLED] ?: true
         val speed = preferences[PreferencesKeys.GAME_SPEED]
@@ -66,6 +72,10 @@ public class DataStoreSettingsRepository(
         AppSettings(
             language = lang,
             soundEnabled = sound,
+            effectsVolume = (preferences[PreferencesKeys.EFFECTS_VOLUME] ?: defaults.effectsVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
+            musicVolume = (preferences[PreferencesKeys.MUSIC_VOLUME] ?: defaults.musicVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
+            ambientVolume = (preferences[PreferencesKeys.AMBIENT_VOLUME] ?: defaults.ambientVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
+            hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: defaults.hapticsEnabled,
             gameSpeed = speed,
             maestroChattiness = chattiness,
             hintEverUsed = preferences[PreferencesKeys.HINT_EVER_USED] ?: false,
@@ -91,6 +101,22 @@ public class DataStoreSettingsRepository(
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.SOUND_ENABLED] = enabled
         }
+    }
+
+    override suspend fun updateEffectsVolume(volume: Int) {
+        dataStore.edit { it[PreferencesKeys.EFFECTS_VOLUME] = volume.coerceIn(0, AudioMixer.MAX_VOLUME) }
+    }
+
+    override suspend fun updateMusicVolume(volume: Int) {
+        dataStore.edit { it[PreferencesKeys.MUSIC_VOLUME] = volume.coerceIn(0, AudioMixer.MAX_VOLUME) }
+    }
+
+    override suspend fun updateAmbientVolume(volume: Int) {
+        dataStore.edit { it[PreferencesKeys.AMBIENT_VOLUME] = volume.coerceIn(0, AudioMixer.MAX_VOLUME) }
+    }
+
+    override suspend fun updateHapticsEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.HAPTICS_ENABLED] = enabled }
     }
 
     override suspend fun updateGameSpeed(speed: GameSpeed) {
@@ -183,6 +209,22 @@ public class InMemorySettingsRepository(
 
     override suspend fun updateSoundEnabled(enabled: Boolean) {
         _state.value = _state.value.copy(soundEnabled = enabled)
+    }
+
+    override suspend fun updateEffectsVolume(volume: Int) {
+        _state.value = _state.value.copy(effectsVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME))
+    }
+
+    override suspend fun updateMusicVolume(volume: Int) {
+        _state.value = _state.value.copy(musicVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME))
+    }
+
+    override suspend fun updateAmbientVolume(volume: Int) {
+        _state.value = _state.value.copy(ambientVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME))
+    }
+
+    override suspend fun updateHapticsEnabled(enabled: Boolean) {
+        _state.value = _state.value.copy(hapticsEnabled = enabled)
     }
 
     override suspend fun updateGameSpeed(speed: GameSpeed) {

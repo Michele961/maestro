@@ -21,7 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import it.maestro.app.designsystem.haptics.rememberGameHaptics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,9 +59,9 @@ internal fun DealSummaryDialog(
     )
 
     // Le voci si accendono una alla volta al ritmo della regia (`DealSummaryRow`), non con un timer del dialog.
-    val haptic = LocalHapticFeedback.current
+    val haptic = rememberGameHaptics()
     LaunchedEffect(revealedCount) {
-        if (revealedCount > 0) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        if (revealedCount > 0) haptic(HapticFeedbackType.TextHandleMove)
     }
 
     MaestroAlertDialog(

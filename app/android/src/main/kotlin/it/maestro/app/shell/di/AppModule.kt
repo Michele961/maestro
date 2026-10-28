@@ -219,7 +219,7 @@ public val appModule: Module = module {
     }
 
     viewModel {
-        SettingsViewModel(settingsRepository = get())
+        SettingsViewModel(settingsRepository = get(), soundManager = get())
     }
 
     viewModel {

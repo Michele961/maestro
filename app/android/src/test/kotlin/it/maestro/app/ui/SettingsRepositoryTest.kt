@@ -70,4 +70,23 @@ class SettingsRepositoryTest {
         repo.updatePlayerName("  Ada  ")
         assertEquals("Ada", repo.settingsFlow.first().playerName)
     }
+
+    @Test
+    fun audioAndHapticsDefaultsAndClamping() = kotlinx.coroutines.test.runTest {
+        val repo = it.maestro.app.data.local.datastore.InMemorySettingsRepository()
+        val defaults = repo.settingsFlow.first()
+        assertEquals(100, defaults.effectsVolume)
+        assertTrue(defaults.musicVolume < defaults.effectsVolume)
+        assertTrue(defaults.hapticsEnabled)
+
+        repo.updateEffectsVolume(250)
+        repo.updateMusicVolume(-3)
+        repo.updateAmbientVolume(55)
+        repo.updateHapticsEnabled(false)
+        val updated = repo.settingsFlow.first()
+        assertEquals(100, updated.effectsVolume)
+        assertEquals(0, updated.musicVolume)
+        assertEquals(55, updated.ambientVolume)
+        assertFalse(updated.hapticsEnabled)
+    }
 }

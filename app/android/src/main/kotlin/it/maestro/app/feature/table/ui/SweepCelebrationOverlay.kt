@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalHapticFeedback
+import it.maestro.app.designsystem.haptics.rememberGameHaptics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -86,7 +86,7 @@ public fun SweepCelebrationOverlay(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit = {},
 ) {
-    val haptic = LocalHapticFeedback.current
+    val haptic = rememberGameHaptics()
 
     val bannerRes = remember(event, isHuman) {
         if (isHuman) {
@@ -129,7 +129,7 @@ public fun SweepCelebrationOverlay(
 
     LaunchedEffect(Unit) {
         // Feedback aptico all'impatto
-        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        haptic(HapticFeedbackType.LongPress)
 
         launch {
             scale.animateTo(

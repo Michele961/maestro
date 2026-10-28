@@ -49,6 +49,7 @@ class SettingsScreenshotTest(private val screen: ScreenConfig) {
         onGameSpeedChanged: (GameSpeed) -> Unit = {},
         onMaestroChattinessChanged: (Chattiness) -> Unit = {},
         onShowPointsRaceToggled: (Boolean) -> Unit = {},
+        onHapticsToggled: (Boolean) -> Unit = {},
     ) = MaestroTheme {
         SettingsScreenContent(
             state = state,
@@ -60,6 +61,7 @@ class SettingsScreenshotTest(private val screen: ScreenConfig) {
             onStartTestEndgameMatch = {},
             onNavigateHome = {},
             showDeveloperTools = showDeveloperTools,
+            onHapticsToggled = onHapticsToggled,
         )
     }
 
@@ -78,6 +80,8 @@ class SettingsScreenshotTest(private val screen: ScreenConfig) {
                     gameSpeed = GameSpeed.FAST,
                     maestroChattiness = Chattiness.QUIET,
                     showPointsRace = true,
+                    effectsVolume = 35,
+                    hapticsEnabled = false,
                 ),
             )
         }
@@ -96,22 +100,26 @@ class SettingsScreenshotTest(private val screen: ScreenConfig) {
         var speed: GameSpeed? = null
         var chat: Chattiness? = null
         var race: Boolean? = null
+        var haptics: Boolean? = null
         composeRule.setContent {
             Content(
                 onSoundToggled = { sound = it },
                 onGameSpeedChanged = { speed = it },
                 onMaestroChattinessChanged = { chat = it },
                 onShowPointsRaceToggled = { race = it },
+                onHapticsToggled = { haptics = it },
             )
         }
         composeRule.onNodeWithTag("sound_enabled_switch").performScrollTo().performClick()
         composeRule.onNodeWithTag("game_speed_fast").performScrollTo().performClick()
         composeRule.onNodeWithTag("maestro_chat_off").performScrollTo().performClick()
         composeRule.onNodeWithTag("points_race_switch").performScrollTo().performClick()
+        composeRule.onNodeWithTag("haptics_switch").performScrollTo().performClick()
 
         assertEquals(false, sound)
         assertEquals(GameSpeed.FAST, speed)
         assertEquals(Chattiness.OFF, chat)
         assertTrue(race == true)
+        assertEquals(false, haptics)
     }
 }
