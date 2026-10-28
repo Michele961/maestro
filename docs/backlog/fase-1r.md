@@ -306,7 +306,8 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Riferimenti:** `docs/app/features/profile.md` §3–§6, F1R-14, F1R-18e
 - **Sotto-task:** 26a storico con avversario e modalità, 26b scheda giocatore e titolo scelto dall'utente, 26c la scala nel Profilo, 26d radar leggibile e consiglio che porta all'allenamento, 26e statistiche e tab «Partite», 26f divisione del file e matrice finale. Ordine delle sezioni: opzione B (radar dopo la scheda), modificabile.
 - **Dipendenze:** esperienza e obiettivi arrivano da F1R-29.
-- **Domande aperte:** —
+- **Stato avanzamento:** 26a, 26b e 26c fatti.
+- **Domande aperte:** (26c) il dossier chiede, al tocco su uno stemma, anche «quando è stato battuto la prima volta», ma `profile.md` §4 dice di non salvare dati nuovi sulla scala e oggi `OpponentProgress` ricorda solo chi è battuto, non la data. Per ora il dettaglio mostra nome e titolo. Serve una decisione di Michele: aggiungere la data (un campo in più nel salvataggio degli avversari battuti) oppure togliere la data dal dossier.
 
 ## F1R-27 — Sfida del Giorno
 

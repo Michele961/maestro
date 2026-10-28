@@ -863,4 +863,5 @@
     <string name="profile_trend_up">▲ Rising</string>
     <string name="profile_trend_flat">▬ Steady</string>
     <string name="profile_trend_down">▼ Falling</string>
+    <string name="profile_ladder_title">The club ladder</string>
 </resources>
