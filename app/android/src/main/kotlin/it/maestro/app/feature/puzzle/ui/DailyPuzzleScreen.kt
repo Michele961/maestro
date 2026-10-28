@@ -67,6 +67,7 @@ import it.maestro.app.feature.puzzle.presentation.DailyPuzzleStatus
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleUiState
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import it.maestro.app.data.local.PuzzleLesson
+import it.maestro.app.feature.table.ui.DealtCardRow
 import it.maestro.app.feature.table.ui.phrasesText
 import it.maestro.app.feature.puzzle.presentation.PuzzleShareFormatter
 
@@ -224,17 +225,15 @@ public fun DailyPuzzleScreenContent(
                                     fontSize = 14.sp,
                                 )
                             } else {
-                                tableCards.forEach { card ->
-                                    CardView(
-                                        card = card,
-                                        width = 66.dp,
-                                        height = 98.dp,
-                                        isPlayable = false,
-                                        modifier = Modifier
-                                            .padding(horizontal = 4.dp)
-                                            .testTag("puzzle_table_card_${card.rank.name}_${card.suit.name}"),
-                                    )
-                                }
+                                DealtCardRow(
+                                    cards = tableCards,
+                                    key = puzzle?.id.orEmpty(),
+                                    speed = uiState.speed,
+                                    maxCardWidth = 66.dp,
+                                    cardModifier = { card ->
+                                        Modifier.testTag("puzzle_table_card_${card.rank.name}_${card.suit.name}")
+                                    },
+                                )
                             }
                         }
 

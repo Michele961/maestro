@@ -19,9 +19,12 @@ import it.maestro.app.domain.rewards.RewardEngine
 import it.maestro.app.designsystem.components.MaestroMood
 import it.maestro.game.model.Card
 import it.maestro.game.scopa.ScopaView
+import it.maestro.app.domain.settings.GameSpeed
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
@@ -58,6 +61,8 @@ public data class DailyPuzzleUiState(
     val maestroPhrases: List<Phrase> = emptyList(),
     /** `true` dopo «Mostrami la soluzione»: il Maestro ha spiegato la mossa. */
     val solutionShown: Boolean = false,
+    /** Velocità di gioco scelta nelle Impostazioni: il mini-tavolo la rispetta (F1R-27d). */
+    val speed: GameSpeed = GameSpeed.NORMAL,
 )
 
 /**
@@ -69,6 +74,7 @@ public class DailyPuzzleViewModel(
     private val customDate: LocalDate? = null,
     private val customPuzzle: TacticalPuzzle? = null,
     private val clock: Clock = SystemClock,
+    gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
 ) : ViewModel() {
 
     // Il giorno si rilegge con refreshDay() (ritorno in primo piano), salvo una data fissata dai test.
@@ -86,6 +92,7 @@ public class DailyPuzzleViewModel(
 
     init {
         loadTier(0)
+        viewModelScope.launch { gameSpeed.collect { speed -> _uiState.value = _uiState.value.copy(speed = speed) } }
     }
 
     /**
@@ -96,7 +103,7 @@ public class DailyPuzzleViewModel(
         val today = clock.today()
         if (today == effectiveDate) return
         effectiveDate = today
-        _uiState.value = DailyPuzzleUiState(puzzleNumber = puzzleNumber, dateString = dateString)
+        _uiState.value = DailyPuzzleUiState(puzzleNumber = puzzleNumber, dateString = dateString, speed = _uiState.value.speed)
         loadTier(0)
     }
 

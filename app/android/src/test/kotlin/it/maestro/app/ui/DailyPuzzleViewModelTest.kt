@@ -295,4 +295,21 @@ class DailyPuzzleViewModelTest {
         assertTrue(lead.args.contains(VoiceArg.CardArg(samplePuzzle.firstMove.card)))
         assertEquals(0, walletRepo.getBalance())
     }
+
+    @Test
+    fun theMiniTableFollowsTheGameSpeedFromSettings() = runTest {
+        val speed = kotlinx.coroutines.flow.MutableStateFlow(it.maestro.app.domain.settings.GameSpeed.NORMAL)
+        val viewModel = DailyPuzzleViewModel(
+            repository = InMemoryDailyPuzzleRepository(),
+            customDate = LocalDate.of(2026, 10, 26),
+            customPuzzle = samplePuzzle,
+            gameSpeed = speed,
+        )
+        advanceUntilIdle()
+        assertEquals(it.maestro.app.domain.settings.GameSpeed.NORMAL, viewModel.uiState.value.speed)
+
+        speed.value = it.maestro.app.domain.settings.GameSpeed.INSTANT
+        advanceUntilIdle()
+        assertEquals(it.maestro.app.domain.settings.GameSpeed.INSTANT, viewModel.uiState.value.speed)
+    }
 }
