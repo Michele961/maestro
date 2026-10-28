@@ -1,7 +1,12 @@
 package it.maestro.app.ui.screenshot
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
@@ -10,6 +15,8 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.app.domain.cosmetics.CosmeticCategory
 import it.maestro.app.domain.cosmetics.CosmeticItem
 import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.domain.wallet.TransactionReason
+import it.maestro.app.domain.wallet.WalletTransaction
 import it.maestro.app.feature.shop.presentation.ShopEvent
 import it.maestro.app.feature.shop.presentation.ShopItemCardState
 import it.maestro.app.feature.shop.ui.ShopScreenContent
@@ -355,5 +362,33 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
         }
         composeRule.onNodeWithTag("shop_item_felt_noble_blue").performClick()
         assertEquals("felt_noble_blue", previewed?.id)
+    }
+
+    @Test
+    fun movements_dialog_empty_and_filled() {
+        val base = sampleStateForCategory(CosmeticCategory.TABLE_FELT)
+        val movements = listOf(
+            WalletTransaction(amount = -40, reason = TransactionReason.COSMETIC_PURCHASE, referenceId = "felt_royal_red", timestamp = 2_000L),
+            WalletTransaction(amount = 15, reason = TransactionReason.DAILY_PUZZLE_REWARD, timestamp = 1_000L),
+        )
+        var state by mutableStateOf(base)
+        composeRule.setContent {
+            MaestroTheme {
+                ShopScreenContent(
+                    uiState = state,
+                    onSelectCategory = {},
+                    onEquipItem = {},
+                    onUnlockItem = {},
+                    onNavigateHome = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag("shop_credits_pill").performClick()
+        composeRule.onNodeWithTag("shop_movements_empty").assertExists()
+        composeRule.onNodeWithTag("shop_movements_close").performClick()
+
+        state = base.copy(movements = movements)
+        composeRule.onNodeWithTag("shop_credits_pill").performClick()
+        composeRule.onAllNodesWithTag("shop_movement_row").assertCountEquals(2)
     }
 }

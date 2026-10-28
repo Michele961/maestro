@@ -12,6 +12,7 @@ import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletOperationResult
 import it.maestro.app.domain.wallet.WalletRepository
+import it.maestro.app.domain.wallet.WalletTransaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -47,6 +48,8 @@ public data class ShopUiState(
     val items: List<ShopItemCardState> = emptyList(),
     val creditsBalance: Int = 0,
     val event: ShopEvent? = null,
+    /** Ultimi movimenti del wallet, dal più recente (F1R-30d). */
+    val movements: List<WalletTransaction> = emptyList(),
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     /** Oggetto aperto nel riquadro «Provalo» (F1R-30b); `null` se il riquadro è chiuso. */
     val previewCard: ShopItemCardState? = null,
@@ -73,9 +76,10 @@ public class ShopViewModel(
         categoryState,
         settingsRepository.settingsFlow,
         walletRepository.observeBalance(),
-        eventState,
-        previewId,
-    ) { category, settings, balance, event, preview ->
+        combine(eventState, previewId, walletRepository.observeTransactions()) { event, preview, transactions ->
+            Triple(event, preview, transactions)
+        },
+    ) { category, settings, balance, (event, preview, transactions) ->
         val categoryItems = when (category) {
             CosmeticCategory.TABLE_FELT -> CosmeticCatalog.TABLES
             CosmeticCategory.CARD_BACK -> CosmeticCatalog.CARD_BACKS
@@ -102,6 +106,7 @@ public class ShopViewModel(
             items = cards,
             creditsBalance = balance,
             event = event,
+            movements = transactions.sortedByDescending { it.timestamp }.take(MAX_MOVEMENTS),
             gameSpeed = settings.gameSpeed,
             previewCard = cards.firstOrNull { it.item.id == preview },
             equippedTableId = settings.selectedTableTheme,
@@ -182,3 +187,6 @@ public class ShopViewModel(
         }
     }
 }
+
+/** Quanti movimenti mostra l'elenco della Bottega. */
+private const val MAX_MOVEMENTS: Int = 50

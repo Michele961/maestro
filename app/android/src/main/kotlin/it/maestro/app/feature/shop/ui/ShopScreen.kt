@@ -37,7 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -121,6 +123,10 @@ public fun ShopScreenContent(
         label = "shop_balance",
     )
     val event = uiState.event
+    var showMovements by remember { mutableStateOf(false) }
+    if (showMovements) {
+        MovementsDialog(movements = uiState.movements, onDismiss = { showMovements = false })
+    }
     LaunchedEffect(event) {
         if (event != null) {
             MotionSpec.pause(MotionSpec.millis(MotionToken.PURCHASE_NOTE, uiState.gameSpeed))
@@ -190,7 +196,9 @@ public fun ShopScreenContent(
                     CurrencyPill(
                         icon = R.drawable.icon_coin,
                         value = shownBalance.toString(),
-                        modifier = Modifier.testTag("shop_credits_pill"),
+                        modifier = Modifier
+                            .clickable { showMovements = true }
+                            .testTag("shop_credits_pill"),
                     )
                 }
             }
