@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.Flow
  * @property botScore Punti totalizzati dal bot o Maestro.
  * @property isWin True se il giocatore umano ha vinto la partita.
  * @property matchLogText Rappresentazione testuale canonica del MatchLog per la consultazione e Game Review.
+ * @property opponent Nome (`Opponent.name`) dell'avversario affrontato; null se la partita non lo registra.
+ * @property sparringObjective Nome (`TrainingFundamental.name`) dell'obiettivo di Sparring; null in Classica.
  */
 public data class MatchHistoryEntry(
     val id: String,
@@ -30,6 +32,8 @@ public data class MatchHistoryEntry(
     val botScore: Int,
     val isWin: Boolean,
     val matchLogText: String? = null,
+    val opponent: String? = null,
+    val sparringObjective: String? = null,
 )
 
 /**
@@ -46,6 +50,7 @@ public interface MasteryRepository {
         humanSeat: Seat = Seat.P1,
         trainingScore: Pair<Int, Int>? = null,
         trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+        opponent: String? = null,
     ): MasteryProfile
     public suspend fun resetProfile()
 }

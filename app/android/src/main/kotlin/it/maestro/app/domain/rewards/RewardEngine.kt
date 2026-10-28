@@ -117,6 +117,7 @@ public class RewardEngine(
             humanSeat = humanSeat,
             trainingScore = trainingScore,
             trainingFundamental = trainingFundamental,
+            opponent = opponent?.name,
         )
         val streakAfter = retention.recordGameActivity(today)
 

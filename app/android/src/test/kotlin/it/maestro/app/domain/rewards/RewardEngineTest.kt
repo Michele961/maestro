@@ -362,4 +362,24 @@ class RewardEngineTest {
         val summary = engine.onMatchFinished(log, analysis(95, 0), Seat.P1, null, TrainingFundamental.NONE)
         assertEquals(emptyList(), summary.achievementsUnlocked)
     }
+
+    // --- F1R-26a: lo storico ricorda avversario e obiettivo ---
+
+    @Test
+    fun historyRemembersTheOpponentAndTheSparringObjective() = runTest {
+        finish(finishedMatch(Seat.P1), TrainingFundamental.DENARI_COUNT, Opponent.TONINO)
+
+        val entry = mastery.observeMatchHistory().first().single()
+        assertEquals(Opponent.TONINO.name, entry.opponent)
+        assertEquals(TrainingFundamental.DENARI_COUNT.name, entry.sparringObjective)
+    }
+
+    @Test
+    fun aClassicMatchHasNoSparringObjectiveInHistory() = runTest {
+        finish(finishedMatch(Seat.P1), TrainingFundamental.NONE, Opponent.GIGI)
+
+        val entry = mastery.observeMatchHistory().first().single()
+        assertEquals(Opponent.GIGI.name, entry.opponent)
+        assertEquals(null, entry.sparringObjective)
+    }
 }
