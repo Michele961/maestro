@@ -10,6 +10,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -290,6 +291,8 @@ private fun RaceOrBubble(
                 soundManager = soundManager,
                 onAnswer = onAnswerCheck,
                 onContinue = onContinueCheck,
+                // Con font grandi le risposte vanno a capo: il fumetto può sforare la zona invece di tagliarle.
+                modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically, unbounded = true),
             )
         } else if (line != null) {
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
