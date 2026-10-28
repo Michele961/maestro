@@ -59,6 +59,7 @@ import it.maestro.app.feature.review.ui.PostMatchScreen
 import org.koin.core.parameter.parametersOf
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.pregame.presentation.LadderViewModel
+import it.maestro.app.feature.pregame.presentation.PreGameViewModel
 import it.maestro.app.feature.pregame.ui.LadderScreen
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.feature.profile.ui.ProfileScreen
@@ -174,8 +175,11 @@ public fun MaestroNavHost(
         }
         composable<Route.PreGame> { entry ->
             val route = entry.toRoute<Route.PreGame>()
+            val preGameViewModel: PreGameViewModel = koinViewModel()
+            val suggested by preGameViewModel.suggestedObjective.collectAsStateWithLifecycle()
             PreGameScreen(
                 opponent = Opponent.valueOf(route.opponent),
+                suggestedObjective = suggested,
                 onStartGame = { level, targetScore, fundamental ->
                     navController.navigate(
                         Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),

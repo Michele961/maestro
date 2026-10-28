@@ -785,6 +785,7 @@
     <string name="post_match_maestro_unlocked">Ottimo lavoro! Hai battuto %1$s: ora puoi sfidare %2$s. Stai attento, è più forte.</string>
     <string name="post_match_maestro_ladder_done">Hai battuto tutti gli avversari del circolo. Sono fiero di te!</string>
     <!-- Obiettivi del Check in Sparring (F1R-25c, [bozza] da approvare) -->
+    <string name="pre_game_objective_suggested">Il Maestro consiglia: %1$s</string>
     <string name="pre_game_objective_title">Cosa alleni</string>
     <string name="objective_sevens_name">Conta i Sette</string>
     <string name="objective_sevens_line">Allena la memoria: tieni il conto dei Sette già usciti.</string>
