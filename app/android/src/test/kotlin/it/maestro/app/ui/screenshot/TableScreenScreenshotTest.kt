@@ -230,6 +230,19 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun pause_dialog_lets_the_player_change_the_maestro_chattiness() {
+        var chosen: it.maestro.app.domain.coach.Chattiness? = null
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, onChattinessChange = { chosen = it })
+            }
+        }
+        composeRule.onNodeWithTag("pause_button").performClick()
+        composeRule.onNodeWithTag("pause_chat_quiet").performClick()
+        org.junit.Assert.assertEquals(it.maestro.app.domain.coach.Chattiness.QUIET, chosen)
+    }
+
+    @Test
     fun playing_card_in_game_does_not_crash() {
         val viewModel = it.maestro.app.feature.table.presentation.GameViewModel(
             ioDispatcher = kotlinx.coroutines.Dispatchers.Unconfined,

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.audio.NoOpSoundManager
 import it.maestro.app.designsystem.audio.SoundEffect
@@ -78,6 +79,8 @@ public fun TableScreen(
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
+    chattiness: Chattiness = Chattiness.NORMAL,
+    onChattinessChange: (Chattiness) -> Unit = {},
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     clock: Clock = koinInject(),
@@ -115,6 +118,8 @@ public fun TableScreen(
         tableThemeId = tableThemeId,
         cardBackThemeId = cardBackThemeId,
         showPointsRace = showPointsRace,
+        chattiness = chattiness,
+        onChattinessChange = onChattinessChange,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -146,6 +151,8 @@ public fun TableContent(
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
+    chattiness: Chattiness = Chattiness.NORMAL,
+    onChattinessChange: (Chattiness) -> Unit = {},
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
@@ -267,7 +274,12 @@ public fun TableContent(
             }
 
             if (showPause) {
-                PauseDialog(onResume = { showPause = false }, onNavigateHome = onNavigateHome)
+                PauseDialog(
+                    onResume = { showPause = false },
+                    onNavigateHome = onNavigateHome,
+                    chattiness = chattiness,
+                    onChattinessChange = onChattinessChange,
+                )
             }
 
             SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))

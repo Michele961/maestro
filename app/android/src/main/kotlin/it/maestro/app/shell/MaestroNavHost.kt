@@ -206,6 +206,8 @@ public fun MaestroNavHost(
                     tableThemeId = settings.selectedTableTheme,
                     cardBackThemeId = settings.selectedCardBackTheme,
                     showPointsRace = settings.showPointsRace,
+                    chattiness = settings.maestroChattiness,
+                    onChattinessChange = { scope.launch { settingsRepository.updateMaestroChattiness(it) } },
                     onNavigateHome = { goHome() },
                     onViewAnalysis = { log, training ->
                         navController.navigate(
