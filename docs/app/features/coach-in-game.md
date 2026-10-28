@@ -60,7 +60,30 @@ In partita (Sparring) il Maestro aiuta in due modi: **su richiesta** con il cons
 4. **Frequenza**: **per smazzata**; resta da definire il momento giusto in cui proporre il Check (vedi «Aperto»).
 5. **Classica**: i Check restano **solo in Sparring**.
 
+### Aggiornamento (2026-10-28, sera)
+
+6. **Testi [bozza]**: approvati da Michele (titoli degli avversari, battute del Maestro, obiettivi, feedback dei Check).
+7. **Obiettivi adattivi**: regola di scelta approvata (asse più basso tra Sette, Denari, Primiera, almeno 3 partite; fatto in 25e). **«Conta le Scope» scartato**: non è una abilità da allenare. «Carte nel mazzo» non si procede senza una nuova indicazione di Michele: nessuna modifica a `core:game`.
+
+### Momento del Check: dati di simulazione e proposta
+
+Simulazione di 1609 smazzate (400 partite, mosse casuali con preferenza per le prese; indicativa, non con i bot veri). Un Check scatta al primo turno del giocatore in cui la regola di oggi lo consente; le carte giocate sono su 36 per smazzata (6 giri da 3 carte a testa).
+
+| Obiettivo | Scatta tra la carta 8 e la 9 | Tra la 10 e la 17 | Dalla 18 (metà smazzata) |
+| --- | --- | --- | --- |
+| Sette | 42% | 35% | 22% |
+| Denari | 41% | 48% | 10% |
+| Primiera | 11% | 24% | 64% |
+| Settebello | 31% | 20% | 48% |
+| Carte | 0% | 53% (dalla 12) | 46% |
+
+Problema: per Sette, Denari e Settebello il Check arriva spesso **molto presto** (circa 4 volte su 10 appena dopo il primo giro), quando c'è poco da ricordare e la risposta è quasi ovvia; per la Primiera arriva quasi sempre tardi. Il momento cambia da obiettivo a obiettivo e il giocatore non sa mai quando aspettarlo.
+
+**Proposta (da approvare)**: un solo momento fisso, uguale per tutti gli obiettivi: il **primo turno del giocatore con almeno 12 carte giocate** (inizio del terzo giro, a un terzo della smazzata). Nessuna regola contestuale prima di allora. Così c'è sempre abbastanza storia da ricordare e il ritmo è prevedibile (una volta per smazzata, mai in Classica). Alternativa: metà smazzata (18 carte, il fallback di oggi) per tutti, con più storia ma meno smazzate di Check utili a fine partita.
+
+Dopo l'approvazione il cambio è piccolo (una soglia in `isCriticalTrainingMoment` più i test): servirebbe il Perimetro autorizzato per toccare `core:game`.
+
 ### Aperto
 
 - **Momento del Check nella smazzata** (a quale mano/turno): da proporre nel task F1R-25a con i dati di una simulazione, senza coprire scene della regia né battute spontanee.
-- **Scelta degli obiettivi adattivi**: elenco dei nuovi obiettivi e regola con cui si sceglie in base alle lacune (F1R-25e): proposta da approvare prima del codice.
+- **Momento del Check**: scelta tra «dalla 12ª carta» e «a metà smazzata» (vedi sopra).
