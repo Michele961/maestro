@@ -74,7 +74,7 @@ class LadderScreenScreenshotTest(private val screen: ScreenConfig) {
             }
         }
         composeRule.onNodeWithTag("ladder_row_TONINO").assertIsNotEnabled()
-        composeRule.onNodeWithTag("ladder_locked_hint_TONINO").assertExists()
+        composeRule.onNodeWithTag("ladder_locked_hint_TONINO", useUnmergedTree = true).assertExists()
         composeRule.onNodeWithTag("ladder_row_TONINO").performClick()
         composeRule.onNodeWithTag("ladder_row_GIGI").performClick()
         assertEquals(listOf(Opponent.GIGI), chosen)
