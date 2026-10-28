@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -71,6 +73,7 @@ public fun PreGameScreen(
 ) {
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
     var sparring by remember { mutableStateOf(initialFundamental != TrainingFundamental.NONE) }
+    var objective by remember { mutableStateOf(initialFundamental.takeIf { it != TrainingFundamental.NONE } ?: TrainingFundamental.SEVENS_COUNT) }
 
     ClubBackground(modifier = modifier.testTag("pre_game_screen"), feltFraction = 0.5f) {
         Box(modifier = Modifier.fillMaxSize().background(Color(0x99000000)))
@@ -82,7 +85,8 @@ public fun PreGameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            // Il contenuto scorre se non sta nello schermo (obiettivi compresi); il pulsante «Gioca» resta sempre visibile.
+            Box(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
                 ParchmentPanel(modifier = Modifier.fillMaxWidth().padding(top = 50.dp)) {
                     Text(
                         text = stringResource(id = R.string.pre_game_title).uppercase(),
@@ -143,6 +147,7 @@ public fun PreGameScreen(
                             )
                         }
                     }
+                    if (sparring) ObjectivePicker(selected = objective, onSelect = { objective = it })
                 }
                 // Le due carte sulla targa in cima, come nel mockup
                 NineSliceBox(
@@ -174,8 +179,7 @@ public fun PreGameScreen(
                     onStartGame(
                         opponent.level,
                         selectedTargetScore,
-                        if (sparring) initialFundamental.takeIf { it != TrainingFundamental.NONE }
-                            ?: TrainingFundamental.SEVENS_COUNT else TrainingFundamental.NONE,
+                        if (sparring) objective else TrainingFundamental.NONE,
                     )
                 },
                 variant = PillButtonVariant.PRIMARY_GREEN,
@@ -186,6 +190,42 @@ public fun PreGameScreen(
             )
         }
     }
+}
+
+/** Gli obiettivi del Check in Sparring: nome semplice e, per quello scelto, una riga che dice cosa allena. */
+@Composable
+private fun ObjectivePicker(selected: TrainingFundamental, onSelect: (TrainingFundamental) -> Unit) {
+    RibbonHeader(stringResource(id = R.string.pre_game_objective_title))
+    Column(modifier = Modifier.fillMaxWidth().testTag("objective_selector"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (fundamental in TrainingFundamental.entries) {
+            val text = fundamental.objectiveText() ?: continue
+            TactileSegmentedPill(
+                text = stringResource(text.first),
+                selected = selected == fundamental,
+                onClick = { onSelect(fundamental) },
+                modifier = Modifier.fillMaxWidth().height(48.dp).testTag("objective_option_${fundamental.name}"),
+            )
+        }
+    }
+    selected.objectiveText()?.let { (_, line) ->
+        Text(
+            text = stringResource(line),
+            style = MaterialTheme.typography.titleSmall,
+            color = Color(0xFF2B1A10),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 4.dp).testTag("objective_line"),
+        )
+    }
+}
+
+/** Nome e riga «cosa allena» dell'obiettivo; `null` per [TrainingFundamental.NONE], che non è un obiettivo. */
+private fun TrainingFundamental.objectiveText(): Pair<Int, Int>? = when (this) {
+    TrainingFundamental.NONE -> null
+    TrainingFundamental.SEVENS_COUNT -> R.string.objective_sevens_name to R.string.objective_sevens_line
+    TrainingFundamental.DENARI_COUNT -> R.string.objective_denari_name to R.string.objective_denari_line
+    TrainingFundamental.PRIMIERA_LEAD -> R.string.objective_primiera_name to R.string.objective_primiera_line
+    TrainingFundamental.SETTEBELLO_LOCATION -> R.string.objective_settebello_name to R.string.objective_settebello_line
+    TrainingFundamental.CARDS_LEAD -> R.string.objective_cards_name to R.string.objective_cards_line
 }
 
 @Composable
