@@ -213,15 +213,15 @@
     <string name="profile_title">Profile &amp; Mastery</string>
     <string name="profile_tab_mastery">Mastery &amp; Radar</string>
     <string name="profile_tab_history">Match History</string>
-    <string name="profile_history_empty">No matches played yet. Play your first match to track your match performance and see the impact on your Elo!</string>
+    <string name="profile_history_empty">No matches played yet. Play your first match to track your match performance and see how your Mastery changes!</string>
     <string name="profile_history_vs_bot">Match vs Maestro</string>
     <string name="profile_history_win">Victory</string>
     <string name="profile_history_loss">Defeat</string>
     <string name="profile_history_accuracy">%1$d%% accuracy</string>
-    <string name="profile_history_elo_delta_plus">+%1$d ELO</string>
-    <string name="profile_history_elo_delta_minus">%1$d ELO</string>
+    <string name="profile_history_elo_delta_plus">+%1$d</string>
+    <string name="profile_history_elo_delta_minus">%1$d</string>
     <string name="profile_history_review_button">Review analysis</string>
-    <string name="profile_elo_badge">%1$d ELO</string>
+    <string name="profile_elo_badge">Mastery %1$d</string>
     <string name="profile_accuracy_label">Average accuracy: %1$d%%</string>
     <string name="profile_elo_explanation">Mastery Index calculated on the mathematical precision of your choices, independent of card luck.</string>
     <string name="profile_radar_title">Ability Radar</string>
@@ -856,4 +856,11 @@
     <string name="today_xp_progress">%1$d / %2$d XP</string>
     <string name="today_achievements_title">Achievements</string>
     <string name="today_achievements_empty">No achievements yet: the first one is close.</string>
+
+    <!-- F1R-26b: scheda giocatore -->
+    <string name="profile_title_none">New at the club</string>
+    <string name="profile_title_pick">Choose your title</string>
+    <string name="profile_trend_up">▲ Rising</string>
+    <string name="profile_trend_flat">▬ Steady</string>
+    <string name="profile_trend_down">▼ Falling</string>
 </resources>
