@@ -64,6 +64,9 @@ public class RoomWalletRepository(
     ): WalletOperationResult = withContext(ioDispatcher) {
         require(amount > 0) { "L'importo di addebito deve essere strettamente positivo: $amount" }
         mutex.withLock {
+            if (referenceId != null && dao.hasTransactionWithReference(reason.name, referenceId)) {
+                return@withContext WalletOperationResult.AlreadyClaimed(reason, referenceId)
+            }
             val currentBalance = dao.getBalance()
             if (currentBalance < amount) {
                 return@withContext WalletOperationResult.InsufficientFunds(
@@ -156,6 +159,9 @@ public class InMemoryWalletRepository(
     ): WalletOperationResult {
         require(amount > 0) { "L'importo di addebito deve essere positivo: $amount" }
         return mutex.withLock {
+            if (referenceId != null && transactions.value.any { it.reason == reason && it.referenceId == referenceId }) {
+                return@withLock WalletOperationResult.AlreadyClaimed(reason, referenceId)
+            }
             val current = balance.value
             if (current < amount) {
                 return@withLock WalletOperationResult.InsufficientFunds(

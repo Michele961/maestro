@@ -36,6 +36,9 @@ public interface WalletRepository {
      * Addebita un importo di crediti registrando un nuovo movimento negativo nel ledger.
      * Se il saldo contabile attuale è inferiore ad [amount], l'operazione viene respinta
      * con [WalletOperationResult.InsufficientFunds] senza alterare il saldo.
+     * Se [referenceId] è fornito e già presente per la stessa causale, l'addebito viene respinto con
+     * [WalletOperationResult.AlreadyClaimed]: un acquisto ripetuto (doppio tocco, ripresa dopo un'interruzione)
+     * non addebita due volte (task F1R-30c).
      */
     public suspend fun spendCredits(
         amount: Int,
