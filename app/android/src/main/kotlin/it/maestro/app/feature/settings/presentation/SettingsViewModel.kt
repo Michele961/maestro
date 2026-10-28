@@ -2,6 +2,9 @@ package it.maestro.app.feature.settings.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.maestro.app.designsystem.audio.SoundEffect
+import it.maestro.app.designsystem.audio.SoundManager
+import it.maestro.app.domain.audio.AudioMixer
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.settings.SettingsRepository
@@ -14,6 +17,8 @@ import kotlinx.coroutines.launch
 /** Valori delle impostazioni mostrati dalla schermata (task F1R-31a). */
 public data class SettingsUiState(
     val soundEnabled: Boolean = true,
+    val effectsVolume: Int = 100,
+    val hapticsEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
     val showPointsRace: Boolean = false,
@@ -25,12 +30,15 @@ public data class SettingsUiState(
  */
 public class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
+    private val soundManager: SoundManager? = null,
 ) : ViewModel() {
 
     public val uiState: StateFlow<SettingsUiState> = settingsRepository.settingsFlow
         .map { settings ->
             SettingsUiState(
                 soundEnabled = settings.soundEnabled,
+                effectsVolume = settings.effectsVolume,
+                hapticsEnabled = settings.hapticsEnabled,
                 gameSpeed = settings.gameSpeed,
                 maestroChattiness = settings.maestroChattiness,
                 showPointsRace = settings.showPointsRace,
@@ -40,6 +48,23 @@ public class SettingsViewModel(
 
     public fun setSoundEnabled(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.updateSoundEnabled(enabled) }
+    }
+
+    /** Il cursore si muove: il volume vale subito per il prossimo suono, ma non si salva a ogni pixel. */
+    public fun previewEffectsVolume(volume: Int) {
+        soundManager?.effectsVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+    }
+
+    /** Il cursore è stato lasciato: salva il volume e fa sentire un suono di prova (task F1R-31b). */
+    public fun commitEffectsVolume(volume: Int) {
+        val clamped = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+        soundManager?.effectsVolume = clamped
+        soundManager?.play(SoundEffect.CARD_PLAY)
+        viewModelScope.launch { settingsRepository.updateEffectsVolume(clamped) }
+    }
+
+    public fun setHapticsEnabled(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.updateHapticsEnabled(enabled) }
     }
 
     public fun setGameSpeed(speed: GameSpeed) {

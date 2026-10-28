@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import it.maestro.app.R
+import it.maestro.app.domain.audio.AudioMixer
 import it.maestro.app.domain.settings.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -27,6 +28,9 @@ public enum class SoundEffect {
  */
 public interface SoundManager {
     public var isEnabled: Boolean
+
+    /** Volume degli effetti, 0–100 (task F1R-31b): tutti i suoni passano da questo livello. */
+    public var effectsVolume: Int
     public fun play(effect: SoundEffect)
     public fun release()
 }
@@ -41,6 +45,7 @@ public class AndroidSoundManager(
 ) : SoundManager {
 
     override var isEnabled: Boolean = true
+    override var effectsVolume: Int = AudioMixer.MAX_VOLUME
 
     private var settingsJob: Job? = null
 
@@ -60,7 +65,10 @@ public class AndroidSoundManager(
         loadSounds()
         if (settingsRepository != null && scope != null) {
             settingsJob = settingsRepository.settingsFlow
-                .onEach { settings -> isEnabled = settings.soundEnabled }
+                .onEach { settings ->
+                    isEnabled = settings.soundEnabled
+                    effectsVolume = settings.effectsVolume
+                }
                 .launchIn(scope)
         }
     }
@@ -83,7 +91,8 @@ public class AndroidSoundManager(
         try {
             val soundId = soundMap[effect] ?: return
             if (soundId > 0) {
-                soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f)
+                val gain = AudioMixer.effectsGain(effectsVolume, soundEnabled = true)
+                if (gain > 0f) soundPool.play(soundId, gain, gain, 1, 0, 1.0f)
             }
         } catch (_: Throwable) {
             // Protezione contro errori del sottosistema audio della piattaforma
@@ -101,11 +110,12 @@ public class AndroidSoundManager(
  */
 public class NoOpSoundManager(
     override var isEnabled: Boolean = true,
+    override var effectsVolume: Int = AudioMixer.MAX_VOLUME,
 ) : SoundManager {
     public val playedEffects: MutableList<SoundEffect> = mutableListOf()
 
     override fun play(effect: SoundEffect) {
-        if (isEnabled) {
+        if (isEnabled && effectsVolume > 0) {
             playedEffects.add(effect)
         }
     }

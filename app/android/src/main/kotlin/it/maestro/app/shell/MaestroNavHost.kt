@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,7 @@ import it.maestro.app.domain.wallet.WalletRepository
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.feature.missions.ui.TodayScreen
+import it.maestro.app.designsystem.haptics.LocalHapticsEnabled
 import it.maestro.app.feature.settings.ui.SettingsScreen
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
@@ -115,203 +117,205 @@ public fun MaestroNavHost(
         navController.navigate(Route.Home) { popUpTo(Route.Home) { inclusive = true } }
     }
 
-    NavHost(navController = navController, startDestination = Route.Home) {
-        composable<Route.Home> {
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { shell.refreshActiveMatch() }
-            HomeScreen(
-                hasActiveMatch = hasActiveMatch,
-                onResumeGameClicked = {
-                    scope.launch {
-                        when (shell.checkResumable()) {
-                            ResumeOutcome.RESUMED -> navController.navigate(
+    CompositionLocalProvider(LocalHapticsEnabled provides settings.hapticsEnabled) {
+        NavHost(navController = navController, startDestination = Route.Home) {
+            composable<Route.Home> {
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { shell.refreshActiveMatch() }
+                HomeScreen(
+                    hasActiveMatch = hasActiveMatch,
+                    onResumeGameClicked = {
+                        scope.launch {
+                            when (shell.checkResumable()) {
+                                ResumeOutcome.RESUMED -> navController.navigate(
+                                    Route.Table(
+                                        level = DifficultyLevel.INTERMEDIO.name,
+                                        targetScore = 0,
+                                        fundamental = TrainingFundamental.NONE.name,
+                                        seed = 0L,
+                                        resume = true,
+                                    ),
+                                )
+                                ResumeOutcome.WRONG_RULES_VERSION -> showWrongRules = true
+                                ResumeOutcome.NOTHING_TO_RESUME -> Unit
+                            }
+                        }
+                    },
+                    onStartGameClicked = { navController.navigate(Route.Ladder()) { launchSingleTop = true } },
+                    onSettingsClicked = { navController.navigate(Route.Settings) { launchSingleTop = true } },
+                    onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
+                    onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
+                    onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
+                    onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
+                    onShopClicked = { navController.navigate(Route.Shop) { launchSingleTop = true } },
+                    streakCount = streak.currentStreak,
+                    credits = credits,
+                    avatarId = settings.selectedAvatar,
+                    playerName = settings.playerName,
+                    day = today.toEpochDay(),
+                    playerNameMaxLength = MAX_PLAYER_NAME,
+                    askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
+                    onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
+                    onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },
+                    mastery = mastery,
+                )
+            }
+            composable<Route.Ladder> { entry ->
+                val ladderRoute = entry.toRoute<Route.Ladder>()
+                val viewModel: LadderViewModel = koinViewModel()
+                val ladder by viewModel.state.collectAsStateWithLifecycle()
+                LadderScreen(
+                    state = ladder,
+                    onOpponentClick = { opponent ->
+                        navController.navigate(Route.PreGame(opponent.name, ladderRoute.objective)) { launchSingleTop = true }
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+            }
+            composable<Route.PreGame> { entry ->
+                val route = entry.toRoute<Route.PreGame>()
+                val preGameViewModel: PreGameViewModel = koinViewModel()
+                val suggested by preGameViewModel.suggestedObjective.collectAsStateWithLifecycle()
+                PreGameScreen(
+                    opponent = Opponent.valueOf(route.opponent),
+                    suggestedObjective = route.objective?.let(TrainingFundamental::valueOf) ?: suggested,
+                    onStartGame = { level, targetScore, fundamental ->
+                        navController.navigate(
+                            Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),
+                        ) { popUpTo(Route.Home) }
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+            }
+            composable<Route.Table> { entry ->
+                val route = entry.toRoute<Route.Table>()
+                val level = DifficultyLevel.valueOf(route.level)
+                TableScreen(
+                    level = level,
+                    targetScore = route.targetScore,
+                    trainingFundamental = TrainingFundamental.valueOf(route.fundamental),
+                    seed = route.seed,
+                    resume = route.resume,
+                    tableThemeId = settings.selectedTableTheme,
+                    cardBackThemeId = settings.selectedCardBackTheme,
+                    showPointsRace = settings.showPointsRace,
+                    onNavigateHome = { goHome() },
+                    onViewAnalysis = { log, training ->
+                        navController.navigate(
+                            Route.PostMatch(
+                                matchLog = log.toText(),
+                                level = route.level,
+                                fundamental = route.fundamental,
+                                trainingCorrect = training?.first ?: -1,
+                                trainingTotal = training?.second ?: -1,
+                            ),
+                        ) { popUpTo(Route.Home) }
+                    },
+                )
+            }
+            composable<Route.PostMatch> { entry ->
+                val route = entry.toRoute<Route.PostMatch>()
+                val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
+                val training = if (route.trainingTotal >= 0) route.trainingCorrect to route.trainingTotal else null
+                val fundamental = TrainingFundamental.valueOf(route.fundamental)
+                LaunchedEffect(route) {
+                    shell.startPostMatch(
+                        matchLog, Seat.P1, training, fundamental, route.fromHistory,
+                        opponent = Opponent.forLevel(DifficultyLevel.valueOf(route.level)),
+                    )
+                }
+                val viewModel: PostMatchViewModel = koinViewModel(key = route.matchLog) {
+                    parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
+                }
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                PostMatchScreen(
+                    state = state,
+                    trainingScore = training,
+                    onClaimMission = { mission ->
+                        shell.claimMissionReward(mission)
+                        viewModel.markClaimed(mission.id)
+                    },
+                    onReviewClicked = {
+                        navController.navigate(Route.Review(route.matchLog, route.level, route.fromHistory))
+                    },
+                    onRematchClicked = {
+                        navController.navigate(
+                            Route.Table(route.level, matchLog.config.targetScore, route.fundamental, shell.newSeed()),
+                        ) { popUpTo(Route.Home) }
+                    },
+                    onHomeClicked = { if (route.fromHistory) navController.popBackStack() else goHome() },
+                )
+            }
+            composable<Route.Review> { entry ->
+                val route = entry.toRoute<Route.Review>()
+                val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
+                // Analisi già pronta dalla fine partita; dopo la chiusura del processo si ricalcola fuori dal thread UI.
+                val analysis by produceState(shell.cachedAnalysis(route.matchLog), route.matchLog) {
+                    if (value == null) value = withContext(Dispatchers.Default) { MatchAnalyzer().analyze(matchLog) }
+                }
+                val ready = analysis
+                if (ready != null) {
+                    GameReviewScreen(
+                        matchLog = matchLog,
+                        analysis = ready,
+                        onNavigateBack = { navController.popBackStack() },
+                    )
+                } else {
+                    ClubBackground(feltFraction = 0.6f) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                    }
+                }
+            }
+            composable<Route.DailyPuzzle> {
+                DailyPuzzleScreen(onNavigateHome = { navController.popBackStack() })
+            }
+            composable<Route.Profile> {
+                ProfileScreen(
+                    onBackClicked = { navController.popBackStack() },
+                    playerName = settings.playerName,
+                    onPlayerNameChanged = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
+                    playerNameMaxLength = MAX_PLAYER_NAME,
+                    onTrain = { objective -> navController.navigate(Route.Ladder(objective.name)) { launchSingleTop = true } },
+                    onReviewMatch = { log ->
+                        navController.navigate(
+                            Route.PostMatch(
+                                matchLog = log.toText(),
+                                level = DifficultyLevel.INTERMEDIO.name,
+                                fundamental = TrainingFundamental.NONE.name,
+                                fromHistory = true,
+                            ),
+                        )
+                    },
+                )
+            }
+            composable<Route.Academy> {
+                AcademyScreen(onNavigateHome = { navController.popBackStack() })
+            }
+            composable<Route.Today> {
+                TodayScreen(onNavigateHome = { navController.popBackStack() })
+            }
+            composable<Route.Shop> {
+                ShopScreen(onNavigateHome = { navController.popBackStack() })
+            }
+            composable<Route.Settings> {
+                SettingsScreen(
+                    onTriggerTestCrash = { crashReporter.triggerTestCrash() },
+                    onStartTestEndgameMatch = {
+                        scope.launch {
+                            val log = shell.prepareTestEndgameMatch()
+                            navController.navigate(
                                 Route.Table(
                                     level = DifficultyLevel.INTERMEDIO.name,
-                                    targetScore = 0,
+                                    targetScore = log.config.targetScore,
                                     fundamental = TrainingFundamental.NONE.name,
-                                    seed = 0L,
+                                    seed = log.seed,
                                     resume = true,
                                 ),
                             )
-                            ResumeOutcome.WRONG_RULES_VERSION -> showWrongRules = true
-                            ResumeOutcome.NOTHING_TO_RESUME -> Unit
                         }
-                    }
-                },
-                onStartGameClicked = { navController.navigate(Route.Ladder()) { launchSingleTop = true } },
-                onSettingsClicked = { navController.navigate(Route.Settings) { launchSingleTop = true } },
-                onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
-                onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
-                onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
-                onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
-                onShopClicked = { navController.navigate(Route.Shop) { launchSingleTop = true } },
-                streakCount = streak.currentStreak,
-                credits = credits,
-                avatarId = settings.selectedAvatar,
-                playerName = settings.playerName,
-                day = today.toEpochDay(),
-                playerNameMaxLength = MAX_PLAYER_NAME,
-                askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
-                onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
-                onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },
-                mastery = mastery,
-            )
-        }
-        composable<Route.Ladder> { entry ->
-            val ladderRoute = entry.toRoute<Route.Ladder>()
-            val viewModel: LadderViewModel = koinViewModel()
-            val ladder by viewModel.state.collectAsStateWithLifecycle()
-            LadderScreen(
-                state = ladder,
-                onOpponentClick = { opponent ->
-                    navController.navigate(Route.PreGame(opponent.name, ladderRoute.objective)) { launchSingleTop = true }
-                },
-                onNavigateBack = { navController.popBackStack() },
-            )
-        }
-        composable<Route.PreGame> { entry ->
-            val route = entry.toRoute<Route.PreGame>()
-            val preGameViewModel: PreGameViewModel = koinViewModel()
-            val suggested by preGameViewModel.suggestedObjective.collectAsStateWithLifecycle()
-            PreGameScreen(
-                opponent = Opponent.valueOf(route.opponent),
-                suggestedObjective = route.objective?.let(TrainingFundamental::valueOf) ?: suggested,
-                onStartGame = { level, targetScore, fundamental ->
-                    navController.navigate(
-                        Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),
-                    ) { popUpTo(Route.Home) }
-                },
-                onNavigateBack = { navController.popBackStack() },
-            )
-        }
-        composable<Route.Table> { entry ->
-            val route = entry.toRoute<Route.Table>()
-            val level = DifficultyLevel.valueOf(route.level)
-            TableScreen(
-                level = level,
-                targetScore = route.targetScore,
-                trainingFundamental = TrainingFundamental.valueOf(route.fundamental),
-                seed = route.seed,
-                resume = route.resume,
-                tableThemeId = settings.selectedTableTheme,
-                cardBackThemeId = settings.selectedCardBackTheme,
-                showPointsRace = settings.showPointsRace,
-                onNavigateHome = { goHome() },
-                onViewAnalysis = { log, training ->
-                    navController.navigate(
-                        Route.PostMatch(
-                            matchLog = log.toText(),
-                            level = route.level,
-                            fundamental = route.fundamental,
-                            trainingCorrect = training?.first ?: -1,
-                            trainingTotal = training?.second ?: -1,
-                        ),
-                    ) { popUpTo(Route.Home) }
-                },
-            )
-        }
-        composable<Route.PostMatch> { entry ->
-            val route = entry.toRoute<Route.PostMatch>()
-            val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
-            val training = if (route.trainingTotal >= 0) route.trainingCorrect to route.trainingTotal else null
-            val fundamental = TrainingFundamental.valueOf(route.fundamental)
-            LaunchedEffect(route) {
-                shell.startPostMatch(
-                    matchLog, Seat.P1, training, fundamental, route.fromHistory,
-                    opponent = Opponent.forLevel(DifficultyLevel.valueOf(route.level)),
+                    },
+                    onNavigateHome = { navController.popBackStack() },
                 )
             }
-            val viewModel: PostMatchViewModel = koinViewModel(key = route.matchLog) {
-                parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
-            }
-            val state by viewModel.uiState.collectAsStateWithLifecycle()
-            PostMatchScreen(
-                state = state,
-                trainingScore = training,
-                onClaimMission = { mission ->
-                    shell.claimMissionReward(mission)
-                    viewModel.markClaimed(mission.id)
-                },
-                onReviewClicked = {
-                    navController.navigate(Route.Review(route.matchLog, route.level, route.fromHistory))
-                },
-                onRematchClicked = {
-                    navController.navigate(
-                        Route.Table(route.level, matchLog.config.targetScore, route.fundamental, shell.newSeed()),
-                    ) { popUpTo(Route.Home) }
-                },
-                onHomeClicked = { if (route.fromHistory) navController.popBackStack() else goHome() },
-            )
-        }
-        composable<Route.Review> { entry ->
-            val route = entry.toRoute<Route.Review>()
-            val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
-            // Analisi già pronta dalla fine partita; dopo la chiusura del processo si ricalcola fuori dal thread UI.
-            val analysis by produceState(shell.cachedAnalysis(route.matchLog), route.matchLog) {
-                if (value == null) value = withContext(Dispatchers.Default) { MatchAnalyzer().analyze(matchLog) }
-            }
-            val ready = analysis
-            if (ready != null) {
-                GameReviewScreen(
-                    matchLog = matchLog,
-                    analysis = ready,
-                    onNavigateBack = { navController.popBackStack() },
-                )
-            } else {
-                ClubBackground(feltFraction = 0.6f) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                }
-            }
-        }
-        composable<Route.DailyPuzzle> {
-            DailyPuzzleScreen(onNavigateHome = { navController.popBackStack() })
-        }
-        composable<Route.Profile> {
-            ProfileScreen(
-                onBackClicked = { navController.popBackStack() },
-                playerName = settings.playerName,
-                onPlayerNameChanged = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
-                playerNameMaxLength = MAX_PLAYER_NAME,
-                onTrain = { objective -> navController.navigate(Route.Ladder(objective.name)) { launchSingleTop = true } },
-                onReviewMatch = { log ->
-                    navController.navigate(
-                        Route.PostMatch(
-                            matchLog = log.toText(),
-                            level = DifficultyLevel.INTERMEDIO.name,
-                            fundamental = TrainingFundamental.NONE.name,
-                            fromHistory = true,
-                        ),
-                    )
-                },
-            )
-        }
-        composable<Route.Academy> {
-            AcademyScreen(onNavigateHome = { navController.popBackStack() })
-        }
-        composable<Route.Today> {
-            TodayScreen(onNavigateHome = { navController.popBackStack() })
-        }
-        composable<Route.Shop> {
-            ShopScreen(onNavigateHome = { navController.popBackStack() })
-        }
-        composable<Route.Settings> {
-            SettingsScreen(
-                onTriggerTestCrash = { crashReporter.triggerTestCrash() },
-                onStartTestEndgameMatch = {
-                    scope.launch {
-                        val log = shell.prepareTestEndgameMatch()
-                        navController.navigate(
-                            Route.Table(
-                                level = DifficultyLevel.INTERMEDIO.name,
-                                targetScore = log.config.targetScore,
-                                fundamental = TrainingFundamental.NONE.name,
-                                seed = log.seed,
-                                resume = true,
-                            ),
-                        )
-                    }
-                },
-                onNavigateHome = { navController.popBackStack() },
-            )
         }
     }
 

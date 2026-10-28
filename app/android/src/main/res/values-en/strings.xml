@@ -138,6 +138,10 @@
     <string name="settings_crash_title">Stability Diagnostics</string>
     <string name="settings_crash_button">Trigger test crash (Crashlytics)</string>
     <string name="settings_crash_warning">This action will force the app to crash to verify Crashlytics.</string>
+    <string name="settings_effects_volume">Effects volume</string>
+    <string name="settings_volume_percent">%1$d%%</string>
+    <string name="settings_haptics">Vibration</string>
+    <string name="settings_haptics_subtitle">A light buzz on celebrations, like a Scopa.</string>
     <string name="settings_section_audio">Audio</string>
     <string name="settings_section_game">Game</string>
     <string name="settings_section_developer">Developer</string>

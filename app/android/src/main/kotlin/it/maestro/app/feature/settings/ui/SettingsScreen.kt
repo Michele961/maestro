@@ -22,10 +22,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -77,6 +81,9 @@ public fun SettingsScreen(
         onGameSpeedChanged = viewModel::setGameSpeed,
         onMaestroChattinessChanged = viewModel::setMaestroChattiness,
         onShowPointsRaceToggled = viewModel::setShowPointsRace,
+        onEffectsVolumeChange = viewModel::previewEffectsVolume,
+        onEffectsVolumeCommitted = viewModel::commitEffectsVolume,
+        onHapticsToggled = viewModel::setHapticsEnabled,
         onTriggerTestCrash = onTriggerTestCrash,
         onStartTestEndgameMatch = onStartTestEndgameMatch,
         onNavigateHome = onNavigateHome,
@@ -97,6 +104,9 @@ public fun SettingsScreenContent(
     onNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
     showDeveloperTools: Boolean = false,
+    onEffectsVolumeChange: (Int) -> Unit = {},
+    onEffectsVolumeCommitted: (Int) -> Unit = {},
+    onHapticsToggled: (Boolean) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -152,6 +162,22 @@ public fun SettingsScreenContent(
                         onCheckedChange = onSoundToggled,
                         rowTag = "sound_toggle_row",
                         switchTag = "sound_enabled_switch",
+                    )
+                    VolumeRow(
+                        title = stringResource(R.string.settings_effects_volume),
+                        volume = state.effectsVolume,
+                        enabled = state.soundEnabled,
+                        onChange = onEffectsVolumeChange,
+                        onCommitted = onEffectsVolumeCommitted,
+                        tag = "effects_volume_slider",
+                    )
+                    SwitchRow(
+                        title = stringResource(R.string.settings_haptics),
+                        subtitle = stringResource(R.string.settings_haptics_subtitle),
+                        checked = state.hapticsEnabled,
+                        onCheckedChange = onHapticsToggled,
+                        rowTag = "haptics_row",
+                        switchTag = "haptics_switch",
                     )
                 }
                 SettingsSection(title = stringResource(R.string.settings_section_game), testTag = "settings_section_game") {
@@ -251,6 +277,29 @@ private fun SwitchRow(
             Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = SubtitleColor)
         }
         Switch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(switchTag))
+    }
+}
+
+/** Cursore del volume: mentre si trascina vale subito, al rilascio si salva e si fa sentire un suono. */
+@Composable
+private fun VolumeRow(title: String, volume: Int, enabled: Boolean, onChange: (Int) -> Unit, onCommitted: (Int) -> Unit, tag: String) {
+    var dragging by remember(volume) { mutableFloatStateOf(volume.toFloat()) }
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = stringResource(R.string.settings_volume_percent, dragging.toInt()), style = MaterialTheme.typography.bodyMedium, color = SubtitleColor)
+        }
+        Slider(
+            value = dragging,
+            onValueChange = {
+                dragging = it
+                onChange(it.toInt())
+            },
+            onValueChangeFinished = { onCommitted(dragging.toInt()) },
+            valueRange = 0f..100f,
+            enabled = enabled,
+            modifier = Modifier.testTag(tag),
+        )
     }
 }
 

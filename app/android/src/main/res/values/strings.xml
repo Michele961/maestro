@@ -138,6 +138,10 @@
     <string name="settings_crash_title">Diagnostica di stabilità</string>
     <string name="settings_crash_button">Invia crash di test (Crashlytics)</string>
     <string name="settings_crash_warning">Questa azione causerà l\'interruzione immediata dell\'app per verificare Crashlytics.</string>
+    <string name="settings_effects_volume">Volume degli effetti</string>
+    <string name="settings_volume_percent">%1$d%%</string>
+    <string name="settings_haptics">Vibrazione</string>
+    <string name="settings_haptics_subtitle">Un leggero tocco nelle celebrazioni, come la Scopa.</string>
     <string name="settings_section_audio">Audio</string>
     <string name="settings_section_game">Gioco</string>
     <string name="settings_section_developer">Sviluppo</string>
