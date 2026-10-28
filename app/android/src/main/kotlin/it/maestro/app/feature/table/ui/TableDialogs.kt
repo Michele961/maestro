@@ -23,6 +23,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.maestro.app.R
+import it.maestro.app.domain.coach.Chattiness
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.PaddingValues
 import it.maestro.app.designsystem.components.MaestroAlertDialog
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.ParchmentPanel
@@ -95,7 +98,12 @@ internal fun CaptureSelectionDialog(
 
 /** Pausa: riprendi o torna al menu (la partita in corso resta salvata, F1-08). */
 @Composable
-internal fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
+internal fun PauseDialog(
+    onResume: () -> Unit,
+    onNavigateHome: () -> Unit,
+    chattiness: Chattiness = Chattiness.NORMAL,
+    onChattinessChange: (Chattiness) -> Unit = {},
+) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onResume) {
         ParchmentPanel(modifier = Modifier.width(300.dp).testTag("pause_dialog")) {
             Text(
@@ -111,6 +119,26 @@ internal fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 testTag = "pause_resume_button",
             )
+            Text(
+                text = stringResource(id = R.string.settings_maestro_chat),
+                style = MaterialTheme.typography.titleSmall,
+                color = Color(0xFF2B1A10),
+                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Chattiness.entries.forEach { level ->
+                    MaestroPillButton(
+                        text = stringResource(id = level.labelRes()),
+                        onClick = { onChattinessChange(level) },
+                        variant = if (level == chattiness) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
+                        height = 36.dp,
+                        fontSize = 11.sp,
+                        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp),
+                        modifier = Modifier.weight(1f),
+                        testTag = "pause_chat_${level.name.lowercase()}",
+                    )
+                }
+            }
             MaestroPillButton(
                 text = stringResource(id = R.string.game_menu_home),
                 onClick = onNavigateHome,
@@ -120,4 +148,11 @@ internal fun PauseDialog(onResume: () -> Unit, onNavigateHome: () -> Unit) {
             )
         }
     }
+}
+
+private fun Chattiness.labelRes(): Int = when (this) {
+    Chattiness.TALKATIVE -> R.string.settings_maestro_chat_talkative
+    Chattiness.NORMAL -> R.string.settings_maestro_chat_normal
+    Chattiness.QUIET -> R.string.settings_maestro_chat_quiet
+    Chattiness.OFF -> R.string.settings_maestro_chat_off
 }
