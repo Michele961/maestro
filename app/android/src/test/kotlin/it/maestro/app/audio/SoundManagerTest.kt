@@ -1,6 +1,6 @@
 package it.maestro.app.audio
 
-import it.maestro.app.data.local.datastore.AppSettings
+import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test

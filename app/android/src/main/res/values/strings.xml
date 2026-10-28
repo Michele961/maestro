@@ -138,6 +138,11 @@
     <string name="settings_crash_title">Diagnostica di stabilità</string>
     <string name="settings_crash_button">Invia crash di test (Crashlytics)</string>
     <string name="settings_crash_warning">Questa azione causerà l\'interruzione immediata dell\'app per verificare Crashlytics.</string>
+    <string name="settings_section_audio">Audio</string>
+    <string name="settings_section_game">Gioco</string>
+    <string name="settings_section_developer">Sviluppo</string>
+    <string name="settings_game_speed_subtitle">Quanto durano animazioni e pause al tavolo.</string>
+    <string name="settings_maestro_chat_subtitle">Quanto spesso il Maestro commenta da solo durante la partita.</string>
     <string name="settings_close">Chiudi</string>
     <string name="home_settings_button">Impostazioni</string>
     <!-- Home (F1-18): voci decorative con valori fissi finché non esistono le funzioni -->

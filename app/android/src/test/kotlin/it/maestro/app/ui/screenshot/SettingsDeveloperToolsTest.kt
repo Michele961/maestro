@@ -2,7 +2,8 @@ package it.maestro.app.ui.screenshot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import it.maestro.app.feature.settings.ui.SettingsDialog
+import it.maestro.app.feature.settings.presentation.SettingsUiState
+import it.maestro.app.feature.settings.ui.SettingsScreenContent
 import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -19,10 +20,23 @@ class SettingsDeveloperToolsTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    @androidx.compose.runtime.Composable
+    private fun content(showDeveloperTools: Boolean) = SettingsScreenContent(
+        state = SettingsUiState(),
+        onSoundToggled = {},
+        onGameSpeedChanged = {},
+        onMaestroChattinessChanged = {},
+        onShowPointsRaceToggled = {},
+        onTriggerTestCrash = {},
+        onStartTestEndgameMatch = {},
+        onNavigateHome = {},
+        showDeveloperTools = showDeveloperTools,
+    )
+
     @Test
     fun settingsInReleaseHideDeveloperTools() {
         composeRule.setContent {
-            MaestroTheme { SettingsDialog(true, {}, {}, {}, showDeveloperTools = false) }
+            MaestroTheme { content(showDeveloperTools = false) }
         }
         composeRule.onNodeWithTag("sound_enabled_switch").assertExists()
         composeRule.onNodeWithTag("trigger_test_crash_button").assertDoesNotExist()
@@ -32,7 +46,7 @@ class SettingsDeveloperToolsTest {
     @Test
     fun settingsInDebugShowDeveloperTools() {
         composeRule.setContent {
-            MaestroTheme { SettingsDialog(true, {}, {}, {}, showDeveloperTools = true) }
+            MaestroTheme { content(showDeveloperTools = true) }
         }
         composeRule.onNodeWithTag("trigger_test_crash_button").assertExists()
         composeRule.onNodeWithTag("start_test_match_button").assertExists()

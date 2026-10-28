@@ -24,7 +24,7 @@ import it.maestro.app.domain.progress.AchievementRepository
 import it.maestro.app.domain.profile.PlayerTitleRepository
 import it.maestro.app.domain.progress.ExperienceRepository
 import it.maestro.app.domain.retention.RetentionRepository
-import it.maestro.app.data.local.datastore.SettingsRepository
+import it.maestro.app.domain.settings.SettingsRepository
 import it.maestro.app.data.local.db.MaestroDatabase
 import it.maestro.app.data.local.db.MaestroMigrations
 import it.maestro.app.data.local.wallet.RoomWalletRepository
@@ -40,6 +40,7 @@ import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.profile.presentation.ProfileViewModel
+import it.maestro.app.feature.settings.presentation.SettingsViewModel
 import it.maestro.app.feature.shop.presentation.ShopViewModel
 import it.maestro.app.feature.academy.presentation.AcademyViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -215,6 +216,10 @@ public val appModule: Module = module {
             clock = get(),
             gameSpeed = get<SettingsRepository>().settingsFlow.map { it.gameSpeed },
         )
+    }
+
+    viewModel {
+        SettingsViewModel(settingsRepository = get())
     }
 
     viewModel {

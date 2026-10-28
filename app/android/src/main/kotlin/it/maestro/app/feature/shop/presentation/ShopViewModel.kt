@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import it.maestro.app.domain.cosmetics.CosmeticCatalog
 import it.maestro.app.domain.cosmetics.CosmeticCategory
 import it.maestro.app.domain.cosmetics.CosmeticItem
-import it.maestro.app.data.local.datastore.SettingsRepository
+import it.maestro.app.domain.settings.SettingsRepository
 import it.maestro.app.designsystem.audio.SoundEffect
 import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.domain.settings.GameSpeed

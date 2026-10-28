@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import it.maestro.app.feature.table.presentation.GameUiState
-import it.maestro.app.feature.settings.ui.SettingsDialog
 import it.maestro.app.feature.table.ui.TableContent
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.game.model.Card
@@ -76,12 +75,6 @@ class DialogsScreenshotTest(private val screen: ScreenConfig) {
         ),
         primieraSums = mapOf(Seat.P1 to 70, Seat.P2 to 78),
     )
-
-    @Test
-    fun settings_dialog_screenshot() {
-        composeRule.setContent { MaestroTheme { SettingsDialog(true, {}, {}, {}) } }
-        captureScreenRoboImage(screen.path("dialog_settings"))
-    }
 
     @Test
     fun deal_summary_dialog_screenshot() {
