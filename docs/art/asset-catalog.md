@@ -43,6 +43,10 @@ Pulsanti, pannelli, targhette, fumetti e cornici dritte non sono immagini: li di
 | `icon_book_closed` | Riserva (regole / tutorial) | `menu_icons.jpg` |
 | `ornament_top`, `ornament_bottom`, `ornament_corner` | Fregi in ottone sopra i pannelli (l'angolo si ribalta per i 4 lati) | `ornaments.jpg` |
 | `avatar_beginner`, `avatar_expert` | Avversari Principiante ed Esperto | `avatars.jpg` |
+| `opponent_1..5_neutral` | Ritratti degli avversari (Gigi, Nonna Rosa, Tonino, Don Alfonso, Il Maestro) **con cornice in ottone già inclusa** | `opponent_portraits.jpg` |
+| `opponent_1..4_win`, `opponent_1,2,4,5_lose` | Espressioni di vittoria e sconfitta (mancano `opponent_5_win` e `opponent_3_lose`, da rigenerare) | `opponent_win_lose.jpg` |
+| `crest_1..5` | Stemmi degli avversari, dal bronzo semplice all'oro con nastro | `opponent_crests.jpg` |
+| `lock_closed`, `lock_open` | Lucchetto per gli avversari bloccati / appena sbloccati | `opponent_locks.webp` |
 | `avatar_player_default`, `avatar_player_alt` | Avatar del giocatore (due scelte) | `avatars.jpg` |
 | `avatar_friends` | Scheda Amici | `avatars.jpg` |
 | `texture_wood` | Sfondo legno, steso a tutto schermo (non ripetuto) | `texture_wood.jpg` |

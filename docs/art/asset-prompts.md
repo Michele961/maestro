@@ -135,3 +135,17 @@ objects, not touching: 1) a heavy brass padlock, closed, with a small dark wood 
 
 Nomi di file attesi (`docs/art/asset-catalog.md` va aggiornato dal task F1R-18d):
 `opponent_1..5_neutral|win|lose`, `crest_1..5`, `lock_closed`, `lock_open`. Passare i ritagli da `scripts/prepare_assets.py` come per gli altri asset.
+
+### Set 5 bis — Le due espressioni mancanti (fondo verde)
+
+Dal primo giro mancano `opponent_5_win` (il Maestro che vince: il foglio mostrava un ritratto senza cornice, con la pelle verde) e `opponent_3_lose` (Tonino che perde: il foglio ne aveva uno sorridente). Stessa conversazione, ripartendo dai ritratti neutri.
+
+```
+Same style, same circular brass frame, plain flat bright green background (#00FF00), no text.
+Draw 2 separate round portraits, not touching, each inside the complete circular brass frame:
+1) the Maestro (elderly man, short white hair and trimmed beard, dark green vest over a linen shirt)
+   delighted after winning, warm triumphant smile, fist gently raised;
+2) Tonino (man in his 50s, thick moustache, grey shirt with rolled-up sleeves) defeated after losing,
+   rueful smile, one hand on his forehead.
+Keep the skin tones natural and warm (no green tint on the faces).
+```

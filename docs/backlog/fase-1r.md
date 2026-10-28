@@ -239,7 +239,7 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 - **Stato:** da fare (dossier `docs/app/features/pre-game.md` approvato il 2026-10-28; sotto-task 18a–e)
 - **Riferimenti:** decisione D11 (`docs/roadmap.md` §3), `docs/app/features/pre-game.md`, prompt asset in `docs/art/asset-prompts.md` (Set Avversari)
 - **Obiettivo:** cinque avversari con nome, titolo e ritratto in una scala di sfida: si sblocca il successivo battendo il precedente in una partita completa in Classica. Progressi in DataStore; ricompense: titoli (esperienza e obiettivi quando esisteranno), nessuna moneta.
-- **Domande aperte:** nomi e titoli definitivi (proposte nel prompt degli asset); asset di Michele per F1R-18d.
+- **Domande aperte:** nomi e titoli definitivi (proposte nel prompt degli asset); asset di Michele per F1R-18d: **consegnati il 2026-10-28** (ritratti neutri, vittoria/sconfitta, stemmi, lucchetti, in `res/drawable-nodpi`; i ritratti hanno la cornice in ottone già inclusa) tranne `opponent_5_win` e `opponent_3_lose`, da rigenerare (prompt in `docs/art/asset-prompts.md`, Set 5 bis).
 
 ## F1R-19 — Home senza voci finte
 
