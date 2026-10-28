@@ -23,6 +23,9 @@ import it.maestro.app.domain.time.FakeClock
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.training.TrainingFundamental
+import it.maestro.app.data.local.datastore.InMemoryExperienceRepository
+import it.maestro.app.domain.progress.Experience
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import java.time.LocalDate
 import kotlin.test.Test
@@ -238,5 +241,66 @@ class RewardEngineTest {
         val again = assertNotNull(finish(log, TrainingFundamental.NONE).ladderVictory)
         assertFalse(again.firstTime)
         assertEquals(null, again.newlyUnlocked)
+    }
+
+    // --- F1R-29d: esperienza ---
+
+    private val xp = InMemoryExperienceRepository()
+    private val xpEngine = RewardEngine(wallet, retention, mastery, FakeClock(today), opponents = InMemoryOpponentRepository(), experience = xp)
+
+    private suspend fun xpPoints() = xp.observePoints().first()
+
+    @Test
+    fun theFirstWinOverAnOpponentGivesExperienceOnlyOnce() = runTest {
+        val log = finishedMatch(Seat.P1)
+        val first = xpEngine.onMatchFinished(log, analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        assertEquals(Experience.ladderFirstWin(Opponent.GIGI), first.experienceGained)
+        assertEquals(100, xpPoints())
+
+        val again = xpEngine.onMatchFinished(log, analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        assertEquals(0, again.experienceGained)
+        assertEquals(100, xpPoints())
+    }
+
+    @Test
+    fun aLossOrSparringGivesNoExperience() = runTest {
+        xpEngine.onMatchFinished(finishedMatch(Seat.P2), analysis(90, 0), Seat.P1, null, TrainingFundamental.NONE, Opponent.GIGI)
+        xpEngine.onMatchFinished(finishedMatch(Seat.P1), analysis(90, 0), Seat.P1, null, TrainingFundamental.SEVENS_COUNT, Opponent.GIGI)
+        assertEquals(0, xpPoints())
+    }
+
+    @Test
+    fun solvingAPuzzleTierGivesItsExperienceOncePerTier() = runTest {
+        val date = LocalDate.of(2026, 10, 26)
+        assertEquals(10, xpEngine.onPuzzleSolved(date, tierIndex = 0, tierCredits = 15).experienceGained)
+        assertEquals(0, xpEngine.onPuzzleSolved(date, tierIndex = 0, tierCredits = 15).experienceGained)
+        assertEquals(15, xpEngine.onPuzzleSolved(date, tierIndex = 1, tierCredits = 20).experienceGained)
+        assertEquals(25, xpPoints())
+    }
+
+    @Test
+    fun claimingAMissionGivesTenAndTheThirdClaimAddsTheThreeOfThreeBonus() = runTest {
+        retention.getDailyMissions(today).missions.forEach { retention.updateMissionProgress(today, it.type, it.target) }
+        val gained = retention.getDailyMissions(today).missions.map { mission ->
+            val current = retention.getDailyMissions(today).missions.first { it.id == mission.id }
+            xpEngine.claimMission(current).experienceGained
+        }
+        assertEquals(listOf(10, 10, 10 + Experience.ALL_MISSIONS_CLAIMED), gained)
+        assertEquals(10 + 10 + 10 + Experience.ALL_MISSIONS_CLAIMED, xpPoints())
+    }
+
+    @Test
+    fun claimingTheSameMissionTwiceGivesExperienceOnce() = runTest {
+        retention.getDailyMissions(today).missions.first().let { retention.updateMissionProgress(today, it.type, it.target) }
+        val mission = retention.getDailyMissions(today).missions.first()
+        xpEngine.claimMission(mission)
+        assertEquals(0, xpEngine.claimMission(retention.getDailyMissions(today).missions.first()).experienceGained)
+        assertEquals(10, xpPoints())
+    }
+
+    @Test
+    fun withoutAnExperienceRepositoryNothingIsGiven() = runTest {
+        val summary = engine.onPuzzleSolved(LocalDate.of(2026, 10, 26), tierIndex = 0, tierCredits = 15)
+        assertEquals(0, summary.experienceGained)
     }
 }

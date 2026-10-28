@@ -10,6 +10,8 @@ import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
+import it.maestro.app.domain.progress.Experience
+import it.maestro.app.domain.progress.ExperienceRepository
 import it.maestro.app.domain.retention.MatchMissionStatsExtractor
 import it.maestro.app.domain.retention.missionIncrement
 import it.maestro.app.domain.retention.weakestMissionFocus
@@ -47,6 +49,7 @@ public data class MissionAdvance(
  * @property streakAfter giorni di streak dopo l'evento.
  * @property masteryBefore Indice di Maestria prima dell'evento, se l'evento lo cambia.
  * @property masteryAfter Indice di Maestria dopo l'evento.
+ * @property experienceGained punti esperienza dati dall'evento (0 se nessuno).
  * @property freezeTokenEarned l'evento ha completato 7 giorni di serie e ricaricato un Gettone Riposo.
  * @property ladderVictory vittoria sulla scala degli avversari registrata dall'evento (solo partita completa in Classica).
  */
@@ -59,6 +62,7 @@ public data class RewardSummary(
     val masteryAfter: Int? = null,
     val ladderVictory: LadderVictory? = null,
     val freezeTokenEarned: Boolean = false,
+    val experienceGained: Int = 0,
 ) {
     /** Variazione dell'Indice di Maestria, se l'evento lo tocca. */
     val masteryDelta: Int? get() = if (masteryBefore != null && masteryAfter != null) masteryAfter - masteryBefore else null
@@ -76,6 +80,7 @@ public class RewardEngine(
     private val mastery: MasteryRepository,
     private val clock: Clock,
     private val opponents: OpponentRepository? = null,
+    private val experience: ExperienceRepository? = null,
 ) {
 
     /**
@@ -143,6 +148,8 @@ public class RewardEngine(
             masteryAfter = masteryAfter.cognitiveElo,
             ladderVictory = ladderVictory,
             freezeTokenEarned = streakAfter.freezeTokens > streakBefore.freezeTokens,
+            experienceGained = ladderVictory?.takeIf { it.firstTime }
+                ?.let { addExperience(Experience.ladderFirstWin(it.defeated)) } ?: 0,
         )
     }
 
@@ -165,6 +172,7 @@ public class RewardEngine(
             streakBefore = streakBefore.currentStreak,
             streakAfter = streakAfter.currentStreak,
             freezeTokenEarned = streakAfter.freezeTokens > streakBefore.freezeTokens,
+            experienceGained = if (credited > 0) addExperience(Experience.puzzleTier(tierIndex)) else 0,
         )
     }
 
@@ -178,12 +186,16 @@ public class RewardEngine(
     public suspend fun claimMission(mission: DailyMission): RewardSummary {
         if (!mission.isCompleted || mission.isClaimed) return RewardSummary()
         if (!retention.claimMissionReward(clock.today(), mission.type)) return RewardSummary()
+        val allClaimed = retention.getDailyMissions(clock.today()).missions.all { it.isClaimed }
         return RewardSummary(
             creditsEarned = credit(
                 mission.type.rewardCredits,
                 TransactionReason.DAILY_MISSION_REWARD,
                 mission.id,
                 "Ricompensa missione: ${mission.id}",
+            ),
+            experienceGained = addExperience(
+                Experience.MISSION_CLAIMED + if (allClaimed) Experience.ALL_MISSIONS_CLAIMED else 0,
             ),
         )
     }
@@ -194,6 +206,12 @@ public class RewardEngine(
     /** Segna il giorno come giocato (streak) senza altri effetti: apertura della sfida, ritorno in app. */
     public suspend fun recordActivity() {
         retention.recordGameActivity(clock.today())
+    }
+
+    /** Aggiunge [points] all'esperienza (se il motore ne ha una) e li restituisce. */
+    private suspend fun addExperience(points: Int): Int {
+        experience?.add(points) ?: return 0
+        return points
     }
 
     private suspend fun credit(amount: Int, reason: TransactionReason, referenceId: String, description: String): Int =
