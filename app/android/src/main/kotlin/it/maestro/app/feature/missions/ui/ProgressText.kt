@@ -26,6 +26,8 @@ internal val AchievementId.nameRes: Int
         AchievementId.FIRST_SPARRING -> R.string.achievement_first_sparring_name
         AchievementId.PUZZLE_FULL_DAY -> R.string.achievement_puzzle_full_day_name
         AchievementId.PUZZLE_WEEK -> R.string.achievement_puzzle_week_name
+        AchievementId.STUDENT -> R.string.achievement_student_name
+        AchievementId.ACADEMY_COMPLETE -> R.string.achievement_academy_complete_name
     }
 
 /** Riga che dice come si ottiene l'obiettivo. */
@@ -49,6 +51,8 @@ internal val AchievementId.descriptionRes: Int
         AchievementId.FIRST_SPARRING -> R.string.achievement_first_sparring_desc
         AchievementId.PUZZLE_FULL_DAY -> R.string.achievement_puzzle_full_day_desc
         AchievementId.PUZZLE_WEEK -> R.string.achievement_puzzle_week_desc
+        AchievementId.STUDENT -> R.string.achievement_student_desc
+        AchievementId.ACADEMY_COMPLETE -> R.string.achievement_academy_complete_desc
     }
 
 private val levelNameRes = intArrayOf(

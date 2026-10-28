@@ -221,6 +221,20 @@ public class RewardEngine(
             creditsEarned = credit(LESSON_CREDITS, TransactionReason.ACADEMY_LESSON_REWARD, lessonId, "Lezione Accademia superata"),
         )
 
+    /**
+     * Capitolo dell'Accademia finito: [Experience.CHAPTER_DONE] punti e gli obiettivi «Studente» e, se era
+     * l'ultimo capitolo ([academyComplete]), «Allievo del Maestro». Il chiamante lo invoca solo nel momento in
+     * cui l'ultima lezione mancante del capitolo viene completata; il titolo del capitolo si deriva dalle
+     * lezioni completate e non si salva.
+     */
+    public suspend fun onChapterCompleted(academyComplete: Boolean): RewardSummary =
+        RewardSummary(
+            experienceGained = addExperience(Experience.CHAPTER_DONE),
+            achievementsUnlocked = unlockAchievements(
+                AchievementFacts(chapterCompleted = true, academyComplete = academyComplete),
+            ),
+        )
+
     /** Riscuote la ricompensa di una missione completata; non fa nulla se è già stata riscossa. */
     public suspend fun claimMission(mission: DailyMission): RewardSummary {
         if (!mission.isCompleted || mission.isClaimed) return RewardSummary()

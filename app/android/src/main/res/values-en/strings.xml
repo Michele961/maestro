@@ -281,6 +281,11 @@
     <string name="academy_chapter_number">Chapter %1$d</string>
     <string name="academy_chapter_recommended">★ Recommended by the Maestro</string>
     <string name="academy_chapter_progress">%1$d/%2$d Lessons</string>
+    <string name="academy_ch1_rank">Circle Pupil</string>
+    <string name="academy_ch2_rank">Primiera Hunter</string>
+    <string name="academy_ch3_rank">Keeper of the Table</string>
+    <string name="academy_ch4_rank">Eye of the Maestro</string>
+    <string name="academy_chapter_rank">Title: %1$s</string>
     <string name="academy_chapter_completed">CHAPTER COMPLETED</string>
     <string name="academy_lesson_number">Lesson %1$d.%2$d</string>
     <string name="academy_lesson_locked">Complete the previous lesson to unlock</string>
@@ -849,6 +854,10 @@
     <string name="achievement_puzzle_full_day_desc">Solve all three levels of the Daily Challenge on the same day.</string>
     <string name="achievement_puzzle_week_name">Challenge week</string>
     <string name="achievement_puzzle_week_desc">Solve seven Daily Challenges.</string>
+    <string name="achievement_student_name">Student</string>
+    <string name="achievement_student_desc">Finish the first chapter of the Academy.</string>
+    <string name="achievement_academy_complete_name">The Maestro\'s Pupil</string>
+    <string name="achievement_academy_complete_desc">Finish the whole Academy.</string>
 
     <!-- F1R-29f: Today screen -->
     <string name="today_title">Today</string>

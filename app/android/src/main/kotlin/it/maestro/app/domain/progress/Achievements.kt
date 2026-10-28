@@ -30,6 +30,8 @@ public enum class AchievementId(public val id: String) {
     FIRST_SPARRING("first_sparring"),
     PUZZLE_FULL_DAY("puzzle_full_day"),
     PUZZLE_WEEK("puzzle_week"),
+    STUDENT("student"),
+    ACADEMY_COMPLETE("academy_complete"),
     ;
 
     public companion object {
@@ -61,6 +63,8 @@ public enum class AchievementCounter { SWEEPS, PUZZLES_SOLVED }
  * @property sparringPlayed la partita era di Sparring.
  * @property puzzleFullDay l'evento ha chiuso il terzo livello della Sfida del Giorno.
  * @property puzzlesSolved sfide del giorno risolte finora.
+ * @property chapterCompleted l'evento ha chiuso un capitolo dell'Accademia.
+ * @property academyComplete l'evento ha chiuso l'ultimo capitolo mancante: tutta l'Accademia è fatta.
  */
 public data class AchievementFacts(
     val winOverOpponent: Opponent? = null,
@@ -73,6 +77,8 @@ public data class AchievementFacts(
     val sparringPlayed: Boolean = false,
     val puzzleFullDay: Boolean = false,
     val puzzlesSolved: Int = 0,
+    val chapterCompleted: Boolean = false,
+    val academyComplete: Boolean = false,
 )
 
 /** Soglie degli obiettivi a conteggio. */
@@ -98,6 +104,8 @@ public fun achievementsFor(facts: AchievementFacts): Set<AchievementId> = buildS
     if (facts.streak >= MONTH_DAYS) add(AchievementId.STREAK_30)
     if (facts.sparringPlayed) add(AchievementId.FIRST_SPARRING)
     if (facts.puzzleFullDay) add(AchievementId.PUZZLE_FULL_DAY)
+    if (facts.chapterCompleted) add(AchievementId.STUDENT)
+    if (facts.academyComplete) add(AchievementId.ACADEMY_COMPLETE)
     if (facts.puzzlesSolved >= PUZZLE_WEEK_THRESHOLD) add(AchievementId.PUZZLE_WEEK)
 }
 

@@ -23,6 +23,7 @@ public object AcademyContent {
             descriptionRes = R.string.academy_ch1_desc,
             iconRes = R.drawable.icon_book_quill,
             badgeRes = R.drawable.badge_best,
+            rankTitleRes = R.string.academy_ch1_rank,
             lessons = listOf(
                 // 1.1: La Presa Singola
                 AcademyLesson(
@@ -246,6 +247,7 @@ public object AcademyContent {
             descriptionRes = R.string.academy_ch2_desc,
             iconRes = R.drawable.icon_shield_fleur,
             badgeRes = R.drawable.badge_best,
+            rankTitleRes = R.string.academy_ch2_rank,
             lessons = listOf(
                 // 2.1: Il Paradosso del Re
                 AcademyLesson(
@@ -466,6 +468,7 @@ public object AcademyContent {
             descriptionRes = R.string.academy_ch3_desc,
             iconRes = R.drawable.icon_book_closed,
             badgeRes = R.drawable.badge_best,
+            rankTitleRes = R.string.academy_ch3_rank,
             lessons = listOf(
                 // 3.1: La Soglia del Dieci
                 AcademyLesson(
@@ -681,6 +684,7 @@ public object AcademyContent {
             descriptionRes = R.string.academy_ch4_desc,
             iconRes = R.drawable.icon_trophy,
             badgeRes = R.drawable.badge_best,
+            rankTitleRes = R.string.academy_ch4_rank,
             lessons = listOf(
                 // 4.1: La Memoria dei Sette
                 AcademyLesson(

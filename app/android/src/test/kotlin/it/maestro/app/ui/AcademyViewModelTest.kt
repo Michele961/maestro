@@ -260,4 +260,34 @@ class AcademyViewModelTest {
         advanceUntilIdle()
         assertFalse(next.uiState.value.chapters[0].lessons[0].isReviewedToday)
     }
+
+    @Test
+    fun finishingTheLastLessonOfAChapterGivesChapterPxOnlyOnce() = runTest {
+        val clock = FakeClock(java.time.LocalDate.of(2026, 10, 28))
+        val chapterOne = AcademyContent.CHAPTERS.first().lessons.map { it.id }
+        val last = chapterOne.last()
+        val repo = InMemoryAcademyRepository(initialCompleted = chapterOne.dropLast(1).toSet(), clock = clock)
+        val xp = it.maestro.app.data.local.datastore.InMemoryExperienceRepository()
+        val viewModel = AcademyViewModel(
+            academyRepository = repo,
+            rewardEngine = RewardEngine(InMemoryWalletRepository(), InMemoryRetentionRepository(), InMemoryMasteryRepository(), clock, experience = xp),
+            clock = clock,
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+
+        repeat(2) { // la seconda volta è un rigioco: il capitolo era già finito
+            viewModel.openLesson(last)
+            advanceUntilIdle()
+            while (viewModel.uiState.value.viewMode is AcademyViewMode.Lesson) {
+                val mode = viewModel.uiState.value.viewMode as AcademyViewMode.Lesson
+                mode.currentStep.options.firstOrNull { it.isCorrect }?.let { viewModel.selectOption(it.id) }
+                mode.currentStep.targetCard?.let { viewModel.playCard(it) }
+                viewModel.nextStep()
+                advanceUntilIdle()
+            }
+        }
+
+        assertEquals(it.maestro.app.domain.progress.Experience.CHAPTER_DONE, xp.observePoints().first())
+    }
 }
