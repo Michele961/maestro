@@ -211,6 +211,7 @@ public val appModule: Module = module {
             rewardEngine = get(),
             masteryRepository = get(),
             clock = get(),
+            gameSpeed = get<SettingsRepository>().settingsFlow.map { it.gameSpeed },
         )
     }
 
