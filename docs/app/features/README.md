@@ -22,7 +22,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 5 | Pre-partita e avversari | `pre-game.md` | D11 | approvato (2026-10-28) |
 | 6 | Home | `home.md` (bozza) | F1R-04 | da fare |
 | 7 | Sfida del giorno | `daily-puzzle.md` (bozza) | F1R-02, F1R-10 | da approvare |
-| 8 | Accademia | `academy.md` | F1R-10, F1R-21 | da fare |
+| 8 | Accademia | `academy.md` (bozza) | F1R-10, F1R-21 | da approvare |
 | 9 | Profilo, Maestria e Radar | `profile.md` (bozza) | F1R-14 | da approvare |
 | 10 | Missioni e streak | `missions.md` | F1R-14 | da fare |
 | 11 | Bottega e wallet | `shop.md` | F1R-03, F1R-14 | da fare |
