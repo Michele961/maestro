@@ -108,6 +108,20 @@ class WalletRepositoryTest {
     }
 
     @Test
+    fun room_spendCreditsWithSameReferenceChargesOnlyOnce() = runBlocking {
+        roomRepository.addCredits(amount = 100, reason = TransactionReason.WELCOME_BONUS)
+
+        val first = roomRepository.spendCredits(40, TransactionReason.COSMETIC_PURCHASE, referenceId = "felt_royal_red")
+        val second = roomRepository.spendCredits(40, TransactionReason.COSMETIC_PURCHASE, referenceId = "felt_royal_red")
+        val other = roomRepository.spendCredits(10, TransactionReason.COSMETIC_PURCHASE, referenceId = "back_vintage_red")
+
+        assertIs<WalletOperationResult.Success>(first)
+        assertIs<WalletOperationResult.AlreadyClaimed>(second)
+        assertIs<WalletOperationResult.Success>(other)
+        assertEquals(50, roomRepository.getBalance(), "Il secondo addebito con lo stesso riferimento non scala il saldo")
+    }
+
+    @Test
     fun room_spendCreditsWithSufficientFundsSucceeds() = runBlocking {
         roomRepository.addCredits(amount = 50, reason = TransactionReason.WELCOME_BONUS)
         assertEquals(50, roomRepository.getBalance())
@@ -178,8 +192,16 @@ class WalletRepositoryTest {
         assertIs<WalletOperationResult.Success>(spendOk)
         assertEquals(40, repository.getBalance())
 
+        val chargedTwice = listOf(
+            repository.spendCredits(5, TransactionReason.HINT_PURCHASE, referenceId = "hint_1"),
+            repository.spendCredits(5, TransactionReason.HINT_PURCHASE, referenceId = "hint_1"),
+        )
+        assertIs<WalletOperationResult.Success>(chargedTwice[0])
+        assertIs<WalletOperationResult.AlreadyClaimed>(chargedTwice[1])
+        assertEquals(35, repository.getBalance())
+
         val spendTooMuch = repository.spendCredits(100, TransactionReason.COSMETIC_PURCHASE)
         assertIs<WalletOperationResult.InsufficientFunds>(spendTooMuch)
-        assertEquals(40, repository.getBalance())
+        assertEquals(35, repository.getBalance())
     }
 }
