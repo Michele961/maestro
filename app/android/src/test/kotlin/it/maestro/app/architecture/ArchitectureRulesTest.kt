@@ -23,7 +23,6 @@ class ArchitectureRulesTest {
         // Layer: la presentazione parla con i repository solo tramite interfacce del dominio.
         // Restano i cataloghi di contenuto con risorse (cosmetici, Accademia, sfida): li sposta la revisione della loro feature.
         ex("feature/shop/presentation/ShopViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
-        ex("feature/shop/ui/ShopScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/puzzle/presentation/DailyPuzzleViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/puzzle/ui/DailyPuzzleScreen.kt", Rule.UI_IMPORTS_DATA) to "F1R-23",
         ex("feature/academy/presentation/AcademyViewModel.kt", Rule.UI_IMPORTS_DATA) to "F1R-21",

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.audio.NoOpSoundManager
 import it.maestro.app.designsystem.audio.SoundEffect
 import it.maestro.app.designsystem.audio.SoundManager
@@ -182,22 +183,15 @@ public fun TableContent(
     }
 
     val context = LocalContext.current
+    val tableStyle = remember(tableThemeId) { CosmeticStyle.tableStyle(tableThemeId) }
     val tableFeltResId = remember(tableThemeId) {
-        if (tableThemeId == "felt_walnut_wood") {
-            R.drawable.texture_wood
-        } else {
+        tableStyle.feltDrawableRes ?: run {
             val id = context.resources.getIdentifier("table_felt_bg", "drawable", context.packageName)
             if (id != 0) id else null
         }
     }
-    val feltTint = remember(tableThemeId) {
-        when (tableThemeId) {
-            "felt_royal_red" -> Color(0xFFE57373)
-            "felt_noble_blue" -> Color(0xFF64B5F6)
-            else -> null
-        }
-    }
-    val feltBrush = remember(tableThemeId) { feltBrushFor(tableThemeId) }
+    val feltTint = tableStyle.feltTint
+    val feltBrush = tableStyle.background
     val model = remember(scene) { StageModel.from(scene) }
 
     CompositionLocalProvider(LocalCardBackTheme provides cardBackThemeId) {
@@ -314,9 +308,3 @@ public fun TableContent(
     }
 }
 
-private fun feltBrushFor(tableThemeId: String): Brush = when (tableThemeId) {
-    "felt_royal_red" -> Brush.radialGradient(listOf(Color(0xFF8B1E2B), Color(0xFF5E121C), Color(0xFF38080F), Color(0xFF1E0307)))
-    "felt_noble_blue" -> Brush.radialGradient(listOf(Color(0xFF1F487E), Color(0xFF14325C), Color(0xFF0C1F3B), Color(0xFF06101F)))
-    "felt_walnut_wood" -> Brush.radialGradient(listOf(Color(0xFF4A2810), Color(0xFF331808), Color(0xFF220E04), Color(0xFF120702)))
-    else -> Brush.radialGradient(listOf(Color(0xFF225740), Color(0xFF1B4332), Color(0xFF0D281E), Color(0xFF081C15)))
-}

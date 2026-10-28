@@ -1,7 +1,7 @@
 package it.maestro.app.ui
 
-import it.maestro.app.data.local.cosmetics.CosmeticCatalog
-import it.maestro.app.data.local.cosmetics.CosmeticCategory
+import it.maestro.app.domain.cosmetics.CosmeticCatalog
+import it.maestro.app.domain.cosmetics.CosmeticCategory
 import it.maestro.app.data.local.datastore.AppSettings
 import it.maestro.app.data.local.datastore.InMemorySettingsRepository
 import it.maestro.app.data.local.wallet.InMemoryWalletRepository

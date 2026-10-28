@@ -2,9 +2,9 @@ package it.maestro.app.feature.shop.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.maestro.app.data.local.cosmetics.CosmeticCatalog
-import it.maestro.app.data.local.cosmetics.CosmeticCategory
-import it.maestro.app.data.local.cosmetics.CosmeticItem
+import it.maestro.app.domain.cosmetics.CosmeticCatalog
+import it.maestro.app.domain.cosmetics.CosmeticCategory
+import it.maestro.app.domain.cosmetics.CosmeticItem
 import it.maestro.app.data.local.datastore.SettingsRepository
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletOperationResult
