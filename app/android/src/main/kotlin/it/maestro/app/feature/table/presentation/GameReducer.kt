@@ -222,25 +222,34 @@ public object GameReducer {
         intent: GameIntent.AnswerTrainingQuestion,
     ): GameReducerResult {
         val question = state.activeTrainingQuestion ?: return GameReducerResult(state)
+        val previous = state.trainingQuestionFeedback
+        val isRetry = previous?.retryAvailable == true
+        if (previous != null && !isRetry) return GameReducerResult(state)
+        if (previous != null && intent.selectedIndex in previous.triedIndexes) return GameReducerResult(state)
         val isCorrect = intent.selectedIndex == question.correctIndex
+        // Dopo un errore su un conteggio il Maestro dà un indizio e lascia riprovare; sulle altre domande (due sole
+        // scelte rimaste) riprovare sarebbe tirare a indovinare, quindi dà subito la risposta.
+        val hintFirst = !isRetry && !isCorrect && question.fundamental in HINT_FIRST_FUNDAMENTALS
         val feedback = TrainingAnswerFeedback(
             selectedIndex = intent.selectedIndex,
             isCorrect = isCorrect,
             correctIndex = question.correctIndex,
             explanationValues = question.explanationValues,
+            retryAvailable = hintFirst,
+            triedIndexes = previous?.triedIndexes.orEmpty() + intent.selectedIndex,
         )
-        val result = TrainingCheckResult(
-            fundamental = question.fundamental,
-            question = question,
-            selectedIndex = intent.selectedIndex,
-            isCorrect = isCorrect,
-        )
-        return GameReducerResult(
-            state = state.copy(
-                trainingQuestionFeedback = feedback,
-                trainingResults = state.trainingResults + result,
-            ),
-        )
+        // Il punteggio di attenzione conta solo il primo tentativo.
+        val results = if (isRetry) {
+            state.trainingResults
+        } else {
+            state.trainingResults + TrainingCheckResult(
+                fundamental = question.fundamental,
+                question = question,
+                selectedIndex = intent.selectedIndex,
+                isCorrect = isCorrect,
+            )
+        }
+        return GameReducerResult(state = state.copy(trainingQuestionFeedback = feedback, trainingResults = results))
     }
 
     private fun handleRequestBotMove(state: GameInternalState): GameReducerResult {
@@ -374,3 +383,6 @@ public object GameReducer {
         }
     }
 }
+
+/** Check a conteggio: sbagliando il Maestro dà prima un indizio (`docs/app/features/coach-in-game.md` §6). */
+private val HINT_FIRST_FUNDAMENTALS = setOf(TrainingFundamental.SEVENS_COUNT, TrainingFundamental.DENARI_COUNT)

@@ -125,8 +125,15 @@
     <string name="training_option_settebello_by_me">Preso da te</string>
     <string name="training_option_settebello_by_opp">Preso dal rivale</string>
     <string name="training_option_settebello_in_play">Ancora in gioco</string>
-    <string name="training_feedback_correct">Risposta corretta! Ottima attenzione.</string>
+    <string name="training_feedback_correct">Esatto! Occhio da Maestro.</string>
+    <string name="training_feedback_correct_retry">Ora sì! Con l\'indizio ci sei arrivato.</string>
     <string name="training_feedback_wrong_answer">Non proprio: era «%1$s».</string>
+    <string name="training_hint_sevens">Guarda bene: conta i Sette a terra e in tutte le prese. In totale sono quattro. Riprova!</string>
+    <string name="training_hint_denari">Ricorda: i Denari sono dieci in tutto. Conta quelli a terra e nelle prese. Riprova!</string>
+    <string name="training_explain_count">Conta le carte a terra e le prese di tutti e due.</string>
+    <string name="training_explain_primiera">Primiera parziale: tu %1$d, avversario %2$d.</string>
+    <string name="training_explain_cards">Carte prese: tu %1$d, avversario %2$d.</string>
+    <string name="training_explain_settebello">Il Settebello vale un punto da solo: tienilo d\'occhio.</string>
     <string name="training_feedback_continue">Continua la partita</string>
     <string name="training_score_label">Punteggio di attenzione: %1$d%% (%2$d/%3$d corretti)</string>
     <string name="maestro_avatar_description">Avatar del Maestro</string>

@@ -125,8 +125,15 @@
     <string name="training_option_settebello_by_me">You took it</string>
     <string name="training_option_settebello_by_opp">Rival took it</string>
     <string name="training_option_settebello_in_play">Still in play</string>
-    <string name="training_feedback_correct">Correct answer! Great attention.</string>
+    <string name="training_feedback_correct">Exactly! A Maestro\'s eye.</string>
+    <string name="training_feedback_correct_retry">Now you\'ve got it! The hint did the trick.</string>
     <string name="training_feedback_wrong_answer">Not quite: it was “%1$s”.</string>
+    <string name="training_hint_sevens">Look closely: count the Sevens on the table and in every pile. There are four in all. Try again!</string>
+    <string name="training_hint_denari">Remember: there are ten Denari in all. Count those on the table and in the piles. Try again!</string>
+    <string name="training_explain_count">Count the cards on the table and both players\' piles.</string>
+    <string name="training_explain_primiera">Partial primiera: you %1$d, opponent %2$d.</string>
+    <string name="training_explain_cards">Cards taken: you %1$d, opponent %2$d.</string>
+    <string name="training_explain_settebello">The Settebello is worth a point by itself: keep an eye on it.</string>
     <string name="training_feedback_continue">Continue match</string>
     <string name="training_score_label">Attention score: %1$d%% (%2$d/%3$d correct)</string>
     <string name="maestro_avatar_description">Maestro Avatar</string>

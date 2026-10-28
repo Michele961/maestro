@@ -190,4 +190,69 @@ class TrainingChecksUiTest {
         val percent = (correctCount * 100) / totalCount
         assertEquals(50, percent)
     }
+
+    private fun stateWith(question: TrainingQuestion) = GameReducer.initial(
+        GameIntent.StartMatch(seed = 42L, humanSeat = Seat.P1, trainingFundamental = question.fundamental),
+    ).state.copy(activeTrainingQuestion = question)
+
+    private val sevensQuestion = TrainingQuestion(
+        fundamental = TrainingFundamental.SEVENS_COUNT,
+        options = listOf(0, 1, 2, 3).map { TrainingOption.IntCount(it) },
+        correctIndex = 2,
+        explanationValues = listOf(2),
+    )
+
+    @Test
+    fun wrongCountAnswerGivesAHintAndAllowsASecondTry() {
+        val first = GameReducer.reduce(stateWith(sevensQuestion), GameIntent.AnswerTrainingQuestion(0)).state
+
+        val hint = assertNotNull(first.trainingQuestionFeedback)
+        assertTrue(hint.retryAvailable)
+        assertEquals(setOf(0), hint.triedIndexes)
+        assertNotNull(first.activeTrainingQuestion)
+        assertFalse(first.trainingResults.single().isCorrect)
+
+        val second = GameReducer.reduce(first, GameIntent.AnswerTrainingQuestion(2)).state
+        val done = assertNotNull(second.trainingQuestionFeedback)
+        assertTrue(done.isCorrect)
+        assertFalse(done.retryAvailable)
+        assertEquals(setOf(0, 2), done.triedIndexes)
+        // Il punteggio di attenzione resta quello del primo tentativo.
+        assertEquals(1, second.trainingResults.size)
+        assertFalse(second.trainingResults.single().isCorrect)
+    }
+
+    @Test
+    fun secondWrongAnswerEndsTheCheckWithoutAnotherHint() {
+        val first = GameReducer.reduce(stateWith(sevensQuestion), GameIntent.AnswerTrainingQuestion(0)).state
+        val second = GameReducer.reduce(first, GameIntent.AnswerTrainingQuestion(3)).state
+
+        val done = assertNotNull(second.trainingQuestionFeedback)
+        assertFalse(done.isCorrect)
+        assertFalse(done.retryAvailable)
+        assertEquals(1, second.trainingResults.size)
+    }
+
+    @Test
+    fun anAnswerAlreadyTriedIsIgnoredDuringTheSecondTry() {
+        val first = GameReducer.reduce(stateWith(sevensQuestion), GameIntent.AnswerTrainingQuestion(0)).state
+        val again = GameReducer.reduce(first, GameIntent.AnswerTrainingQuestion(0)).state
+
+        assertEquals(first.trainingQuestionFeedback, again.trainingQuestionFeedback)
+    }
+
+    @Test
+    fun wrongAnswerOnALeadQuestionGivesTheAnswerAtOnce() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.CARDS_LEAD,
+            options = listOf(SeatLead.HUMAN, SeatLead.TIE, SeatLead.OPPONENT).map { TrainingOption.Lead(it) },
+            correctIndex = 0,
+            explanationValues = listOf(12, 8),
+        )
+        val state = GameReducer.reduce(stateWith(question), GameIntent.AnswerTrainingQuestion(2)).state
+
+        val feedback = assertNotNull(state.trainingQuestionFeedback)
+        assertFalse(feedback.isCorrect)
+        assertFalse(feedback.retryAvailable)
+    }
 }
