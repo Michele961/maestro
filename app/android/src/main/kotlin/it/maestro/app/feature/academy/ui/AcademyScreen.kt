@@ -12,6 +12,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.DpOffset
+import it.maestro.app.designsystem.motion.MotionSpec
+import it.maestro.app.designsystem.motion.MotionToken
+import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.feature.table.ui.MovingCard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -111,6 +122,7 @@ public fun AcademyScreen(
                 onNextStep = { viewModel.nextStep() },
                 onBackToMap = { viewModel.backToMap() },
                 modifier = modifier,
+                speed = uiState.speed,
             )
         }
     }
@@ -572,6 +584,7 @@ public fun AcademyLessonContent(
     onNextStep: () -> Unit,
     onBackToMap: () -> Unit,
     modifier: Modifier = Modifier,
+    speed: GameSpeed = GameSpeed.NORMAL,
 ) {
     val step = lesson.currentStep
     val isSummary = step.type == AcademyStepType.SUMMARY_AND_BADGE
@@ -625,7 +638,7 @@ public fun AcademyLessonContent(
             ) {
                 if (!isSummary) {
                     // Tavolo con feltro e carte a terra
-                    LessonTableArea(step = step)
+                    LessonTableArea(step = step, speed = speed)
 
                     // Area di interazione specifica per tipo di step
                     when (step.type) {
@@ -816,6 +829,7 @@ private fun LessonCoachArea(
 @Composable
 private fun LessonTableArea(
     step: AcademyStep,
+    speed: GameSpeed,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -852,19 +866,28 @@ private fun LessonTableArea(
                 }
             }
 
-            // Carte disposte sul tavolo
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                step.tableCards.forEach { card ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
+            // Carte disposte sul tavolo: arrivano una alla volta con i tempi di MotionSpec (come al tavolo vero)
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val count = step.tableCards.size.coerceAtLeast(1)
+                val cardWidth = minOf(62.dp, (maxWidth - CARD_GAP * (count - 1)) / count)
+                val cardHeight = cardWidth * 92 / 62
+                val rowWidth = cardWidth * count + CARD_GAP * (count - 1)
+                val startX = (maxWidth - rowWidth) / 2
+                val millis = MotionSpec.millis(MotionToken.DEAL_CARD, speed)
+                var revealed by remember(step.id) { mutableIntStateOf(0) }
+                LaunchedEffect(step.id) {
+                    step.tableCards.indices.forEach { index ->
+                        revealed = index + 1
+                        MotionSpec.pause(millis)
+                    }
+                }
+                Box(modifier = Modifier.fillMaxWidth().height(BADGE_ROOM + cardHeight)) {
+                    step.tableCards.take(revealed).forEachIndexed { index, card ->
+                        val x = startX + (cardWidth + CARD_GAP) * index
                         step.cardBadges[card]?.let { badgeResId ->
                             Box(
                                 modifier = Modifier
+                                    .offset(x = x, y = 0.dp)
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(Color(0xFF2A170C))
                                     .border(1.dp, BrassRivetGold, RoundedCornerShape(6.dp))
@@ -878,11 +901,16 @@ private fun LessonTableArea(
                                 )
                             }
                         }
-                        CardView(
+                        MovingCard(
                             card = card,
-                            width = 62.dp,
-                            height = 92.dp,
-                            isPlayable = false,
+                            target = DpOffset(x, BADGE_ROOM),
+                            origin = DpOffset(x, -(cardHeight + BADGE_ROOM)),
+                            millis = millis.toInt(),
+                            flip = false,
+                            shrink = false,
+                            width = cardWidth,
+                            height = cardHeight,
+                            highlighted = false,
                         )
                     }
                 }
@@ -890,6 +918,9 @@ private fun LessonTableArea(
         }
     }
 }
+
+private val CARD_GAP = 8.dp
+private val BADGE_ROOM = 20.dp
 
 /**
  * Sezione didattica a scelta multipla con risposte interattive.

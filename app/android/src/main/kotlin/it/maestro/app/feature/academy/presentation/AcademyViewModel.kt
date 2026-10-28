@@ -17,6 +17,7 @@ import it.maestro.app.feature.profile.presentation.weakestAxis
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.data.local.datastore.AcademyRepository
 import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
 import it.maestro.app.domain.wallet.TransactionReason
@@ -26,6 +27,7 @@ import it.maestro.game.model.Card
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -120,6 +122,8 @@ public data class AcademyUiState(
     public val viewMode: AcademyViewMode = AcademyViewMode.ChapterMap,
     /** Il capitolo consigliato dal Maestro in base al radar; `null` senza abbastanza partite. */
     public val recommendedChapterId: AcademyChapterId? = null,
+    /** Velocità di gioco scelta nelle Impostazioni: il mini-tavolo delle lezioni la rispetta. */
+    public val speed: GameSpeed = GameSpeed.NORMAL,
 )
 
 /**
@@ -131,6 +135,7 @@ public class AcademyViewModel(
     private val availableChapters: List<AcademyChapter> = AcademyContent.CHAPTERS,
     private val masteryRepository: MasteryRepository? = null,
     private val clock: Clock = SystemClock,
+    gameSpeed: Flow<GameSpeed> = flowOf(GameSpeed.NORMAL),
 ) : ViewModel() {
 
     private val viewModeState = MutableStateFlow<AcademyViewMode>(AcademyViewMode.ChapterMap)
@@ -141,7 +146,8 @@ public class AcademyViewModel(
         viewModeState,
         expandedChapterState,
         masteryRepository?.observeMasteryProfile() ?: flowOf(null),
-    ) { progressMap, currentViewMode, expandedChapterId, mastery ->
+        gameSpeed,
+    ) { progressMap, currentViewMode, expandedChapterId, mastery, speed ->
         val chapterStates = availableChapters.map { chapter ->
             val lessonStates = chapter.lessons.map { lesson ->
                 val progress = progressMap[lesson.id] ?: AcademyLessonProgress(
@@ -174,6 +180,7 @@ public class AcademyViewModel(
             chapters = chapterStates,
             expandedChapterId = expandedChapterId,
             viewMode = currentViewMode,
+            speed = speed,
             recommendedChapterId = mastery?.let {
                 recommendedChapter(it, progressMap.filterValues { p -> p.isCompleted }.keys)
             },
