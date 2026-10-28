@@ -88,6 +88,8 @@ public fun ShopScreen(
         onSelectCategory = viewModel::selectCategory,
         onEquipItem = viewModel::equipCosmetic,
         onUnlockItem = viewModel::unlockAndEquip,
+        onPreviewItem = viewModel::openPreview,
+        onDismissPreview = viewModel::closePreview,
         onNavigateHome = onNavigateHome,
         modifier = modifier,
     )
@@ -101,7 +103,17 @@ public fun ShopScreenContent(
     onUnlockItem: (CosmeticItem) -> Unit,
     onNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
+    onPreviewItem: (CosmeticItem) -> Unit = {},
+    onDismissPreview: () -> Unit = {},
 ) {
+    uiState.previewCard?.let { preview ->
+        TryItemDialog(
+            uiState = uiState,
+            onEquip = { onEquipItem(preview.item); onDismissPreview() },
+            onUnlock = { onUnlockItem(preview.item); onDismissPreview() },
+            onDismiss = onDismissPreview,
+        )
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -205,6 +217,7 @@ public fun ShopScreenContent(
                         card = card,
                         onEquip = { onEquipItem(card.item) },
                         onUnlock = { onUnlockItem(card.item) },
+                        onPreview = { onPreviewItem(card.item) },
                     )
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -375,6 +388,7 @@ private fun ShopItemRow(
     card: ShopItemCardState,
     onEquip: () -> Unit,
     onUnlock: () -> Unit,
+    onPreview: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val item = card.item
@@ -382,6 +396,7 @@ private fun ShopItemRow(
     WoodPanel(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onPreview)
             .testTag("shop_item_${item.id}"),
     ) {
         Row(

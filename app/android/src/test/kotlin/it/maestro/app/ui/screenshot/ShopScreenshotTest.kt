@@ -242,4 +242,66 @@ class ShopScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("shop_back_button").performClick()
         assertTrue(closed)
     }
+
+    private fun tryDialogState(index: Int, credits: Int): ShopUiState {
+        val base = sampleStateForCategory(CosmeticCategory.TABLE_FELT, credits)
+        val card = base.items[index].let { it.copy(canAfford = credits >= it.item.priceCredits) }
+        return base.copy(previewCard = card)
+    }
+
+    private fun showTryDialog(state: ShopUiState) {
+        composeRule.setContent {
+            MaestroTheme {
+                ShopScreenContent(
+                    uiState = state,
+                    onSelectCategory = {},
+                    onEquipItem = {},
+                    onUnlockItem = {},
+                    onNavigateHome = {},
+                )
+            }
+        }
+    }
+
+    @Test
+    fun try_dialog_owned_item_offers_equip() {
+        showTryDialog(tryDialogState(index = 1, credits = 120))
+        composeRule.onNodeWithTag("shop_try_equip").assertExists()
+        composeRule.onNodeWithTag("shop_try_table").captureRoboImage(screen.path("shop_try_owned"))
+    }
+
+    @Test
+    fun try_dialog_affordable_item_offers_unlock() {
+        showTryDialog(tryDialogState(index = 2, credits = 120))
+        composeRule.onNodeWithTag("shop_try_unlock").assertExists()
+        composeRule.onNodeWithTag("shop_try_table").captureRoboImage(screen.path("shop_try_affordable"))
+    }
+
+    @Test
+    fun try_dialog_unaffordable_item_shows_missing_credits() {
+        showTryDialog(tryDialogState(index = 3, credits = 20))
+        composeRule.onNodeWithTag("shop_try_missing").assertExists()
+        composeRule.onNodeWithTag("shop_try_unlock").assertDoesNotExist()
+        composeRule.onNodeWithTag("shop_try_table").captureRoboImage(screen.path("shop_try_unaffordable"))
+    }
+
+    @Test
+    fun tapping_an_item_asks_to_preview_it() {
+        var previewed: CosmeticItem? = null
+        val state = sampleStateForCategory(CosmeticCategory.TABLE_FELT)
+        composeRule.setContent {
+            MaestroTheme {
+                ShopScreenContent(
+                    uiState = state,
+                    onSelectCategory = {},
+                    onEquipItem = {},
+                    onUnlockItem = {},
+                    onNavigateHome = {},
+                    onPreviewItem = { previewed = it },
+                )
+            }
+        }
+        composeRule.onNodeWithTag("shop_item_felt_noble_blue").performClick()
+        assertEquals("felt_noble_blue", previewed?.id)
+    }
 }

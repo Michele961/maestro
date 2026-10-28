@@ -164,4 +164,28 @@ class ShopViewModelTest {
         assertFalse(updatedRed.isUnlocked)
         assertFalse(updatedRed.isEquipped)
     }
+
+    @Test
+    fun openPreview_showsItemWithEquippedOthers_andCloses() = runTest {
+        val viewModel = ShopViewModel(InMemorySettingsRepository(), InMemoryWalletRepository())
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+
+        val red = CosmeticCatalog.TABLES.first { it.id == "felt_royal_red" }
+        viewModel.openPreview(red)
+        advanceUntilIdle()
+        val open = viewModel.uiState.value
+        assertEquals("felt_royal_red", open.previewCard?.item?.id)
+        assertEquals("felt_classic_green", open.equippedTableId)
+
+        viewModel.selectCategory(CosmeticCategory.CARD_BACK)
+        advanceUntilIdle()
+        assertEquals(null, viewModel.uiState.value.previewCard)
+
+        viewModel.openPreview(CosmeticCatalog.CARD_BACKS.last())
+        advanceUntilIdle()
+        viewModel.closePreview()
+        advanceUntilIdle()
+        assertEquals(null, viewModel.uiState.value.previewCard)
+    }
 }
