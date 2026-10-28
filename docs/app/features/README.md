@@ -24,7 +24,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 7 | Sfida del giorno | `daily-puzzle.md` (bozza) | F1R-02, F1R-10 | da approvare |
 | 8 | Accademia | `academy.md` (bozza) | F1R-10, F1R-21 | da approvare |
 | 9 | Profilo, Maestria e Radar | `profile.md` (bozza) | F1R-14 | da approvare |
-| 10 | Missioni e streak | `missions.md` | F1R-14 | da fare |
+| 10 | Missioni, serie, esperienza e obiettivi | `missions.md` (bozza) | F1R-14 | da approvare |
 | 11 | Bottega e wallet | `shop.md` (bozza) | F1R-03, F1R-14 | da approvare |
 | 12 | Impostazioni e audio | `settings.md` | F1R-09, F1R-20 | da fare |
 
