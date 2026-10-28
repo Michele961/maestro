@@ -209,6 +209,7 @@ public val appModule: Module = module {
         AcademyViewModel(
             academyRepository = get(),
             rewardEngine = get(),
+            masteryRepository = get(),
         )
     }
 

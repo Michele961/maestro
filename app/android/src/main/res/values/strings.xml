@@ -279,6 +279,7 @@
     <string name="academy_screen_subtitle">Il percorso didattico del Circolo</string>
     <string name="academy_nav_title">Accademia</string>
     <string name="academy_chapter_number">Capitolo %1$d</string>
+    <string name="academy_chapter_recommended">★ Consigliato dal Maestro</string>
     <string name="academy_chapter_progress">%1$d/%2$d Lezioni</string>
     <string name="academy_chapter_completed">CAPITOLO COMPLETATO</string>
     <string name="academy_lesson_number">Lezione %1$d.%2$d</string>
