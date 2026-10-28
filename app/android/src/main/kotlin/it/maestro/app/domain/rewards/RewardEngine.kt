@@ -11,6 +11,7 @@ import it.maestro.app.domain.retention.RetentionRepository
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.retention.MatchMissionStatsExtractor
+import it.maestro.app.domain.retention.missionIncrement
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletOperationResult
 import it.maestro.app.domain.wallet.WalletRepository
@@ -103,8 +104,8 @@ public class RewardEngine(
         val streakAfter = retention.recordGameActivity(today)
 
         val stats = MatchMissionStatsExtractor.extract(log, humanSeat)
-        if (stats.sweepsCount > 0) retention.updateMissionProgress(today, DailyMissionType.MAKE_SWEEPS, stats.sweepsCount)
-        if (stats.denariCount > 0) retention.updateMissionProgress(today, DailyMissionType.CAPTURE_DENARI, stats.denariCount)
+        advanceByScope(today, missionsBefore, DailyMissionType.MAKE_SWEEPS, stats.sweepsCount)
+        advanceByScope(today, missionsBefore, DailyMissionType.CAPTURE_DENARI, stats.denariCount)
         if (analysis.accuracy(humanSeat) >= ACCURACY_MISSION_THRESHOLD) {
             retention.updateMissionProgress(today, DailyMissionType.COMPLETE_MATCH_WITH_ACCURACY_80)
         }
@@ -188,6 +189,17 @@ public class RewardEngine(
             is WalletOperationResult.Success -> amount
             else -> 0
         }
+
+    private suspend fun advanceByScope(
+        today: java.time.LocalDate,
+        missions: List<DailyMission>,
+        type: DailyMissionType,
+        value: Int,
+    ) {
+        val mission = missions.firstOrNull { it.type == type } ?: return
+        val increment = missionIncrement(mission, value)
+        if (increment > 0) retention.updateMissionProgress(today, type, increment)
+    }
 
     private fun advances(before: List<DailyMission>, after: List<DailyMission>): List<MissionAdvance> =
         after.mapNotNull { now ->
