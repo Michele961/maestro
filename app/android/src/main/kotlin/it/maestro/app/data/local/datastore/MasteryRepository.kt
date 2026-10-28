@@ -63,6 +63,7 @@ public class DataStoreMasteryRepository(
         humanSeat: Seat,
         trainingScore: Pair<Int, Int>?,
         trainingFundamental: TrainingFundamental,
+        opponent: String?,
     ): MasteryProfile {
         val current = getMasteryProfile()
         val rawHistory = dataStore.data.first()[PreferencesKeys.MATCH_HISTORY].orEmpty()
@@ -101,6 +102,8 @@ public class DataStoreMasteryRepository(
             botScore = opponentTotal,
             isWin = isWin,
             matchLogText = encodedLog,
+            opponent = opponent,
+            sparringObjective = trainingFundamental.takeIf { it != TrainingFundamental.NONE }?.name,
         )
 
         dataStore.edit { preferences ->
@@ -180,6 +183,8 @@ public class DataStoreMasteryRepository(
                     botScore = parts[6].toIntOrNull() ?: 0,
                     isWin = parts[7] == "1",
                     matchLogText = matchLogText,
+                    opponent = parts.getOrNull(9)?.takeIf { it.isNotBlank() },
+                    sparringObjective = parts.getOrNull(10)?.takeIf { it.isNotBlank() },
                 )
             } else {
                 null
@@ -192,7 +197,7 @@ public class DataStoreMasteryRepository(
             val encodedLog = it.matchLogText?.let { text ->
                 java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(text.toByteArray(Charsets.UTF_8))
             }.orEmpty()
-            "${it.id}|${it.timestampMillis}|${it.accuracy}|${it.cognitiveElo}|${it.eloDelta}|${it.humanScore}|${it.botScore}|${if (it.isWin) 1 else 0}|$encodedLog"
+            "${it.id}|${it.timestampMillis}|${it.accuracy}|${it.cognitiveElo}|${it.eloDelta}|${it.humanScore}|${it.botScore}|${if (it.isWin) 1 else 0}|$encodedLog|${it.opponent.orEmpty()}|${it.sparringObjective.orEmpty()}"
         }
 }
 
@@ -220,6 +225,7 @@ public class InMemoryMasteryRepository(
         humanSeat: Seat,
         trainingScore: Pair<Int, Int>?,
         trainingFundamental: TrainingFundamental,
+        opponent: String?,
     ): MasteryProfile {
         val current = profileState.value
         val encodedLog = matchLog.toText()
@@ -257,6 +263,8 @@ public class InMemoryMasteryRepository(
             botScore = opponentTotal,
             isWin = isWin,
             matchLogText = encodedLog,
+            opponent = opponent,
+            sparringObjective = trainingFundamental.takeIf { it != TrainingFundamental.NONE }?.name,
         )
 
         profileState.value = updated
