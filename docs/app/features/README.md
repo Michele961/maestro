@@ -26,7 +26,7 @@ Un dossier non introduce regole di gioco, dipendenze o moduli: se servono, diven
 | 9 | Profilo, Maestria e Radar | `profile.md` (bozza) | F1R-14 | da approvare |
 | 10 | Missioni, serie, esperienza e obiettivi | `missions.md` (bozza) | F1R-14 | da approvare |
 | 11 | Bottega e wallet | `shop.md` (bozza) | F1R-03, F1R-14 | da approvare |
-| 12 | Impostazioni e audio | `settings.md` | F1R-09, F1R-20 | da fare |
+| 12 | Impostazioni e audio | `settings.md` (bozza) | F1R-09, F1R-20 | da approvare |
 
 L'ordine segue l'impatto sul giocatore: prima ciò che si usa in ogni sessione.
 
