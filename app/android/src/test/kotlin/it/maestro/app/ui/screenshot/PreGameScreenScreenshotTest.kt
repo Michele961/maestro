@@ -1,6 +1,7 @@
 package it.maestro.app.ui.screenshot
 
 import android.app.Application
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -71,5 +72,28 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("mode_option_classic").performClick()
         composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(Triple(DifficultyLevel.INTERMEDIO, 21, TrainingFundamental.NONE), chosen)
+    }
+
+    @Test
+    fun sparring_lets_the_player_pick_the_objective_and_shows_what_it_trains() {
+        var chosen: TrainingFundamental? = null
+        composeRule.setContent { MaestroTheme { PreGameScreen(onStartGame = { _, _, f -> chosen = f }) } }
+        composeRule.onNodeWithTag("objective_option_PRIMIERA_LEAD").performScrollTo().performClick()
+        composeRule.onNodeWithTag("objective_line").performScrollTo().assertTextContains("calcolo", substring = true)
+        composeRule.onNodeWithTag("start_game_button").performClick()
+        assertEquals(TrainingFundamental.PRIMIERA_LEAD, chosen)
+    }
+
+    @Test
+    fun classic_mode_hides_the_objectives() {
+        composeRule.setContent { MaestroTheme { PreGameScreen() } }
+        composeRule.onNodeWithTag("mode_option_classic").performScrollTo().performClick()
+        composeRule.onNodeWithTag("objective_selector").assertDoesNotExist()
+    }
+
+    @Test
+    fun pre_game_objectives_screenshot() {
+        composeRule.setContent { MaestroTheme { PreGameScreen(initialFundamental = TrainingFundamental.DENARI_COUNT) } }
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game_objectives"))
     }
 }

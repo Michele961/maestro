@@ -784,4 +784,16 @@
     <string name="ladder_unlocked_line">Unlocked: %1$s</string>
     <string name="post_match_maestro_unlocked">Great job! You beat %1$s: now you can challenge %2$s. Careful, they are stronger.</string>
     <string name="post_match_maestro_ladder_done">You have beaten every opponent at the club. I am proud of you!</string>
+    <!-- Check objectives in Sparring (F1R-25c, [draft] to approve) -->
+    <string name="pre_game_objective_title">What you train</string>
+    <string name="objective_sevens_name">Count the Sevens</string>
+    <string name="objective_sevens_line">Trains memory: keep track of the Sevens already played.</string>
+    <string name="objective_denari_name">Count the Coins</string>
+    <string name="objective_denari_line">Trains tactics: keep track of the Coins already taken.</string>
+    <string name="objective_primiera_name">Who wins the Primiera</string>
+    <string name="objective_primiera_line">Trains calculation: see who leads the Primiera.</string>
+    <string name="objective_settebello_name">Where is the Settebello</string>
+    <string name="objective_settebello_line">Trains attention: always know where the Settebello is.</string>
+    <string name="objective_cards_name">Who has more cards</string>
+    <string name="objective_cards_line">Trains captures: see who leads the card count.</string>
 </resources>
