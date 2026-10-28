@@ -33,15 +33,10 @@
     <string name="game_card_rank_cavallo">Cavallo</string>
     <string name="game_card_rank_re">Re</string>
     <string name="pre_game_title">Preparati a giocare</string>
-    <string name="pre_game_difficulty_title">Livello avversario</string>
+    <string name="pre_game_opponent_title">Il tuo avversario</string>
     <string name="pre_game_target_score_title">Punti obiettivo</string>
     <string name="pre_game_start_button">Inizia Partita</string>
     <string name="pre_game_back_button">Indietro</string>
-    <string name="level_principiante">Principiante</string>
-    <string name="level_dilettante">Dilettante</string>
-    <string name="level_intermedio">Intermedio</string>
-    <string name="level_avanzato">Avanzato</string>
-    <string name="level_maestro">Maestro</string>
     <string name="target_score_11">11 punti (Standard)</string>
     <string name="target_score_16">16 punti</string>
     <string name="target_score_21">21 punti (Lunga)</string>
@@ -157,8 +152,6 @@
     <string name="home_nav_shop">Bottega</string>
     <string name="home_maestro_title">Il Maestro</string>
     <string name="pre_game_points">%1$d Punti</string>
-    <string name="pre_game_level_number">(Liv. %1$d)</string>
-    <string name="level_esperto">Esperto</string>
     <string name="pre_game_mode_title">Modalità di gioco</string>
     <string name="pre_game_mode_classic">Classica</string>
     <string name="pre_game_mode_sparring">Sparring</string>
@@ -760,4 +753,26 @@
     <string name="home_line_welcome_2">Il tavolo è pronto: una sfida o un po\' di allenamento?</string>
     <string name="review_why_button">Perché?</string>
     <string name="review_why_close">Ho capito</string>
+    <!-- Avversari del circolo (F1R-18, [bozza] da approvare) -->
+    <string name="opponent_gigi_name">Gigi</string>
+    <string name="opponent_gigi_title">L\'ultimo arrivato</string>
+    <string name="opponent_gigi_line">Ho imparato ieri, ma ho tanta voglia!</string>
+    <string name="opponent_rosa_name">Nonna Rosa</string>
+    <string name="opponent_rosa_title">Campionessa del pianerottolo</string>
+    <string name="opponent_rosa_line">Giocavo prima che nascessi, caro.</string>
+    <string name="opponent_tonino_name">Tonino</string>
+    <string name="opponent_tonino_title">Il migliore del bar</string>
+    <string name="opponent_tonino_line">Qui al bar non mi batte nessuno.</string>
+    <string name="opponent_alfonso_name">Don Alfonso</string>
+    <string name="opponent_alfonso_title">Il terrore del circolo</string>
+    <string name="opponent_alfonso_line">Poche parole. Distribuisci.</string>
+    <string name="opponent_maestro_name">Il Maestro</string>
+    <string name="opponent_maestro_title">Il Maestro</string>
+    <string name="opponent_maestro_line">Vediamo cosa hai imparato.</string>
+    <string name="ladder_title">Gli avversari del circolo</string>
+    <string name="ladder_next">Da battere</string>
+    <string name="ladder_beaten">Battuto</string>
+    <string name="ladder_locked_hint">Batti %1$s per sbloccarlo</string>
+    <string name="ladder_difficulty">Difficoltà %1$d su 5</string>
+    <string name="ladder_locked">Bloccato</string>
 </resources>

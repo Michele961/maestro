@@ -27,6 +27,7 @@ import it.maestro.app.domain.match.MatchRepository
 import it.maestro.app.data.repository.RoomMatchRepository
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.app.feature.missions.presentation.DailyMissionsViewModel
+import it.maestro.app.feature.pregame.presentation.LadderViewModel
 import it.maestro.app.feature.puzzle.presentation.DailyPuzzleViewModel
 import it.maestro.app.feature.review.presentation.GameReviewViewModel
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
@@ -163,6 +164,8 @@ public val appModule: Module = module {
             masteryRepository = get(),
         )
     }
+
+    viewModel { LadderViewModel(repository = get()) }
 
     viewModel {
         DailyMissionsViewModel(

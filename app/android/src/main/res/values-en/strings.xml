@@ -33,15 +33,10 @@
     <string name="game_card_rank_cavallo">Knight</string>
     <string name="game_card_rank_re">King</string>
     <string name="pre_game_title">Get ready to play</string>
-    <string name="pre_game_difficulty_title">Opponent level</string>
+    <string name="pre_game_opponent_title">Your opponent</string>
     <string name="pre_game_target_score_title">Target points</string>
     <string name="pre_game_start_button">Start Match</string>
     <string name="pre_game_back_button">Back</string>
-    <string name="level_principiante">Beginner</string>
-    <string name="level_dilettante">Amateur</string>
-    <string name="level_intermedio">Intermediate</string>
-    <string name="level_avanzato">Advanced</string>
-    <string name="level_maestro">Master</string>
     <string name="target_score_11">11 points (Standard)</string>
     <string name="target_score_16">16 points</string>
     <string name="target_score_21">21 points (Long)</string>
@@ -157,8 +152,6 @@
     <string name="home_nav_shop">Shop</string>
     <string name="home_maestro_title">The Maestro</string>
     <string name="pre_game_points">%1$d Points</string>
-    <string name="pre_game_level_number">(Lv. %1$d)</string>
-    <string name="level_esperto">Expert</string>
     <string name="pre_game_mode_title">Game mode</string>
     <string name="pre_game_mode_classic">Classic</string>
     <string name="pre_game_mode_sparring">Sparring</string>
@@ -760,4 +753,26 @@
     <string name="home_line_welcome_2">The table is ready: a challenge or some practice?</string>
     <string name="review_why_button">Why?</string>
     <string name="review_why_close">Got it</string>
+    <!-- Club opponents (F1R-18, [draft] to be approved) -->
+    <string name="opponent_gigi_name">Gigi</string>
+    <string name="opponent_gigi_title">The Newcomer</string>
+    <string name="opponent_gigi_line">I only learned yesterday, but I\'m keen!</string>
+    <string name="opponent_rosa_name">Nonna Rosa</string>
+    <string name="opponent_rosa_title">Stairwell Champion</string>
+    <string name="opponent_rosa_line">I was playing before you were born, dear.</string>
+    <string name="opponent_tonino_name">Tonino</string>
+    <string name="opponent_tonino_title">Best in the Bar</string>
+    <string name="opponent_tonino_line">Nobody beats me at this bar.</string>
+    <string name="opponent_alfonso_name">Don Alfonso</string>
+    <string name="opponent_alfonso_title">Terror of the Club</string>
+    <string name="opponent_alfonso_line">Few words. Deal.</string>
+    <string name="opponent_maestro_name">The Maestro</string>
+    <string name="opponent_maestro_title">The Maestro</string>
+    <string name="opponent_maestro_line">Let\'s see what you\'ve learned.</string>
+    <string name="ladder_title">The club\'s opponents</string>
+    <string name="ladder_next">To beat</string>
+    <string name="ladder_beaten">Beaten</string>
+    <string name="ladder_locked_hint">Beat %1$s to unlock</string>
+    <string name="ladder_difficulty">Difficulty %1$d of 5</string>
+    <string name="ladder_locked">Locked</string>
 </resources>

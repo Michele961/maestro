@@ -57,6 +57,9 @@ import it.maestro.app.feature.home.ui.HomeScreen
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.review.ui.PostMatchScreen
 import org.koin.core.parameter.parametersOf
+import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.feature.pregame.presentation.LadderViewModel
+import it.maestro.app.feature.pregame.ui.LadderScreen
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.feature.profile.ui.ProfileScreen
 import it.maestro.app.feature.shop.ui.ShopScreen
@@ -139,7 +142,7 @@ public fun MaestroNavHost(
                         }
                     }
                 },
-                onStartGameClicked = { navController.navigate(Route.PreGame) { launchSingleTop = true } },
+                onStartGameClicked = { navController.navigate(Route.Ladder) { launchSingleTop = true } },
                 onSettingsClicked = { showSettings = true },
                 onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
                 onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
@@ -158,8 +161,21 @@ public fun MaestroNavHost(
                 mastery = mastery,
             )
         }
-        composable<Route.PreGame> {
+        composable<Route.Ladder> {
+            val viewModel: LadderViewModel = koinViewModel()
+            val ladder by viewModel.state.collectAsStateWithLifecycle()
+            LadderScreen(
+                state = ladder,
+                onOpponentClick = { opponent ->
+                    navController.navigate(Route.PreGame(opponent.name)) { launchSingleTop = true }
+                },
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable<Route.PreGame> { entry ->
+            val route = entry.toRoute<Route.PreGame>()
             PreGameScreen(
+                opponent = Opponent.valueOf(route.opponent),
                 onStartGame = { level, targetScore, fundamental ->
                     navController.navigate(
                         Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),

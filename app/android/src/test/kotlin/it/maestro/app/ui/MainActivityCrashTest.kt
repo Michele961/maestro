@@ -28,8 +28,10 @@ class MainActivityCrashTest {
     @Test
     fun navigateToTableScreenDoesNotCrash() {
         composeRule.waitForIdle()
-        // Clicchiamo su "Gioca ora" per andare a PreGameScreen
+        // "Gioca ora" porta alla scala degli avversari: si parte dal primo, sempre sbloccato.
         composeRule.onNodeWithTag("play_now_button").performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("ladder_row_GIGI").performClick()
         composeRule.waitForIdle()
         // Clicchiamo su "Inizia partita" per entrare in TableScreen
         composeRule.onNodeWithTag("start_game_button").performClick()
