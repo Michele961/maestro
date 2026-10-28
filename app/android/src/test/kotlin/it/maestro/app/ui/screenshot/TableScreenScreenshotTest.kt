@@ -323,7 +323,7 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
             options = listOf(0, 1, 2, 3).map { count -> TrainingOption.IntCount(count) },
             correctIndex = 1,
         )
-        val state = midDeal.copy(activeTrainingQuestion = question)
+        val state = midDeal.copy(isSparring = true, activeTrainingQuestion = question)
         val played = SceneStep.OpponentReadPause(Card(Rank.SETTE, Suit.DENARI))
         var scene by androidx.compose.runtime.mutableStateOf(sceneOf(state, played))
 
@@ -337,5 +337,41 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
 
         composeRule.onNodeWithTag("training_question_dialog").assertExists()
         composeRule.onNodeWithTag("training_question_text").assertExists()
+    }
+
+    @Test
+    fun check_bubble_answers_and_continues_without_covering_the_table() {
+        val question = TrainingQuestion(
+            fundamental = TrainingFundamental.SEVENS_COUNT,
+            options = listOf(0, 1, 2, 3).map { count -> TrainingOption.IntCount(count) },
+            correctIndex = 1,
+        )
+        val intents = mutableListOf<it.maestro.app.feature.table.presentation.GameIntent>()
+        var state by androidx.compose.runtime.mutableStateOf(midDeal.copy(isSparring = true, activeTrainingQuestion = question))
+
+        composeRule.setContent {
+            MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = { intents += it }) }
+        }
+
+        // Il Check è un fumetto: le carte della mano restano sul tavolo e giocabili a vista.
+        composeRule.onNodeWithTag("training_option_2").performClick()
+        state = state.copy(
+            trainingQuestionFeedback = it.maestro.app.feature.table.presentation.TrainingAnswerFeedback(
+                selectedIndex = 2,
+                isCorrect = false,
+                correctIndex = 1,
+            ),
+        )
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("training_feedback_banner").assertExists()
+        composeRule.onNodeWithTag("training_continue_button").performClick()
+
+        org.junit.Assert.assertEquals(
+            listOf(
+                it.maestro.app.feature.table.presentation.GameIntent.AnswerTrainingQuestion(2),
+                it.maestro.app.feature.table.presentation.GameIntent.DismissTrainingQuestion,
+            ),
+            intents,
+        )
     }
 }

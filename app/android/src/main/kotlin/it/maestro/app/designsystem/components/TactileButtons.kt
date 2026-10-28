@@ -203,6 +203,57 @@ public fun MaestroDialogueBox(
 public enum class BubbleTail { BOTTOM_START, BOTTOM_CENTER, BOTTOM_END, TOP_START, START, END }
 
 /**
+ * Cornice del fumetto laterale (codina a destra con [BubbleTail.END], a sinistra con [BubbleTail.START]) con un
+ * [content] qualsiasi: serve a fumetti che contengono più del testo, come il Check del Maestro.
+ */
+@Composable
+public fun MaestroSpeechBubbleFrame(
+    tail: BubbleTail,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val pointsRight = tail == BubbleTail.END
+    val tailShape: @Composable () -> Unit = {
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .size(width = 10.dp, height = 16.dp)
+                .offset(x = if (pointsRight) (-1).dp else 1.dp)
+                .zIndex(1f),
+        ) {
+            val path = androidx.compose.ui.graphics.Path().apply {
+                if (pointsRight) {
+                    moveTo(0f, 0f)
+                    lineTo(size.width, size.height * 0.5f)
+                    lineTo(0f, size.height)
+                } else {
+                    moveTo(size.width, 0f)
+                    lineTo(0f, size.height * 0.5f)
+                    lineTo(size.width, size.height)
+                }
+                close()
+            }
+            drawPath(path, BubblePaper)
+        }
+    }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (!pointsRight) tailShape()
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = BubblePaper,
+            border = BorderStroke(1.dp, Color(0x55603813)),
+            shadowElevation = 4.dp,
+            modifier = Modifier.weight(1f, fill = false),
+        ) {
+            content()
+        }
+        if (pointsRight) tailShape()
+    }
+}
+
+/**
  * Fumetto compatto del Maestro come nei mockup (F1-26): carta avorio, testo centrato,
  * codina verso il ritratto, nessuna intestazione. Ingombro minimo: la larghezza va limitata
  * dal chiamante.
@@ -216,61 +267,25 @@ public fun MaestroSpeechBubble(
     maxLines: Int = 8,
 ) {
     if (tail == BubbleTail.START || tail == BubbleTail.END) {
-        val pointsRight = tail == BubbleTail.END
-        val tailShape: @Composable () -> Unit = {
-            androidx.compose.foundation.Canvas(
+        MaestroSpeechBubbleFrame(tail = tail, modifier = modifier) {
+            Box(
                 modifier = Modifier
-                    .size(width = 10.dp, height = 16.dp)
-                    .offset(x = if (pointsRight) (-1).dp else 1.dp)
-                    .zIndex(1f),
+                    .heightIn(max = 180.dp)
+                    .verticalScroll(rememberScrollState()),
             ) {
-                val path = androidx.compose.ui.graphics.Path().apply {
-                    if (pointsRight) {
-                        moveTo(0f, 0f)
-                        lineTo(size.width, size.height * 0.5f)
-                        lineTo(0f, size.height)
-                    } else {
-                        moveTo(size.width, 0f)
-                        lineTo(0f, size.height * 0.5f)
-                        lineTo(size.width, size.height)
-                    }
-                    close()
-                }
-                drawPath(path, BubblePaper)
+                Text(
+                    text = message,
+                    color = WoodSurfaceDark,
+                    fontSize = fontSize,
+                    lineHeight = fontSize * 1.20f,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = MaestroDisplayFont,
+                    textAlign = TextAlign.Center,
+                    maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                )
             }
-        }
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (!pointsRight) tailShape()
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = BubblePaper,
-                border = BorderStroke(1.dp, Color(0x55603813)),
-                shadowElevation = 4.dp,
-                modifier = Modifier.weight(1f, fill = false),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .heightIn(max = 180.dp)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    Text(
-                        text = message,
-                        color = WoodSurfaceDark,
-                        fontSize = fontSize,
-                        lineHeight = fontSize * 1.20f,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = MaestroDisplayFont,
-                        textAlign = TextAlign.Center,
-                        maxLines = maxLines,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                    )
-                }
-            }
-            if (pointsRight) tailShape()
         }
         return
     }

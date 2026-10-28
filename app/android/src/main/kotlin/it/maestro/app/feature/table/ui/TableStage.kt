@@ -10,6 +10,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.designsystem.components.BubbleTail
 import it.maestro.app.designsystem.components.CardBackView
 import it.maestro.app.designsystem.components.FramedPortrait
@@ -56,6 +58,9 @@ internal fun TableStage(
     onPlay: (Card) -> Unit,
     onRequestHint: () -> Unit,
     onDismissLine: () -> Unit,
+    soundManager: SoundManager,
+    onAnswerCheck: (Int) -> Unit,
+    onContinueCheck: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -72,7 +77,15 @@ internal fun TableStage(
             suggestedCard = uiState.suggestedMove?.card,
             onPlay = onPlay,
         )
-        RaceOrBubble(model, uiState, geometry, showRace = showPointsRace, onDismissLine = onDismissLine)
+        RaceOrBubble(
+            model, uiState, geometry,
+            showRace = showPointsRace,
+            checkActive = atRest,
+            soundManager = soundManager,
+            onDismissLine = onDismissLine,
+            onAnswerCheck = onAnswerCheck,
+            onContinueCheck = onContinueCheck,
+        )
         MaestroCorner(uiState, geometry, canAskHint = canPlay && atRest, atRest = atRest, sweepBy = sweepBy, onRequestHint = onRequestHint)
     }
 }
@@ -255,9 +268,14 @@ private fun RaceOrBubble(
     uiState: GameUiState,
     geometry: TableGeometry,
     showRace: Boolean,
+    checkActive: Boolean,
+    soundManager: SoundManager,
     onDismissLine: () -> Unit,
+    onAnswerCheck: (Int) -> Unit,
+    onContinueCheck: () -> Unit,
 ) {
     val zone = geometry.zones.pointsRace
+    val check = uiState.activeTrainingQuestion?.takeIf { checkActive }
     val hint = uiState.suggestedMove
     var dismissed by remember(hint, uiState.hintNudge) { mutableStateOf(false) }
     val nudge = uiState.hintNudge
@@ -265,7 +283,18 @@ private fun RaceOrBubble(
     val line = uiState.maestroLine?.takeIf { uiState.isSparring && !showBubble }
     // Il fumetto si appoggia al lato del Maestro: la coda tocca il ritratto, senza vuoto in mezzo.
     Zone(zone, Alignment.CenterEnd) {
-        if (line != null) {
+        if (check != null) {
+            // Il Check del Maestro sta qui e non copre le carte; a scena ferma, mai sopra una giocata.
+            CheckBubble(
+                question = check,
+                feedback = uiState.trainingQuestionFeedback,
+                soundManager = soundManager,
+                onAnswer = onAnswerCheck,
+                onContinue = onContinueCheck,
+                // Con font grandi le risposte vanno a capo: il fumetto può sforare la zona invece di tagliarle.
+                modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically, unbounded = true),
+            )
+        } else if (line != null) {
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
             MaestroSpeechBubble(
                 message = voiceText(line),
