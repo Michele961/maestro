@@ -11,6 +11,9 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.mastery.AbilityRadar
 import it.maestro.ai.mastery.MasteryProfile
 import it.maestro.app.R
+import it.maestro.app.feature.profile.presentation.ProfileTab
+import it.maestro.app.domain.retention.StreakState
+import it.maestro.app.domain.mastery.MatchHistoryEntry
 import it.maestro.app.feature.profile.presentation.RadarAxis
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.app.domain.opponents.Opponent
@@ -202,5 +205,40 @@ class ProfileScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("profile_maestro_advice_panel").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("profile_train_button").assertDoesNotExist()
         composeRule.onRoot().captureRoboImage(screen.path("profile_screen_weak_board_no_train"))
+    }
+
+    @Test
+    fun captureProfileScreen_historyShowsOpponentAndMode() {
+        fun entry(i: Int, opponent: String?, objective: String?, win: Boolean) = MatchHistoryEntry(
+            id = "m$i", timestampMillis = 0L, accuracy = 80 - i, cognitiveElo = 1200, eloDelta = if (win) 18 else -12,
+            humanScore = if (win) 11 else 7, botScore = if (win) 6 else 11, isWin = win, opponent = opponent, sparringObjective = objective,
+        )
+        val state = ProfileUiState(
+            selectedTab = ProfileTab.HISTORY,
+            matchHistory = listOf(
+                entry(0, Opponent.TONINO.name, null, win = true),
+                entry(1, Opponent.GIGI.name, TrainingFundamental.DENARI_COUNT.name, win = false),
+                entry(2, null, null, win = true),
+            ),
+        )
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_history_card_0").assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_history_modes"))
+    }
+
+    @Test
+    fun captureProfileScreen_statsShowRecentRecordAndStreak() {
+        val state = ProfileUiState(
+            profile = MasteryProfile(matchesPlayed = 9, accuracyEma = 74.0, cognitiveElo = 1400),
+            streak = StreakState(currentStreak = 4, bestStreak = 9, lastPlayedDate = "2026-10-28", freezeTokens = 1),
+            matchHistory = List(3) { MatchHistoryEntry("m$it", 0L, 80, 1400, 5, 11, 4, it != 1) },
+        )
+
+        composeRule.setContent { MaestroTheme { ProfileContent(uiState = state, onBackClicked = {}) } }
+
+        composeRule.onNodeWithTag("profile_stats_card").performScrollTo().assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage(screen.path("profile_screen_stats_streak"))
     }
 }

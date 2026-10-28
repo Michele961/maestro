@@ -232,7 +232,7 @@ private fun ObjectivePicker(selected: TrainingFundamental, suggested: TrainingFu
 }
 
 /** Nome e riga «cosa allena» dell'obiettivo; `null` per [TrainingFundamental.NONE], che non è un obiettivo. */
-private fun TrainingFundamental.objectiveText(): Pair<Int, Int>? = when (this) {
+internal fun TrainingFundamental.objectiveText(): Pair<Int, Int>? = when (this) {
     TrainingFundamental.NONE -> null
     TrainingFundamental.SEVENS_COUNT -> R.string.objective_sevens_name to R.string.objective_sevens_line
     TrainingFundamental.DENARI_COUNT -> R.string.objective_denari_name to R.string.objective_denari_line
@@ -300,3 +300,6 @@ private fun OpponentCard(opponent: Opponent, modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Solo il nome dell'obiettivo, per chi non mostra la riga «cosa allena»; `null` per [TrainingFundamental.NONE]. */
+internal fun TrainingFundamental.objectiveNameRes(): Int? = objectiveText()?.first

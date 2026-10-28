@@ -13,6 +13,10 @@ import it.maestro.app.domain.opponents.OpponentProgress
 import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.profile.MasteryTrend
 import it.maestro.app.domain.profile.PlayerTitleRepository
+import it.maestro.app.domain.retention.RetentionRepository
+import it.maestro.app.domain.retention.StreakState
+import it.maestro.app.domain.time.Clock
+import it.maestro.app.domain.time.SystemClock
 import it.maestro.app.domain.profile.PlayerTitles
 import it.maestro.app.feature.pregame.presentation.LadderState
 import it.maestro.app.feature.pregame.presentation.ObjectiveAdvisor
@@ -51,6 +55,7 @@ public data class ProfileUiState(
     /** La scala degli avversari con lo stato di ciascuno. */
     val ladder: LadderState = LadderState.of(OpponentProgress()),
     /** L'asse più debole; `null` finché le partite sono troppo poche perché il radar dica qualcosa. */
+    val streak: StreakState = StreakState.INITIAL,
     val weakestAxis: RadarAxis? = null,
     /** L'obiettivo di Sparring da allenare, se l'asse più debole ha un Check («Allena questo»). */
     val trainObjective: TrainingFundamental? = null,
@@ -65,6 +70,8 @@ public class ProfileViewModel(
     private val masteryRepository: MasteryRepository,
     private val opponentRepository: OpponentRepository? = null,
     private val titleRepository: PlayerTitleRepository? = null,
+    private val retentionRepository: RetentionRepository? = null,
+    private val clock: Clock = SystemClock,
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(ProfileTab.MASTERY)
@@ -75,7 +82,15 @@ public class ProfileViewModel(
         _selectedTab,
         opponentRepository?.observeProgress() ?: flowOf(OpponentProgress()),
         titleRepository?.observeSelected() ?: flowOf(null),
-    ) { profile, history, tab, progress, selectedTitle ->
+        retentionRepository?.observeStreak(clock.today()) ?: flowOf(StreakState.INITIAL),
+    ) { values ->
+        val profile = values[0] as MasteryProfile
+        @Suppress("UNCHECKED_CAST")
+        val history = values[1] as List<MatchHistoryEntry>
+        val tab = values[2] as ProfileTab
+        val progress = values[3] as OpponentProgress
+        val selectedTitle = values[4] as String?
+        val streak = values[5] as StreakState
         val weakest = profile.radar.weakestAxis().takeIf { profile.matchesPlayed >= ObjectiveAdvisor.MIN_MATCHES }
         ProfileUiState(
             profile = profile,
@@ -86,6 +101,7 @@ public class ProfileViewModel(
             currentTitle = PlayerTitles.current(progress, selectedTitle),
             trend = masteryTrendOf(history),
             ladder = LadderState.of(progress),
+            streak = streak,
             weakestAxis = weakest,
             trainObjective = weakest?.objective?.let { ObjectiveAdvisor.suggest(profile) },
             selectedTab = tab,

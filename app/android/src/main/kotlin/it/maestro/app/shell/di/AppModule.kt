@@ -187,6 +187,8 @@ public val appModule: Module = module {
             masteryRepository = get(),
             opponentRepository = get(),
             titleRepository = get(),
+            retentionRepository = get(),
+            clock = get(),
         )
     }
 

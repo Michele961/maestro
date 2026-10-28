@@ -214,7 +214,6 @@
     <string name="profile_tab_mastery">Mastery &amp; Radar</string>
     <string name="profile_tab_history">Match History</string>
     <string name="profile_history_empty">No matches played yet. Play your first match to track your match performance and see how your Mastery changes!</string>
-    <string name="profile_history_vs_bot">Match vs Maestro</string>
     <string name="profile_history_win">Victory</string>
     <string name="profile_history_loss">Defeat</string>
     <string name="profile_history_accuracy">%1$d%% accuracy</string>
@@ -872,4 +871,11 @@
     <string name="radar_axis_board_what">How well you manage the board: what you leave on the table for your opponent. It has no Check yet: train it by playing and reviewing your matches.</string>
     <string name="radar_axis_endgame_what">How well you play the endgame, with the deck empty. It has no Check yet: train it by playing and reviewing your matches.</string>
     <string name="profile_train_button">Train this</string>
+
+    <!-- F1R-26e: statistiche e partite -->
+    <string name="profile_history_unknown_opponent">Opponent not recorded</string>
+    <string name="profile_history_classic">Classic</string>
+    <string name="profile_history_sparring">Sparring · %1$s</string>
+    <string name="profile_recent_record">Last %1$d matches: %2$d wins, %3$d losses</string>
+    <string name="profile_streak_days">Day streak: %1$d (best %2$d)</string>
 </resources>
