@@ -151,7 +151,7 @@ public fun MaestroNavHost(
                             when (shell.checkResumable()) {
                                 ResumeOutcome.RESUMED -> navController.navigate(
                                     Route.Table(
-                                        level = DifficultyLevel.INTERMEDIO.name,
+                                        level = (shell.savedMatchLevel() ?: DifficultyLevel.INTERMEDIO).name,
                                         targetScore = 0,
                                         fundamental = TrainingFundamental.NONE.name,
                                         seed = 0L,

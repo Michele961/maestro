@@ -1,5 +1,6 @@
 package it.maestro.app.shell
 
+import it.maestro.ai.bot.DifficultyLevel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,6 +93,10 @@ public class ShellViewModel(
                 ResumeOutcome.NOTHING_TO_RESUME
             }
         }
+
+    /** Il livello (cioè l'avversario) della partita salvata, per riaprire il tavolo con lo stesso avversario. */
+    public suspend fun savedMatchLevel(): DifficultyLevel? =
+        (matchRepository.restoreActiveMatch() as? RestoreMatchResult.Success)?.level
 
     /** Salva come partita in corso una partita all'ultima mano, per collaudo (solo build di debug). */
     public suspend fun prepareTestEndgameMatch(): MatchLog {
