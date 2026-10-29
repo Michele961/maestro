@@ -16,6 +16,7 @@ import it.maestro.game.model.Suit
 import it.maestro.app.feature.table.presentation.OpponentMoveSummary
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
@@ -241,6 +242,34 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("pause_button").performClick()
         composeRule.onNodeWithTag("pause_chat_quiet").performClick()
         org.junit.Assert.assertEquals(it.maestro.app.domain.coach.Chattiness.QUIET, chosen)
+    }
+
+    @Test
+    fun the_speaker_button_toggles_the_sound_from_the_table() {
+        var toggled = 0
+        composeRule.setContent {
+            MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, onSoundToggle = { toggled++ }) }
+        }
+        composeRule.onNodeWithTag("sound_toggle_button").performClick()
+        org.junit.Assert.assertEquals(1, toggled)
+    }
+
+    @Test
+    fun pause_dialog_has_the_three_volume_sliders_and_they_stop_when_the_sound_is_off() {
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(
+                    uiState = midDeal,
+                    scene = sceneOf(midDeal),
+                    onIntent = {},
+                    audio = it.maestro.app.domain.audio.AudioLevels(soundEnabled = false),
+                )
+            }
+        }
+        composeRule.onNodeWithTag("pause_button").performClick()
+        for (tag in listOf("pause_effects_volume", "pause_music_volume", "pause_ambient_volume")) {
+            composeRule.onNodeWithTag(tag).assertExists().assertIsNotEnabled()
+        }
     }
 
     @Test

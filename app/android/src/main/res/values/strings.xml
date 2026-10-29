@@ -948,4 +948,7 @@
     <string name="settings_language_english">English</string>
     <string name="settings_music_volume">Volume della musica</string>
     <string name="settings_ambient_volume">Volume dei rumori di fondo</string>
+    <string name="game_sound_off">🔇</string>
+    <string name="game_sound_on">🔊</string>
+    <string name="game_sound_toggle">Suono attivo o disattivo</string>
 </resources>
