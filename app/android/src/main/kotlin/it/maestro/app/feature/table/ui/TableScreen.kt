@@ -195,7 +195,7 @@ public fun TableContent(
     }
 
     // Sotto il tavolo suona il rumore del tavolo; la musica è sempre la stessa del circolo (F1R-20).
-    LaunchedEffect(localHour) { soundManager.setBackdrop(Backdrops.table(localHour)) }
+    LaunchedEffect(localHour, audio.musicChoice) { soundManager.setBackdrop(Backdrops.table(localHour, audio.musicChoice)) }
 
     // A fine partita, a scena ferma e riepilogo chiuso, si passa alla schermata di fine partita.
     val matchOver = uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null && !scene.busy

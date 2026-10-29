@@ -99,6 +99,20 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun musicChoice_isSavedAndStartsAutomatic() = runTest {
+        val repository = InMemorySettingsRepository()
+        val viewModel = SettingsViewModel(repository)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+        advanceUntilIdle()
+        assertEquals(it.maestro.app.domain.audio.MusicChoice.AUTO, viewModel.uiState.value.musicChoice)
+
+        viewModel.setMusicChoice(it.maestro.app.domain.audio.MusicChoice.VICTORY)
+        advanceUntilIdle()
+        assertEquals(it.maestro.app.domain.audio.MusicChoice.VICTORY, viewModel.uiState.value.musicChoice)
+        assertEquals(it.maestro.app.domain.audio.MusicChoice.VICTORY, repository.settingsFlow.first().musicChoice)
+    }
+
+    @Test
     fun language_isSavedAndUnknownTagFollowsSystem() = runTest {
         val repository = InMemorySettingsRepository()
         val viewModel = SettingsViewModel(repository)

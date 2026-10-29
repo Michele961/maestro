@@ -2,9 +2,11 @@ package it.maestro.app.audio
 
 import it.maestro.app.domain.audio.AmbientTrack
 import it.maestro.app.domain.audio.Backdrops
+import it.maestro.app.domain.audio.MusicChoice
 import it.maestro.app.domain.audio.MusicTrack
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 /** Sfondo sonoro (F1R-20): giorno fino alle 19, sera dopo; la musica non cambia tra circolo e tavolo. */
 class BackdropsTest {
@@ -30,5 +32,21 @@ class BackdropsTest {
             assertEquals(Backdrops.circle(hour).music, Backdrops.table(hour).music)
         }
         assertEquals(AmbientTrack.TABLE, Backdrops.table(12).ambient)
+    }
+
+    @Test
+    fun theChosenTrackPlaysEverywhereAndAutomaticFollowsTheHour() {
+        for (hour in listOf(3, 12, 21)) {
+            assertEquals(MusicTrack.VICTORY, Backdrops.circle(hour, MusicChoice.VICTORY).music)
+            assertEquals(MusicTrack.VICTORY, Backdrops.table(hour, MusicChoice.VICTORY).music)
+            assertEquals(Backdrops.circleMusic(hour), Backdrops.table(hour, MusicChoice.AUTO).music)
+        }
+    }
+
+    @Test
+    fun noMusicLeavesTheAmbienceAlone() {
+        val backdrop = Backdrops.table(12, MusicChoice.OFF)
+        assertNull(backdrop.music)
+        assertEquals(AmbientTrack.TABLE, backdrop.ambient)
     }
 }

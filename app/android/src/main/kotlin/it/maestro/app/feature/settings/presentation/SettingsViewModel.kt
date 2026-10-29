@@ -6,6 +6,7 @@ import it.maestro.app.designsystem.audio.SoundEffect
 import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.domain.audio.AudioMixer
 import it.maestro.app.domain.coach.Chattiness
+import it.maestro.app.domain.audio.MusicChoice
 import it.maestro.app.domain.settings.AppLanguage
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.settings.SettingsRepository
@@ -21,6 +22,7 @@ public data class SettingsUiState(
     val effectsVolume: Int = 100,
     val musicVolume: Int = 40,
     val ambientVolume: Int = 40,
+    val musicChoice: MusicChoice = MusicChoice.AUTO,
     val hapticsEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
@@ -44,6 +46,7 @@ public class SettingsViewModel(
                 effectsVolume = settings.effectsVolume,
                 musicVolume = settings.musicVolume,
                 ambientVolume = settings.ambientVolume,
+                musicChoice = settings.musicChoice,
                 hapticsEnabled = settings.hapticsEnabled,
                 gameSpeed = settings.gameSpeed,
                 maestroChattiness = settings.maestroChattiness,
@@ -90,6 +93,11 @@ public class SettingsViewModel(
         val clamped = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
         soundManager?.ambientVolume = clamped
         viewModelScope.launch { settingsRepository.updateAmbientVolume(clamped) }
+    }
+
+    /** Il giocatore sceglie il brano: vale subito e in tutta l'app. */
+    public fun setMusicChoice(choice: MusicChoice) {
+        viewModelScope.launch { settingsRepository.updateMusicChoice(choice) }
     }
 
     public fun setHapticsEnabled(enabled: Boolean) {

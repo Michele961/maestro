@@ -132,7 +132,7 @@ public fun MaestroNavHost(
     val destination = backStackEntry?.destination
     val screenOwnsBackdrop = destination?.hasRoute<Route.Table>() == true
     LaunchedEffect(destination, settingsLoaded) {
-        if (settingsLoaded && !screenOwnsBackdrop) soundManager.setBackdrop(Backdrops.circle(clock.localHour()))
+        if (settingsLoaded && !screenOwnsBackdrop) soundManager.setBackdrop(Backdrops.circle(clock.localHour(), settings.musicChoice))
     }
 
     // La lingua si applica solo a impostazioni lette davvero: il valore iniziale non deve cambiarla (F1R-31c).
@@ -223,7 +223,7 @@ public fun MaestroNavHost(
                     showPointsRace = settings.showPointsRace,
                     chattiness = settings.maestroChattiness,
                     onChattinessChange = { scope.launch { settingsRepository.updateMaestroChattiness(it) } },
-                    audio = AudioLevels(settings.soundEnabled, settings.effectsVolume, settings.musicVolume, settings.ambientVolume),
+                    audio = AudioLevels(settings.soundEnabled, settings.effectsVolume, settings.musicVolume, settings.ambientVolume, settings.musicChoice),
                     onSoundToggle = { scope.launch { settingsRepository.updateSoundEnabled(!settings.soundEnabled) } },
                     onVolumeChange = { channel, volume ->
                         scope.launch {
