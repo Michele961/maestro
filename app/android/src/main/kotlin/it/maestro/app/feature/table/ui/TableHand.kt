@@ -65,6 +65,7 @@ internal fun PlayerHand(
     suggestedCard: Card?,
     onPlay: (Card) -> Unit,
     modifier: Modifier = Modifier,
+    playedMark: HandMark? = null,
 ) {
     val cardHeight = cardWidth * TableGeometry.CARD_RATIO
     var selected by remember(cards) { mutableStateOf<Card?>(null) }
@@ -166,7 +167,11 @@ internal fun PlayerHand(
                         isPlayable = canPlay,
                         width = cardWidth,
                         height = cardHeight,
-                        modifier = if (isSelected || overThreshold) Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(6.dp)) else Modifier,
+                        modifier = when {
+                            isSelected || overThreshold -> Modifier.border(3.dp, GoldAccentColor, RoundedCornerShape(6.dp))
+                            playedMark?.card == card -> Modifier.border(4.dp, if (playedMark.good) MarkGood else MarkWrong, RoundedCornerShape(6.dp))
+                            else -> Modifier
+                        },
                         onClick = {
                             if (canPlay) {
                                 if (isSelected) {
@@ -183,6 +188,12 @@ internal fun PlayerHand(
         }
     }
 }
+
+/** La carta che si è giocata nella revisione: bordo verde se la mossa era buona, rosso se era un errore. */
+internal data class HandMark(val card: Card, val good: Boolean)
+
+private val MarkGood = Color(0xFF43A047)
+private val MarkWrong = Color(0xFFE53935)
 
 /** Quanto si alza la carta selezionata, in frazione della sua altezza. */
 private const val SELECTED_LIFT = 0.10f

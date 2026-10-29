@@ -56,27 +56,30 @@ public data class TableGeometry(
 
         private val GAP = 8.dp
 
+        /** Nella revisione la fascia sopra la mano è più stretta: lì non si trascina, si tocca. */
+        private val REVIEW_CONTROLS_STRIP = 28.dp
+
         /** Fascia sopra le carte della mano, sempre riservata: ci stanno «Gioca» e «Trascina sul tavolo» senza muovere nulla. */
         public val CONTROLS_STRIP: Dp = 48.dp
 
         /** Geometria per uno spazio utile di [width] × [height] (già al netto degli inset di sistema). */
-        public fun from(width: Dp, height: Dp): TableGeometry {
+        public fun from(width: Dp, height: Dp, review: Boolean = false): TableGeometry {
             val opponentCard = (width * 0.13f).coerceIn(40.dp, 64.dp)
             val pile = (width * 0.15f).coerceIn(48.dp, 72.dp)
             val maestro = (width * 0.14f).coerceIn(44.dp, 72.dp)
-            val barHeight = (height * 0.07f).coerceIn(40.dp, 64.dp)
+            val barHeight = if (review) 0.dp else (height * 0.07f).coerceIn(40.dp, 64.dp)
             val opponentHandHeight = opponentCard * CARD_RATIO
 
             // La mano occupa il 24% dell'altezza e le carte restano intere al suo interno.
-            val cardsHeight = height * 0.24f
-            val handHeight = cardsHeight + CONTROLS_STRIP
+            val cardsHeight = height * (if (review) 0.22f else 0.24f)
+            val handHeight = cardsHeight + (if (review) REVIEW_CONTROLS_STRIP else CONTROLS_STRIP)
             val handCard = min((width * 0.26f).coerceIn(84.dp, 128.dp), (cardsHeight - GAP) / CARD_RATIO)
             // La zona del Maestro è più alta del ritratto quando c'è spazio: il fumetto ci sta per intero (4-5 righe).
-            val statusHeight = (height * 0.11f).coerceIn(maestro, 92.dp)
+            val statusHeight = if (review) 0.dp else (height * 0.11f).coerceIn(maestro, 92.dp)
 
             // La zona di gioco prende lo spazio che resta (al massimo il 42% dell'altezza).
             val fixed = barHeight + opponentHandHeight + statusHeight + handHeight + GAP * 5
-            val playHeight = min(height * 0.42f, height - fixed)
+            val playHeight = min(height * (if (review) 0.5f else 0.42f), height - fixed)
             val playWidth = width - pile - GAP
             // Due file di carte a terra devono stare nella zona di gioco.
             val tableCard = min(

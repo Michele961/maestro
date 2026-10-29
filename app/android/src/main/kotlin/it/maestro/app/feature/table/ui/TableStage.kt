@@ -109,6 +109,7 @@ internal fun StageBoard(
     suggestedCard: Card?,
     onPlay: (Card) -> Unit,
     modifier: Modifier = Modifier,
+    playedMark: HandMark? = null,
 ) {
     val zones = geometry.zones
     // Le scope già in pila restano visibili durante la presa: la nuova compare solo a scena finita.
@@ -152,6 +153,7 @@ internal fun StageBoard(
                 canPlay = canPlay,
                 suggestedCard = suggestedCard,
                 onPlay = onPlay,
+                playedMark = playedMark,
             )
         }
         model.flights.forEach { flight ->
