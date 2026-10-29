@@ -42,6 +42,8 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.audio.Backdrops
+import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.audio.NoOpSoundManager
@@ -83,6 +85,9 @@ public fun TableScreen(
     showPointsRace: Boolean = false,
     chattiness: Chattiness = Chattiness.NORMAL,
     onChattinessChange: (Chattiness) -> Unit = {},
+    audio: AudioLevels = AudioLevels(),
+    onSoundToggle: () -> Unit = {},
+    onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     clock: Clock = koinInject(),
@@ -125,6 +130,9 @@ public fun TableScreen(
         showPointsRace = showPointsRace,
         chattiness = chattiness,
         onChattinessChange = onChattinessChange,
+        audio = audio,
+        onSoundToggle = onSoundToggle,
+        onVolumeChange = onVolumeChange,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -161,6 +169,9 @@ public fun TableContent(
     showPointsRace: Boolean = false,
     chattiness: Chattiness = Chattiness.NORMAL,
     onChattinessChange: (Chattiness) -> Unit = {},
+    audio: AudioLevels = AudioLevels(),
+    onSoundToggle: () -> Unit = {},
+    onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
@@ -248,6 +259,8 @@ public fun TableContent(
                         zone = geometry.zones.opponentBar,
                         sweepBy = (step as? SceneStep.Sweep)?.actor,
                         onPause = { showPause = true },
+                        soundEnabled = audio.soundEnabled,
+                        onToggleSound = onSoundToggle,
                         opponent = opponent,
                     )
                     TableStage(
@@ -291,6 +304,8 @@ public fun TableContent(
                     onNavigateHome = onNavigateHome,
                     chattiness = chattiness,
                     onChattinessChange = onChattinessChange,
+                    audio = audio,
+                    onVolumeChange = onVolumeChange,
                 )
             }
 

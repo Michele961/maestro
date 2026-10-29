@@ -1,6 +1,8 @@
 package it.maestro.app.shell
 
 import android.app.Activity
+import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.audio.Backdrops
 import it.maestro.app.designsystem.audio.SoundManager
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -221,6 +223,17 @@ public fun MaestroNavHost(
                     showPointsRace = settings.showPointsRace,
                     chattiness = settings.maestroChattiness,
                     onChattinessChange = { scope.launch { settingsRepository.updateMaestroChattiness(it) } },
+                    audio = AudioLevels(settings.soundEnabled, settings.effectsVolume, settings.musicVolume, settings.ambientVolume),
+                    onSoundToggle = { scope.launch { settingsRepository.updateSoundEnabled(!settings.soundEnabled) } },
+                    onVolumeChange = { channel, volume ->
+                        scope.launch {
+                            when (channel) {
+                                AudioChannel.EFFECTS -> settingsRepository.updateEffectsVolume(volume)
+                                AudioChannel.MUSIC -> settingsRepository.updateMusicVolume(volume)
+                                AudioChannel.AMBIENT -> settingsRepository.updateAmbientVolume(volume)
+                            }
+                        }
+                    },
                     onNavigateHome = { goHome() },
                     onViewAnalysis = { log, training ->
                         navController.navigate(

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
 import it.maestro.app.designsystem.components.MaestroPillButton
+import it.maestro.app.designsystem.components.VolumeSlider
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.theme.BrassRivetGold
@@ -174,7 +175,7 @@ public fun SettingsScreenContent(
                         rowTag = "sound_toggle_row",
                         switchTag = "sound_enabled_switch",
                     )
-                    VolumeRow(
+                    VolumeSlider(
                         title = stringResource(R.string.settings_effects_volume),
                         volume = state.effectsVolume,
                         enabled = state.soundEnabled,
@@ -182,7 +183,7 @@ public fun SettingsScreenContent(
                         onCommitted = onEffectsVolumeCommitted,
                         tag = "effects_volume_slider",
                     )
-                    VolumeRow(
+                    VolumeSlider(
                         title = stringResource(R.string.settings_music_volume),
                         volume = state.musicVolume,
                         enabled = state.soundEnabled,
@@ -190,7 +191,7 @@ public fun SettingsScreenContent(
                         onCommitted = onMusicVolumeCommitted,
                         tag = "music_volume_slider",
                     )
-                    VolumeRow(
+                    VolumeSlider(
                         title = stringResource(R.string.settings_ambient_volume),
                         volume = state.ambientVolume,
                         enabled = state.soundEnabled,
@@ -318,28 +319,6 @@ private fun SwitchRow(
 }
 
 /** Cursore del volume: mentre si trascina vale subito, al rilascio si salva e si fa sentire un suono. */
-@Composable
-private fun VolumeRow(title: String, volume: Int, enabled: Boolean, onChange: (Int) -> Unit, onCommitted: (Int) -> Unit, tag: String) {
-    var dragging by remember(volume) { mutableFloatStateOf(volume.toFloat()) }
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(text = stringResource(R.string.settings_volume_percent, dragging.toInt()), style = MaterialTheme.typography.bodyMedium, color = SubtitleColor)
-        }
-        Slider(
-            value = dragging,
-            onValueChange = {
-                dragging = it
-                onChange(it.toInt())
-            },
-            onValueChangeFinished = { onCommitted(dragging.toInt()) },
-            valueRange = 0f..100f,
-            enabled = enabled,
-            modifier = Modifier.testTag(tag),
-        )
-    }
-}
-
 @Composable
 private fun <T> ChoiceRow(
     title: String,

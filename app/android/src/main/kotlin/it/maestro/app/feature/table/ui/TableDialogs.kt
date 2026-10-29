@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +25,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.maestro.app.R
+import it.maestro.app.designsystem.components.VolumeSlider
+import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.coach.Chattiness
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.PaddingValues
@@ -103,9 +108,11 @@ internal fun PauseDialog(
     onNavigateHome: () -> Unit,
     chattiness: Chattiness = Chattiness.NORMAL,
     onChattinessChange: (Chattiness) -> Unit = {},
+    audio: AudioLevels = AudioLevels(),
+    onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onResume) {
-        ParchmentPanel(modifier = Modifier.width(300.dp).testTag("pause_dialog")) {
+        ParchmentPanel(modifier = Modifier.width(300.dp).verticalScroll(rememberScrollState()).testTag("pause_dialog")) {
             Text(
                 text = stringResource(id = R.string.game_pause).uppercase(),
                 style = MaterialTheme.typography.headlineSmall,
@@ -119,6 +126,20 @@ internal fun PauseDialog(
                 modifier = Modifier.fillMaxWidth(),
                 testTag = "pause_resume_button",
             )
+            for ((channel, title, tag) in listOf(
+                Triple(AudioChannel.EFFECTS, R.string.settings_effects_volume, "pause_effects_volume"),
+                Triple(AudioChannel.MUSIC, R.string.settings_music_volume, "pause_music_volume"),
+                Triple(AudioChannel.AMBIENT, R.string.settings_ambient_volume, "pause_ambient_volume"),
+            )) {
+                VolumeSlider(
+                    title = stringResource(id = title),
+                    volume = audio.volume(channel),
+                    enabled = audio.soundEnabled,
+                    onChange = {},
+                    onCommitted = { onVolumeChange(channel, it) },
+                    tag = tag,
+                )
+            }
             Text(
                 text = stringResource(id = R.string.settings_maestro_chat),
                 style = MaterialTheme.typography.titleSmall,

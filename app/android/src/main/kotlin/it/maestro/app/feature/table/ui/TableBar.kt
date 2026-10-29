@@ -23,6 +23,10 @@ import it.maestro.app.feature.pregame.ui.style
 import it.maestro.app.domain.opponents.Opponent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
 import it.maestro.app.designsystem.components.NineSliceBox
@@ -39,6 +43,8 @@ internal fun OpponentBar(
     sweepBy: Seat?,
     onPause: () -> Unit,
     opponent: Opponent = Opponent.MAESTRO,
+    soundEnabled: Boolean = true,
+    onToggleSound: () -> Unit = {},
 ) {
     val portrait = when {
         sweepBy == uiState.humanSeat -> opponent.losingPortrait()
@@ -66,12 +72,14 @@ internal fun OpponentBar(
             skin = R.drawable.skin_name_plaque,
             slice = 0.35f,
             corner = 12.dp,
-            modifier = Modifier.padding(start = 4.dp),
+            modifier = Modifier.padding(start = 4.dp).weight(1f, fill = false),
         ) {
             Text(
                 text = stringResource(opponent.style().name),
                 style = MaterialTheme.typography.titleSmall,
                 color = GoldAccentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             )
         }
@@ -81,6 +89,19 @@ internal fun OpponentBar(
             p2Score = model.opponentScore,
             p1Label = stringResource(R.string.game_player_you),
             p2Label = stringResource(R.string.game_opponent_short),
+        )
+        val soundLabel = stringResource(R.string.game_sound_toggle)
+        Text(
+            text = stringResource(if (soundEnabled) R.string.game_sound_on else R.string.game_sound_off),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(start = 6.dp)
+                .size(zone.height.coerceAtMost(40.dp))
+                .clip(CircleShape)
+                .clickable(onClick = onToggleSound)
+                .semantics { contentDescription = soundLabel }
+                .testTag("sound_toggle_button"),
+            textAlign = TextAlign.Center,
         )
         Image(
             painter = painterResource(R.drawable.button_pause),
