@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 public data class SettingsUiState(
     val soundEnabled: Boolean = true,
     val effectsVolume: Int = 100,
+    val musicVolume: Int = 40,
+    val ambientVolume: Int = 40,
     val hapticsEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
     val maestroChattiness: Chattiness = Chattiness.NORMAL,
@@ -40,6 +42,8 @@ public class SettingsViewModel(
             SettingsUiState(
                 soundEnabled = settings.soundEnabled,
                 effectsVolume = settings.effectsVolume,
+                musicVolume = settings.musicVolume,
+                ambientVolume = settings.ambientVolume,
                 hapticsEnabled = settings.hapticsEnabled,
                 gameSpeed = settings.gameSpeed,
                 maestroChattiness = settings.maestroChattiness,
@@ -64,6 +68,28 @@ public class SettingsViewModel(
         soundManager?.effectsVolume = clamped
         soundManager?.play(SoundEffect.CARD_PLAY)
         viewModelScope.launch { settingsRepository.updateEffectsVolume(clamped) }
+    }
+
+    /** Il cursore della musica si muove: si sente subito, ma si salva solo al rilascio (task F1R-20). */
+    public fun previewMusicVolume(volume: Int) {
+        soundManager?.musicVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+    }
+
+    public fun commitMusicVolume(volume: Int) {
+        val clamped = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+        soundManager?.musicVolume = clamped
+        viewModelScope.launch { settingsRepository.updateMusicVolume(clamped) }
+    }
+
+    /** Come [previewMusicVolume], per il rumore di fondo. */
+    public fun previewAmbientVolume(volume: Int) {
+        soundManager?.ambientVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+    }
+
+    public fun commitAmbientVolume(volume: Int) {
+        val clamped = volume.coerceIn(0, AudioMixer.MAX_VOLUME)
+        soundManager?.ambientVolume = clamped
+        viewModelScope.launch { settingsRepository.updateAmbientVolume(clamped) }
     }
 
     public fun setHapticsEnabled(enabled: Boolean) {

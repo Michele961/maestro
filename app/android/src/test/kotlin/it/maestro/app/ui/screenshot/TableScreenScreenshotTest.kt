@@ -243,6 +243,22 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun table_sets_its_backdrop_and_turns_tense_in_the_last_deal() {
+        val sound = it.maestro.app.designsystem.audio.NoOpSoundManager()
+        var state by androidx.compose.runtime.mutableStateOf(midDeal.copy(deckCardCount = 10))
+        composeRule.setContent {
+            MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}, soundManager = sound, localHour = 21) }
+        }
+        composeRule.waitForIdle()
+        org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.CIRCLE_EVENING, sound.currentBackdrop?.music)
+        org.junit.Assert.assertEquals(it.maestro.app.domain.audio.AmbientTrack.TABLE, sound.currentBackdrop?.ambient)
+
+        state = midDeal.copy(deckCardCount = 0)
+        composeRule.waitForIdle()
+        org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.TENSE, sound.currentBackdrop?.music)
+    }
+
+    @Test
     fun playing_card_in_game_does_not_crash() {
         val viewModel = it.maestro.app.feature.table.presentation.GameViewModel(
             ioDispatcher = kotlinx.coroutines.Dispatchers.Unconfined,

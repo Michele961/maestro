@@ -11,6 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import it.maestro.app.designsystem.audio.SoundManager
+import org.koin.android.ext.android.inject
 import it.maestro.app.shell.MaestroNavHost
 import it.maestro.app.designsystem.theme.MaestroTheme
 
@@ -45,6 +47,18 @@ public class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private val soundManager: SoundManager by inject()
+
+    override fun onStart() {
+        super.onStart()
+        soundManager.setAppVisible(true)
+    }
+
+    override fun onStop() {
+        soundManager.setAppVisible(false)
+        super.onStop()
     }
 
     private fun consumeLastCrashReport(): String? {

@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.audio.Backdrops
+import androidx.compose.runtime.DisposableEffect
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.audio.NoOpSoundManager
@@ -115,6 +117,7 @@ public fun TableScreen(
         onIntent = viewModel::onIntent,
         modifier = modifier,
         soundManager = soundManager,
+        localHour = clock.localHour(),
         tableThemeId = tableThemeId,
         cardBackThemeId = cardBackThemeId,
         showPointsRace = showPointsRace,
@@ -148,6 +151,7 @@ public fun TableContent(
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
     soundManager: SoundManager = NoOpSoundManager(),
+    localHour: Int = 12,
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
@@ -174,6 +178,14 @@ public fun TableContent(
             else -> {}
         }
     }
+
+    // Sotto il tavolo suonano il rumore del tavolo e la musica; all'ultima smazzata la musica si fa tesa,
+    // e mentre il Maestro parla si abbassa (F1R-20).
+    val lastDeal = uiState.deckCardCount == 0 && uiState.humanHand.isNotEmpty()
+    LaunchedEffect(lastDeal, localHour) { soundManager.setBackdrop(Backdrops.table(localHour, lastDeal)) }
+    val maestroSpeaking = uiState.maestroLine != null
+    LaunchedEffect(maestroSpeaking) { soundManager.maestroSpeaking = maestroSpeaking }
+    DisposableEffect(Unit) { onDispose { soundManager.maestroSpeaking = false } }
 
     // A fine partita, a scena ferma e riepilogo chiuso, si passa alla schermata di fine partita.
     val matchOver = uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null && !scene.busy

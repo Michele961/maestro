@@ -112,4 +112,23 @@ class SettingsViewModelTest {
         assertEquals("en", repository.settingsFlow.first().language)
         assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTag("fr"))
     }
+
+    @Test
+    fun musicAndAmbientVolumes_areHeardAtOnceAndSavedOnRelease() = runTest {
+        val repository = InMemorySettingsRepository()
+        val sound = NoOpSoundManager()
+        val viewModel = SettingsViewModel(repository, sound)
+
+        viewModel.previewMusicVolume(70)
+        viewModel.previewAmbientVolume(10)
+        assertEquals(70, sound.musicVolume)
+        assertEquals(10, sound.ambientVolume)
+        assertEquals(40, repository.settingsFlow.first().musicVolume)
+
+        viewModel.commitMusicVolume(70)
+        viewModel.commitAmbientVolume(10)
+        advanceUntilIdle()
+        assertEquals(70, repository.settingsFlow.first().musicVolume)
+        assertEquals(10, repository.settingsFlow.first().ambientVolume)
+    }
 }
