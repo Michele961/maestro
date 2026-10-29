@@ -6,6 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -107,10 +110,14 @@ public fun DailyPuzzleScreenContent(
     val isSolved = uiState.status is DailyPuzzleStatus.Solved
 
     ClubBackground(modifier = modifier.testTag("daily_puzzle_screen"), feltFraction = 0.72f) {
+        // Il tavolo ha un'altezza minima che gli basta a mostrare le carte: se il resto non ci sta (a sfida risolta c'è
+        // molto da leggere), la pagina scorre invece di schiacciarlo.
+        val tableHeight = (LocalConfiguration.current.screenHeightDp * 0.3f).dp.coerceAtLeast(210.dp)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)),
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+                .verticalScroll(rememberScrollState()),
         ) {
             // Intestazione schermata
             PuzzleHeader(
@@ -150,7 +157,7 @@ public fun DailyPuzzleScreenContent(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(tableHeight)
                     .padding(horizontal = 14.dp, vertical = 4.dp),
                 shape = RoundedCornerShape(14.dp),
                 color = Color(0xFF13361E),
