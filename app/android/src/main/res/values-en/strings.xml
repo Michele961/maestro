@@ -950,4 +950,7 @@
     <string name="settings_language_english">English</string>
     <string name="settings_music_volume">Music volume</string>
     <string name="settings_ambient_volume">Background sound volume</string>
+    <string name="review_replay_best">Watch the best</string>
+    <string name="review_replay_played">Watch the move</string>
+    <string name="review_replay_slow">Slow down</string>
 </resources>

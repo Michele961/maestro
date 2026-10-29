@@ -950,4 +950,7 @@
     <string name="settings_language_english">English</string>
     <string name="settings_music_volume">Volume della musica</string>
     <string name="settings_ambient_volume">Volume dei rumori di fondo</string>
+    <string name="review_replay_best">Guarda la migliore</string>
+    <string name="review_replay_played">Guarda la mossa</string>
+    <string name="review_replay_slow">Rallenta</string>
 </resources>

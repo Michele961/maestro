@@ -240,7 +240,7 @@ public fun GameReviewScreen(
             when {
                 isFound || (!isRetryMode && bestShown && currentStep.bestBeat != null) -> stage.showBest(currentStep)
                 isRetryMode -> stage.rest(currentStep)
-                else -> stage.showPlayed(currentStep)
+                else -> stage.rest(currentStep)
             }
         }
 
@@ -329,6 +329,16 @@ public fun GameReviewScreen(
 
                 if (isRetryMode && uiState.retryFeedback is RetryFeedback.Correct) {
                     ConfettiCelebration(modifier = Modifier.fillMaxSize())
+                }
+            }
+
+            if (!isRetryMode) {
+                viewModel.stage?.let { stage ->
+                    ReviewReplayControls(
+                        stage = stage,
+                        step = currentStep,
+                        showBest = isSolutionVisible && isHumanMove && moveAnalysis.isMistake() && currentStep.bestBeat != null,
+                    )
                 }
             }
 
