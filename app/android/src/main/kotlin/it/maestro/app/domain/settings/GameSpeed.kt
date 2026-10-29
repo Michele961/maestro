@@ -5,8 +5,6 @@ package it.maestro.app.domain.settings
  * `MotionSpec`. [INSTANT] azzera le attese ed è pensata per i test di partita completa.
  */
 public enum class GameSpeed(public val multiplier: Double) {
-    /** Rallentatore: non è tra le scelte dell'utente, lo usa la revisione per far rivedere una mossa. */
-    SLOW(0.5),
     NORMAL(1.0),
     FAST(1.5),
     FASTER(2.0),

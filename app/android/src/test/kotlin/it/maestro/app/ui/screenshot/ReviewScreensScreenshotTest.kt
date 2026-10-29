@@ -209,6 +209,16 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun every_step_has_the_same_replay_button_and_no_slow_motion() {
+        val analysis = analyzer.analyze(log)
+        composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
+        composeRule.onNodeWithTag("review_replay_played").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("review_replay_slow").assertDoesNotExist()
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
+        composeRule.onNodeWithTag("review_replay_played").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
     fun game_review_screenshot() {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }

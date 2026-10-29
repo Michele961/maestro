@@ -379,7 +379,7 @@ private fun DeveloperAction(
 }
 
 private fun GameSpeed.labelRes(): Int = when (this) {
-    GameSpeed.SLOW, GameSpeed.NORMAL -> R.string.settings_game_speed_normal
+    GameSpeed.NORMAL -> R.string.settings_game_speed_normal
     GameSpeed.FAST -> R.string.settings_game_speed_fast
     GameSpeed.FASTER -> R.string.settings_game_speed_faster
     GameSpeed.INSTANT -> R.string.settings_game_speed_faster
