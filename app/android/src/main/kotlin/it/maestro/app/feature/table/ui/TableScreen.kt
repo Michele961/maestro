@@ -100,7 +100,7 @@ public fun TableScreen(
     LaunchedEffect(Unit) {
         if (viewModel.hasMatch) return@LaunchedEffect
         if (resume || started) {
-            viewModel.resumeActiveMatch(trainingFundamental, onUnavailable = onNavigateHome)
+            viewModel.resumeActiveMatch(onUnavailable = onNavigateHome)
         } else {
             viewModel.onIntent(
                 GameIntent.StartMatch(

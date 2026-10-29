@@ -140,7 +140,6 @@ public class GameViewModel(
      * controllo, ad esempio per tornare alla Home.
      */
     public fun resumeActiveMatch(
-        trainingFundamental: TrainingFundamental,
         onUnavailable: () -> Unit = {},
     ) {
         val repository = matchRepository ?: return onUnavailable()
@@ -151,8 +150,8 @@ public class GameViewModel(
                     GameIntent.RestoreMatch(
                         session = result.session,
                         level = result.level,
-                        trainingFundamental = trainingFundamental,
-                        sparring = trainingFundamental != TrainingFundamental.NONE,
+                        trainingFundamental = result.trainingFundamental,
+                        sparring = result.trainingFundamental != TrainingFundamental.NONE,
                     ),
                 )
                 else -> {
@@ -213,6 +212,7 @@ public class GameViewModel(
                             targetScore = session.config.targetScore,
                             p1Score = session.totals[Seat.P1] ?: 0,
                             p2Score = session.totals[Seat.P2] ?: 0,
+                            trainingFundamental = internalState.trainingFundamental,
                         )
                     } else if (session.phase == DealPhase.MATCH_OVER) {
                         matchRepository.markCompleted(

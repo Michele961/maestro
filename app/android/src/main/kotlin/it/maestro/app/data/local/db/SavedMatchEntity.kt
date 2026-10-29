@@ -1,5 +1,6 @@
 package it.maestro.app.data.local.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -20,4 +21,7 @@ public data class SavedMatchEntity(
     val p2Score: Int,
     val createdAt: Long,
     val updatedAt: Long,
+    /** Obiettivo dello Sparring con cui è iniziata la partita; `NONE` = Classica (migrazione 3 → 4). */
+    @ColumnInfo(defaultValue = "NONE")
+    val trainingFundamental: String = "NONE",
 )

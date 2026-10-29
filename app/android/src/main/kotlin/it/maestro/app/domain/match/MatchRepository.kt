@@ -1,6 +1,7 @@
 package it.maestro.app.domain.match
 
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
 
@@ -13,6 +14,8 @@ public sealed interface RestoreMatchResult {
         val matchLog: MatchLog,
         val level: DifficultyLevel,
         val targetScore: Int,
+        /** Obiettivo dello Sparring con cui è iniziata la partita; `NONE` per la Classica. */
+        val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     ) : RestoreMatchResult
 
     public data object None : RestoreMatchResult
@@ -35,6 +38,7 @@ public interface MatchRepository {
         targetScore: Int,
         p1Score: Int = 0,
         p2Score: Int = 0,
+        trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     )
 
     public suspend fun markCompleted(
