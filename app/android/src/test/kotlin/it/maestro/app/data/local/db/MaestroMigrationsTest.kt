@@ -68,9 +68,39 @@ class MaestroMigrationsTest {
     }
 
     @Test
+    fun migration3To4KeepsTheSavedMatchAsClassic() {
+        helper.createDatabase(dbName, 3).apply {
+            execSQL(
+                "INSERT INTO saved_matches (id, matchLogText, levelName, targetScore, status, winnerSeat, " +
+                    "p1Score, p2Score, createdAt, updatedAt) VALUES " +
+                    "('active', 'log-attivo', 'PRINCIPIANTE', 11, 'IN_PROGRESS', NULL, 3, 2, 100, 200)",
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(dbName, 4, true, *MaestroMigrations.ALL).close()
+
+        val db = Room.databaseBuilder(
+            ApplicationProvider.getApplicationContext<Application>(),
+            MaestroDatabase::class.java,
+            dbName,
+        ).addMigrations(*MaestroMigrations.ALL).allowMainThreadQueries().build()
+        try {
+            runBlocking {
+                val active = assertNotNull(db.savedMatchDao().getActiveMatch())
+                assertEquals("log-attivo", active.matchLogText)
+                assertEquals("PRINCIPIANTE", active.levelName)
+                assertEquals("NONE", active.trainingFundamental)
+            }
+        } finally {
+            db.close()
+        }
+    }
+
+    @Test
     fun everyVersionAfterTheFirstExportedHasAMigration() {
         val versions = MaestroMigrations.ALL.map { it.startVersion to it.endVersion }
-        assertEquals(listOf(2 to 3), versions)
-        assertEquals(3, versions.last().second, "L'ultima migrazione deve arrivare alla versione del database")
+        assertEquals(listOf(2 to 3, 3 to 4), versions)
+        assertEquals(4, versions.last().second, "L'ultima migrazione deve arrivare alla versione del database")
     }
 }

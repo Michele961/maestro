@@ -7,6 +7,7 @@ import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.data.local.db.SavedMatchDao
 import it.maestro.app.data.local.db.SavedMatchEntity
 import it.maestro.game.model.Seat
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ReplayResult
 import it.maestro.game.scopa.replay
@@ -28,6 +29,7 @@ public class RoomMatchRepository(
         targetScore: Int,
         p1Score: Int,
         p2Score: Int,
+        trainingFundamental: TrainingFundamental,
     ) {
         val now = clock.nowMillis()
         val existing = dao.getActiveMatch()
@@ -42,6 +44,7 @@ public class RoomMatchRepository(
             p2Score = p2Score,
             createdAt = existing?.createdAt ?: now,
             updatedAt = now,
+            trainingFundamental = trainingFundamental.name,
         )
         dao.insertOrUpdate(entity)
     }
@@ -80,6 +83,8 @@ public class RoomMatchRepository(
                     matchLog = parsedLog,
                     level = level,
                     targetScore = active.targetScore,
+                    trainingFundamental = TrainingFundamental.entries.firstOrNull { it.name == active.trainingFundamental }
+                        ?: TrainingFundamental.NONE,
                 )
             }
             is ReplayResult.WrongRulesVersion -> {
@@ -113,6 +118,7 @@ public class InMemoryMatchRepository(
         targetScore: Int,
         p1Score: Int,
         p2Score: Int,
+        trainingFundamental: TrainingFundamental,
     ) {
         val now = clock.nowMillis()
         activeMatch = SavedMatchEntity(
@@ -126,6 +132,7 @@ public class InMemoryMatchRepository(
             p2Score = p2Score,
             createdAt = activeMatch?.createdAt ?: now,
             updatedAt = now,
+            trainingFundamental = trainingFundamental.name,
         )
     }
 
@@ -162,6 +169,8 @@ public class InMemoryMatchRepository(
                     matchLog = parsedLog,
                     level = level,
                     targetScore = active.targetScore,
+                    trainingFundamental = TrainingFundamental.entries.firstOrNull { it.name == active.trainingFundamental }
+                        ?: TrainingFundamental.NONE,
                 )
             }
             is ReplayResult.WrongRulesVersion -> {

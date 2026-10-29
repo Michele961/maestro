@@ -18,6 +18,16 @@ public object MaestroMigrations {
         override fun migrate(db: SupportSQLiteDatabase) = Unit
     }
 
+    /**
+     * 3 → 4: la partita in corso ricorda l'obiettivo dello Sparring (`NONE` = Classica), così «Riprendi» la
+     * riapre nella stessa modalità. Le partite già salvate restano Classiche.
+     */
+    public val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE saved_matches ADD COLUMN trainingFundamental TEXT NOT NULL DEFAULT 'NONE'")
+        }
+    }
+
     /** Tutte le migrazioni, in ordine di versione. */
-    public val ALL: Array<Migration> = arrayOf(MIGRATION_2_3)
+    public val ALL: Array<Migration> = arrayOf(MIGRATION_2_3, MIGRATION_3_4)
 }

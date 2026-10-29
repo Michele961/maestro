@@ -23,6 +23,7 @@ class AppModuleTest {
             targetScore: Int,
             p1Score: Int,
             p2Score: Int,
+            trainingFundamental: it.maestro.game.training.TrainingFundamental,
         ) {}
         override suspend fun restoreActiveMatch(): RestoreMatchResult = RestoreMatchResult.None
         override suspend fun clearActiveMatch() {}

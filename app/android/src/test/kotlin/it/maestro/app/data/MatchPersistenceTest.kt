@@ -9,6 +9,7 @@ import it.maestro.app.feature.table.presentation.GameIntent
 import it.maestro.app.feature.table.presentation.GameViewModel
 import it.maestro.game.CoreGame
 import it.maestro.game.model.Seat
+import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.MatchLog
 import it.maestro.game.scopa.ScopaConfig
@@ -216,5 +217,45 @@ class MatchPersistenceTest {
         assertFalse(updated.soundEnabled)
         assertEquals(DifficultyLevel.MAESTRO, updated.preferredLevel)
         assertEquals(21, updated.preferredTargetScore)
+    }
+
+    @Test
+    fun theSparringObjectiveSurvivesClosingAndReopening() = runBlocking {
+        val repository = InMemoryMatchRepository()
+        // Il ViewModel si crea prima: senza interfaccia la sua mano iniziale di prova salverebbe una partita sopra la nostra.
+        val reopened = GameViewModel(
+            matchRepository = repository,
+            ioDispatcher = Dispatchers.Unconfined,
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+        )
+        val log = it.maestro.app.feature.table.presentation.TestMatchGenerator.generateEndgameMatch().log
+        repository.saveActiveMatch(
+            log = log,
+            level = DifficultyLevel.PRINCIPIANTE,
+            targetScore = log.config.targetScore,
+            trainingFundamental = TrainingFundamental.DENARI_COUNT,
+        )
+        val restored = repository.restoreActiveMatch() as RestoreMatchResult.Success
+        assertEquals(TrainingFundamental.DENARI_COUNT, restored.trainingFundamental)
+        assertEquals(DifficultyLevel.PRINCIPIANTE, restored.level)
+
+        reopened.resumeActiveMatch()
+        assertEquals(TrainingFundamental.DENARI_COUNT, reopened.uiState.value.trainingFundamental)
+        assertTrue(reopened.uiState.value.isSparring)
+    }
+
+    @Test
+    fun aClassicMatchIsResumedAsClassic() = runBlocking {
+        val repository = InMemoryMatchRepository()
+        val viewModel = GameViewModel(
+            matchRepository = repository,
+            ioDispatcher = Dispatchers.Unconfined,
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+        )
+        viewModel.onIntent(
+            GameIntent.StartMatch(config = ScopaConfig(targetScore = 11), level = DifficultyLevel.INTERMEDIO, seed = 8L, humanSeat = Seat.P1),
+        )
+        val restored = repository.restoreActiveMatch() as RestoreMatchResult.Success
+        assertEquals(TrainingFundamental.NONE, restored.trainingFundamental)
     }
 }

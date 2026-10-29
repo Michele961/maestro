@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase
         SavedMatchEntity::class,
         WalletTransactionEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 public abstract class MaestroDatabase : RoomDatabase() {
