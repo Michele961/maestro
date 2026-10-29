@@ -1,7 +1,21 @@
 package it.maestro.app.domain.audio
 
 /** Brani di musica dell'app (task F1R-20). */
-public enum class MusicTrack { CIRCLE_DAY, CIRCLE_EVENING }
+public enum class MusicTrack { CIRCLE_DAY, CIRCLE_EVENING, TENSE, VICTORY, DEFEAT }
+
+/**
+ * La musica scelta dal giocatore (task F1R-33): [AUTO] lascia fare all'app (giorno o sera), gli altri fissano
+ * un brano per tutta l'app, [OFF] toglie la musica lasciando gli altri suoni.
+ */
+public enum class MusicChoice(public val track: MusicTrack?) {
+    AUTO(null),
+    CIRCLE_DAY(MusicTrack.CIRCLE_DAY),
+    CIRCLE_EVENING(MusicTrack.CIRCLE_EVENING),
+    TENSE(MusicTrack.TENSE),
+    VICTORY(MusicTrack.VICTORY),
+    DEFEAT(MusicTrack.DEFEAT),
+    OFF(null),
+}
 
 /** Rumori di fondo dell'app (task F1R-20). */
 public enum class AmbientTrack { BAR, TABLE }
@@ -26,9 +40,16 @@ public object Backdrops {
     public fun circleMusic(hour: Int): MusicTrack =
         if (hour >= EVENING_FROM_HOUR || hour < DAY_FROM_HOUR) MusicTrack.CIRCLE_EVENING else MusicTrack.CIRCLE_DAY
 
+    /** Il brano che suona davvero: quello scelto dal giocatore, o quello del momento con [MusicChoice.AUTO]; `null` se spenta. */
+    public fun music(hour: Int, choice: MusicChoice): MusicTrack? = when (choice) {
+        MusicChoice.AUTO -> circleMusic(hour)
+        MusicChoice.OFF -> null
+        else -> choice.track
+    }
+
     /** Circolo (Home, fine partita e schermate fuori partita): musica del momento e brusio del bar. */
-    public fun circle(hour: Int): Backdrop = Backdrop(circleMusic(hour), AmbientTrack.BAR)
+    public fun circle(hour: Int, choice: MusicChoice = MusicChoice.AUTO): Backdrop = Backdrop(music(hour, choice), AmbientTrack.BAR)
 
     /** Tavolo: la stessa musica del circolo, senza interruzioni, e il rumore del tavolo al posto del bar. */
-    public fun table(hour: Int): Backdrop = Backdrop(circleMusic(hour), AmbientTrack.TABLE)
+    public fun table(hour: Int, choice: MusicChoice = MusicChoice.AUTO): Backdrop = Backdrop(music(hour, choice), AmbientTrack.TABLE)
 }

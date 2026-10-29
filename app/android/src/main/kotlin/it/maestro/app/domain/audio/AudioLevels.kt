@@ -9,6 +9,7 @@ public data class AudioLevels(
     val effects: Int = AudioMixer.MAX_VOLUME,
     val music: Int = 40,
     val ambient: Int = 40,
+    val musicChoice: MusicChoice = MusicChoice.AUTO,
 ) {
     /** Il volume di [channel]. */
     public fun volume(channel: AudioChannel): Int = when (channel) {

@@ -951,4 +951,13 @@
     <string name="game_sound_off">🔇</string>
     <string name="game_sound_on">🔊</string>
     <string name="game_sound_toggle">Sound on or off</string>
+    <string name="settings_music_auto">Automatic (day and evening)</string>
+    <string name="settings_music_choice">Music</string>
+    <string name="settings_music_choice_subtitle">One track for the whole app, no changes</string>
+    <string name="settings_music_day">The club by day</string>
+    <string name="settings_music_defeat">Rematch</string>
+    <string name="settings_music_evening">The club by night</string>
+    <string name="settings_music_off">No music</string>
+    <string name="settings_music_tense">Tense match</string>
+    <string name="settings_music_victory">Victory</string>
 </resources>
