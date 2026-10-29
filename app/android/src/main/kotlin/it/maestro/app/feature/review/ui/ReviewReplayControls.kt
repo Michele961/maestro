@@ -3,7 +3,7 @@ package it.maestro.app.feature.review.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,14 +29,14 @@ internal fun ReviewReplayControls(stage: ReviewStage, step: ReviewStep, showBest
             text = stringResource(id = R.string.review_replay_played),
             selected = false,
             onClick = { stage.showPlayed(step) },
-            modifier = Modifier.weight(1f).height(44.dp).testTag("review_replay_played"),
+            modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("review_replay_played"),
         )
         if (showBest) {
             TactileSegmentedPill(
                 text = stringResource(id = R.string.review_replay_best),
                 selected = false,
                 onClick = { stage.showBest(step) },
-                modifier = Modifier.weight(1f).height(44.dp).testTag("review_replay_best"),
+                modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("review_replay_best"),
             )
         }
         TactileSegmentedPill(
@@ -46,7 +46,7 @@ internal fun ReviewReplayControls(stage: ReviewStage, step: ReviewStep, showBest
                 slow = !slow
                 stage.slow = slow
             },
-            modifier = Modifier.weight(1f).height(44.dp).testTag("review_replay_slow"),
+            modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("review_replay_slow"),
         )
     }
 }

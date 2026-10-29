@@ -1,19 +1,17 @@
 package it.maestro.app.domain.audio
 
 /** Brani di musica dell'app (task F1R-20). */
-public enum class MusicTrack { CIRCLE_DAY, CIRCLE_EVENING, TENSE, VICTORY, DEFEAT }
+public enum class MusicTrack { CIRCLE_DAY, CIRCLE_EVENING, TENSE }
 
 /**
  * La musica scelta dal giocatore (task F1R-33): [AUTO] lascia fare all'app (giorno o sera), gli altri fissano
- * un brano per tutta l'app, [OFF] toglie la musica lasciando gli altri suoni.
+ * un brano per tutta l'app (solo brani abbastanza lunghi da non stancare in loop: oltre 45 secondi), [OFF] toglie la musica lasciando gli altri suoni.
  */
 public enum class MusicChoice(public val track: MusicTrack?) {
     AUTO(null),
     CIRCLE_DAY(MusicTrack.CIRCLE_DAY),
     CIRCLE_EVENING(MusicTrack.CIRCLE_EVENING),
     TENSE(MusicTrack.TENSE),
-    VICTORY(MusicTrack.VICTORY),
-    DEFEAT(MusicTrack.DEFEAT),
     OFF(null),
 }
 
