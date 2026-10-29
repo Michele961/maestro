@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.puzzle.PuzzleGoal
 import it.maestro.ai.puzzle.TacticalPuzzle
@@ -176,15 +177,15 @@ class DailyPuzzleScreenshotTest(private val screen: ScreenConfig) {
         composeRule.waitForIdle()
 
         // Verifica stato iniziale
-        composeRule.onNodeWithTag("puzzle_coach_bubble").assertIsDisplayed()
-        composeRule.onNodeWithTag("puzzle_card_${winningCard.rank.name}_${winningCard.suit.name}").assertIsDisplayed()
+        composeRule.onNodeWithTag("puzzle_coach_bubble").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("puzzle_card_${winningCard.rank.name}_${winningCard.suit.name}").performScrollTo().assertIsDisplayed()
 
         // Tocca la carta vincente
         composeRule.onNodeWithTag("puzzle_card_${winningCard.rank.name}_${winningCard.suit.name}").performClick()
         composeRule.waitForIdle()
 
         // Verifica che compare il banner celebrativo di completamento con pulsante condividi
-        composeRule.onNodeWithTag("puzzle_solved_banner").assertIsDisplayed()
-        composeRule.onNodeWithTag("puzzle_share_button").assertIsDisplayed()
+        composeRule.onNodeWithTag("puzzle_solved_banner").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("puzzle_share_button").performScrollTo().assertIsDisplayed()
     }
 }

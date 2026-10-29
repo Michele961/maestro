@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,6 +60,18 @@ internal fun PlayerNameDialog(
                 onValueChange = { name = it.take(maxLength) },
                 singleLine = true,
                 label = { Text(stringResource(R.string.home_name_dialog_label)) },
+                textStyle = MaterialTheme.typography.titleMedium.copy(color = Ink),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Ink,
+                    unfocusedTextColor = Ink,
+                    focusedContainerColor = Color(0xFFFFF8E6),
+                    unfocusedContainerColor = Color(0xFFFFF8E6),
+                    focusedBorderColor = Color(0xFF8C5A2B),
+                    unfocusedBorderColor = Color(0xFF8C5A2B),
+                    focusedLabelColor = Color(0xFF5A3A1E),
+                    unfocusedLabelColor = Color(0xFF5A3A1E),
+                    cursorColor = Ink,
+                ),
                 modifier = Modifier.fillMaxWidth().testTag("player_name_field"),
             )
             Text(

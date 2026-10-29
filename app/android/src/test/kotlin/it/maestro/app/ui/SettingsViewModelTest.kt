@@ -106,10 +106,10 @@ class SettingsViewModelTest {
         advanceUntilIdle()
         assertEquals(it.maestro.app.domain.audio.MusicChoice.AUTO, viewModel.uiState.value.musicChoice)
 
-        viewModel.setMusicChoice(it.maestro.app.domain.audio.MusicChoice.VICTORY)
+        viewModel.setMusicChoice(it.maestro.app.domain.audio.MusicChoice.TENSE)
         advanceUntilIdle()
-        assertEquals(it.maestro.app.domain.audio.MusicChoice.VICTORY, viewModel.uiState.value.musicChoice)
-        assertEquals(it.maestro.app.domain.audio.MusicChoice.VICTORY, repository.settingsFlow.first().musicChoice)
+        assertEquals(it.maestro.app.domain.audio.MusicChoice.TENSE, viewModel.uiState.value.musicChoice)
+        assertEquals(it.maestro.app.domain.audio.MusicChoice.TENSE, repository.settingsFlow.first().musicChoice)
     }
 
     @Test

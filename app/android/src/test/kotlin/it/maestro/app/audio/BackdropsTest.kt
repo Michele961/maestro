@@ -37,8 +37,8 @@ class BackdropsTest {
     @Test
     fun theChosenTrackPlaysEverywhereAndAutomaticFollowsTheHour() {
         for (hour in listOf(3, 12, 21)) {
-            assertEquals(MusicTrack.VICTORY, Backdrops.circle(hour, MusicChoice.VICTORY).music)
-            assertEquals(MusicTrack.VICTORY, Backdrops.table(hour, MusicChoice.VICTORY).music)
+            assertEquals(MusicTrack.TENSE, Backdrops.circle(hour, MusicChoice.TENSE).music)
+            assertEquals(MusicTrack.TENSE, Backdrops.table(hour, MusicChoice.TENSE).music)
             assertEquals(Backdrops.circleMusic(hour), Backdrops.table(hour, MusicChoice.AUTO).music)
         }
     }

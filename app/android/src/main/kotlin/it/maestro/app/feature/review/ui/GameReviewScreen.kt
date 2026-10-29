@@ -7,6 +7,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -244,10 +246,13 @@ public fun GameReviewScreen(
             }
         }
 
+        // Il tavolo ha un'altezza che gli basta a far stare le carte intere: se il resto non ci sta, la pagina scorre.
+        val boardHeight = (LocalConfiguration.current.screenHeightDp * 0.6f).dp.coerceAtLeast(440.dp)
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .then(if (isRetryMode) Modifier.testTag("review_retry_mode") else Modifier),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -311,8 +316,8 @@ public fun GameReviewScreen(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(boardHeight),
             ) {
                 viewModel.stage?.let { stage ->
                     ReviewBoard(

@@ -200,11 +200,11 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     fun the_explanation_opens_on_request_and_does_not_squash_the_board() {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
-        composeRule.onNodeWithTag("review_next_mistake").performClick()
-        composeRule.onNodeWithTag("review_show_solution_button").performClick()
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
+        composeRule.onNodeWithTag("review_show_solution_button").performScrollTo().performClick()
         composeRule.onNodeWithTag("review_explanation_card").assertDoesNotExist()
         composeRule.onNodeWithTag("review_board").assertIsDisplayed()
-        composeRule.onNodeWithTag("review_why_button").performClick()
+        composeRule.onNodeWithTag("review_why_button").performScrollTo().performClick()
         composeRule.onNodeWithTag("review_explanation_card").assertExists()
     }
 
@@ -213,7 +213,7 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
         // Salta al primo errore, come la mano evidenziata nel mockup
-        composeRule.onNodeWithTag("review_next_mistake").performClick()
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
         composeRule.onRoot().captureRoboImage(screen.path("game_review"))
     }
 
@@ -221,8 +221,8 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
     fun game_review_retry_mode_screenshot() {
         val analysis = analyzer.analyze(log)
         composeRule.setContent { MaestroTheme { GameReviewScreen(matchLog = log, analysis = analysis) } }
-        composeRule.onNodeWithTag("review_next_mistake").performClick()
-        composeRule.onNodeWithTag("review_retry_button").performClick()
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
+        composeRule.onNodeWithTag("review_retry_button").performScrollTo().performClick()
         composeRule.waitForIdle()
         composeRule.onRoot().captureRoboImage(screen.path("game_review_retry"))
     }
@@ -240,8 +240,8 @@ class ReviewScreensScreenshotTest(private val screen: ScreenConfig) {
                 )
             }
         }
-        composeRule.onNodeWithTag("review_next_mistake").performClick()
-        composeRule.onNodeWithTag("review_retry_button").performClick()
+        composeRule.onNodeWithTag("review_next_mistake").performScrollTo().performClick()
+        composeRule.onNodeWithTag("review_retry_button").performScrollTo().performClick()
         val currentStep = viewModel.uiState.value.currentStep!!
         val bestCard = currentStep.analysis.bestMove.card
         val tag = "card_${bestCard.suit.name}_${bestCard.rank.name}"

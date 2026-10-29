@@ -291,7 +291,7 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
             }
         }
         composeRule.onNodeWithTag("opponent_portrait").assertExists()
-        composeRule.onNodeWithText("Gigi", substring = true).assertExists()
+        composeRule.onNodeWithTag("opponent_name").assertTextEquals("Gigi")
     }
 
     @Test

@@ -3,6 +3,9 @@ package it.maestro.app.feature.table.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
@@ -58,29 +61,26 @@ internal fun OpponentBar(
             .testTag("table_top_bar"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(portrait),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(zone.height.coerceAtMost(56.dp))
-                .clip(CircleShape)
-                .border(2.dp, GoldAccentColor, CircleShape)
-                .testTag("opponent_portrait"),
-        )
-        NineSliceBox(
-            skin = R.drawable.skin_name_plaque,
-            slice = 0.35f,
-            corner = 12.dp,
-            modifier = Modifier.padding(start = 4.dp).weight(1f, fill = false),
-        ) {
+        // Ritratto con il nome sotto: il nome non ruba larghezza al punteggio e ai pulsanti.
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.widthIn(max = 76.dp)) {
+            Image(
+                painter = painterResource(portrait),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size((zone.height - 14.dp).coerceIn(30.dp, 50.dp))
+                    .clip(CircleShape)
+                    .border(2.dp, GoldAccentColor, CircleShape)
+                    .testTag("opponent_portrait"),
+            )
             Text(
                 text = stringResource(opponent.style().name),
-                style = MaterialTheme.typography.titleSmall,
                 color = GoldAccentColor,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                modifier = Modifier.testTag("opponent_name"),
             )
         }
         Spacer(modifier = Modifier.widthIn(min = 4.dp).weight(1f, fill = false))

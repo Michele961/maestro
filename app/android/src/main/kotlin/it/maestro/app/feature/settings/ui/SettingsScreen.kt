@@ -423,7 +423,5 @@ private fun MusicChoice.labelRes(): Int = when (this) {
     MusicChoice.CIRCLE_DAY -> R.string.settings_music_day
     MusicChoice.CIRCLE_EVENING -> R.string.settings_music_evening
     MusicChoice.TENSE -> R.string.settings_music_tense
-    MusicChoice.VICTORY -> R.string.settings_music_victory
-    MusicChoice.DEFEAT -> R.string.settings_music_defeat
     MusicChoice.OFF -> R.string.settings_music_off
 }
