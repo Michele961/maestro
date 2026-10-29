@@ -5,10 +5,8 @@ import it.maestro.app.domain.audio.Backdrops
 import it.maestro.app.domain.audio.MusicTrack
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
 
-/** Sfondo sonoro (F1R-20): giorno fino alle 19, sera dopo; tesa all'ultima smazzata; fine partita una volta sola. */
+/** Sfondo sonoro (F1R-20): giorno fino alle 19, sera dopo; la musica non cambia tra circolo e tavolo. */
 class BackdropsTest {
 
     @Test
@@ -27,19 +25,10 @@ class BackdropsTest {
     }
 
     @Test
-    fun tableHasTableAmbienceAndTheMusicTurnsTenseInTheLastDeal() {
-        assertEquals(MusicTrack.CIRCLE_DAY, Backdrops.table(hour = 12, lastDeal = false).music)
-        assertEquals(MusicTrack.CIRCLE_EVENING, Backdrops.table(hour = 21, lastDeal = false).music)
-        assertEquals(MusicTrack.TENSE, Backdrops.table(hour = 12, lastDeal = true).music)
-        assertEquals(AmbientTrack.TABLE, Backdrops.table(hour = 12, lastDeal = true).ambient)
-    }
-
-    @Test
-    fun theResultPlaysOnceWithoutAmbience() {
-        val won = Backdrops.result(won = true)
-        assertEquals(MusicTrack.VICTORY, won.music)
-        assertEquals(MusicTrack.DEFEAT, Backdrops.result(won = false).music)
-        assertFalse(won.musicLoops)
-        assertNull(won.ambient)
+    fun tableKeepsTheSameMusicAsTheCircleAndChangesOnlyTheAmbience() {
+        for (hour in listOf(3, 12, 21)) {
+            assertEquals(Backdrops.circle(hour).music, Backdrops.table(hour).music)
+        }
+        assertEquals(AmbientTrack.TABLE, Backdrops.table(12).ambient)
     }
 }
