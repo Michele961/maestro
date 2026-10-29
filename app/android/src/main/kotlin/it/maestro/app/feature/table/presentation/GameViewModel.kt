@@ -152,6 +152,7 @@ public class GameViewModel(
                         session = result.session,
                         level = result.level,
                         trainingFundamental = trainingFundamental,
+                        sparring = trainingFundamental != TrainingFundamental.NONE,
                     ),
                 )
                 else -> {

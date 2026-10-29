@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.audio.Backdrops
 import androidx.compose.runtime.DisposableEffect
 import it.maestro.app.domain.coach.Chattiness
@@ -103,6 +104,7 @@ public fun TableScreen(
                     level = level,
                     seed = seed,
                     trainingFundamental = trainingFundamental,
+                    sparring = trainingFundamental != TrainingFundamental.NONE,
                 ),
             )
         }
@@ -118,6 +120,7 @@ public fun TableScreen(
         modifier = modifier,
         soundManager = soundManager,
         localHour = clock.localHour(),
+        opponent = Opponent.forLevel(level),
         tableThemeId = tableThemeId,
         cardBackThemeId = cardBackThemeId,
         showPointsRace = showPointsRace,
@@ -138,6 +141,7 @@ public fun TableScreen(
                     level = level,
                     seed = clock.newSeed(),
                     trainingFundamental = trainingFundamental,
+                    sparring = trainingFundamental != TrainingFundamental.NONE,
                 ),
             )
         },
@@ -152,6 +156,7 @@ public fun TableContent(
     modifier: Modifier = Modifier,
     soundManager: SoundManager = NoOpSoundManager(),
     localHour: Int = 12,
+    opponent: Opponent = Opponent.MAESTRO,
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
@@ -249,6 +254,7 @@ public fun TableContent(
                         zone = geometry.zones.opponentBar,
                         sweepBy = (step as? SceneStep.Sweep)?.actor,
                         onPause = { showPause = true },
+                        opponent = opponent,
                     )
                     TableStage(
                         model = model,

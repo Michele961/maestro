@@ -19,6 +19,7 @@ import it.maestro.game.scopa.ScopaMove
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -256,6 +257,17 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
         state = midDeal.copy(deckCardCount = 0)
         composeRule.waitForIdle()
         org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.TENSE, sound.currentBackdrop?.music)
+    }
+
+    @Test
+    fun the_top_bar_shows_the_chosen_opponent_and_not_the_maestro() {
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, opponent = it.maestro.app.domain.opponents.Opponent.GIGI)
+            }
+        }
+        composeRule.onNodeWithTag("opponent_portrait").assertExists()
+        composeRule.onNodeWithText("Gigi", substring = true).assertExists()
     }
 
     @Test
