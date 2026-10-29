@@ -21,6 +21,12 @@ public enum class SoundEffect {
     CHECK_CORRECT,
     CHECK_WRONG,
     BUTTON_CLICK,
+
+    /** Due note ascendenti di mandolino: un obiettivo sbloccato (task F1R-20). */
+    GOAL_UNLOCKED,
+
+    /** Monete leggere e chiusura di cassetto: un acquisto nella Bottega (task F1R-20). */
+    PURCHASE,
 }
 
 /**
@@ -81,6 +87,8 @@ public class AndroidSoundManager(
             soundMap[SoundEffect.CHECK_CORRECT] = soundPool.load(context, R.raw.check_correct, 1)
             soundMap[SoundEffect.CHECK_WRONG] = soundPool.load(context, R.raw.check_wrong, 1)
             soundMap[SoundEffect.BUTTON_CLICK] = soundPool.load(context, R.raw.click, 1)
+            soundMap[SoundEffect.GOAL_UNLOCKED] = soundPool.load(context, R.raw.sfx_goal_unlocked, 1)
+            soundMap[SoundEffect.PURCHASE] = soundPool.load(context, R.raw.sfx_purchase, 1)
         } catch (_: Throwable) {
             // Fallback per ambienti simulati o test
         }

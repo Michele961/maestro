@@ -42,6 +42,8 @@ class SoundManagerTest {
             SoundEffect.CHECK_CORRECT,
             SoundEffect.CHECK_WRONG,
             SoundEffect.BUTTON_CLICK,
+            SoundEffect.GOAL_UNLOCKED,
+            SoundEffect.PURCHASE,
         )
         assertEquals(expected, SoundEffect.entries.toSet())
     }

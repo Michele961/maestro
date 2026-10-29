@@ -1,6 +1,9 @@
 package it.maestro.app.feature.review.presentation
 
 import it.maestro.ai.analysis.MatchAnalysis
+import it.maestro.app.designsystem.audio.NoOpSoundManager
+import it.maestro.app.designsystem.audio.SoundEffect
+import it.maestro.app.domain.progress.AchievementId
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.game.model.Seat
 import kotlinx.coroutines.Dispatchers
@@ -34,12 +37,15 @@ class PostMatchViewModelTest {
     @AfterTest
     fun tearDown() = Dispatchers.resetMain()
 
+    private val sound = NoOpSoundManager()
+
     private fun viewModel(fromHistory: Boolean = false) = PostMatchViewModel(
         matchLog = PostMatchFixtures.log,
         humanSeat = Seat.P1,
         fromHistory = fromHistory,
         analysis = analysis,
         reward = reward,
+        soundManager = sound,
     )
 
     private fun TestScope.step(vm: PostMatchViewModel): PostMatchStep {
@@ -90,5 +96,17 @@ class PostMatchViewModelTest {
         val state = viewModel().uiState.value
         assertEquals(state.humanTotal >= state.opponentTotal, state.won)
         assertEquals(Seat.P1, state.humanSeat)
+    }
+
+    @Test
+    fun anUnlockedGoalPlaysTheGoalSoundOnlyWhenTheRewardArrives() = runTest(dispatcher) {
+        val vm = viewModel()
+        analysis.value = PostMatchFixtures.analysis
+        runCurrent()
+        assertEquals(emptyList(), sound.playedEffects)
+
+        reward.value = RewardSummary(achievementsUnlocked = listOf(AchievementId.FIRST_WIN))
+        runCurrent()
+        assertEquals(listOf(SoundEffect.GOAL_UNLOCKED), sound.playedEffects)
     }
 }

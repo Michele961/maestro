@@ -176,7 +176,7 @@ public class ShopViewModel(
                 settingsRepository.unlockCosmetic(item.id)
                 equipCosmetic(item)
                 eventState.value = ShopEvent.Unlocked(item)
-                soundManager?.play(SoundEffect.CHECK_CORRECT)
+                soundManager?.play(SoundEffect.PURCHASE)
             }
             is WalletOperationResult.InsufficientFunds -> {
                 eventState.value = ShopEvent.NotEnoughCredits(item.priceCredits - walletRepository.getBalance())

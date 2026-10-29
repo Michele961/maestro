@@ -207,7 +207,7 @@ class ShopViewModelTest {
         advanceUntilIdle()
 
         assertEquals(60, walletRepo.getBalance())
-        assertEquals(listOf(SoundEffect.CHECK_CORRECT), sound.playedEffects)
+        assertEquals(listOf(SoundEffect.PURCHASE), sound.playedEffects)
     }
 
     @Test
