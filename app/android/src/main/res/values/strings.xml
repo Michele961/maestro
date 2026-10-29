@@ -956,4 +956,13 @@
     <string name="game_sound_off">🔇</string>
     <string name="game_sound_on">🔊</string>
     <string name="game_sound_toggle">Suono attivo o disattivo</string>
+    <string name="settings_music_auto">Automatica (giorno e sera)</string>
+    <string name="settings_music_choice">Musica</string>
+    <string name="settings_music_choice_subtitle">Un solo brano per tutta l\'app, senza cambi</string>
+    <string name="settings_music_day">Il circolo di giorno</string>
+    <string name="settings_music_defeat">Rivincita</string>
+    <string name="settings_music_evening">Il circolo di sera</string>
+    <string name="settings_music_off">Nessuna musica</string>
+    <string name="settings_music_tense">Partita tesa</string>
+    <string name="settings_music_victory">Vittoria</string>
 </resources>

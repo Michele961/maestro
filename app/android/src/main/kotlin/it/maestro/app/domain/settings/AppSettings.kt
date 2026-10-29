@@ -1,6 +1,7 @@
 package it.maestro.app.domain.settings
 
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.domain.audio.MusicChoice
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.cosmetics.CosmeticCatalog
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,8 @@ public data class AppSettings(
     val musicVolume: Int = 40,
     /** Volume dell'ambiente, 0–100; arriva con F1R-20. */
     val ambientVolume: Int = 40,
+    /** Il brano scelto dal giocatore (task F1R-33); `AUTO` = giorno o sera secondo l'ora. */
+    val musicChoice: MusicChoice = MusicChoice.AUTO,
     /** Vibrazione nelle celebrazioni (Scopa, riepilogo smazzata). */
     val hapticsEnabled: Boolean = true,
     val gameSpeed: GameSpeed = GameSpeed.NORMAL,
@@ -48,6 +51,7 @@ public interface SettingsRepository {
     public suspend fun updateEffectsVolume(volume: Int)
     public suspend fun updateMusicVolume(volume: Int)
     public suspend fun updateAmbientVolume(volume: Int)
+    public suspend fun updateMusicChoice(choice: MusicChoice)
     public suspend fun updateHapticsEnabled(enabled: Boolean)
     public suspend fun updateGameSpeed(speed: GameSpeed)
     public suspend fun updateMaestroChattiness(chattiness: Chattiness)

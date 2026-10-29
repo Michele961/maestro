@@ -194,6 +194,9 @@ public class AndroidSoundManager(
     private fun musicResource(track: MusicTrack): Int = when (track) {
         MusicTrack.CIRCLE_DAY -> R.raw.music_circle_day
         MusicTrack.CIRCLE_EVENING -> R.raw.music_circle_evening
+        MusicTrack.TENSE -> R.raw.music_tense
+        MusicTrack.VICTORY -> R.raw.music_victory
+        MusicTrack.DEFEAT -> R.raw.music_defeat
     }
 
     private fun ambientResource(track: AmbientTrack): Int = when (track) {

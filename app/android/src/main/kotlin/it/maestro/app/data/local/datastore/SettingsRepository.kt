@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.audio.AudioMixer
+import it.maestro.app.domain.audio.MusicChoice
 import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.domain.settings.GameSpeed
 import it.maestro.app.domain.settings.SettingsRepository
@@ -31,6 +32,7 @@ public class DataStoreSettingsRepository(
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
         val EFFECTS_VOLUME = intPreferencesKey("effects_volume")
         val MUSIC_VOLUME = intPreferencesKey("music_volume")
+        val MUSIC_CHOICE = stringPreferencesKey("music_choice")
         val AMBIENT_VOLUME = intPreferencesKey("ambient_volume")
         val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
         val GAME_SPEED = stringPreferencesKey("game_speed")
@@ -73,6 +75,7 @@ public class DataStoreSettingsRepository(
             language = lang,
             soundEnabled = sound,
             effectsVolume = (preferences[PreferencesKeys.EFFECTS_VOLUME] ?: defaults.effectsVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
+            musicChoice = MusicChoice.entries.firstOrNull { it.name == preferences[PreferencesKeys.MUSIC_CHOICE] } ?: defaults.musicChoice,
             musicVolume = (preferences[PreferencesKeys.MUSIC_VOLUME] ?: defaults.musicVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
             ambientVolume = (preferences[PreferencesKeys.AMBIENT_VOLUME] ?: defaults.ambientVolume).coerceIn(0, AudioMixer.MAX_VOLUME),
             hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: defaults.hapticsEnabled,
@@ -109,6 +112,10 @@ public class DataStoreSettingsRepository(
 
     override suspend fun updateMusicVolume(volume: Int) {
         dataStore.edit { it[PreferencesKeys.MUSIC_VOLUME] = volume.coerceIn(0, AudioMixer.MAX_VOLUME) }
+    }
+
+    override suspend fun updateMusicChoice(choice: MusicChoice) {
+        dataStore.edit { it[PreferencesKeys.MUSIC_CHOICE] = choice.name }
     }
 
     override suspend fun updateAmbientVolume(volume: Int) {
@@ -217,6 +224,10 @@ public class InMemorySettingsRepository(
 
     override suspend fun updateMusicVolume(volume: Int) {
         _state.value = _state.value.copy(musicVolume = volume.coerceIn(0, AudioMixer.MAX_VOLUME))
+    }
+
+    override suspend fun updateMusicChoice(choice: MusicChoice) {
+        _state.value = _state.value.copy(musicChoice = choice)
     }
 
     override suspend fun updateAmbientVolume(volume: Int) {

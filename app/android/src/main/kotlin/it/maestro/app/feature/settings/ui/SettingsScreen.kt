@@ -45,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.R
 import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.VolumeSlider
+import it.maestro.app.domain.audio.MusicChoice
 import it.maestro.app.designsystem.components.ParchmentPanel
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.theme.BrassRivetGold
@@ -91,6 +92,7 @@ public fun SettingsScreen(
         onAmbientVolumeChange = viewModel::previewAmbientVolume,
         onAmbientVolumeCommitted = viewModel::commitAmbientVolume,
         onHapticsToggled = viewModel::setHapticsEnabled,
+        onMusicChoiceSelected = viewModel::setMusicChoice,
         onTriggerTestCrash = onTriggerTestCrash,
         onStartTestEndgameMatch = onStartTestEndgameMatch,
         onNavigateHome = onNavigateHome,
@@ -119,6 +121,7 @@ public fun SettingsScreenContent(
     onAmbientVolumeCommitted: (Int) -> Unit = {},
     onHapticsToggled: (Boolean) -> Unit = {},
     onLanguageChanged: (AppLanguage) -> Unit = {},
+    onMusicChoiceSelected: (MusicChoice) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -191,6 +194,7 @@ public fun SettingsScreenContent(
                         onCommitted = onMusicVolumeCommitted,
                         tag = "music_volume_slider",
                     )
+                    MusicChoiceRow(selected = state.musicChoice, onSelected = onMusicChoiceSelected)
                     VolumeSlider(
                         title = stringResource(R.string.settings_ambient_volume),
                         volume = state.ambientVolume,
@@ -392,4 +396,34 @@ private fun AppLanguage.labelRes(): Int = when (this) {
     AppLanguage.SYSTEM -> R.string.settings_language_system
     AppLanguage.ITALIAN -> R.string.settings_language_italian
     AppLanguage.ENGLISH -> R.string.settings_language_english
+}
+
+/** La musica a scelta: «Automatica» (giorno o sera) o un brano fisso per tutta l'app, o nessuna musica (task F1R-33). */
+@Composable
+private fun MusicChoiceRow(selected: MusicChoice, onSelected: (MusicChoice) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().testTag("music_choice_row"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(text = stringResource(R.string.settings_music_choice), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(text = stringResource(R.string.settings_music_choice_subtitle), style = MaterialTheme.typography.bodySmall, color = SubtitleColor)
+        MusicChoice.entries.forEach { choice ->
+            MaestroPillButton(
+                text = stringResource(choice.labelRes()),
+                onClick = { onSelected(choice) },
+                variant = if (choice == selected) PillButtonVariant.PRIMARY_GREEN else PillButtonVariant.CREAM,
+                height = 44.dp,
+                fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth(),
+                testTag = "music_choice_${choice.name.lowercase()}",
+            )
+        }
+    }
+}
+
+private fun MusicChoice.labelRes(): Int = when (this) {
+    MusicChoice.AUTO -> R.string.settings_music_auto
+    MusicChoice.CIRCLE_DAY -> R.string.settings_music_day
+    MusicChoice.CIRCLE_EVENING -> R.string.settings_music_evening
+    MusicChoice.TENSE -> R.string.settings_music_tense
+    MusicChoice.VICTORY -> R.string.settings_music_victory
+    MusicChoice.DEFEAT -> R.string.settings_music_defeat
+    MusicChoice.OFF -> R.string.settings_music_off
 }
