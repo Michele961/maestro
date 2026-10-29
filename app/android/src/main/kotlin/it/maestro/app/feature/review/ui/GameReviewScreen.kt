@@ -337,8 +337,8 @@ public fun GameReviewScreen(
                 }
             }
 
-            // Con una o due scelte non c'è niente da rivedere al rallentatore: bastano le carte segnate sul tavolo.
-            if (!isRetryMode && ReviewCoach.isWorthRetrying(moveAnalysis.alternatives.size)) {
+            // Lo stesso con due scelte e con più scelte: cambia solo se la soluzione è già visibile.
+            if (!isRetryMode) {
                 viewModel.stage?.let { stage ->
                     ReviewReplayControls(
                         stage = stage,

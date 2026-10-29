@@ -70,21 +70,4 @@ class ReviewStageTest {
         assertNotNull(step.bestBeat)
         assertEquals(step.bestBeat!!.viewAfter, stage.scene.value.view)
     }
-
-    @Test
-    fun slowMotionMakesTheSameSceneLastLonger() {
-        fun sceneMillis(slow: Boolean): Long {
-            var elapsed = 0L
-            runTest(StandardTestDispatcher()) {
-                val step = steps.first()
-                val stage = ReviewStage(TestScope(testScheduler), Seat.P1, step.playerView)
-                stage.slow = slow
-                stage.showPlayed(step)
-                advanceUntilIdle()
-                elapsed = testScheduler.currentTime
-            }
-            return elapsed
-        }
-        assertTrue(sceneMillis(slow = true) > sceneMillis(slow = false))
-    }
 }

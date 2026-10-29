@@ -19,12 +19,9 @@ public class ReviewStage(scope: CoroutineScope, humanSeat: Seat, first: ScopaVie
         scope = scope,
         humanSeat = humanSeat,
         initialView = first,
-        speed = { if (slow) GameSpeed.SLOW else GameSpeed.NORMAL },
+        speed = { GameSpeed.NORMAL },
         waitForPlayer = false,
     )
-
-    /** Con il rallentatore le scene durano il doppio, per poterle rivedere con calma. */
-    public var slow: Boolean = false
 
     /** Ciò che il tavolo mostra ora. */
     public val scene: StateFlow<TableScene> = director.scene
