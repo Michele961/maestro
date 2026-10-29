@@ -28,6 +28,7 @@ public object GameReducer {
             pendingCapture = null,
             isBotThinking = false,
             trainingFundamental = intent.trainingFundamental,
+            isSparring = intent.sparring,
             lastError = null,
             lastEvent = null,
             dealAnimationId = 1L,
@@ -200,6 +201,7 @@ public object GameReducer {
             botLevel = intent.level,
             lastMoveId = intent.session.log.moves.size.toLong(),
             trainingFundamental = intent.trainingFundamental,
+            isSparring = intent.sparring,
         )
         val botSeat = intent.humanSeat.other()
         val botPlays = intent.session.phase == DealPhase.PLAYING && intent.session.toMove == botSeat

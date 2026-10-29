@@ -128,8 +128,7 @@ public fun MaestroNavHost(
     // Sotto le schermate fuori partita suona il circolo; il tavolo e la fine partita scelgono da sé (F1R-20).
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
-    val screenOwnsBackdrop = destination?.hasRoute<Route.Table>() == true ||
-        (destination?.hasRoute<Route.PostMatch>() == true && backStackEntry?.toRoute<Route.PostMatch>()?.fromHistory == false)
+    val screenOwnsBackdrop = destination?.hasRoute<Route.Table>() == true
     LaunchedEffect(destination, settingsLoaded) {
         if (settingsLoaded && !screenOwnsBackdrop) soundManager.setBackdrop(Backdrops.circle(clock.localHour()))
     }
@@ -251,9 +250,6 @@ public fun MaestroNavHost(
                     parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
                 }
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
-                LaunchedEffect(route.fromHistory, state.won) {
-                    if (!route.fromHistory) soundManager.setBackdrop(Backdrops.result(state.won))
-                }
                 PostMatchScreen(
                     state = state,
                     trainingScore = training,

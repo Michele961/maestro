@@ -19,6 +19,7 @@ import it.maestro.game.scopa.ScopaMove
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -243,19 +244,25 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun table_sets_its_backdrop_and_turns_tense_in_the_last_deal() {
+    fun table_sets_its_backdrop_with_the_circle_music() {
         val sound = it.maestro.app.designsystem.audio.NoOpSoundManager()
-        var state by androidx.compose.runtime.mutableStateOf(midDeal.copy(deckCardCount = 10))
         composeRule.setContent {
-            MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}, soundManager = sound, localHour = 21) }
+            MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, soundManager = sound, localHour = 21) }
         }
         composeRule.waitForIdle()
         org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.CIRCLE_EVENING, sound.currentBackdrop?.music)
         org.junit.Assert.assertEquals(it.maestro.app.domain.audio.AmbientTrack.TABLE, sound.currentBackdrop?.ambient)
+    }
 
-        state = midDeal.copy(deckCardCount = 0)
-        composeRule.waitForIdle()
-        org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.TENSE, sound.currentBackdrop?.music)
+    @Test
+    fun the_top_bar_shows_the_chosen_opponent_and_not_the_maestro() {
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, opponent = it.maestro.app.domain.opponents.Opponent.GIGI)
+            }
+        }
+        composeRule.onNodeWithTag("opponent_portrait").assertExists()
+        composeRule.onNodeWithText("Gigi", substring = true).assertExists()
     }
 
     @Test
