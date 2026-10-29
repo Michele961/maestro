@@ -72,4 +72,14 @@ class TableGeometryTest {
         assertTrue(pixel.cardWidth > small.cardWidth)
         assertTrue(pixel.handCardWidth > small.handCardWidth)
     }
+
+    @Test
+    fun reviewBoardWithoutBarAndStatusZoneGivesTableCardsTheRoom() {
+        // Un tavolo di revisione di 344 × 440 dp: senza barra e striscia del Maestro le carte a terra restano leggibili.
+        val game = TableGeometry.from(344.dp, 440.dp)
+        val review = TableGeometry.from(344.dp, 440.dp, review = true)
+        assertTrue(review.cardWidth > game.cardWidth, "le carte a terra devono crescere")
+        assertTrue(review.cardWidth >= 52.dp, "carte a terra ${review.cardWidth}")
+        assertTrue(review.zones.opponentBar.height == 0.dp && review.zones.pointsRace.height == 0.dp)
+    }
 }

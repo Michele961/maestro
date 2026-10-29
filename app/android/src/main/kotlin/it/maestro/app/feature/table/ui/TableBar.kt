@@ -68,7 +68,7 @@ internal fun OpponentBar(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size((zone.height - 14.dp).coerceIn(30.dp, 50.dp))
+                    .size((zone.height - 15.dp).coerceIn(30.dp, 52.dp))
                     .clip(CircleShape)
                     .border(2.dp, GoldAccentColor, CircleShape)
                     .testTag("opponent_portrait"),
@@ -76,7 +76,8 @@ internal fun OpponentBar(
             Text(
                 text = stringResource(opponent.style().name),
                 color = GoldAccentColor,
-                fontSize = 11.sp,
+                fontSize = 10.sp,
+                lineHeight = 12.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

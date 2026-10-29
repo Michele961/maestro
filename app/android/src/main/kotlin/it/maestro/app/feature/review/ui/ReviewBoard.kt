@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.app.feature.review.presentation.RetryFeedback
 import it.maestro.app.feature.review.presentation.isMistake
 import it.maestro.app.feature.review.presentation.ReviewStage
+import it.maestro.app.feature.table.ui.HandMark
 import it.maestro.app.feature.table.ui.StageBoard
 import it.maestro.app.feature.table.ui.StageModel
 import it.maestro.app.feature.table.ui.TableGeometry
@@ -53,6 +54,12 @@ internal fun ReviewBoard(
     val canPlayCards = !scene.busy && (isHumanMistake && !isSolutionVisible || isRetryMode && retryFeedback !is RetryFeedback.Correct)
     val showBest = !scene.busy && isHumanMistake && (isSolutionVisible || retryFeedback is RetryFeedback.Correct)
     val best = step.analysis.bestMove
+    // La carta giocata si riconosce a colpo d'occhio: verde se era una buona mossa, rossa se era un errore.
+    val playedMark = if (step.mover == humanSeat && !scene.busy && !isRetryMode) {
+        HandMark(step.analysis.playedMove.card, good = !step.analysis.isMistake())
+    } else {
+        null
+    }
 
     Card(
         modifier = modifier.fillMaxWidth().testTag("review_board"),
@@ -61,7 +68,7 @@ internal fun ReviewBoard(
         border = BorderStroke(4.dp, Brush.verticalGradient(listOf(Color(0xFFFFE082), GoldAccent, Color(0xFF8C6D1F)))),
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val geometry = remember(maxWidth, maxHeight) { TableGeometry.from(maxWidth - 16.dp, maxHeight - 16.dp) }
+            val geometry = remember(maxWidth, maxHeight) { TableGeometry.from(maxWidth - 16.dp, maxHeight - 16.dp, review = true) }
             Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
                 StageBoard(
                     model = model,
@@ -75,6 +82,7 @@ internal fun ReviewBoard(
                     suggestedCapture = if (showBest) best.capture.toSet() else emptySet(),
                     suggestedCard = if (showBest) best.card else null,
                     onPlay = onPlayCard,
+                    playedMark = playedMark,
                 )
                 if (scene.busy) {
                     // Un tocco salta la scena, come al tavolo.
