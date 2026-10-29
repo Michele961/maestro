@@ -3,6 +3,8 @@ package it.maestro.app.feature.review.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.maestro.ai.analysis.MatchAnalysis
+import it.maestro.app.designsystem.audio.SoundEffect
+import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.domain.rewards.RewardSummary
 import it.maestro.game.model.Seat
 import it.maestro.game.scopa.MatchLog
@@ -54,6 +56,7 @@ public class PostMatchViewModel(
     fromHistory: Boolean,
     analysis: Flow<MatchAnalysis?>,
     reward: Flow<RewardSummary?>,
+    private val soundManager: SoundManager? = null,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(initialState(matchLog, humanSeat, fromHistory))
@@ -66,6 +69,7 @@ public class PostMatchViewModel(
             val result = analysis.filterNotNull().first()
             val summary = if (fromHistory) null else reward.filterNotNull().first()
             _uiState.update { it.copy(analysis = result, reward = summary, step = PostMatchStep.READY) }
+            if (summary?.achievementsUnlocked?.isNotEmpty() == true) soundManager?.play(SoundEffect.GOAL_UNLOCKED)
         }
     }
 

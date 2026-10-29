@@ -251,10 +251,10 @@ Parallelismo: F1R-05 e F1R-06 subito; F1R-02, F1R-03, F1R-04 in parallelo dopo F
 
 ## F1R-20 — Audio a tre livelli
 
-- **Stato:** da fare
+- **Stato:** in corso. 20a fatto (asset di Michele del 2026-10-29, tutti generati o con licenza): `scripts/prepare_audio.py` li prepara (loop del circolo e dell'ambiente chiusi con dissolvenza incrociata, stacchetti di 20 s per vittoria e sconfitta, volumi allineati) e li scrive in `res/raw/` come `.ogg`; effetti `GOAL_UNLOCKED` (obiettivo sbloccato a fine partita) e `PURCHASE` (acquisto in Bottega). Resta 20b: musica e ambiente nelle schermate (circolo di giorno fino alle 19 e di sera dopo; partita tesa dall'ultima smazzata; bar nel circolo e tavolo in partita; vittoria/sconfitta a fine partita), abbassamento mentre parla il Maestro (`AudioMixer.DUCK_FACTOR`), cursori Musica e Ambiente in Impostazioni.
 - **Riferimenti:** `docs/app/game-feel.md` §7
 - **Obiettivo:** musica, ambiente ed effetti con volumi separati; la musica si abbassa quando parla il Maestro.
-- **Domande aperte:** asset audio forniti da Michele.
+- **Domande aperte:** nessuna.
 
 ## F1R-21 — Revisione dei contenuti didattici
 
