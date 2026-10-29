@@ -78,6 +78,7 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
     fun sparring_lets_the_player_pick_the_objective_and_shows_what_it_trains() {
         var chosen: TrainingFundamental? = null
         composeRule.setContent { MaestroTheme { PreGameScreen(onStartGame = { _, _, f -> chosen = f }) } }
+        composeRule.onNodeWithTag("objective_change").performScrollTo().performClick()
         composeRule.onNodeWithTag("objective_option_PRIMIERA_LEAD").performScrollTo().performClick()
         composeRule.onNodeWithTag("objective_line").performScrollTo().assertTextContains("calcolo", substring = true)
         composeRule.onNodeWithTag("start_game_button").performClick()
@@ -103,6 +104,8 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent {
             MaestroTheme { PreGameScreen(suggestedObjective = TrainingFundamental.DENARI_COUNT, onStartGame = { _, _, f -> chosen = f }) }
         }
+        composeRule.onNodeWithTag("objective_current").performScrollTo().assertTextContains("Conta i Denari", substring = true)
+        composeRule.onNodeWithTag("objective_change").performScrollTo().performClick()
         composeRule.onNodeWithTag("objective_suggestion").performScrollTo().assertTextContains("Conta i Denari", substring = true)
         composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(TrainingFundamental.DENARI_COUNT, chosen)

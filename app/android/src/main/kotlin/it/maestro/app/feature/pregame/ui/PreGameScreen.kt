@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
@@ -195,17 +196,50 @@ public fun PreGameScreen(
     }
 }
 
-/** Gli obiettivi del Check in Sparring: nome semplice e, per quello scelto, una riga che dice cosa allena. */
+/**
+ * L'obiettivo del Check in Sparring, leggero: l'obiettivo già scelto (quello consigliato dal Maestro) con la riga che dice
+ * cosa allena e un «Cambia» che apre l'elenco; chi non vuole scegliere preme «Gioca» e basta.
+ */
 @Composable
 private fun ObjectivePicker(selected: TrainingFundamental, suggested: TrainingFundamental?, onSelect: (TrainingFundamental) -> Unit) {
-    RibbonHeader(stringResource(id = R.string.pre_game_objective_title))
+    var changing by remember { mutableStateOf(false) }
+    val ink = Color(0xFF2B1A10)
+    selected.objectiveText()?.let { (name, line) ->
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                text = stringResource(id = R.string.pre_game_objective_current, stringResource(name)),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = ink,
+                modifier = Modifier.weight(1f).testTag("objective_current"),
+            )
+            MaestroPillButton(
+                text = stringResource(id = R.string.pre_game_objective_change),
+                onClick = { changing = !changing },
+                variant = PillButtonVariant.CREAM,
+                height = 48.dp,
+                fontSize = 18.sp,
+                testTag = "objective_change",
+            )
+        }
+        Text(
+            text = stringResource(line),
+            style = MaterialTheme.typography.titleSmall,
+            color = ink,
+            modifier = Modifier.fillMaxWidth().padding(top = 2.dp, bottom = 4.dp).testTag("objective_line"),
+        )
+    }
+    if (!changing) return
     suggested?.objectiveText()?.let { (name, _) ->
         Text(
             text = stringResource(id = R.string.pre_game_objective_suggested, stringResource(name)),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2B1A10),
-            textAlign = TextAlign.Center,
+            color = ink,
             modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).testTag("objective_suggestion"),
         )
     }
@@ -215,19 +249,13 @@ private fun ObjectivePicker(selected: TrainingFundamental, suggested: TrainingFu
             TactileSegmentedPill(
                 text = stringResource(text.first),
                 selected = selected == fundamental,
-                onClick = { onSelect(fundamental) },
-                modifier = Modifier.fillMaxWidth().height(48.dp).testTag("objective_option_${fundamental.name}"),
+                onClick = {
+                    onSelect(fundamental)
+                    changing = false
+                },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("objective_option_${fundamental.name}"),
             )
         }
-    }
-    selected.objectiveText()?.let { (_, line) ->
-        Text(
-            text = stringResource(line),
-            style = MaterialTheme.typography.titleSmall,
-            color = Color(0xFF2B1A10),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 4.dp).testTag("objective_line"),
-        )
     }
 }
 

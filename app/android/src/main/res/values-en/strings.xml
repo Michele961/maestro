@@ -845,6 +845,8 @@
     <string name="post_match_maestro_unlocked">Great job! You beat %1$s: now you can challenge %2$s. Careful, they are stronger.</string>
     <string name="post_match_maestro_ladder_done">You have beaten every opponent at the club. I am proud of you!</string>
     <!-- Check objectives in Sparring (F1R-25c, [draft] to approve) -->
+    <string name="pre_game_objective_change">Change</string>
+    <string name="pre_game_objective_current">Training: %1$s</string>
     <string name="pre_game_objective_suggested">The Maestro suggests: %1$s</string>
     <string name="pre_game_objective_title">What you train</string>
     <string name="objective_sevens_name">Count the Sevens</string>
