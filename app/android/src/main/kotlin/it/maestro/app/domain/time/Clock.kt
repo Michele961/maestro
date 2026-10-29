@@ -15,6 +15,9 @@ public interface Clock {
     /** Data corrente nel fuso orario dell'utente. */
     public fun today(): LocalDate
 
+    /** Ora locale del giorno, 0–23 (per la musica del circolo, task F1R-20b). */
+    public fun localHour(): Int
+
     /** Seed per una nuova partita (ADR-0003): la partita resta riproducibile dal suo log. */
     public fun newSeed(): Long
 }

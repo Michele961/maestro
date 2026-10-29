@@ -1,6 +1,10 @@
 package it.maestro.app.shell
 
 import android.app.Activity
+import it.maestro.app.domain.audio.Backdrops
+import it.maestro.app.designsystem.audio.SoundManager
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.currentBackStackEntryAsState
 import it.maestro.app.domain.settings.AppLanguage
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Box
@@ -96,6 +100,7 @@ public fun MaestroNavHost(
     val masteryRepository: MasteryRepository = koinInject()
     val crashReporter: CrashReporter = koinInject()
     val clock: Clock = koinInject()
+    val soundManager: SoundManager = koinInject()
     val scope = rememberCoroutineScope()
 
     // Il giorno si rilegge al ritorno in primo piano: a mezzanotte cambiano streak e missioni (F1R-02).
@@ -118,6 +123,15 @@ public fun MaestroNavHost(
 
     fun goHome() {
         navController.navigate(Route.Home) { popUpTo(Route.Home) { inclusive = true } }
+    }
+
+    // Sotto le schermate fuori partita suona il circolo; il tavolo e la fine partita scelgono da sé (F1R-20).
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val destination = backStackEntry?.destination
+    val screenOwnsBackdrop = destination?.hasRoute<Route.Table>() == true ||
+        (destination?.hasRoute<Route.PostMatch>() == true && backStackEntry?.toRoute<Route.PostMatch>()?.fromHistory == false)
+    LaunchedEffect(destination, settingsLoaded) {
+        if (settingsLoaded && !screenOwnsBackdrop) soundManager.setBackdrop(Backdrops.circle(clock.localHour()))
     }
 
     // La lingua si applica solo a impostazioni lette davvero: il valore iniziale non deve cambiarla (F1R-31c).
@@ -237,6 +251,9 @@ public fun MaestroNavHost(
                     parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
                 }
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
+                LaunchedEffect(route.fromHistory, state.won) {
+                    if (!route.fromHistory) soundManager.setBackdrop(Backdrops.result(state.won))
+                }
                 PostMatchScreen(
                     state = state,
                     trainingScore = training,

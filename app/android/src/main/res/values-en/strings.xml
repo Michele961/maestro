@@ -946,4 +946,6 @@
     <string name="settings_language_system">System</string>
     <string name="settings_language_italian">Italian</string>
     <string name="settings_language_english">English</string>
+    <string name="settings_music_volume">Music volume</string>
+    <string name="settings_ambient_volume">Background sound volume</string>
 </resources>

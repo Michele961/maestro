@@ -2,9 +2,13 @@ package it.maestro.app.designsystem.audio
 
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.SoundPool
 import it.maestro.app.R
+import it.maestro.app.domain.audio.AmbientTrack
 import it.maestro.app.domain.audio.AudioMixer
+import it.maestro.app.domain.audio.Backdrop
+import it.maestro.app.domain.audio.MusicTrack
 import it.maestro.app.domain.settings.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -37,7 +41,22 @@ public interface SoundManager {
 
     /** Volume degli effetti, 0–100 (task F1R-31b): tutti i suoni passano da questo livello. */
     public var effectsVolume: Int
+
+    /** Volume della musica, 0–100 (task F1R-20). */
+    public var musicVolume: Int
+
+    /** Volume dell'ambiente, 0–100 (task F1R-20). */
+    public var ambientVolume: Int
+
+    /** Il Maestro sta parlando: la musica si abbassa (`AudioMixer.DUCK_FACTOR`). */
+    public var maestroSpeaking: Boolean
     public fun play(effect: SoundEffect)
+
+    /** Cosa suona sotto la schermata corrente; `null` per il silenzio (task F1R-20). */
+    public fun setBackdrop(backdrop: Backdrop?)
+
+    /** L'app è in primo piano o no: in secondo piano musica e ambiente si fermano. */
+    public fun setAppVisible(visible: Boolean)
     public fun release()
 }
 
@@ -51,9 +70,35 @@ public class AndroidSoundManager(
 ) : SoundManager {
 
     override var isEnabled: Boolean = true
+        set(value) {
+            field = value
+            refreshVolumes()
+        }
     override var effectsVolume: Int = AudioMixer.MAX_VOLUME
+    override var musicVolume: Int = 40
+        set(value) {
+            field = value
+            refreshVolumes()
+        }
+    override var ambientVolume: Int = 40
+        set(value) {
+            field = value
+            refreshVolumes()
+        }
+    override var maestroSpeaking: Boolean = false
+        set(value) {
+            field = value
+            refreshVolumes()
+        }
 
     private var settingsJob: Job? = null
+    private var backdrop: Backdrop? = null
+    private var appVisible: Boolean = true
+    private var musicPlayer: Playing<MusicTrack>? = null
+    private var ambientPlayer: Playing<AmbientTrack>? = null
+
+    /** Un [MediaPlayer] e il brano che sta suonando. */
+    private class Playing<T>(val track: T, val player: MediaPlayer)
 
     private val soundPool: SoundPool = SoundPool.Builder()
         .setMaxStreams(4)
@@ -74,6 +119,8 @@ public class AndroidSoundManager(
                 .onEach { settings ->
                     isEnabled = settings.soundEnabled
                     effectsVolume = settings.effectsVolume
+                    musicVolume = settings.musicVolume
+                    ambientVolume = settings.ambientVolume
                 }
                 .launchIn(scope)
         }
@@ -107,8 +154,69 @@ public class AndroidSoundManager(
         }
     }
 
+    override fun setBackdrop(backdrop: Backdrop?) {
+        this.backdrop = backdrop
+        syncPlayers()
+    }
+
+    override fun setAppVisible(visible: Boolean) {
+        appVisible = visible
+        syncPlayers()
+    }
+
+    private fun syncPlayers() {
+        val wanted = if (appVisible) backdrop else null
+        musicPlayer = swap(musicPlayer, wanted?.music, wanted?.musicLoops ?: true, ::musicResource)
+        ambientPlayer = swap(ambientPlayer, wanted?.ambient, looping = true, ::ambientResource)
+        refreshVolumes()
+    }
+
+    /** Se il brano voluto è già in corso lo lascia stare; altrimenti ferma il vecchio e avvia il nuovo. */
+    private fun <T : Any> swap(current: Playing<T>?, wanted: T?, looping: Boolean, resource: (T) -> Int): Playing<T>? {
+        if (current?.track == wanted) return current
+        current?.player?.let { runCatching { it.stop() }; it.release() }
+        if (wanted == null) return null
+        return try {
+            MediaPlayer.create(context, resource(wanted))?.let { player ->
+                player.isLooping = looping
+                player.start()
+                Playing(wanted, player)
+            }
+        } catch (_: Throwable) {
+            null // Ambienti simulati o test senza audio
+        }
+    }
+
+    private fun refreshVolumes() {
+        musicPlayer?.player?.let { player ->
+            val gain = AudioMixer.musicGain(musicVolume, isEnabled, maestroSpeaking)
+            runCatching { player.setVolume(gain, gain) }
+        }
+        ambientPlayer?.player?.let { player ->
+            val gain = AudioMixer.ambientGain(ambientVolume, isEnabled)
+            runCatching { player.setVolume(gain, gain) }
+        }
+    }
+
+    private fun musicResource(track: MusicTrack): Int = when (track) {
+        MusicTrack.CIRCLE_DAY -> R.raw.music_circle_day
+        MusicTrack.CIRCLE_EVENING -> R.raw.music_circle_evening
+        MusicTrack.TENSE -> R.raw.music_tense
+        MusicTrack.VICTORY -> R.raw.music_victory
+        MusicTrack.DEFEAT -> R.raw.music_defeat
+    }
+
+    private fun ambientResource(track: AmbientTrack): Int = when (track) {
+        AmbientTrack.BAR -> R.raw.ambient_bar
+        AmbientTrack.TABLE -> R.raw.ambient_table
+    }
+
     override fun release() {
         settingsJob?.cancel()
+        musicPlayer?.player?.release()
+        ambientPlayer?.player?.release()
+        musicPlayer = null
+        ambientPlayer = null
         soundPool.release()
     }
 }
@@ -119,8 +227,27 @@ public class AndroidSoundManager(
 public class NoOpSoundManager(
     override var isEnabled: Boolean = true,
     override var effectsVolume: Int = AudioMixer.MAX_VOLUME,
+    override var musicVolume: Int = 40,
+    override var ambientVolume: Int = 40,
+    override var maestroSpeaking: Boolean = false,
 ) : SoundManager {
     public val playedEffects: MutableList<SoundEffect> = mutableListOf()
+
+    /** Ultimo sfondo richiesto, per i test. */
+    public var currentBackdrop: Backdrop? = null
+        private set
+
+    /** Ultimo stato di visibilità comunicato, per i test. */
+    public var appVisible: Boolean = true
+        private set
+
+    override fun setBackdrop(backdrop: Backdrop?) {
+        currentBackdrop = backdrop
+    }
+
+    override fun setAppVisible(visible: Boolean) {
+        appVisible = visible
+    }
 
     override fun play(effect: SoundEffect) {
         if (isEnabled && effectsVolume > 0) {

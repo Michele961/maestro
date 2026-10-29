@@ -85,6 +85,10 @@ public fun SettingsScreen(
         onLanguageChanged = viewModel::setLanguage,
         onEffectsVolumeChange = viewModel::previewEffectsVolume,
         onEffectsVolumeCommitted = viewModel::commitEffectsVolume,
+        onMusicVolumeChange = viewModel::previewMusicVolume,
+        onMusicVolumeCommitted = viewModel::commitMusicVolume,
+        onAmbientVolumeChange = viewModel::previewAmbientVolume,
+        onAmbientVolumeCommitted = viewModel::commitAmbientVolume,
         onHapticsToggled = viewModel::setHapticsEnabled,
         onTriggerTestCrash = onTriggerTestCrash,
         onStartTestEndgameMatch = onStartTestEndgameMatch,
@@ -108,6 +112,10 @@ public fun SettingsScreenContent(
     showDeveloperTools: Boolean = false,
     onEffectsVolumeChange: (Int) -> Unit = {},
     onEffectsVolumeCommitted: (Int) -> Unit = {},
+    onMusicVolumeChange: (Int) -> Unit = {},
+    onMusicVolumeCommitted: (Int) -> Unit = {},
+    onAmbientVolumeChange: (Int) -> Unit = {},
+    onAmbientVolumeCommitted: (Int) -> Unit = {},
     onHapticsToggled: (Boolean) -> Unit = {},
     onLanguageChanged: (AppLanguage) -> Unit = {},
 ) {
@@ -173,6 +181,22 @@ public fun SettingsScreenContent(
                         onChange = onEffectsVolumeChange,
                         onCommitted = onEffectsVolumeCommitted,
                         tag = "effects_volume_slider",
+                    )
+                    VolumeRow(
+                        title = stringResource(R.string.settings_music_volume),
+                        volume = state.musicVolume,
+                        enabled = state.soundEnabled,
+                        onChange = onMusicVolumeChange,
+                        onCommitted = onMusicVolumeCommitted,
+                        tag = "music_volume_slider",
+                    )
+                    VolumeRow(
+                        title = stringResource(R.string.settings_ambient_volume),
+                        volume = state.ambientVolume,
+                        enabled = state.soundEnabled,
+                        onChange = onAmbientVolumeChange,
+                        onCommitted = onAmbientVolumeCommitted,
+                        tag = "ambient_volume_slider",
                     )
                     SwitchRow(
                         title = stringResource(R.string.settings_haptics),
