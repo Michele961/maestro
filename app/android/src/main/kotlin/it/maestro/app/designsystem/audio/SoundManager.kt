@@ -48,8 +48,6 @@ public interface SoundManager {
     /** Volume dell'ambiente, 0–100 (task F1R-20). */
     public var ambientVolume: Int
 
-    /** Il Maestro sta parlando: la musica si abbassa (`AudioMixer.DUCK_FACTOR`). */
-    public var maestroSpeaking: Boolean
     public fun play(effect: SoundEffect)
 
     /** Cosa suona sotto la schermata corrente; `null` per il silenzio (task F1R-20). */
@@ -81,11 +79,6 @@ public class AndroidSoundManager(
             refreshVolumes()
         }
     override var ambientVolume: Int = 40
-        set(value) {
-            field = value
-            refreshVolumes()
-        }
-    override var maestroSpeaking: Boolean = false
         set(value) {
             field = value
             refreshVolumes()
@@ -166,7 +159,7 @@ public class AndroidSoundManager(
 
     private fun syncPlayers() {
         val wanted = if (appVisible) backdrop else null
-        musicPlayer = swap(musicPlayer, wanted?.music, wanted?.musicLoops ?: true, ::musicResource)
+        musicPlayer = swap(musicPlayer, wanted?.music, true, ::musicResource)
         ambientPlayer = swap(ambientPlayer, wanted?.ambient, looping = true, ::ambientResource)
         refreshVolumes()
     }
@@ -189,7 +182,7 @@ public class AndroidSoundManager(
 
     private fun refreshVolumes() {
         musicPlayer?.player?.let { player ->
-            val gain = AudioMixer.musicGain(musicVolume, isEnabled, maestroSpeaking)
+            val gain = AudioMixer.musicGain(musicVolume, isEnabled, maestroSpeaking = false) // la musica non si abbassa (scelta di Michele)
             runCatching { player.setVolume(gain, gain) }
         }
         ambientPlayer?.player?.let { player ->
@@ -201,9 +194,6 @@ public class AndroidSoundManager(
     private fun musicResource(track: MusicTrack): Int = when (track) {
         MusicTrack.CIRCLE_DAY -> R.raw.music_circle_day
         MusicTrack.CIRCLE_EVENING -> R.raw.music_circle_evening
-        MusicTrack.TENSE -> R.raw.music_tense
-        MusicTrack.VICTORY -> R.raw.music_victory
-        MusicTrack.DEFEAT -> R.raw.music_defeat
     }
 
     private fun ambientResource(track: AmbientTrack): Int = when (track) {
@@ -229,7 +219,6 @@ public class NoOpSoundManager(
     override var effectsVolume: Int = AudioMixer.MAX_VOLUME,
     override var musicVolume: Int = 40,
     override var ambientVolume: Int = 40,
-    override var maestroSpeaking: Boolean = false,
 ) : SoundManager {
     public val playedEffects: MutableList<SoundEffect> = mutableListOf()
 

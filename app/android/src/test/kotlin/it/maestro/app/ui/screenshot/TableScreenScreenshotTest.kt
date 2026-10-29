@@ -16,9 +16,11 @@ import it.maestro.game.model.Suit
 import it.maestro.app.feature.table.presentation.OpponentMoveSummary
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.ScopaMove
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -243,19 +245,53 @@ class TableScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
-    fun table_sets_its_backdrop_and_turns_tense_in_the_last_deal() {
-        val sound = it.maestro.app.designsystem.audio.NoOpSoundManager()
-        var state by androidx.compose.runtime.mutableStateOf(midDeal.copy(deckCardCount = 10))
+    fun the_speaker_button_toggles_the_sound_from_the_table() {
+        var toggled = 0
         composeRule.setContent {
-            MaestroTheme { TableContent(uiState = state, scene = sceneOf(state), onIntent = {}, soundManager = sound, localHour = 21) }
+            MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, onSoundToggle = { toggled++ }) }
+        }
+        composeRule.onNodeWithTag("sound_toggle_button").performClick()
+        org.junit.Assert.assertEquals(1, toggled)
+    }
+
+    @Test
+    fun pause_dialog_has_the_three_volume_sliders_and_they_stop_when_the_sound_is_off() {
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(
+                    uiState = midDeal,
+                    scene = sceneOf(midDeal),
+                    onIntent = {},
+                    audio = it.maestro.app.domain.audio.AudioLevels(soundEnabled = false),
+                )
+            }
+        }
+        composeRule.onNodeWithTag("pause_button").performClick()
+        for (tag in listOf("pause_effects_volume", "pause_music_volume", "pause_ambient_volume")) {
+            composeRule.onNodeWithTag(tag).assertExists().assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun table_sets_its_backdrop_with_the_circle_music() {
+        val sound = it.maestro.app.designsystem.audio.NoOpSoundManager()
+        composeRule.setContent {
+            MaestroTheme { TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, soundManager = sound, localHour = 21) }
         }
         composeRule.waitForIdle()
         org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.CIRCLE_EVENING, sound.currentBackdrop?.music)
         org.junit.Assert.assertEquals(it.maestro.app.domain.audio.AmbientTrack.TABLE, sound.currentBackdrop?.ambient)
+    }
 
-        state = midDeal.copy(deckCardCount = 0)
-        composeRule.waitForIdle()
-        org.junit.Assert.assertEquals(it.maestro.app.domain.audio.MusicTrack.TENSE, sound.currentBackdrop?.music)
+    @Test
+    fun the_top_bar_shows_the_chosen_opponent_and_not_the_maestro() {
+        composeRule.setContent {
+            MaestroTheme {
+                TableContent(uiState = midDeal, scene = sceneOf(midDeal), onIntent = {}, opponent = it.maestro.app.domain.opponents.Opponent.GIGI)
+            }
+        }
+        composeRule.onNodeWithTag("opponent_portrait").assertExists()
+        composeRule.onNodeWithText("Gigi", substring = true).assertExists()
     }
 
     @Test

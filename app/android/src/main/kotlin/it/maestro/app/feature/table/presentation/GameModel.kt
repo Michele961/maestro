@@ -137,6 +137,8 @@ public sealed interface GameIntent {
         val seed: Long = 42L,
         val humanSeat: Seat = Seat.P1,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+        /** Sparring (con Maestro, consigli e Check) o Classica (nessun aiuto, solo pose); da `docs/app/features/maestro-voice.md` §6. */
+        val sparring: Boolean = true,
     ) : GameIntent
 
     public data class RestoreMatch(
@@ -144,6 +146,7 @@ public sealed interface GameIntent {
         val level: DifficultyLevel,
         val humanSeat: Seat = Seat.P1,
         val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
+        val sparring: Boolean = true,
     ) : GameIntent
 
     public data class PlayCard(val card: Card) : GameIntent

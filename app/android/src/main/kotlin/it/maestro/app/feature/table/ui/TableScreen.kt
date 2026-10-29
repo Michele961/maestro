@@ -40,8 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.audio.Backdrops
-import androidx.compose.runtime.DisposableEffect
+import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.designsystem.cosmetics.CosmeticStyle
 import it.maestro.app.designsystem.audio.NoOpSoundManager
@@ -83,6 +85,9 @@ public fun TableScreen(
     showPointsRace: Boolean = false,
     chattiness: Chattiness = Chattiness.NORMAL,
     onChattinessChange: (Chattiness) -> Unit = {},
+    audio: AudioLevels = AudioLevels(),
+    onSoundToggle: () -> Unit = {},
+    onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
     viewModel: GameViewModel = koinViewModel(),
     soundManager: SoundManager = koinInject(),
     clock: Clock = koinInject(),
@@ -103,6 +108,7 @@ public fun TableScreen(
                     level = level,
                     seed = seed,
                     trainingFundamental = trainingFundamental,
+                    sparring = trainingFundamental != TrainingFundamental.NONE,
                 ),
             )
         }
@@ -118,11 +124,15 @@ public fun TableScreen(
         modifier = modifier,
         soundManager = soundManager,
         localHour = clock.localHour(),
+        opponent = Opponent.forLevel(level),
         tableThemeId = tableThemeId,
         cardBackThemeId = cardBackThemeId,
         showPointsRace = showPointsRace,
         chattiness = chattiness,
         onChattinessChange = onChattinessChange,
+        audio = audio,
+        onSoundToggle = onSoundToggle,
+        onVolumeChange = onVolumeChange,
         onNavigateHome = onNavigateHome,
         onViewAnalysis = {
             val results = uiState.trainingResults
@@ -138,6 +148,7 @@ public fun TableScreen(
                     level = level,
                     seed = clock.newSeed(),
                     trainingFundamental = trainingFundamental,
+                    sparring = trainingFundamental != TrainingFundamental.NONE,
                 ),
             )
         },
@@ -152,11 +163,15 @@ public fun TableContent(
     modifier: Modifier = Modifier,
     soundManager: SoundManager = NoOpSoundManager(),
     localHour: Int = 12,
+    opponent: Opponent = Opponent.MAESTRO,
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
     chattiness: Chattiness = Chattiness.NORMAL,
     onChattinessChange: (Chattiness) -> Unit = {},
+    audio: AudioLevels = AudioLevels(),
+    onSoundToggle: () -> Unit = {},
+    onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
     onNavigateHome: () -> Unit = {},
     onViewAnalysis: () -> Unit = {},
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
@@ -179,13 +194,8 @@ public fun TableContent(
         }
     }
 
-    // Sotto il tavolo suonano il rumore del tavolo e la musica; all'ultima smazzata la musica si fa tesa,
-    // e mentre il Maestro parla si abbassa (F1R-20).
-    val lastDeal = uiState.deckCardCount == 0 && uiState.humanHand.isNotEmpty()
-    LaunchedEffect(lastDeal, localHour) { soundManager.setBackdrop(Backdrops.table(localHour, lastDeal)) }
-    val maestroSpeaking = uiState.maestroLine != null
-    LaunchedEffect(maestroSpeaking) { soundManager.maestroSpeaking = maestroSpeaking }
-    DisposableEffect(Unit) { onDispose { soundManager.maestroSpeaking = false } }
+    // Sotto il tavolo suona il rumore del tavolo; la musica è sempre la stessa del circolo (F1R-20).
+    LaunchedEffect(localHour) { soundManager.setBackdrop(Backdrops.table(localHour)) }
 
     // A fine partita, a scena ferma e riepilogo chiuso, si passa alla schermata di fine partita.
     val matchOver = uiState.phase == DealPhase.MATCH_OVER && uiState.pendingDealScore == null && !scene.busy
@@ -249,6 +259,9 @@ public fun TableContent(
                         zone = geometry.zones.opponentBar,
                         sweepBy = (step as? SceneStep.Sweep)?.actor,
                         onPause = { showPause = true },
+                        soundEnabled = audio.soundEnabled,
+                        onToggleSound = onSoundToggle,
+                        opponent = opponent,
                     )
                     TableStage(
                         model = model,
@@ -291,6 +304,8 @@ public fun TableContent(
                     onNavigateHome = onNavigateHome,
                     chattiness = chattiness,
                     onChattinessChange = onChattinessChange,
+                    audio = audio,
+                    onVolumeChange = onVolumeChange,
                 )
             }
 
