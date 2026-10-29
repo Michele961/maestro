@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
@@ -216,7 +217,7 @@ private fun ObjectivePicker(selected: TrainingFundamental, suggested: TrainingFu
                 text = stringResource(text.first),
                 selected = selected == fundamental,
                 onClick = { onSelect(fundamental) },
-                modifier = Modifier.fillMaxWidth().height(48.dp).testTag("objective_option_${fundamental.name}"),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("objective_option_${fundamental.name}"),
             )
         }
     }
