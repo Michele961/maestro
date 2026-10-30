@@ -75,20 +75,20 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-05 — Ricerca e bozza di specifica: napola e asso che taglia
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Obiettivo:** raccogliere da fonti pubbliche le regole di napola e asso pigliatutto e preparare la bozza di modifica a `docs/rules/scopa.md` per l'approvazione di Michele.
 - **Perimetro:** solo documenti (`docs/research/`); **non** si modifica `docs/rules/` senza approvazione esplicita (CLAUDE.md §3). La bozza elenca le varianti trovate, le fonti, dove divergono e una proposta per ogni punto aperto: carta di partenza della sequenza, punti della napola, somma ai punti normali, valore per il punteggio obiettivo; per l'asso: cosa prende se c'è già un asso, prima mossa, scopa, tavolo vuoto.
 - **Criteri di accettazione:** ogni regola ha almeno due fonti o è segnata come non verificata; Michele approva punto per punto.
 - **Per Michele:** scegliere la variante per ogni punto.
-- **Domande aperte:** le divergenze e le proposte sono in `docs/research/napola-e-asso.md` (N-a…N-f, A-a…A-g): Michele approva o corregge punto per punto.
+- **Domande aperte:** nessuna: Michele ha approvato le proposte il 2026-10-30.
 
 ## F1G-06 — Napola e asso che taglia nel motore
 
-- **Stato:** bloccato
+- **Stato:** in corso
 - **Obiettivo:** implementare le due varianti dopo l'approvazione della specifica.
 - **Perimetro:** `core:game` con test; aumento di `RULES_VERSION`; verifica che bot e analizzatore non rompano; lezioni e Check solo se Michele li chiede.
 - **Criteri di accettazione:** da scrivere dopo F1G-05.
-- **Domande aperte:** blocca su F1G-05.
+- **Domande aperte:** Michele ha approvato le regole (2026-10-30); specifica aggiornata alla versione 2 in `docs/rules/scopa.md`. `RULES_VERSION` resta 1 (uguaglianza stretta nel replay e nell'analizzatore: salirla renderebbe illeggibili partite e storico salvati; le varianti nuove sono spente di default). Ci sono due letture da confermare: con un Asso sul tavolo l'Asso giocato prende **un** Asso a scelta (regola 4.2 invariata, non «tutti gli assi»).
 
 ## F1G-07 — Modello e schermata della Stagione
 
