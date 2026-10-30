@@ -59,7 +59,7 @@ sealed interface PlayResult {
     data class Rejected(val reason: RejectReason) : PlayResult
 }
 
-// Cosa vede un giocatore: unica cosa che riceve l'AI e, in Fase 2, il client.
+// Cosa vede un giocatore: unica cosa che riceve l'AI e, in Fase 3, il client.
 fun viewFor(state: ScopaState, seat: Seat): ScopaView
 
 // Log e replay (ADR-0003).
@@ -77,11 +77,11 @@ Tutte queste funzioni stanno in `it.maestro.game.scopa`. I tipi e i valori non e
 
 **Partita offline:** UI → ViewModel → `MatchSession` (dominio) → `play()` → `Beat` (eventi + vista) → `TableDirector` → scena → UI. Il bot riceve `viewFor()` e muove solo quando la regia ha finito la scena precedente (ADR-0015). A fine partita, l'analizzatore lavora sul `MatchLog` e `RewardEngine` assegna le ricompense.
 
-**Partita online (Fase 2):** il client invia `PlayCard`; il server chiama `play()` sullo stato autoritativo e invia a ciascun client gli eventi filtrati e, alla riconnessione, `viewFor()`. Il server conserva il `MatchLog` e lo rigioca per verificarlo.
+**Partita online (Fase 3):** il client invia `PlayCard`; il server chiama `play()` sullo stato autoritativo e invia a ciascun client gli eventi filtrati e, alla riconnessione, `viewFor()`. Il server conserva il `MatchLog` e lo rigioca per verificarlo.
 
 **Review (ADR-0005):** l'anteprima è calcolata sul telefono. Sblocco e risultato ufficiale passano dal server (dalla Fase 3). Nell'MVP la review è gratuita e solo locale.
 
-## Multiplayer (riferimento per la Fase 2)
+## Multiplayer (riferimento per la Fase 3)
 
 - Server autoritativo (ADR-0002): distribuisce le carte, valida, invia solo la vista di ciascun giocatore.
 - Messaggi: `PlayCard`, `Emote`, `Resync(lastSeq)` dal client; `Event(seq)`, `Snapshot`, `TurnTimer` dal server.
