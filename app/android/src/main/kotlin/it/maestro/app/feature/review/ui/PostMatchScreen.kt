@@ -54,6 +54,8 @@ public fun PostMatchScreen(
     onClaimMission: (DailyMission) -> Unit = {},
     onReviewClicked: (MatchAnalysis) -> Unit = {},
     onRematchClicked: () -> Unit = {},
+    /** Solo per la partita del giorno: condivide il risultato senza svelare le mosse. */
+    onShareClicked: (() -> Unit)? = null,
     onHomeClicked: () -> Unit = {},
 ) {
     ClubBackground(modifier = modifier.testTag("post_match_preview_screen"), feltFraction = 0.55f) {
@@ -91,7 +93,7 @@ public fun PostMatchScreen(
                                 RewardCard(reward, state.claimedMissions, onClaimMission)
                             }
                             MaestroLine(state, analysis)
-                            Actions(state, analysis, onReviewClicked, onRematchClicked, onHomeClicked)
+                            Actions(state, analysis, onReviewClicked, onRematchClicked, onHomeClicked, onShareClicked)
                         }
                     }
                 }
@@ -132,7 +134,7 @@ private fun MaestroLine(state: PostMatchUiState, analysis: MatchAnalysis?) {
 
 /** Rivedi partita (primaria), Rivincita, Menu. */
 @Composable
-private fun Actions(state: PostMatchUiState, analysis: MatchAnalysis, onReview: (MatchAnalysis) -> Unit, onRematch: () -> Unit, onHome: () -> Unit) {
+private fun Actions(state: PostMatchUiState, analysis: MatchAnalysis, onReview: (MatchAnalysis) -> Unit, onRematch: () -> Unit, onHome: () -> Unit, onShare: (() -> Unit)?) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         MaestroPillButton(
             text = stringResource(id = R.string.post_match_review_button).uppercase(),
@@ -152,6 +154,17 @@ private fun Actions(state: PostMatchUiState, analysis: MatchAnalysis, onReview: 
             modifier = Modifier.fillMaxWidth(0.85f).padding(top = 8.dp),
             testTag = "post_match_rematch_button",
         )
+        if (onShare != null) {
+            MaestroPillButton(
+                text = stringResource(id = R.string.daily_match_share_button).uppercase(),
+                onClick = onShare,
+                variant = PillButtonVariant.SECONDARY_AMBER,
+                height = 40.dp,
+                fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth(0.85f).padding(top = 6.dp),
+                testTag = "post_match_share_button",
+            )
+        }
         MaestroPillButton(
             text = stringResource(id = if (state.fromHistory) R.string.post_match_back_to_history else R.string.post_match_back_to_menu).uppercase(),
             onClick = onHome,

@@ -231,6 +231,11 @@
     <string name="puzzle_challenge_streak">Serie di sfide: %1$d</string>
     <string name="puzzle_tier_recommended">★ Consigliato</string>
     <string name="home_daily_puzzle_button">Sfida del giorno</string>
+    <string name="home_daily_match_button">Partita del giorno</string>
+    <string name="daily_match_share_text">Maestro Scopa, partita del %1$s: %2$s %3$d–%4$d</string>
+    <string name="daily_match_share_won">vinta</string>
+    <string name="daily_match_share_lost">persa</string>
+    <string name="daily_match_share_button">Condividi</string>
     <string name="profile_title">Profilo &amp; Maestria</string>
     <string name="profile_tab_mastery">Maestria &amp; Radar</string>
     <string name="profile_tab_history">Cronologia Partite</string>
