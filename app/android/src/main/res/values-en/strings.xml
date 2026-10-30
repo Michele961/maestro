@@ -165,6 +165,10 @@
     <string name="pre_game_re_bello">Re bello</string>
     <string name="pre_game_re_bello_hint">One extra point for whoever takes the King of Coins</string>
     <string name="pre_game_redeal">Redeal on three Kings</string>
+    <string name="pre_game_napola">Napola</string>
+    <string name="pre_game_napola_hint">Ace, 2, 3 of Coins score 3 points, +1 for each Coin in a row</string>
+    <string name="pre_game_asso">Ace takes all</string>
+    <string name="pre_game_asso_hint">The Ace takes the whole table when there is no other Ace</string>
     <string name="pre_game_redeal_hint">If the table opens with 3 or 4 Kings, the deal is reshuffled</string>
     <string name="pre_game_points">%1$d Points</string>
     <string name="pre_game_mode_title">Game mode</string>

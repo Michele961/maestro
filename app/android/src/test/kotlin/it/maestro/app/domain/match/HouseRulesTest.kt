@@ -16,4 +16,10 @@ class HouseRulesTest {
 
         assertEquals(ScopaConfig(targetScore = 21, redealOnThreeKings = false, reBello = true), config)
     }
+
+    @Test
+    fun `napola e asso che taglia entrano nella configurazione, spente di default`() {
+        assertEquals(ScopaConfig(napola = true, assoPigliatutto = true), HouseRules(napola = true, assoPigliatutto = true).toConfig(11))
+        assertEquals(false, HouseRules().toConfig(11).napola)
+    }
 }

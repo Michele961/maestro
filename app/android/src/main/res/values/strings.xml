@@ -165,6 +165,10 @@
     <string name="pre_game_re_bello">Re bello</string>
     <string name="pre_game_re_bello_hint">1 punto in più a chi prende il Re di Denari</string>
     <string name="pre_game_redeal">Ridistribuisci con 3 Re</string>
+    <string name="pre_game_napola">Napola</string>
+    <string name="pre_game_napola_hint">Asso, 2, 3 di Denari valgono 3 punti, +1 per ogni Denaro di fila</string>
+    <string name="pre_game_asso">Asso che taglia</string>
+    <string name="pre_game_asso_hint">L\'Asso prende tutto il tavolo se non ci sono altri Assi</string>
     <string name="pre_game_redeal_hint">Se sul tavolo ci sono 3 o 4 Re, si rimescola</string>
     <string name="pre_game_points">%1$d Punti</string>
     <string name="pre_game_mode_title">Modalità di gioco</string>

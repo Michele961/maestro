@@ -11,8 +11,18 @@ public data class HouseRules(
     val reBello: Boolean = false,
     /** Smazzata annullata se sul tavolo iniziale ci sono 3 o 4 Re (§3.3). */
     val redealOnThreeKings: Boolean = true,
+    /** Napola: i punti della sequenza di Denari dall'Asso (§6.4). */
+    val napola: Boolean = false,
+    /** Asso che taglia: l'Asso senza Assi sul tavolo prende tutte le carte (§4.10). */
+    val assoPigliatutto: Boolean = false,
 ) {
     /** La configurazione di partita con queste regole e il [targetScore] scelto. */
     public fun toConfig(targetScore: Int): ScopaConfig =
-        ScopaConfig(targetScore = targetScore, redealOnThreeKings = redealOnThreeKings, reBello = reBello)
+        ScopaConfig(
+            targetScore = targetScore,
+            redealOnThreeKings = redealOnThreeKings,
+            reBello = reBello,
+            napola = napola,
+            assoPigliatutto = assoPigliatutto,
+        )
 }

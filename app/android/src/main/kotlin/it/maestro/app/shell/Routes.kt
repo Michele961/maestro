@@ -37,6 +37,8 @@ public sealed interface Route {
         val resume: Boolean = false,
         val reBello: Boolean = false,
         val redealOnThreeKings: Boolean = true,
+        val napola: Boolean = false,
+        val assoPigliatutto: Boolean = false,
     ) : Route
 
     /** Fine partita. [trainingCorrect]/[trainingTotal] sono -1 se non ci sono stati Check. */
