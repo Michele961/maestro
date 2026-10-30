@@ -75,12 +75,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-05 — Ricerca e bozza di specifica: napola e asso che taglia
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Obiettivo:** raccogliere da fonti pubbliche le regole di napola e asso pigliatutto e preparare la bozza di modifica a `docs/rules/scopa.md` per l'approvazione di Michele.
 - **Perimetro:** solo documenti (`docs/research/`); **non** si modifica `docs/rules/` senza approvazione esplicita (CLAUDE.md §3). La bozza elenca le varianti trovate, le fonti, dove divergono e una proposta per ogni punto aperto: carta di partenza della sequenza, punti della napola, somma ai punti normali, valore per il punteggio obiettivo; per l'asso: cosa prende se c'è già un asso, prima mossa, scopa, tavolo vuoto.
 - **Criteri di accettazione:** ogni regola ha almeno due fonti o è segnata come non verificata; Michele approva punto per punto.
 - **Per Michele:** scegliere la variante per ogni punto.
-- **Domande aperte:** tutte le divergenze trovate.
+- **Domande aperte:** le divergenze e le proposte sono in `docs/research/napola-e-asso.md` (N-a…N-f, A-a…A-g): Michele approva o corregge punto per punto.
 
 ## F1G-06 — Napola e asso che taglia nel motore
 
