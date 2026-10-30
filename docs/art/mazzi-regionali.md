@@ -47,5 +47,5 @@ Il solo secondo mazzo che ha già 40 carte singole è il **bergamasco**, con lic
 
 ## Per Michele
 
-- Scegliere le prime tre regioni (N5) e come ottenerle: Bergamasche (CC BY-SA 3.0, da accettare), oppure carte generate o procurate da te per Piacentine, Romagnole, Siciliane, Trentine e le altre.
+- Decisione di Michele (2026-10-30): prime tre regioni **Bergamasche** (CC BY-SA 3.0 accettata: attribuzione a «Poulpy» e immagini adattate con la stessa licenza), **Piacentine** e **Siciliane** (carte da generare o procurare; quelle del Commons sono solo 16).
 - Se vuoi generare tu i mazzi (ADR-0008 vale per tutto tranne il mazzo base), le carte nuove vanno in `docs/art/` con la stessa scheda e senza dipendere da fonti terze.
