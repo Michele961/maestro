@@ -66,7 +66,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-04 — Regole della casa già nel motore
 
-- **Stato:** in revisione
+- **Stato:** fatto
 - **Obiettivo:** esporre all'utente `reBello`, `redealOnThreeKings` e il punteggio obiettivo 16/21, già in specifica (`docs/rules/scopa.md` §6–7).
 - **Perimetro:** scelta nelle impostazioni di partita (Sparring e partita libera); i valori entrano in `GameConfig` e nel `MatchLog`; **nessuna regola nuova**. Le scelte valgono per la partita che parte (non sono salvate come preferenza); la ripresa usa la configurazione del `MatchLog`. Resta com'è ora lo sblocco degli avversari: non cambia con le regole della casa finché Michele non decide (domanda aperta).
 - **Criteri di accettazione:** configurazione salvata e ripresa con la partita; replay del log invariato; bot e Check funzionano con le varianti già coperte dai test del motore; test di UI.
@@ -84,7 +84,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-06 — Napola e asso che taglia nel motore
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Obiettivo:** implementare le due varianti dopo l'approvazione della specifica.
 - **Perimetro:** `core:game` con test; aumento di `RULES_VERSION`; verifica che bot e analizzatore non rompano; lezioni e Check solo se Michele li chiede.
 - **Criteri di accettazione:** da scrivere dopo F1G-05.
@@ -117,12 +117,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-10 — Schede fonte e licenza dei mazzi regionali
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Obiettivo:** per ogni mazzo candidato, scheda con fonte, licenza, autore, link, 40 carte, semi latini, leggibilità, peso.
 - **Perimetro:** solo documenti (`docs/art/`); nessun mazzo incluso senza scheda approvata. Modello: ADR-0013.
 - **Criteri di accettazione:** una scheda per mazzo; licenze compatibili con la distribuzione in app.
 - **Per Michele:** scegliere le prime tre regioni (N5).
-- **Domande aperte:** N5, N6.
+- **Domande aperte:** N5, N6. Primo passaggio fatto in `docs/art/mazzi-regionali.md`: dai soli elenchi di categoria nessun secondo mazzo è ancora verificato (manca licenza e autore sulle pagine dei file).
 
 ## F1G-11 — Integrazione di un mazzo regionale
 
