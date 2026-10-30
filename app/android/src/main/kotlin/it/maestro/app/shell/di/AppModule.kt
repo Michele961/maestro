@@ -8,8 +8,10 @@ import it.maestro.app.designsystem.audio.SoundManager
 import it.maestro.app.shell.crash.CrashReporter
 import it.maestro.app.shell.crash.DefaultCrashReporter
 import it.maestro.app.data.local.datastore.AcademyRepository
+import it.maestro.app.data.local.datastore.DailyMatchRepository
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
+import it.maestro.app.data.local.datastore.DataStoreDailyMatchRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
 import it.maestro.app.data.local.datastore.DataStoreAchievementRepository
@@ -58,6 +60,7 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
+private val Context.dailyMatchDataStore by preferencesDataStore(name = "maestro_daily_match")
 private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
 private val Context.opponentsDataStore by preferencesDataStore(name = "maestro_opponents")
@@ -97,6 +100,10 @@ public val appModule: Module = module {
 
     single<DailyPuzzleRepository> {
         DataStoreDailyPuzzleRepository(dataStore = androidContext().dailyPuzzleDataStore)
+    }
+
+    single<DailyMatchRepository> {
+        DataStoreDailyMatchRepository(dataStore = androidContext().dailyMatchDataStore)
     }
 
     single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get(), achievements = get()) }

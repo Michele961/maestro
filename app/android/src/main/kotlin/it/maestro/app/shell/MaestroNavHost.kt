@@ -2,6 +2,9 @@ package it.maestro.app.shell
 
 import android.app.Activity
 import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.data.local.datastore.DailyMatchRepository
+import it.maestro.app.domain.daily.DailyMatch
+import it.maestro.app.domain.daily.DailyMatchResult
 import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.audio.Backdrops
@@ -48,6 +51,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.feature.puzzle.presentation.PuzzleShareFormatter
 import it.maestro.app.shell.crash.CrashReporter
 import it.maestro.app.domain.settings.AppSettings
 import it.maestro.app.data.local.datastore.MAX_PLAYER_NAME
@@ -103,6 +107,7 @@ public fun MaestroNavHost(
     val masteryRepository: MasteryRepository = koinInject()
     val crashReporter: CrashReporter = koinInject()
     val clock: Clock = koinInject()
+    val dailyMatchRepository: DailyMatchRepository = koinInject()
     val soundManager: SoundManager = koinInject()
     val scope = rememberCoroutineScope()
 
@@ -167,6 +172,16 @@ public fun MaestroNavHost(
                     onStartGameClicked = { navController.navigate(Route.Ladder()) { launchSingleTop = true } },
                     onSettingsClicked = { navController.navigate(Route.Settings) { launchSingleTop = true } },
                     onDailyPuzzleClicked = { navController.navigate(Route.DailyPuzzle) { launchSingleTop = true } },
+                    onDailyMatchClicked = {
+                        navController.navigate(
+                            Route.Table(
+                                level = DifficultyLevel.INTERMEDIO.name,
+                                targetScore = DailyMatch.TARGET_SCORE,
+                                fundamental = TrainingFundamental.NONE.name,
+                                seed = DailyMatch.seedFor(today),
+                            ),
+                        ) { popUpTo(Route.Home) }
+                    },
                     onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
                     onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
                     onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
@@ -274,9 +289,25 @@ public fun MaestroNavHost(
                     parametersOf(matchLog, Seat.P1, route.fromHistory, shell.analysisOf(matchLog), shell.rewardOf(matchLog))
                 }
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
+                val isDailyMatch = !route.fromHistory && DailyMatch.isDailySeed(matchLog.seed, today)
+                val context = LocalContext.current
+                LaunchedEffect(route.matchLog) {
+                    if (isDailyMatch) {
+                        dailyMatchRepository.record(DailyMatchResult(today, state.won, state.humanTotal, state.opponentTotal))
+                    }
+                }
                 PostMatchScreen(
                     state = state,
                     trainingScore = training,
+                    onShareClicked = if (isDailyMatch) {
+                        {
+                            val outcome = context.getString(if (state.won) R.string.daily_match_share_won else R.string.daily_match_share_lost)
+                            PuzzleShareFormatter.shareViaIntent(
+                                context,
+                                context.getString(R.string.daily_match_share_text, today.toString(), outcome, state.humanTotal, state.opponentTotal),
+                            )
+                        }
+                    } else null,
                     onClaimMission = { mission ->
                         shell.claimMissionReward(mission)
                         viewModel.markClaimed(mission.id)

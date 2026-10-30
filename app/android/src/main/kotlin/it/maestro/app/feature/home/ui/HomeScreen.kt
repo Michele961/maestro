@@ -52,6 +52,7 @@ public fun HomeScreen(
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
     onDailyPuzzleClicked: () -> Unit = {},
+    onDailyMatchClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
     onMissionsClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
@@ -115,12 +116,20 @@ public fun HomeScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
-            WoodRowTile(
-                icon = R.drawable.icon_book_quill,
-                title = stringResource(R.string.home_daily_puzzle_button),
-                modifier = Modifier.fillMaxWidth().height(50.dp).testTag("home_daily_puzzle_tile"),
-                onClick = onDailyPuzzleClicked,
-            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                WoodRowTile(
+                    icon = R.drawable.icon_book_quill,
+                    title = stringResource(R.string.home_daily_puzzle_button),
+                    modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_puzzle_tile"),
+                    onClick = onDailyPuzzleClicked,
+                )
+                WoodRowTile(
+                    icon = R.drawable.card_denari_7,
+                    title = stringResource(R.string.home_daily_match_button),
+                    modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_match_tile"),
+                    onClick = onDailyMatchClicked,
+                )
+            }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MissionsTile(streakCount, onMissionsClicked, Modifier.weight(1f).height(84.dp))
                 AcademyTile(onAcademyClicked, Modifier.weight(1f).height(84.dp))

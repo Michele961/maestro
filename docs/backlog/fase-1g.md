@@ -158,7 +158,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-15 — Partita del giorno offline
 
-- **Stato:** da fare
+- **Stato:** in corso
 - **Obiettivo:** una partita a seme comune (seme dalla data) contro un bot, con risultato condivisibile come testo senza rivelare le mosse.
 - **Perimetro:** dominio puro; classifica solo locale; verifica se il bot è deterministico dal seme e riportarla; nessun server.
 - **Criteri di accettazione:** stesso giorno → stessa mano di partenza; testo di condivisione senza spoiler; test.

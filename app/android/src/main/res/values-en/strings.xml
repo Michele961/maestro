@@ -231,6 +231,11 @@
     <string name="puzzle_challenge_streak">Challenge streak: %1$d</string>
     <string name="puzzle_tier_recommended">★ Recommended</string>
     <string name="home_daily_puzzle_button">Daily puzzle</string>
+    <string name="home_daily_match_button">Daily match</string>
+    <string name="daily_match_share_text">Maestro Scopa, match of %1$s: %2$s %3$d–%4$d</string>
+    <string name="daily_match_share_won">won</string>
+    <string name="daily_match_share_lost">lost</string>
+    <string name="daily_match_share_button">Share</string>
     <string name="profile_title">Profile &amp; Mastery</string>
     <string name="profile_tab_mastery">Mastery &amp; Radar</string>
     <string name="profile_tab_history">Match History</string>
