@@ -70,8 +70,8 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
                 PreGameScreen(opponent = Opponent.TONINO, onStartGame = { l, t, f, _ -> chosen = Triple(l, t, f) })
             }
         }
-        composeRule.onNodeWithTag("target_score_option_21").performClick()
-        composeRule.onNodeWithTag("mode_option_classic").performClick()
+        composeRule.onNodeWithTag("target_score_option_21").performScrollTo().performClick()
+        composeRule.onNodeWithTag("mode_option_classic").performScrollTo().performClick()
         composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(Triple(DifficultyLevel.INTERMEDIO, 21, TrainingFundamental.NONE), chosen)
     }
