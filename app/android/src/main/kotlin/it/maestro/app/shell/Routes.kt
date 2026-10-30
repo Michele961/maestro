@@ -35,6 +35,8 @@ public sealed interface Route {
         val fundamental: String,
         val seed: Long,
         val resume: Boolean = false,
+        val reBello: Boolean = false,
+        val redealOnThreeKings: Boolean = true,
     ) : Route
 
     /** Fine partita. [trainingCorrect]/[trainingTotal] sono -1 se non ci sono stati Check. */

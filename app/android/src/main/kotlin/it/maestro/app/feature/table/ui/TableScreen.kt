@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.audio.Backdrops
 import it.maestro.app.domain.audio.AudioChannel
@@ -60,7 +61,6 @@ import it.maestro.app.feature.table.presentation.director.TableScene
 import it.maestro.app.feature.table.ui.SweepCelebrationOverlay
 import it.maestro.game.scopa.DealPhase
 import it.maestro.game.scopa.MatchLog
-import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.training.TrainingFundamental
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -77,6 +77,7 @@ public fun TableScreen(
     modifier: Modifier = Modifier,
     level: DifficultyLevel = DifficultyLevel.INTERMEDIO,
     targetScore: Int = 11,
+    houseRules: HouseRules = HouseRules(),
     trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     seed: Long = 42L,
     resume: Boolean = false,
@@ -104,7 +105,7 @@ public fun TableScreen(
         } else {
             viewModel.onIntent(
                 GameIntent.StartMatch(
-                    config = ScopaConfig(targetScore = targetScore),
+                    config = houseRules.toConfig(targetScore),
                     level = level,
                     seed = seed,
                     trainingFundamental = trainingFundamental,
@@ -144,7 +145,7 @@ public fun TableScreen(
         onRematch = {
             viewModel.onIntent(
                 GameIntent.StartMatch(
-                    config = ScopaConfig(targetScore = targetScore),
+                    config = houseRules.toConfig(targetScore),
                     level = level,
                     seed = clock.newSeed(),
                     trainingFundamental = trainingFundamental,
