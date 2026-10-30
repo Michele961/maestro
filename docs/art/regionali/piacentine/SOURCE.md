@@ -54,4 +54,4 @@ SVG parziali di Flanker e Argento (PD-self), ridisegni Inkscape di un mazzo Modi
 
 ## Peso
 
-Il foglio sorgente pesa 2,9 MB. Le 40 carte in WebP a 600x936 stanno, per stima dalle napoletane, intorno a 3-5 MB (il disegno è piatto e comprime bene).
+Il foglio sorgente pesa 2,9 MB. Le 40 carte in WebP a 600x936 (qualità 88, stessa pipeline delle napoletane) pesano 3,8 MB misurati, contro i 2,8 MB delle 41 napoletane in `res`.
