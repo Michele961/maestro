@@ -1,6 +1,8 @@
 package it.maestro.app.ui.screenshot
 
 import android.app.Application
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -65,7 +67,7 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
         var chosen: Triple<DifficultyLevel, Int, TrainingFundamental>? = null
         composeRule.setContent {
             MaestroTheme {
-                PreGameScreen(opponent = Opponent.TONINO, onStartGame = { l, t, f -> chosen = Triple(l, t, f) })
+                PreGameScreen(opponent = Opponent.TONINO, onStartGame = { l, t, f, _ -> chosen = Triple(l, t, f) })
             }
         }
         composeRule.onNodeWithTag("target_score_option_21").performClick()
@@ -77,12 +79,24 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
     @Test
     fun sparring_lets_the_player_pick_the_objective_and_shows_what_it_trains() {
         var chosen: TrainingFundamental? = null
-        composeRule.setContent { MaestroTheme { PreGameScreen(onStartGame = { _, _, f -> chosen = f }) } }
+        composeRule.setContent { MaestroTheme { PreGameScreen(onStartGame = { _, _, f, _ -> chosen = f }) } }
         composeRule.onNodeWithTag("objective_change").performScrollTo().performClick()
         composeRule.onNodeWithTag("objective_option_PRIMIERA_LEAD").performScrollTo().performClick()
         composeRule.onNodeWithTag("objective_line").performScrollTo().assertTextContains("calcolo", substring = true)
         composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(TrainingFundamental.PRIMIERA_LEAD, chosen)
+    }
+
+    @Test
+    fun the_house_rules_are_off_or_on_as_in_the_spec_and_reach_the_game() {
+        var chosen: it.maestro.app.domain.match.HouseRules? = null
+        composeRule.setContent { MaestroTheme { PreGameScreen(onStartGame = { _, _, _, rules -> chosen = rules }) } }
+        composeRule.onNodeWithTag("house_rule_re_bello").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("house_rule_redeal").performScrollTo().assertIsOn()
+        composeRule.onNodeWithTag("house_rule_re_bello").performClick()
+        composeRule.onNodeWithTag("house_rule_redeal").performClick()
+        composeRule.onNodeWithTag("start_game_button").performClick()
+        assertEquals(it.maestro.app.domain.match.HouseRules(reBello = true, redealOnThreeKings = false), chosen)
     }
 
     @Test
@@ -102,7 +116,7 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
     fun the_suggested_objective_is_preselected_and_announced() {
         var chosen: TrainingFundamental? = null
         composeRule.setContent {
-            MaestroTheme { PreGameScreen(suggestedObjective = TrainingFundamental.DENARI_COUNT, onStartGame = { _, _, f -> chosen = f }) }
+            MaestroTheme { PreGameScreen(suggestedObjective = TrainingFundamental.DENARI_COUNT, onStartGame = { _, _, f, _ -> chosen = f }) }
         }
         composeRule.onNodeWithTag("objective_current").performScrollTo().assertTextContains("Conta i Denari", substring = true)
         composeRule.onNodeWithTag("objective_change").performScrollTo().performClick()

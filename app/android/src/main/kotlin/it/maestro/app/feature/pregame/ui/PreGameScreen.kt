@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.MaestroPillButton
@@ -70,10 +72,11 @@ public fun PreGameScreen(
     initialTargetScore: Int = 11,
     initialFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
     suggestedObjective: TrainingFundamental? = null,
-    onStartGame: (it.maestro.ai.bot.DifficultyLevel, Int, TrainingFundamental) -> Unit = { _, _, _ -> },
+    onStartGame: (it.maestro.ai.bot.DifficultyLevel, Int, TrainingFundamental, HouseRules) -> Unit = { _, _, _, _ -> },
     onNavigateBack: () -> Unit = {},
 ) {
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
+    var houseRules by remember { mutableStateOf(HouseRules()) }
     var sparring by remember { mutableStateOf(initialFundamental != TrainingFundamental.NONE) }
     var objective by remember(suggestedObjective) {
         mutableStateOf(suggestedObjective ?: initialFundamental.takeIf { it != TrainingFundamental.NONE } ?: TrainingFundamental.SEVENS_COUNT)
@@ -114,6 +117,22 @@ public fun PreGameScreen(
                             )
                         }
                     }
+
+                    RibbonHeader(stringResource(id = R.string.pre_game_house_rules_title))
+                    HouseRuleRow(
+                        label = stringResource(id = R.string.pre_game_re_bello),
+                        hint = stringResource(id = R.string.pre_game_re_bello_hint),
+                        checked = houseRules.reBello,
+                        onCheckedChange = { houseRules = houseRules.copy(reBello = it) },
+                        tag = "house_rule_re_bello",
+                    )
+                    HouseRuleRow(
+                        label = stringResource(id = R.string.pre_game_redeal),
+                        hint = stringResource(id = R.string.pre_game_redeal_hint),
+                        checked = houseRules.redealOnThreeKings,
+                        onCheckedChange = { houseRules = houseRules.copy(redealOnThreeKings = it) },
+                        tag = "house_rule_redeal",
+                    )
 
                     RibbonHeader(stringResource(id = R.string.pre_game_opponent_title))
                     OpponentCard(opponent = opponent, modifier = Modifier.fillMaxWidth().testTag("pre_game_opponent"))
@@ -184,6 +203,7 @@ public fun PreGameScreen(
                         opponent.level,
                         selectedTargetScore,
                         if (sparring) objective else TrainingFundamental.NONE,
+                        houseRules,
                     )
                 },
                 variant = PillButtonVariant.PRIMARY_GREEN,
@@ -193,6 +213,23 @@ public fun PreGameScreen(
                 testTag = "start_game_button",
             )
         }
+    }
+}
+
+/** Una regola della casa: nome, riga che la spiega e interruttore. */
+@Composable
+private fun HouseRuleRow(label: String, hint: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, tag: String) {
+    val ink = Color(0xFF2B1A10)
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, color = ink)
+            Text(text = hint, style = MaterialTheme.typography.bodySmall, color = ink)
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(tag))
     }
 }
 

@@ -66,9 +66,9 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-04 — Regole della casa già nel motore
 
-- **Stato:** da fare
+- **Stato:** in revisione
 - **Obiettivo:** esporre all'utente `reBello`, `redealOnThreeKings` e il punteggio obiettivo 16/21, già in specifica (`docs/rules/scopa.md` §6–7).
-- **Perimetro:** scelta nelle impostazioni di partita (Sparring e partita libera); i valori entrano in `GameConfig` e nel `MatchLog`; **nessuna regola nuova**. Le partite con regole diverse dalle standard valgono per lo sblocco solo secondo D22/Q (da decidere: proposta N3, una regola nuova alla volta).
+- **Perimetro:** scelta nelle impostazioni di partita (Sparring e partita libera); i valori entrano in `GameConfig` e nel `MatchLog`; **nessuna regola nuova**. Le scelte valgono per la partita che parte (non sono salvate come preferenza); la ripresa usa la configurazione del `MatchLog`. Resta com'è ora lo sblocco degli avversari: non cambia con le regole della casa finché Michele non decide (domanda aperta).
 - **Criteri di accettazione:** configurazione salvata e ripresa con la partita; replay del log invariato; bot e Check funzionano con le varianti già coperte dai test del motore; test di UI.
 - **Per Michele:** niente.
 - **Domande aperte:** le vittorie con regola della casa sbloccano l'avversario successivo? (proposta: sì).

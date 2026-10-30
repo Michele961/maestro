@@ -160,6 +160,11 @@
     <string name="home_nav_training">Palestra</string>
     <string name="home_nav_shop">Bottega</string>
     <string name="home_maestro_title">Il Maestro</string>
+    <string name="pre_game_house_rules_title">Regole della casa</string>
+    <string name="pre_game_re_bello">Re bello</string>
+    <string name="pre_game_re_bello_hint">1 punto in più a chi prende il Re di Denari</string>
+    <string name="pre_game_redeal">Ridistribuisci con 3 Re</string>
+    <string name="pre_game_redeal_hint">Se sul tavolo ci sono 3 o 4 Re, si rimescola</string>
     <string name="pre_game_points">%1$d Punti</string>
     <string name="pre_game_mode_title">Modalità di gioco</string>
     <string name="pre_game_mode_classic">Classica</string>

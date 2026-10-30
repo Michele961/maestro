@@ -160,6 +160,11 @@
     <string name="home_nav_training">Training</string>
     <string name="home_nav_shop">Shop</string>
     <string name="home_maestro_title">The Maestro</string>
+    <string name="pre_game_house_rules_title">House rules</string>
+    <string name="pre_game_re_bello">Re bello</string>
+    <string name="pre_game_re_bello_hint">One extra point for whoever takes the King of Coins</string>
+    <string name="pre_game_redeal">Redeal on three Kings</string>
+    <string name="pre_game_redeal_hint">If the table opens with 3 or 4 Kings, the deal is reshuffled</string>
     <string name="pre_game_points">%1$d Points</string>
     <string name="pre_game_mode_title">Game mode</string>
     <string name="pre_game_mode_classic">Classic</string>

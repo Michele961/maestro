@@ -2,6 +2,7 @@ package it.maestro.app.shell
 
 import android.app.Activity
 import it.maestro.app.domain.audio.AudioChannel
+import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.audio.Backdrops
 import it.maestro.app.designsystem.audio.SoundManager
@@ -201,9 +202,16 @@ public fun MaestroNavHost(
                 PreGameScreen(
                     opponent = Opponent.valueOf(route.opponent),
                     suggestedObjective = route.objective?.let(TrainingFundamental::valueOf) ?: suggested,
-                    onStartGame = { level, targetScore, fundamental ->
+                    onStartGame = { level, targetScore, fundamental, rules ->
                         navController.navigate(
-                            Route.Table(level.name, targetScore, fundamental.name, seed = shell.newSeed()),
+                            Route.Table(
+                                level.name,
+                                targetScore,
+                                fundamental.name,
+                                seed = shell.newSeed(),
+                                reBello = rules.reBello,
+                                redealOnThreeKings = rules.redealOnThreeKings,
+                            ),
                         ) { popUpTo(Route.Home) }
                     },
                     onNavigateBack = { navController.popBackStack() },
@@ -215,6 +223,7 @@ public fun MaestroNavHost(
                 TableScreen(
                     level = level,
                     targetScore = route.targetScore,
+                    houseRules = HouseRules(route.reBello, route.redealOnThreeKings),
                     trainingFundamental = TrainingFundamental.valueOf(route.fundamental),
                     seed = route.seed,
                     resume = route.resume,
@@ -275,7 +284,14 @@ public fun MaestroNavHost(
                     },
                     onRematchClicked = {
                         navController.navigate(
-                            Route.Table(route.level, matchLog.config.targetScore, route.fundamental, shell.newSeed()),
+                            Route.Table(
+                                route.level,
+                                matchLog.config.targetScore,
+                                route.fundamental,
+                                shell.newSeed(),
+                                reBello = matchLog.config.reBello,
+                                redealOnThreeKings = matchLog.config.redealOnThreeKings,
+                            ),
                         ) { popUpTo(Route.Home) }
                     },
                     onHomeClicked = { if (route.fromHistory) navController.popBackStack() else goHome() },
