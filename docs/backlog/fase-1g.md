@@ -44,7 +44,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** schermata di primo avvio (riusa il dialogo del nome); flag «primo avvio completato» in DataStore con valore di default (nessuna migrazione distruttiva); chi aggiorna l'app con dati esistenti non vede il primo avvio.
 - **Criteri di accettazione:** utente nuovo → saluto → nome → ingresso nella prima mano; utente esistente → Home com'è; il flag sopravvive a chiusura del processo e rotazione; test sul flag e screenshot nella matrice.
 - **Per Michele:** testi del saluto (D16): bozza rivista e approvata per delega in `docs/design/testi-primo-avvio-e-home.md`.
-- **Domande aperte:** Q5 (la prima partita di Gigi è in Sparring o in Classica?); proposta: mano d'esordio in Sparring, prima partita vera in Classica.
+- **Domande aperte:** Q5 (la prima partita di Gigi è in Sparring o in Classica?); proposta confermata da Michele (2026-10-30): mano d'esordio in Sparring, prima partita vera in Classica.
 
 ## F1G-02 — Mano d'esordio guidata
 
@@ -62,7 +62,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** stato «funzioni presentate» in DataStore; la Home lo legge; nessuna voce finta; chi ha già giocato vede tutto.
 - **Criteri di accettazione:** utente nuovo vede solo Gioca; sblocchi come da tabella nel documento di ricerca §6; utente esistente invariato; screenshot.
 - **Per Michele:** niente.
-- **Domande aperte:** ordine esatto degli sblocchi (proposta nel documento di ricerca).
+- **Domande aperte:** nessuna. Ordine degli sblocchi confermato da Michele (2026-10-30), vedi `docs/design/testi-primo-avvio-e-home.md`.
 
 ## F1G-04 — Regole della casa già nel motore
 

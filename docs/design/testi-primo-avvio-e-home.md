@@ -69,3 +69,4 @@ Principio: nessuna voce finta; una funzione compare quando serve, con una frase 
 
 - Revisione indipendente del 2026-10-30: tre correzioni applicate (nome «Bottega», trigger dell'Accademia allineato al backlog, sblocchi di Partita del giorno e Missioni sfalsati) e due ritocchi di tono (`first_launch_name_skipped`, `home_unlock_missions`).
 - **Approvata** il 2026-10-30 per delega di Michele (D16: «scrivi la bozza, falla controllare, poi auto-approvala»). Resta modificabile da Michele in qualsiasi momento.
+- **Confermata da Michele** il 2026-10-30 («Confermo i tuoi consigli»): ordine di sblocco della Home e proposta Q5 (mano d'esordio in Sparring, prima partita vera in Classica).
