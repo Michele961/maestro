@@ -49,6 +49,7 @@
     <string name="score_category_primiera">Prime</string>
     <string name="score_category_scope">Sweeps</string>
     <string name="score_category_re_bello">King of Coins</string>
+    <string name="score_category_napola">Napola (run of Coins)</string>
     <string name="deal_summary_deal_total">Deal total</string>
     <string name="deal_summary_match_total">Match total</string>
     <string name="deal_summary_continue">Continue</string>

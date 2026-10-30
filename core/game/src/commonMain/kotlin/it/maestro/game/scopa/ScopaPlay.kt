@@ -2,6 +2,7 @@ package it.maestro.game.scopa
 
 import it.maestro.game.model.Card
 import it.maestro.game.model.CardOrder
+import it.maestro.game.model.Rank
 import it.maestro.game.model.Seat
 import it.maestro.game.model.fullDeck
 import it.maestro.game.rng.SeededRng
@@ -38,7 +39,10 @@ public fun legalMoves(state: ScopaState): List<ScopaMove> {
     return buildList {
         for (card in sortedHand) {
             val equalRankCards = sortedTable.filter { it.rank == card.rank }
-            if (equalRankCards.isNotEmpty()) {
+            if (isAssoTakeAll(state.config, card, sortedTable)) {
+                // spec §4.10: l'Asso senza Assi sul tavolo prende tutte le carte.
+                add(ScopaMove(card = card, capture = sortedTable.toSet()))
+            } else if (equalRankCards.isNotEmpty()) {
                 // spec §4.2: precedenza della carta uguale sulla presa per somma.
                 for (matchingCard in equalRankCards) {
                     add(ScopaMove(card = card, capture = setOf(matchingCard)))
@@ -127,7 +131,9 @@ private fun applyMoveIfLegal(state: ScopaState, move: ScopaMove): PlayResult {
 
         // spec §5.1, §5.2: presa che svuota il tavolo vale scopa, tranne all'ultima giocata della smazzata.
         val isLastPlayOfDeal = bothHandsEmpty && state.deck.isEmpty()
-        if (newTable.isEmpty() && !isLastPlayOfDeal) {
+        // spec §4.10: la presa di tutto il tavolo fatta dall'Asso non è una scopa.
+        val isAssoTakeAll = isAssoTakeAll(state.config, move.card, state.table)
+        if (newTable.isEmpty() && !isLastPlayOfDeal && !isAssoTakeAll) {
             val updatedSeatSweeps = state.sweeps.getValue(seat) + 1
             newSweeps = mapOf(
                 Seat.P1 to if (seat == Seat.P1) updatedSeatSweeps else state.sweeps.getValue(Seat.P1),
@@ -332,3 +338,10 @@ private object CaptureListComparator : Comparator<List<Card>> {
         return a.size.compareTo(b.size)
     }
 }
+
+/**
+ * `true` se con la variante [ScopaConfig.assoPigliatutto] la carta [card] è un Asso giocato su un [table] non vuoto
+ * senza altri Assi: in questo caso prende tutte le carte (spec §4.10).
+ */
+private fun isAssoTakeAll(config: ScopaConfig, card: Card, table: List<Card>): Boolean =
+    config.assoPigliatutto && card.rank == Rank.ASSO && table.isNotEmpty() && table.none { it.rank == Rank.ASSO }

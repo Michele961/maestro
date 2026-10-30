@@ -49,6 +49,7 @@
     <string name="score_category_primiera">Primiera</string>
     <string name="score_category_scope">Scope</string>
     <string name="score_category_re_bello">Re Bello</string>
+    <string name="score_category_napola">Napola</string>
     <string name="deal_summary_deal_total">Totale smazzata</string>
     <string name="deal_summary_match_total">Totale partita</string>
     <string name="deal_summary_continue">Continua</string>

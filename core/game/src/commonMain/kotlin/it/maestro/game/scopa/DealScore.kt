@@ -143,6 +143,10 @@ internal fun calculateDealScore(
     val p1ReBello = if (config.reBello && reDiDenari in p1Captured) 1 else 0
     val p2ReBello = if (config.reBello && reDiDenari in p2Captured) 1 else 0
 
+    // spec §6.4 Napola: sequenza di Denari dall'Asso (almeno Asso, 2, 3), solo con variante napola attiva.
+    val p1Napola = if (config.napola) napolaPoints(p1Captured) else 0
+    val p2Napola = if (config.napola) napolaPoints(p2Captured) else 0
+
     val p1Points = mapOf(
         ScoreCategory.CARTE to p1Carte,
         ScoreCategory.DENARI to p1Denari,
@@ -150,6 +154,7 @@ internal fun calculateDealScore(
         ScoreCategory.PRIMIERA to p1Primiera,
         ScoreCategory.SCOPE to p1Scope,
         ScoreCategory.RE_BELLO to p1ReBello,
+        ScoreCategory.NAPOLA to p1Napola,
     )
     val p2Points = mapOf(
         ScoreCategory.CARTE to p2Carte,
@@ -158,6 +163,7 @@ internal fun calculateDealScore(
         ScoreCategory.PRIMIERA to p2Primiera,
         ScoreCategory.SCOPE to p2Scope,
         ScoreCategory.RE_BELLO to p2ReBello,
+        ScoreCategory.NAPOLA to p2Napola,
     )
 
     return DealScore(
@@ -188,4 +194,19 @@ internal fun computePrimieraSum(captured: List<Card>): Int? {
         sum += maxInSuit
     }
     return sum
+}
+
+private const val MIN_NAPOLA_RUN: Int = 3
+
+/**
+ * Punti della napola di [captured] (spec §6.4): la lunghezza della sequenza continua di Denari che parte dall'Asso
+ * (Asso, 2, 3, …), se è di almeno [MIN_NAPOLA_RUN] carte; altrimenti `0`.
+ */
+internal fun napolaPoints(captured: List<Card>): Int {
+    var run = 0
+    for (rank in Rank.entries) {
+        if (Card(rank, Suit.DENARI) !in captured) break
+        run++
+    }
+    return if (run >= MIN_NAPOLA_RUN) run else 0
 }
