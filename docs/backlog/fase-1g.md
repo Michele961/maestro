@@ -43,7 +43,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Obiettivo:** un utente nuovo non trova la Home piena: trova il Maestro che saluta, dà il nome ed entra nella prima mano.
 - **Perimetro:** schermata di primo avvio (riusa il dialogo del nome); flag «primo avvio completato» in DataStore con valore di default (nessuna migrazione distruttiva); chi aggiorna l'app con dati esistenti non vede il primo avvio.
 - **Criteri di accettazione:** utente nuovo → saluto → nome → ingresso nella prima mano; utente esistente → Home com'è; il flag sopravvive a chiusura del processo e rotazione; test sul flag e screenshot nella matrice.
-- **Per Michele:** testi del saluto (D16).
+- **Per Michele:** testi del saluto (D16): bozza rivista e approvata per delega in `docs/design/testi-primo-avvio-e-home.md`.
 - **Domande aperte:** Q5 (la prima partita di Gigi è in Sparring o in Classica?); proposta: mano d'esordio in Sparring, prima partita vera in Classica.
 
 ## F1G-02 — Mano d'esordio guidata
@@ -158,7 +158,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-15 — Partita del giorno offline
 
-- **Stato:** in corso
+- **Stato:** fatto
 - **Obiettivo:** una partita a seme comune (seme dalla data) contro un bot, con risultato condivisibile come testo senza rivelare le mosse.
 - **Perimetro:** dominio puro; classifica solo locale; verifica se il bot è deterministico dal seme e riportarla; nessun server.
 - **Criteri di accettazione:** stesso giorno → stessa mano di partenza; testo di condivisione senza spoiler; test.
