@@ -121,8 +121,9 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Obiettivo:** per ogni mazzo candidato, scheda con fonte, licenza, autore, link, 40 carte, semi latini, leggibilità, peso.
 - **Perimetro:** solo documenti (`docs/art/`); nessun mazzo incluso senza scheda approvata. Modello: ADR-0013.
 - **Criteri di accettazione:** una scheda per mazzo; licenze compatibili con la distribuzione in app.
-- **Per Michele:** scegliere le prime tre regioni (N5).
-- **Domande aperte:** N5, N6. Verifica fatta in `docs/art/mazzi-regionali.md` (2026-10-30): solo le bergamasche hanno 40 carte singole (CC BY-SA 3.0, da accettare); romagnole CC0 ma incomplete; gli altri senza carte singole.
+- **Per Michele:** procurare o generare le carte di Piacentine e Siciliane (D14).
+- **Decisione di Michele (2026-10-30):** N5 = Bergamasche, Piacentine, Siciliane. Licenza CC BY-SA 3.0 delle Bergamasche **accettata** (attribuzione a «Poulpy» e immagini adattate rilasciate con la stessa licenza). Le Siciliane del Commons hanno solo 16 carte: servono le altre 24.
+- **Domande aperte:** N6. Verifica fatta in `docs/art/mazzi-regionali.md` (2026-10-30): solo le bergamasche hanno 40 carte singole (CC BY-SA 3.0, accettata); romagnole CC0 ma incomplete; gli altri senza carte singole.
 
 ## F1G-11 — Integrazione di un mazzo regionale
 
