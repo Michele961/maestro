@@ -96,8 +96,9 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Obiettivo:** la «Scalata dei Circoli» come dati: capitoli che richiamano avversario, modalità, Check, livello di sfida, lezione; schermata del capitolo corrente.
 - **Perimetro:** modello nel dominio, progresso in DataStore, ricompense solo da `RewardEngine`; capitoli come dati, non codice; nessun blocco a tempo.
 - **Criteri di accettazione:** progresso salvato e sopravvive a chiusura; capitolo completato assegna ricompensa una sola volta; screenshot; test del modello.
-- **Per Michele:** conferma capitoli e abbinamento Circoli ↔ avversari (Q10).
-- **Domande aperte:** Q2, Q10.
+- **Decisioni di Michele (2026-10-30):** Q2 forma «Scalata dei Circoli» con tono da apprendista confermata; Q10 abbinamento Gigi–Tavolino del Bar, Nonna Rosa–Circolo Rionale, Tonino–Salotto Nobile, Don Alfonso–Gran Casinò, il Maestro–Olimpo confermato; se un personaggio non calza, Michele ne genera altri.
+- **Per Michele:** niente.
+- **Domande aperte:** nessuna. Dipendenze tecniche ancora aperte: F1R-18, F1R-27, F1R-28, F1R-29.
 
 ## F1G-08 — Testi e voce della Stagione
 
@@ -105,7 +106,8 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Obiettivo:** battute di apertura e chiusura dei capitoli con la voce del Maestro (D18).
 - **Perimetro:** `strings.xml` it/en; bozze dell'agente, approvazione di Michele (D16).
 - **Criteri di accettazione:** parità it/en; Michele ha approvato.
-- **Domande aperte:** tono definitivo.
+- **Testi:** storia e battute dei 10 capitoli, rivedute e approvate per delega, in `docs/design/stagione-storia.md`; le stringhe `story_*` entrano in `strings.xml` con F1G-07 (nessuna stringa inutilizzata prima).
+- **Domande aperte:** nessuna.
 
 ## F1G-09 — Regole della casa che si sbloccano con gli avversari
 
