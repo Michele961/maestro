@@ -56,6 +56,7 @@ internal fun DealSummaryDialog(
         } else {
             null
         },
+        ScoreCategory.NAPOLA to R.string.score_category_napola,
     )
 
     // Le voci si accendono una alla volta al ritmo della regia (`DealSummaryRow`), non con un timer del dialog.

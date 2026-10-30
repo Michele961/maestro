@@ -8,16 +8,22 @@ package it.maestro.game.scopa
  * - [redealOnThreeKings]: annulla e ridistribuisce la smazzata se sul tavolo iniziale escono 3 o 4 Re
  *   (default `true`, spec §3.3).
  * - [reBello]: assegna 1 punto a fine smazzata a chi ha preso il Re di Denari (default `false`, spec §6.2).
+ * - [napola]: assegna i punti della sequenza di Denari dall'Asso (default `false`, spec §6.4).
+ * - [assoPigliatutto]: l'Asso giocato senza Assi sul tavolo prende tutte le carte (default `false`, spec §4.10).
  *
  * @property targetScore Punteggio obiettivo di fine partita (`11`, `16` o `21`).
  * @property redealOnThreeKings `true` se la regola dei 3 o 4 Re sul tavolo iniziale è attiva.
  * @property reBello `true` se la variante del Re bello (Re di Denari) è attiva.
+ * @property napola `true` se la variante della napola è attiva.
+ * @property assoPigliatutto `true` se la variante dell'asso che taglia è attiva.
  * @throws IllegalArgumentException se [targetScore] non è tra i valori ammessi (`11`, `16`, `21`).
  */
 public data class ScopaConfig(
     public val targetScore: Int = DEFAULT_TARGET_SCORE,
     public val redealOnThreeKings: Boolean = true,
     public val reBello: Boolean = false,
+    public val napola: Boolean = false,
+    public val assoPigliatutto: Boolean = false,
 ) {
     init {
         require(targetScore in VALID_TARGET_SCORES) {

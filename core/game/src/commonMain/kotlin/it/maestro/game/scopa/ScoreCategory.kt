@@ -33,4 +33,9 @@ public enum class ScoreCategory {
      * Aver preso il Re di Denari, assegnato solo se la variante [ScopaConfig.reBello] è attiva (spec §6.2).
      */
     RE_BELLO,
+
+    /**
+     * I punti della napola (Asso, 2, 3… di Denari), assegnati solo se la variante [ScopaConfig.napola] è attiva (spec §6.4).
+     */
+    NAPOLA,
 }

@@ -15,6 +15,7 @@ private const val EMPTY_CAPTURE_TOKEN: String = "-"
 private const val MIN_LOG_HEADER_LINES: Int = 4
 private const val MOVE_LINE_TOKENS: Int = 3
 private const val CONFIG_ENTRIES_COUNT: Int = 3
+private const val CONFIG_MAX_ENTRIES_COUNT: Int = 5
 private const val KEY_VALUE_PARTS: Int = 2
 private const val CARD_NOTATION_LENGTH: Int = 2
 
@@ -33,6 +34,8 @@ private const val CARD_NOTATION_LENGTH: Int = 2
  * move 7D AD,6C
  * move 3S -
  * ```
+ * Le varianti `napola=true` e `assoPigliatutto=true` si aggiungono in coda alla riga `config` solo se attive: i log
+ * scritti prima restano validi, con le due varianti spente.
  *
  * @property rulesVersion Versione della specifica delle regole con cui il log è stato registrato
  *   (default [CoreGame.RULES_VERSION]).
@@ -59,7 +62,9 @@ public data class MatchLog(
         lines.add(
             "${CONFIG_PREFIX}targetScore=${config.targetScore} " +
                 "redealOnThreeKings=${config.redealOnThreeKings} " +
-                "reBello=${config.reBello}",
+                "reBello=${config.reBello}" +
+                (if (config.napola) " napola=true" else "") +
+                (if (config.assoPigliatutto) " assoPigliatutto=true" else ""),
         )
         lines.add("$SEED_PREFIX$seed")
         for (move in moves) {
@@ -159,7 +164,7 @@ private fun parseConfigLine(line: String): ScopaConfig {
         "Riga 3 non valida: attesa '$CONFIG_PREFIX...', trovata '$line'"
     }
     val tokens = line.removePrefix(CONFIG_PREFIX).split(' ')
-    require(tokens.size == CONFIG_ENTRIES_COUNT) {
+    require(tokens.size in CONFIG_ENTRIES_COUNT..CONFIG_MAX_ENTRIES_COUNT) {
         "Riga config non valida: attesi $CONFIG_ENTRIES_COUNT parametri chiave=valore, trovati '${line.removePrefix(CONFIG_PREFIX)}'"
     }
 
@@ -176,7 +181,8 @@ private fun parseConfigLine(line: String): ScopaConfig {
     }
 
     val expectedKeys = setOf("targetScore", "redealOnThreeKings", "reBello")
-    require(entries.keys == expectedKeys) {
+    val optionalKeys = setOf("napola", "assoPigliatutto")
+    require(entries.keys.containsAll(expectedKeys) && (entries.keys - expectedKeys).all { it in optionalKeys }) {
         "Parametri config non riconosciuti o mancanti: attesi $expectedKeys, trovati ${entries.keys}"
     }
 
@@ -189,10 +195,20 @@ private fun parseConfigLine(line: String): ScopaConfig {
     val reBello = entries.getValue("reBello").toBooleanStrictOrNull()
         ?: throw IllegalArgumentException("Valore reBello non booleano: '${entries["reBello"]}'")
 
+    // I log scritti prima di napola e asso che taglia non hanno queste chiavi: restano valide e le varianti sono spente.
+    val napola = entries["napola"]?.let {
+        it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("Valore napola non booleano: '$it'")
+    } ?: false
+    val assoPigliatutto = entries["assoPigliatutto"]?.let {
+        it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("Valore assoPigliatutto non booleano: '$it'")
+    } ?: false
+
     return ScopaConfig(
         targetScore = targetScore,
         redealOnThreeKings = redealOnThreeKings,
         reBello = reBello,
+        napola = napola,
+        assoPigliatutto = assoPigliatutto,
     )
 }
 
