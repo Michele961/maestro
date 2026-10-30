@@ -211,6 +211,8 @@ public fun MaestroNavHost(
                                 seed = shell.newSeed(),
                                 reBello = rules.reBello,
                                 redealOnThreeKings = rules.redealOnThreeKings,
+                                napola = rules.napola,
+                                assoPigliatutto = rules.assoPigliatutto,
                             ),
                         ) { popUpTo(Route.Home) }
                     },
@@ -223,7 +225,7 @@ public fun MaestroNavHost(
                 TableScreen(
                     level = level,
                     targetScore = route.targetScore,
-                    houseRules = HouseRules(route.reBello, route.redealOnThreeKings),
+                    houseRules = HouseRules(route.reBello, route.redealOnThreeKings, route.napola, route.assoPigliatutto),
                     trainingFundamental = TrainingFundamental.valueOf(route.fundamental),
                     seed = route.seed,
                     resume = route.resume,
@@ -291,6 +293,8 @@ public fun MaestroNavHost(
                                 shell.newSeed(),
                                 reBello = matchLog.config.reBello,
                                 redealOnThreeKings = matchLog.config.redealOnThreeKings,
+                                napola = matchLog.config.napola,
+                                assoPigliatutto = matchLog.config.assoPigliatutto,
                             ),
                         ) { popUpTo(Route.Home) }
                     },

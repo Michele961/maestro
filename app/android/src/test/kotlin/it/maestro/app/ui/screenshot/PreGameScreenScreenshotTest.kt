@@ -70,8 +70,8 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
                 PreGameScreen(opponent = Opponent.TONINO, onStartGame = { l, t, f, _ -> chosen = Triple(l, t, f) })
             }
         }
-        composeRule.onNodeWithTag("target_score_option_21").performClick()
-        composeRule.onNodeWithTag("mode_option_classic").performClick()
+        composeRule.onNodeWithTag("target_score_option_21").performScrollTo().performClick()
+        composeRule.onNodeWithTag("mode_option_classic").performScrollTo().performClick()
         composeRule.onNodeWithTag("start_game_button").performClick()
         assertEquals(Triple(DifficultyLevel.INTERMEDIO, 21, TrainingFundamental.NONE), chosen)
     }
@@ -95,8 +95,20 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("house_rule_redeal").performScrollTo().assertIsOn()
         composeRule.onNodeWithTag("house_rule_re_bello").performClick()
         composeRule.onNodeWithTag("house_rule_redeal").performClick()
+        composeRule.onNodeWithTag("house_rule_napola").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("house_rule_napola").performClick()
+        composeRule.onNodeWithTag("house_rule_asso").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("house_rule_asso").performClick()
         composeRule.onNodeWithTag("start_game_button").performClick()
-        assertEquals(it.maestro.app.domain.match.HouseRules(reBello = true, redealOnThreeKings = false), chosen)
+        assertEquals(
+            it.maestro.app.domain.match.HouseRules(
+                reBello = true,
+                redealOnThreeKings = false,
+                napola = true,
+                assoPigliatutto = true,
+            ),
+            chosen,
+        )
     }
 
     @Test

@@ -133,6 +133,20 @@ public fun PreGameScreen(
                         onCheckedChange = { houseRules = houseRules.copy(redealOnThreeKings = it) },
                         tag = "house_rule_redeal",
                     )
+                    HouseRuleRow(
+                        label = stringResource(id = R.string.pre_game_napola),
+                        hint = stringResource(id = R.string.pre_game_napola_hint),
+                        checked = houseRules.napola,
+                        onCheckedChange = { houseRules = houseRules.copy(napola = it) },
+                        tag = "house_rule_napola",
+                    )
+                    HouseRuleRow(
+                        label = stringResource(id = R.string.pre_game_asso),
+                        hint = stringResource(id = R.string.pre_game_asso_hint),
+                        checked = houseRules.assoPigliatutto,
+                        onCheckedChange = { houseRules = houseRules.copy(assoPigliatutto = it) },
+                        tag = "house_rule_asso",
+                    )
 
                     RibbonHeader(stringResource(id = R.string.pre_game_opponent_title))
                     OpponentCard(opponent = opponent, modifier = Modifier.fillMaxWidth().testTag("pre_game_opponent"))
