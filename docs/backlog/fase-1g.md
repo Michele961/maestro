@@ -119,12 +119,18 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-10 — Schede fonte e licenza dei mazzi regionali
 
-- **Stato:** in revisione
+- **Stato:** in corso (schede scritte in `docs/art/regionali/<mazzo>/SOURCE.md`; mancano la verifica a vista delle Siciliane e le 24 numeriche + dorso, vedi «Esito» sotto)
 - **Obiettivo:** per ogni mazzo candidato, scheda con fonte, licenza, autore, link, 40 carte, semi latini, leggibilità, peso.
 - **Perimetro:** solo documenti (`docs/art/`); nessun mazzo incluso senza scheda approvata. Modello: ADR-0013.
 - **Criteri di accettazione:** una scheda per mazzo; licenze compatibili con la distribuzione in app.
 - **Per Michele:** procurare o generare le carte di Piacentine e Siciliane (D14).
 - **Decisione di Michele (2026-10-30):** N5 = Bergamasche, Piacentine, Siciliane. Licenza CC BY-SA 3.0 delle Bergamasche **accettata** (attribuzione a «Poulpy» e immagini adattate rilasciate con la stessa licenza). Le Siciliane del Commons hanno solo 16 carte: servono le altre 24.
+- **Esito (2026-10-30), schede in `docs/art/regionali/`:**
+  - Bergamasche: 40 carte ritagliabili in automatico dal foglio `Carte bergamasche.jpg` (pagina: `{{PD-old}}`, «Public domain»; il testo «Public Domain Mark» non c'è sulla pagina); qualità a 532x868 discreta; dubbio forte sulla datazione (Asso di denari con «MADE IN ITALY» e marchio Masenghini). Ripiego: serie Poulpy CC BY-SA 3.0, ritagliata dallo stesso foglio. Manca il dorso.
+  - Piacentine: 40 carte ritagliabili dal foglio di Florixc (`PD-self`); qualità sfocata (disegno sotto i 250 px, ingrandimento 1,7-2,5x); Asso di denari con il centro bianco da ritoccare; edizione scansionata non identificata; manca il dorso.
+  - Siciliane: solo 16 carte su 40 (OppidumNissenae CC BY-SA 4.0); mancano 24 numeriche e il dorso: da generare o procurare.
+  - Triestine e Sarde (CC BY-SA 4.0, GattoFigaro): foto a carte a contatto, non ritagliabili in automatico, sfocate a 868 px. Romagnole (CC0, Gallica 1850): 38 carte su 40 + dorso, nitide ma di stile antico; mancano Re di denari e di bastoni.
+  - `scripts/crop_sheet.py` ritaglia i fogli con sfondo chiaro (Piacentine, Bergamasche).
 - **Domande aperte:** N6. Verifica fatta in `docs/art/mazzi-regionali.md` (2026-10-30): solo le bergamasche hanno 40 carte singole (CC BY-SA 3.0, accettata); romagnole CC0 ma incomplete; gli altri senza carte singole.
 
 ## F1G-11 — Integrazione di un mazzo regionale
