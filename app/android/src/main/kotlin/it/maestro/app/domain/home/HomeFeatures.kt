@@ -16,7 +16,7 @@ public enum class HomeFeature(
     /** Partita del giorno: dopo la seconda partita vinta. */
     DAILY_MATCH,
 
-    /** Missioni: dopo la prima Sfida del giorno risolta. */
+    /** Missioni: dopo la prima Sfida del giorno risolta, o comunque dalla terza vittoria (chi gioca già molto non le perde). */
     MISSIONS,
 
     /** Accademia: dopo la prima prova (Check) giocata. */
@@ -95,11 +95,14 @@ public data class PresentedFeatures(
 /** Regole di sblocco della Home: dominio puro, senza orologio né I/O. */
 public object HomeUnlocks {
 
+    /** Vittorie dopo le quali le Missioni compaiono anche senza aver risolto la Sfida del giorno. */
+    public const val MISSIONS_AFTER_WINS: Int = 3
+
     /** Le funzioni che i [signals] sbloccano oggi (senza memoria di ciò che era già stato mostrato). */
     public fun unlocked(signals: HomeSignals): Set<HomeFeature> = buildSet {
         if (signals.matchesWon >= 1) add(HomeFeature.DAILY_PUZZLE)
         if (signals.matchesWon >= 2) add(HomeFeature.DAILY_MATCH)
-        if (signals.dailyPuzzleSolved) add(HomeFeature.MISSIONS)
+        if (signals.dailyPuzzleSolved || signals.matchesWon >= MISSIONS_AFTER_WINS) add(HomeFeature.MISSIONS)
         if (signals.checkPlayed) add(HomeFeature.ACADEMY)
         if (signals.rewardReceived) add(HomeFeature.SHOP)
         if (signals.matchesPlayed >= 1) {

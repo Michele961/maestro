@@ -10,6 +10,12 @@ import kotlin.test.assertTrue
 class HomeUnlocksTest {
 
     @Test
+    fun missions_also_unlock_after_the_third_win_without_the_daily_puzzle() {
+        assertFalse(HomeFeature.MISSIONS in HomeUnlocks.unlocked(HomeSignals(matchesPlayed = 2, matchesWon = 2)))
+        assertTrue(HomeFeature.MISSIONS in HomeUnlocks.unlocked(HomeSignals(matchesPlayed = 3, matchesWon = 3)))
+    }
+
+    @Test
     fun aNewPlayerUnlocksNothingAndHasNoActivity() {
         assertEquals(emptySet(), HomeUnlocks.unlocked(HomeSignals()))
         assertFalse(HomeSignals().hasActivity)

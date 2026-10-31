@@ -38,7 +38,7 @@ Principio: nessuna voce finta; una funzione compare quando serve, con una frase 
 | 0 | Gioca (Sparring) | subito | — |
 | 1 | Sfida del giorno | la prima partita vinta | `home_unlock_daily_puzzle` |
 | 2 | Partita del giorno | la seconda partita vinta | `home_unlock_daily_match` |
-| 3 | Missioni | la prima Sfida del giorno | `home_unlock_missions` |
+| 3 | Missioni | la prima Sfida del giorno, o la terza vittoria | `home_unlock_missions` |
 | 4 | Accademia | la prima prova (Check) | `home_unlock_academy` |
 | 5 | Bottega e Profilo | la prima ricompensa ricevuta | `home_unlock_shop` |
 
