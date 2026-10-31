@@ -131,16 +131,20 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
   - Siciliane: solo 16 carte su 40 (OppidumNissenae CC BY-SA 4.0); mancano 24 numeriche e il dorso: da generare o procurare.
   - Triestine e Sarde (CC BY-SA 4.0, GattoFigaro): foto a carte a contatto, non ritagliabili in automatico, sfocate a 868 px. Romagnole (CC0, Gallica 1850): 38 carte su 40 + dorso, nitide ma di stile antico; mancano Re di denari e di bastoni.
   - `scripts/crop_sheet.py` ritaglia i fogli con sfondo chiaro (Piacentine, Bergamasche).
+  - **Verifica a vista delle anteprime (2026-10-31):** le Bergamasche ritagliate sono leggibili (le figure doppie sono autentiche del mazzo); le Piacentine **non** sono pulite: nel ritaglio automatico l'Asso di denari è tagliato e alcune carte hanno i bordi sbagliati, quindi servono ritaglio a mano e ingrandimento o ridisegno (grafica di Michele, D14). Nessun mazzo è pronto per `res`.
+  - **Decisione per delega (2026-10-31):** per le Bergamasche si userà il ripiego Poulpy (CC BY-SA 3.0, già accettata da Michele) con attribuzione e immagini adattate rilasciate con la stessa licenza; la dicitura `PD-old` della pagina del foglio non basta da sola. Piacentine come secondo mazzo.
+  - **Nota sul mazzo base:** l'Asso di denari della napoletana in `res` riporta «T. Dal Negro Treviso» e «Made in Italy». ADR-0013 (approvato da Michele) lo dichiara pubblico dominio (Trocche100, `PD-user-it`); la sola presenza di un marchio commerciale sulla carta merita un controllo di Michele prima del rilascio.
 - **Domande aperte:** N6. Verifica fatta in `docs/art/mazzi-regionali.md` (2026-10-30): solo le bergamasche hanno 40 carte singole (CC BY-SA 3.0, accettata); romagnole CC0 ma incomplete; gli altri senza carte singole.
 
 ## F1G-11 — Integrazione di un mazzo regionale
 
-- **Stato:** bloccato
+- **Stato:** bloccato (attende le 40 immagini pulite di un mazzo, vedi F1G-10)
 - **Obiettivo:** includere nell'APK un mazzo con scheda approvata e renderlo scegliibile come il napoletano.
 - **Perimetro:** asset in `res`, nessuna regola cambiata; ripetibile per mazzo.
 - **Criteri di accettazione:** leggibilità nella matrice screenshot; peso verificato.
-- **Per Michele:** fornire o confermare le immagini scaricate.
-- **Domande aperte:** blocca su F1G-10.
+- **Per Michele:** fornire le 40 carte e il dorso, ritagliate o ridisegnate, del primo mazzo (Bergamasche o Piacentine).
+- **Parte tecnica (già prevista, non iniziata):** `DeckTheme` esiste (`designsystem/theme/DeckTheme.kt`); servono un tema per mazzo con prefisso dei drawable, una scelta salvata nelle impostazioni, un `CompositionLocal` che la porti alle carte, la pagina dei crediti con l'attribuzione CC BY-SA e il controllo del peso dell'APK. Si fa quando le immagini ci sono, per non costruire codice senza asset.
+- **Domande aperte:** nessuna.
 
 ## F1G-12 — Chiusura del giorno
 
@@ -162,10 +166,11 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-14 — Misure minime del ritorno
 
-- **Stato:** bloccato
+- **Stato:** da fare (rimandato: manca una superficie dove leggere i dati)
 - **Obiettivo:** sapere se il giocatore torna il giorno dopo e dopo 7 giorni, senza dati personali.
 - **Perimetro:** contatori locali anonimi con consenso, oppure strumento esterno (dipendenza nuova → decisione di Michele).
-- **Domande aperte:** Q4.
+- **Decisione per delega (2026-10-31, Q4):** solo contatori **locali e anonimi** (data del primo avvio e giorni di apertura, in DataStore, che non lasciano mai il telefono); nessuno strumento esterno e nessuna nuova dipendenza. Si implementa quando esiste dove leggerli (strumenti di sviluppo o fase online con consenso, Q13); fino ad allora non serve e non si costruisce.
+- **Domande aperte:** nessuna.
 
 ## F1G-15 — Partita del giorno offline
 
