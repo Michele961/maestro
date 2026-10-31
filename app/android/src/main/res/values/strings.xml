@@ -170,6 +170,12 @@
     <string name="pre_game_asso">Asso che taglia</string>
     <string name="pre_game_asso_hint">L\'Asso prende tutto il tavolo se non ci sono altri Assi</string>
     <string name="pre_game_redeal_hint">Se sul tavolo ci sono 3 o 4 Re, si rimescola</string>
+    <string name="pre_game_rule_always_on">Sempre attiva in questa sfida</string>
+    <string name="rule_lesson_title">Il Maestro spiega</string>
+    <string name="rule_lesson_re_bello">Da qui in poi il Re di Denari vale un punto in più a chi lo prende. Non è una carta qualsiasi.</string>
+    <string name="rule_lesson_redeal">Se all\'inizio sul tavolo ci sono tre o quattro Re, si rimescola e si ridistribuisce. Non è un errore: è la regola.</string>
+    <string name="rule_lesson_napola">Asso, due e tre di Denari valgono 3 punti, e uno in più per ogni Denaro di fila. Tienili d\'occhio.</string>
+    <string name="rule_lesson_asso">L\'Asso prende tutto il tavolo quando non ci sono altri Assi. Usalo con giudizio.</string>
     <string name="pre_game_points">%1$d Punti</string>
     <string name="pre_game_mode_title">Modalità di gioco</string>
     <string name="pre_game_mode_classic">Classica</string>

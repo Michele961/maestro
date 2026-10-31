@@ -170,6 +170,12 @@
     <string name="pre_game_asso">Ace takes all</string>
     <string name="pre_game_asso_hint">The Ace takes the whole table when there is no other Ace</string>
     <string name="pre_game_redeal_hint">If the table opens with 3 or 4 Kings, the deal is reshuffled</string>
+    <string name="pre_game_rule_always_on">Always on in this challenge</string>
+    <string name="rule_lesson_title">The Maestro explains</string>
+    <string name="rule_lesson_re_bello">From here on, the King of Coins is worth one extra point to whoever takes it. It is no ordinary card.</string>
+    <string name="rule_lesson_redeal">If the table opens with three or four Kings, the cards are reshuffled and dealt again. It is not a mistake: it is the rule.</string>
+    <string name="rule_lesson_napola">Ace, two and three of Coins are worth 3 points, plus one for each Coin in a row. Keep an eye on them.</string>
+    <string name="rule_lesson_asso">The Ace takes the whole table when there is no other Ace. Use it wisely.</string>
     <string name="pre_game_points">%1$d Points</string>
     <string name="pre_game_mode_title">Game mode</string>
     <string name="pre_game_mode_classic">Classic</string>

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import it.maestro.app.data.local.datastore.DataStoreGuideRepository
 import it.maestro.app.domain.guide.GuideProgress
 import it.maestro.app.domain.guide.GuidedHandStatus
+import it.maestro.app.domain.match.HouseRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,6 +46,24 @@ class GuideRepositoryTest {
         assertEquals(
             GuideProgress(GuidedHandStatus.SKIPPED, reviewed = true),
             DataStoreGuideRepository(open(secondRun)).observe().first(),
+        )
+        secondRun.cancel()
+    }
+
+    @Test
+    fun theSeenRuleLessonsStartEmptyAndSurviveARestartOfTheProcess() = runTest {
+        val firstRun = CoroutineScope(Job() + Dispatchers.Unconfined)
+        val repository = DataStoreGuideRepository(open(firstRun))
+        assertEquals(emptySet<HouseRule>(), repository.observe().first().seenRuleLessons)
+        repository.markRuleLessonSeen(HouseRule.RE_BELLO)
+        repository.markRuleLessonSeen(HouseRule.RE_BELLO)
+        repository.markRuleLessonSeen(HouseRule.NAPOLA)
+        firstRun.cancel()
+
+        val secondRun = CoroutineScope(Job() + Dispatchers.Unconfined)
+        assertEquals(
+            setOf(HouseRule.RE_BELLO, HouseRule.NAPOLA),
+            DataStoreGuideRepository(open(secondRun)).observe().first().seenRuleLessons,
         )
         secondRun.cancel()
     }

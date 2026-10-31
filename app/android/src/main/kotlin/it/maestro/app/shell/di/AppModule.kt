@@ -286,7 +286,7 @@ public val appModule: Module = module {
     viewModel { LadderViewModel(repository = get()) }
     viewModel { SeasonViewModel(repository = get(), rewards = get()) }
     viewModel { StoryViewModel(season = get(), story = get()) }
-    viewModel { PreGameViewModel(mastery = get()) }
+    viewModel { PreGameViewModel(mastery = get(), guide = get()) }
 
     viewModel {
         DailyMissionsViewModel(

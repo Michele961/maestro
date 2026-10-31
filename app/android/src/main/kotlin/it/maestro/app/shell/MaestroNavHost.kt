@@ -9,6 +9,7 @@ import it.maestro.app.domain.guide.GuidedHand
 import it.maestro.app.domain.guide.GuidedHandStatus
 import it.maestro.app.domain.daily.DailyMatchResult
 import it.maestro.app.domain.match.HouseRules
+import it.maestro.app.domain.match.StoryHouseRules
 import it.maestro.app.domain.audio.AudioLevels
 import it.maestro.app.domain.audio.Backdrops
 import it.maestro.app.designsystem.audio.SoundManager
@@ -264,10 +265,16 @@ public fun MaestroNavHost(
                 val route = entry.toRoute<Route.PreGame>()
                 val preGameViewModel: PreGameViewModel = koinViewModel()
                 val suggested by preGameViewModel.suggestedObjective.collectAsStateWithLifecycle()
+                val seenLessons by preGameViewModel.seenRuleLessons.collectAsStateWithLifecycle()
+                val pregameOpponent = Opponent.valueOf(route.opponent)
+                val lesson = StoryHouseRules.enteringWith(pregameOpponent)?.takeIf { seenLessons != null && it !in seenLessons.orEmpty() }
                 PreGameScreen(
-                    opponent = Opponent.valueOf(route.opponent),
+                    opponent = pregameOpponent,
                     suggestedObjective = route.objective?.let(TrainingFundamental::valueOf) ?: suggested,
+                    lesson = lesson,
                     onStartGame = { level, targetScore, fundamental, rules ->
+                        // La mini-lezione si vede in Classica, dove le regole sono fisse: partita avviata, è «vista».
+                        if (fundamental == TrainingFundamental.NONE) lesson?.let(preGameViewModel::onRuleLessonSeen)
                         navController.navigate(
                             Route.Table(
                                 level.name,

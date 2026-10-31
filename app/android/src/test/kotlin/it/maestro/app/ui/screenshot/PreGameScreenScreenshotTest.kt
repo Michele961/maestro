@@ -11,6 +11,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.ai.bot.DifficultyLevel
+import it.maestro.app.domain.match.HouseRule
+import it.maestro.app.domain.match.HouseRules
+import it.maestro.app.domain.match.StoryHouseRules
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.designsystem.theme.MaestroTheme
@@ -109,6 +112,77 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
             ),
             chosen,
         )
+    }
+
+    private fun classic(opponent: Opponent, lesson: HouseRule? = null, onStart: (HouseRules) -> Unit = {}) {
+        composeRule.setContent {
+            MaestroTheme {
+                PreGameScreen(
+                    opponent = opponent,
+                    initialFundamental = TrainingFundamental.NONE,
+                    lesson = lesson,
+                    onStartGame = { _, _, _, rules -> onStart(rules) },
+                )
+            }
+        }
+    }
+
+    @Test
+    fun pre_game_fixed_rules_against_rosa_screenshot() {
+        classic(Opponent.NONNA_ROSA, lesson = HouseRule.RE_BELLO)
+        composeRule.onNodeWithTag("rule_lesson").assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game_fixed_rosa"))
+    }
+
+    @Test
+    fun pre_game_fixed_rules_against_tonino_screenshot() {
+        classic(Opponent.TONINO, lesson = HouseRule.REDEAL_ON_THREE_KINGS)
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game_fixed_tonino"))
+    }
+
+    @Test
+    fun pre_game_fixed_rules_against_alfonso_screenshot() {
+        classic(Opponent.DON_ALFONSO, lesson = HouseRule.NAPOLA)
+        composeRule.onRoot().captureRoboImage(screen.path("pre_game_fixed_alfonso"))
+    }
+
+    @Test
+    fun against_a_story_character_the_rules_in_force_are_fixed_labels_without_switches() {
+        var started: HouseRules? = null
+        classic(Opponent.DON_ALFONSO) { started = it }
+        composeRule.onNodeWithTag("fixed_rule_RE_BELLO").performScrollTo().assertExists()
+        composeRule.onNodeWithTag("fixed_rule_REDEAL_ON_THREE_KINGS").performScrollTo().assertExists()
+        composeRule.onNodeWithTag("fixed_rule_NAPOLA").performScrollTo().assertExists()
+        composeRule.onNodeWithTag("fixed_rule_ASSO_PIGLIATUTTO").assertDoesNotExist()
+        composeRule.onNodeWithTag("house_rule_re_bello").assertDoesNotExist()
+        composeRule.onNodeWithTag("house_rule_asso").assertDoesNotExist()
+        composeRule.onNodeWithTag("rule_lesson").assertDoesNotExist()
+        composeRule.onNodeWithTag("start_game_button").performClick()
+        assertEquals(StoryHouseRules.forOpponent(Opponent.DON_ALFONSO), started)
+    }
+
+    @Test
+    fun against_gigi_there_are_no_rules_to_show_and_the_spec_defaults_apply() {
+        var started: HouseRules? = null
+        classic(Opponent.GIGI) { started = it }
+        composeRule.onNodeWithTag("fixed_rule_RE_BELLO").assertDoesNotExist()
+        composeRule.onNodeWithTag("house_rule_re_bello").assertDoesNotExist()
+        composeRule.onNodeWithTag("start_game_button").performClick()
+        assertEquals(HouseRules(), started)
+    }
+
+    @Test
+    fun the_lesson_shows_the_text_of_the_rule_entering_force() {
+        classic(Opponent.NONNA_ROSA, lesson = HouseRule.RE_BELLO)
+        composeRule.onNodeWithTag("rule_lesson").performScrollTo().assertTextContains("Re di Denari", substring = true)
+    }
+
+    @Test
+    fun in_sparring_the_player_still_chooses_the_rules_freely() {
+        composeRule.setContent { MaestroTheme { PreGameScreen(opponent = Opponent.DON_ALFONSO, lesson = HouseRule.NAPOLA) } }
+        composeRule.onNodeWithTag("house_rule_napola").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("fixed_rule_NAPOLA").assertDoesNotExist()
+        composeRule.onNodeWithTag("rule_lesson").assertDoesNotExist()
     }
 
     @Test

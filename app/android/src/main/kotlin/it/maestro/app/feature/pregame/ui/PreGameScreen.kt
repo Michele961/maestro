@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -50,7 +51,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.domain.match.HouseRule
 import it.maestro.app.domain.match.HouseRules
+import it.maestro.app.domain.match.StoryHouseRules
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.MaestroPillButton
@@ -64,6 +67,10 @@ import it.maestro.game.training.TrainingFundamental
  * Semplificata come nel mockup (decisione di Michele): punti obiettivo, avversario scelto sulla scala e modalità Classica/Sparring.
  * Classica = partita senza check didattici; Sparring = con i check del Maestro su [initialFundamental].
  * Tutti i testi provengono rigorosamente dalle risorse stringhe (ADR-0007).
+ *
+ * Regole della casa (F1G-09): in Classica contro un personaggio della Scalata valgono, fisse e senza interruttore, quelle
+ * di [StoryHouseRules]; in Sparring restano libere. [onStartGame] riceve sempre le regole già risolte. [lesson] è la
+ * mini-lezione del Maestro ancora da mostrare (la regola che entra in vigore con [opponent]), `null` se già vista.
  */
 @Composable
 public fun PreGameScreen(
@@ -72,12 +79,14 @@ public fun PreGameScreen(
     initialTargetScore: Int = 11,
     initialFundamental: TrainingFundamental = TrainingFundamental.SEVENS_COUNT,
     suggestedObjective: TrainingFundamental? = null,
+    lesson: HouseRule? = null,
     onStartGame: (it.maestro.ai.bot.DifficultyLevel, Int, TrainingFundamental, HouseRules) -> Unit = { _, _, _, _ -> },
     onNavigateBack: () -> Unit = {},
 ) {
     var selectedTargetScore by remember { mutableIntStateOf(initialTargetScore) }
     var houseRules by remember { mutableStateOf(HouseRules()) }
     var sparring by remember { mutableStateOf(initialFundamental != TrainingFundamental.NONE) }
+    val fixedRules = if (sparring) emptyList() else StoryHouseRules.inForce(opponent)
     var objective by remember(suggestedObjective) {
         mutableStateOf(suggestedObjective ?: initialFundamental.takeIf { it != TrainingFundamental.NONE } ?: TrainingFundamental.SEVENS_COUNT)
     }
@@ -118,35 +127,41 @@ public fun PreGameScreen(
                         }
                     }
 
-                    RibbonHeader(stringResource(id = R.string.pre_game_house_rules_title))
-                    HouseRuleRow(
-                        label = stringResource(id = R.string.pre_game_re_bello),
-                        hint = stringResource(id = R.string.pre_game_re_bello_hint),
-                        checked = houseRules.reBello,
-                        onCheckedChange = { houseRules = houseRules.copy(reBello = it) },
-                        tag = "house_rule_re_bello",
-                    )
-                    HouseRuleRow(
-                        label = stringResource(id = R.string.pre_game_redeal),
-                        hint = stringResource(id = R.string.pre_game_redeal_hint),
-                        checked = houseRules.redealOnThreeKings,
-                        onCheckedChange = { houseRules = houseRules.copy(redealOnThreeKings = it) },
-                        tag = "house_rule_redeal",
-                    )
-                    HouseRuleRow(
-                        label = stringResource(id = R.string.pre_game_napola),
-                        hint = stringResource(id = R.string.pre_game_napola_hint),
-                        checked = houseRules.napola,
-                        onCheckedChange = { houseRules = houseRules.copy(napola = it) },
-                        tag = "house_rule_napola",
-                    )
-                    HouseRuleRow(
-                        label = stringResource(id = R.string.pre_game_asso),
-                        hint = stringResource(id = R.string.pre_game_asso_hint),
-                        checked = houseRules.assoPigliatutto,
-                        onCheckedChange = { houseRules = houseRules.copy(assoPigliatutto = it) },
-                        tag = "house_rule_asso",
-                    )
+                    if (sparring) {
+                        RibbonHeader(stringResource(id = R.string.pre_game_house_rules_title))
+                        HouseRuleRow(
+                            label = stringResource(id = R.string.pre_game_re_bello),
+                            hint = stringResource(id = R.string.pre_game_re_bello_hint),
+                            checked = houseRules.reBello,
+                            onCheckedChange = { houseRules = houseRules.copy(reBello = it) },
+                            tag = "house_rule_re_bello",
+                        )
+                        HouseRuleRow(
+                            label = stringResource(id = R.string.pre_game_redeal),
+                            hint = stringResource(id = R.string.pre_game_redeal_hint),
+                            checked = houseRules.redealOnThreeKings,
+                            onCheckedChange = { houseRules = houseRules.copy(redealOnThreeKings = it) },
+                            tag = "house_rule_redeal",
+                        )
+                        HouseRuleRow(
+                            label = stringResource(id = R.string.pre_game_napola),
+                            hint = stringResource(id = R.string.pre_game_napola_hint),
+                            checked = houseRules.napola,
+                            onCheckedChange = { houseRules = houseRules.copy(napola = it) },
+                            tag = "house_rule_napola",
+                        )
+                        HouseRuleRow(
+                            label = stringResource(id = R.string.pre_game_asso),
+                            hint = stringResource(id = R.string.pre_game_asso_hint),
+                            checked = houseRules.assoPigliatutto,
+                            onCheckedChange = { houseRules = houseRules.copy(assoPigliatutto = it) },
+                            tag = "house_rule_asso",
+                        )
+                    } else if (fixedRules.isNotEmpty()) {
+                        RibbonHeader(stringResource(id = R.string.pre_game_house_rules_title))
+                        if (lesson != null && lesson in fixedRules) RuleLesson(lesson)
+                        for (rule in fixedRules) FixedRuleRow(rule)
+                    }
 
                     RibbonHeader(stringResource(id = R.string.pre_game_opponent_title))
                     OpponentCard(opponent = opponent, modifier = Modifier.fillMaxWidth().testTag("pre_game_opponent"))
@@ -217,7 +232,7 @@ public fun PreGameScreen(
                         opponent.level,
                         selectedTargetScore,
                         if (sparring) objective else TrainingFundamental.NONE,
-                        houseRules,
+                        StoryHouseRules.resolve(opponent, sparring, houseRules),
                     )
                 },
                 variant = PillButtonVariant.PRIMARY_GREEN,
@@ -244,6 +259,65 @@ private fun HouseRuleRow(label: String, hint: String, checked: Boolean, onChecke
             Text(text = hint, style = MaterialTheme.typography.bodySmall, color = ink)
         }
         MaestroSwitch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(tag))
+    }
+}
+
+/** Nome e riga che spiega di una regola della casa (le stesse stringhe degli interruttori dello Sparring). */
+internal fun HouseRule.ruleText(): Pair<Int, Int> = when (this) {
+    HouseRule.RE_BELLO -> R.string.pre_game_re_bello to R.string.pre_game_re_bello_hint
+    HouseRule.REDEAL_ON_THREE_KINGS -> R.string.pre_game_redeal to R.string.pre_game_redeal_hint
+    HouseRule.NAPOLA -> R.string.pre_game_napola to R.string.pre_game_napola_hint
+    HouseRule.ASSO_PIGLIATUTTO -> R.string.pre_game_asso to R.string.pre_game_asso_hint
+}
+
+/** La mini-lezione del Maestro per una regola appena entrata in vigore (F1G-09). */
+internal fun HouseRule.lessonText(): Int = when (this) {
+    HouseRule.RE_BELLO -> R.string.rule_lesson_re_bello
+    HouseRule.REDEAL_ON_THREE_KINGS -> R.string.rule_lesson_redeal
+    HouseRule.NAPOLA -> R.string.rule_lesson_napola
+    HouseRule.ASSO_PIGLIATUTTO -> R.string.rule_lesson_asso
+}
+
+/** Una regola fissa della sfida: nome, riga che la spiega e l'etichetta «Sempre attiva» al posto dell'interruttore. */
+@Composable
+private fun FixedRuleRow(rule: HouseRule) {
+    val ink = Color(0xFF2B1A10)
+    val (label, hint) = rule.ruleText()
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(vertical = 2.dp).testTag("fixed_rule_${rule.name}"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = stringResource(label), style = MaterialTheme.typography.titleMedium, color = ink)
+            Text(text = stringResource(hint), style = MaterialTheme.typography.bodySmall, color = ink)
+        }
+        Text(
+            text = stringResource(id = R.string.pre_game_rule_always_on),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1B4332),
+            textAlign = TextAlign.End,
+            modifier = Modifier.widthIn(max = 120.dp),
+        )
+    }
+}
+
+/** La mini-lezione del Maestro: due frasi al massimo, la prima volta che [rule] entra in vigore. */
+@Composable
+private fun RuleLesson(rule: HouseRule) {
+    val ink = Color(0xFF2B1A10)
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp).testTag("rule_lesson"),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = stringResource(id = R.string.rule_lesson_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1B4332),
+        )
+        Text(text = stringResource(rule.lessonText()), style = MaterialTheme.typography.bodyMedium, fontStyle = FontStyle.Italic, color = ink)
     }
 }
 
