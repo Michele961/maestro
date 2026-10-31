@@ -8,7 +8,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import it.maestro.app.domain.guide.GuideRepository
+import it.maestro.app.domain.guide.GuidedHandStatus
 import it.maestro.app.shell.MainActivity
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +30,9 @@ class MainActivityCrashTest {
 
     @Test
     fun navigateToTableScreenDoesNotCrash() {
+        composeRule.waitForIdle()
+        // Chi torna a giocare ha già superato il primo avvio (F1G-16b): qui si prova il percorso verso il tavolo.
+        runBlocking { org.koin.core.context.GlobalContext.get().get<GuideRepository>().setHand(GuidedHandStatus.SKIPPED) }
         composeRule.waitForIdle()
         // "Gioca ora" porta alla scala degli avversari: si parte dal primo, sempre sbloccato.
         composeRule.onNodeWithTag("play_now_button").performClick()
