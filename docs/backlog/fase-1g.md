@@ -196,3 +196,11 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** dominio puro; classifica solo locale; verifica se il bot è deterministico dal seme e riportarla; nessun server.
 - **Criteri di accettazione:** stesso giorno → stessa mano di partenza; testo di condivisione senza spoiler; test.
 - **Domande aperte:** nessuna.
+
+## F1G-17 — Ritocchi grafici dal test di Michele
+
+- **Stato:** fatto (2026-10-31)
+- **Obiettivo:** tre ritocchi emersi dal test sul telefono.
+- **Perimetro:** (1) interruttori delle regole della casa (PreGame) e delle Impostazioni con colori del design system (`MaestroSwitch`: acceso verde con pallino crema, spento beige con pallino di legno), stessi `testTag` e stesso comportamento; (2) nelle scene della storia i ritratti degli avversari, che hanno già la cornice circolare in ottone, si disegnano senza un secondo cerchio (solo il Maestro, senza cornice nell'immagine, usa `FramedPortrait`); (3) stile dialogo in `StoryScenePlayer`: l'altro interlocutore in alto a destra, il Maestro in basso a sinistra, ognuno col suo fumetto sotto il ritratto; chi non parla resta visibile, piccolo e attenuato, finché la scena non cambia; nessuno scorrimento, misure dallo spazio disponibile; le scene con un solo interlocutore restano come prima.
+- **Criteri di accettazione:** screenshot nella matrice (small, medium, pixel10pro, small-font130) per una scena con Maestro e Gigi; i test esistenti passano senza asserzioni cambiate.
+- **Domande aperte:** nessuna.
