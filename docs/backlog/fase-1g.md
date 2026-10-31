@@ -92,13 +92,15 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-07 — Modello e schermata della Stagione
 
-- **Stato:** da fare
+- **Stato:** fatto (con le due voci in «Resta» e le dipendenze F1R-18/27/28/29 ancora da confermare da Michele sul telefono)
 - **Obiettivo:** la «Scalata dei Circoli» come dati: capitoli che richiamano avversario, modalità, Check, livello di sfida, lezione; schermata del capitolo corrente.
 - **Perimetro:** modello nel dominio, progresso in DataStore, ricompense solo da `RewardEngine`; capitoli come dati, non codice; nessun blocco a tempo.
 - **Criteri di accettazione:** progresso salvato e sopravvive a chiusura; capitolo completato assegna ricompensa una sola volta; screenshot; test del modello.
 - **Decisioni di Michele (2026-10-30):** Q2 forma «Scalata dei Circoli» con tono da apprendista confermata; Q10 abbinamento Gigi–Tavolino del Bar, Nonna Rosa–Circolo Rionale, Tonino–Salotto Nobile, Don Alfonso–Gran Casinò, il Maestro–Olimpo confermato; se un personaggio non calza, Michele ne genera altri.
 - **Per Michele:** niente.
 - **Domande aperte:** nessuna. Dipendenze tecniche ancora aperte: F1R-18, F1R-27, F1R-28, F1R-29.
+- **Esito (2026-10-31, procede per autorizzazione di Michele con le dipendenze ancora aperte):** modello in `domain/season/` (10 capitoli come dati, capitolo corrente derivato da avversari battuti, Sfida del giorno, Accademia e storico Sparring; in DataStore solo i capitoli con ricompensa riscossa); ricompensa solo da `RewardEngine.onSeasonChapterCompleted` (20 crediti a capitolo, 50 al decimo, una volta sola); schermata `feature/season`, raggiungibile da «La Scalata» in Home; stringhe `story_*` copiate dalla storia approvata.
+- **Resta:** cap. 1 (mano d'esordio guidata, F1G-02) e cap. 7 (revisione: nessun segnale registrato) restano nascosti e non completabili finché la funzione non c'è; il cap. 4 si completa solo se la Sfida del giorno è risolta nel giorno in cui si apre la schermata (la Sfida non conserva lo storico). I titoli dei capitoli in inglese (`story_chNN_title`) sono bozza dell'agente: da rivedere (D16).
 
 ## F1G-08 — Testi e voce della Stagione
 
