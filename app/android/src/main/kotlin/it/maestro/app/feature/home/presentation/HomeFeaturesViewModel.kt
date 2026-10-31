@@ -2,6 +2,8 @@ package it.maestro.app.feature.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.maestro.app.domain.guide.GuideRepository
+import it.maestro.app.domain.guide.GuidedHandStatus
 import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.domain.home.GuideSignals
 import it.maestro.app.domain.home.HomeFeaturesRepository
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -34,6 +37,9 @@ import java.time.LocalDate
  *
  * [guide] è il suggerimento «cosa premere» e [returnScene] il saluto di rientro dopo giorni di assenza (F1G-16a).
  *
+ * [firstLaunch] è `true` per chi è nuovo e non ha ancora fatto né saltato la mano d'esordio: la shell mostra il saluto del
+ * Maestro (F1G-01). [loaded] è `false` finché i dati non sono letti.
+ *
  * Prima che i dati siano letti non si mostra niente di opzionale ([LOADING]): meglio una Home spoglia per un
  * istante che una Home piena che poi si svuota.
  */
@@ -42,9 +48,11 @@ public data class HomeFeaturesUi(
     val introduction: HomeFeature?,
     val guide: HomeGuide? = null,
     val returnScene: StoryScene? = null,
+    val firstLaunch: Boolean = false,
+    val loaded: Boolean = true,
 ) {
     public companion object {
-        public val LOADING: HomeFeaturesUi = HomeFeaturesUi(emptySet(), null)
+        public val LOADING: HomeFeaturesUi = HomeFeaturesUi(emptySet(), null, loaded = false)
     }
 }
 
@@ -70,6 +78,8 @@ public class HomeFeaturesViewModel(
     puzzleSolvedToday: Flow<Boolean> = flowOf(false),
     /** Le scene viste, per non ripetere il saluto di rientro; senza, il saluto non compare. */
     private val story: StoryRepository? = null,
+    /** La mano d'esordio guidata (F1G-16b): decide il primo avvio; senza, il primo avvio non compare. */
+    private val guide: GuideRepository? = null,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeFeaturesUi.LOADING)
@@ -85,6 +95,7 @@ public class HomeFeaturesViewModel(
         val solvedToday: Boolean,
         val seen: Set<String>,
         val lastPlayed: String,
+        val hand: GuidedHandStatus,
     )
 
     init {
@@ -111,7 +122,8 @@ public class HomeFeaturesViewModel(
         }
         val guideInputs = combine(
             seasonProgress, puzzleSolvedToday, story?.observeSeen() ?: flowOf(emptySet()), retention.observeStreak(today),
-        ) { season, solved, seen, streak -> GuideInputs(season, solved, seen, streak.lastPlayedDate) }
+            guide?.observe()?.map { it.hand } ?: flowOf(GuidedHandStatus.SKIPPED),
+        ) { season, solved, seen, streak, hand -> GuideInputs(season, solved, seen, streak.lastPlayedDate, hand) }
         viewModelScope.launch {
             combine(signals, rest, guideInputs) { base, (lessons, reward), inputs ->
                 base.copy(academyLessonsDone = lessons, rewardReceived = reward) to inputs
@@ -144,6 +156,9 @@ public class HomeFeaturesViewModel(
         )
         val lastPlayed = runCatching { LocalDate.parse(inputs.lastPlayed) }.getOrNull()
         val returnScene = if (story == null) null else StoryDirector.returnGreeting(inputs.season, lastPlayed, today, inputs.seen)
-        _state.value = HomeFeaturesUi(next.revealed, introduction, guide, returnScene)
+        // Chi aveva già giocato prima di questa funzione non rivede il primo avvio: la guida conta come saltata.
+        val newcomer = inputs.hand == GuidedHandStatus.NOT_DONE && !signals.hasActivity
+        if (inputs.hand == GuidedHandStatus.NOT_DONE && signals.hasActivity) this.guide?.setHand(GuidedHandStatus.SKIPPED)
+        _state.value = HomeFeaturesUi(next.revealed, introduction, guide, returnScene, firstLaunch = newcomer)
     }
 }

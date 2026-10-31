@@ -1,5 +1,7 @@
 package it.maestro.app.feature.table.presentation
 
+import it.maestro.app.domain.guide.GuideTone
+import it.maestro.app.domain.guide.GuidedHand
 import it.maestro.app.domain.match.MatchSession
 import it.maestro.app.domain.match.SessionPlay
 import it.maestro.game.scopa.DealPhase
@@ -33,6 +35,7 @@ public object GameReducer {
             lastEvent = null,
             dealAnimationId = 1L,
             isInitialDeal = true,
+            guide = if (intent.guided) GuideSession() else null,
         )
         val effect = if (state.toMove != intent.humanSeat && state.phase == DealPhase.PLAYING) {
             GameEffect.ScheduleBotMove(
@@ -103,6 +106,10 @@ public object GameReducer {
             is GameIntent.ShowMaestroLine -> GameReducerResult(state.copy(maestroLine = intent.line))
 
             is GameIntent.DismissMaestroLine -> GameReducerResult(state.copy(maestroLine = null))
+
+            is GameIntent.DismissGuideIntro -> GameReducerResult(state.copy(guide = state.guide?.copy(introSeen = true)))
+
+            is GameIntent.FinishGuide -> GameReducerResult(state.copy(guide = state.guide?.copy(finished = true)))
         }
     }
 
@@ -355,6 +362,7 @@ public object GameReducer {
                     opponentLastMove = newOpponentLastMove,
                     dealAnimationId = nextDealAnimId,
                     isInitialDeal = if (hadCardsDealt) false else state.isInitialDeal,
+                    guide = if (isBotMove) state.guide else state.guide?.let { reactToMove(state, it, move) },
                 )
 
                 val nextEffect = if (dealScore == null && nextPhase == DealPhase.PLAYING && nextToMove == botSeat) {
@@ -384,6 +392,19 @@ public object GameReducer {
             }
         }
     }
+}
+
+// La reazione del Maestro alla mossa del giocatore: lode se era quella insegnata, consiglio se no; il passo si
+// considera insegnato solo se la mossa era giusta, altrimenti si ripresenta alla prossima occasione.
+private fun reactToMove(state: GameInternalState, progress: GuideSession, move: ScopaMove): GuideSession {
+    val table = state.session.view(state.humanSeat).table
+    val taught = GuidedHand.step(progress.taught, progress.moves, state.session.legalMovesFor(state.humanSeat), table)
+    val right = taught == null || GuidedHand.isRight(taught.step, move, table)
+    return progress.copy(
+        taught = if (taught != null && right) progress.taught + taught.step else progress.taught,
+        moves = progress.moves + 1,
+        feedback = taught?.copy(tone = if (right) GuideTone.OK else GuideTone.WRONG, card = null),
+    )
 }
 
 /** Check a conteggio: sbagliando il Maestro dà prima un indizio (`docs/app/features/coach-in-game.md` §6). */

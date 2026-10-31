@@ -48,7 +48,9 @@ import it.maestro.app.feature.pregame.ui.style
  * battuta chiude la scena, «Salta» la chiude subito. Nessuna animazione: la scena è ferma finché non si tocca. Il
  * [playerName] sceglie la variante con il nome (`_named`) dove esiste; senza nome vale il testo base.
  *
- * [onDone] arriva una sola volta, a scena finita o saltata.
+ * [onDone] arriva una sola volta, a scena finita o saltata. Se la scena ha un [StoryScene.end], dopo l'ultima battuta
+ * compare il suo pulsante ([onEnd], di norma come [onDone]) e un tocco non chiude più. [onSkip] e [skipLabel] cambiano il
+ * «Salta» in alto (la mano guidata lo usa per «Salta la guida»).
  */
 @Composable
 public fun StoryScenePlayer(
@@ -56,16 +58,21 @@ public fun StoryScenePlayer(
     playerName: String?,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
+    onEnd: () -> Unit = onDone,
+    onSkip: () -> Unit = onDone,
+    skipLabel: Int = R.string.story_scene_skip,
 ) {
     var index by rememberSaveable(scene.id) { mutableIntStateOf(0) }
     val beat = scene.beats[index.coerceIn(0, scene.beats.lastIndex)]
+    val atEnd = index >= scene.beats.lastIndex
+    val end = scene.end.takeIf { atEnd }
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xE6000000))
             .testTag("story_scene")
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                if (index >= scene.beats.lastIndex) onDone() else index += 1
+                if (!atEnd) index += 1 else if (scene.end == null) onDone()
             },
     ) {
         // Il ritratto si misura sullo spazio che c'è: più piccolo sui telefoni bassi.
@@ -80,8 +87,8 @@ public fun StoryScenePlayer(
         ) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 MaestroPillButton(
-                    text = stringResource(R.string.story_scene_skip),
-                    onClick = onDone,
+                    text = stringResource(skipLabel),
+                    onClick = onSkip,
                     variant = PillButtonVariant.SECONDARY_AMBER,
                     height = 40.dp,
                     fontSize = 14.sp,
@@ -113,11 +120,26 @@ public fun StoryScenePlayer(
                     message = beat.text(playerName),
                     modifier = Modifier.testTag("story_scene_box"),
                 )
-                Text(
-                    text = stringResource(R.string.story_scene_tap_hint),
-                    color = Color(0xFFFFF4D6),
-                    fontSize = 12.sp,
-                )
+                if (end == null) {
+                    Text(
+                        text = stringResource(R.string.story_scene_tap_hint),
+                        color = Color(0xFFFFF4D6),
+                        fontSize = 12.sp,
+                    )
+                } else {
+                    end.textRes?.let {
+                        Text(text = stringResource(it), color = Color(0xFFFFF4D6), fontSize = 14.sp, modifier = Modifier.testTag("story_scene_end_text"))
+                    }
+                    MaestroPillButton(
+                        text = stringResource(end.buttonRes),
+                        onClick = onEnd,
+                        variant = PillButtonVariant.HERO_RED,
+                        height = 48.dp,
+                        fontSize = 16.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        testTag = "story_scene_end_button",
+                    )
+                }
             }
         }
     }

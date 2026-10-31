@@ -4,6 +4,7 @@ import it.maestro.app.R
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.season.ChapterState
 import it.maestro.app.domain.season.ChapterStatus
+import it.maestro.app.domain.season.StepSituation
 import it.maestro.game.training.TrainingFundamental
 
 /** Dove porta il pulsante del «prossimo passo»: la shell lo traduce in una rotta esistente. */
@@ -22,6 +23,9 @@ public sealed interface StepAction {
 
     /** Il Profilo, dove si rivedono le partite («Rivedi analisi»). */
     public data object Profile : StepAction
+
+    /** La scala degli avversari, per giocare una partita qualunque. */
+    public data object Play : StepAction
 }
 
 /** Il «prossimo passo» di un capitolo: la frase del Maestro, l'etichetta del pulsante e dove porta. */
@@ -34,7 +38,19 @@ public data class NextStep(val textRes: Int, val buttonRes: Int, val action: Ste
 public val ChapterState.nextStep: NextStep?
     get() {
         if (status != ChapterStatus.CURRENT) return null
-        return when (chapter.number) {
+        val base = regularStep() ?: return null
+        return when {
+            situation == StepSituation.NOTHING_TO_REVIEW ->
+                step(R.string.story_edge_review_empty_text, R.string.story_edge_review_empty_button, StepAction.Play)
+            // Dopo una sconfitta il Maestro incoraggia a riprovare lo stesso avversario, non cambia dove si va.
+            situation == StepSituation.LOST && base.action is StepAction.PlayOpponent ->
+                step(R.string.story_edge_lost_text, R.string.story_edge_lost_button, base.action)
+            else -> base
+        }
+    }
+
+private fun ChapterState.regularStep(): NextStep? =
+        when (chapter.number) {
             1 -> step(R.string.story_ch01_next_text, R.string.story_ch01_next_button, StepAction.PlayOpponent(Opponent.GIGI))
             2 -> step(R.string.story_ch02_next_text, R.string.story_ch02_next_button, StepAction.PlayOpponent(Opponent.GIGI))
             3 -> step(
@@ -61,6 +77,5 @@ public val ChapterState.nextStep: NextStep?
             }
             else -> null
         }
-    }
 
 private fun step(text: Int, button: Int, action: StepAction) = NextStep(text, button, action)

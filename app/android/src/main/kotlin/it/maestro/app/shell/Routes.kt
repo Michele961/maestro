@@ -39,6 +39,8 @@ public sealed interface Route {
         val redealOnThreeKings: Boolean = true,
         val napola: Boolean = false,
         val assoPigliatutto: Boolean = false,
+        /** Mano d'esordio guidata (F1G-02): seme fisso, il Maestro guida e la partita non si registra. */
+        val guided: Boolean = false,
     ) : Route
 
     /** Fine partita. [trainingCorrect]/[trainingTotal] sono -1 se non ci sono stati Check. */

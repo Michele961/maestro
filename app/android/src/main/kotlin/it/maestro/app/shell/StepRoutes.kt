@@ -12,4 +12,5 @@ internal fun StepAction.toRoute(): Route = when (this) {
     StepAction.DailyPuzzle -> Route.DailyPuzzle
     StepAction.Academy -> Route.Academy
     StepAction.Profile -> Route.Profile
+    StepAction.Play -> Route.Ladder()
 }

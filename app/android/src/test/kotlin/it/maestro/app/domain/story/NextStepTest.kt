@@ -74,6 +74,7 @@ class NextStepTest {
             sparringChecksPlayed = setOf(TrainingFundamental.SEVENS_COUNT),
             dailyPuzzleSolvedToday = true,
             completedAcademyChapters = AcademyChapterId.entries.toSet(),
+            reviewed = true,
         )
         val state = current(lessonDone)
         assertEquals(9, state.chapter.number)
