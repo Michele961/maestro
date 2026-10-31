@@ -26,6 +26,9 @@ import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.season.SeasonRepository
+import it.maestro.app.domain.story.StoryRepository
+import it.maestro.app.data.local.datastore.DataStoreStoryRepository
+import it.maestro.app.feature.season.presentation.StoryViewModel
 import it.maestro.app.data.local.datastore.DataStoreSeasonRepository
 import it.maestro.app.data.local.datastore.seasonFacts
 import it.maestro.app.feature.season.presentation.SeasonViewModel
@@ -132,6 +135,8 @@ public val appModule: Module = module {
     single<OpponentRepository> {
         DataStoreOpponentRepository(dataStore = androidContext().opponentsDataStore)
     }
+
+    single<StoryRepository> { DataStoreStoryRepository(dataStore = androidContext().seasonDataStore) }
 
     single<SeasonRepository> {
         DataStoreSeasonRepository(
@@ -241,10 +246,16 @@ public val appModule: Module = module {
             academyLessonsDone = get<AcademyRepository>().observeProgress().map { lessons -> lessons.values.count { it.isCompleted } },
             wallet = get(),
             clock = get(),
+            seasonProgress = get<SeasonRepository>().observeProgress(),
+            puzzleSolvedToday = get<DailyPuzzleRepository>()
+                .observeDailyPuzzle(get<Clock>().today().toString())
+                .map { it.isSolvedToday },
+            story = get(),
         )
     }
     viewModel { LadderViewModel(repository = get()) }
     viewModel { SeasonViewModel(repository = get(), rewards = get()) }
+    viewModel { StoryViewModel(season = get(), story = get()) }
     viewModel { PreGameViewModel(mastery = get()) }
 
     viewModel {

@@ -34,10 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
 import it.maestro.app.designsystem.components.ClubBackground
+import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.NineSliceBox
+import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.domain.season.ChapterState
 import it.maestro.app.domain.season.SeasonChapters
 import it.maestro.app.domain.season.SeasonProgress
+import it.maestro.app.domain.story.StepAction
+import it.maestro.app.domain.story.StoryScene
+import it.maestro.app.domain.story.nextStep
 
 private val Ink = Color(0xFF2B1A10)
 private val Cream = Color(0xFFFFF4D6)
@@ -52,6 +57,12 @@ public fun SeasonScreen(
     progress: SeasonProgress,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    playerName: String? = null,
+    /** La scena da mostrare sopra la schermata (F1G-16a), se c'è; [onSceneDone] arriva a scena finita o saltata. */
+    scene: StoryScene? = null,
+    onSceneDone: (String) -> Unit = {},
+    /** Il giocatore ha premuto il pulsante del «prossimo passo»: la shell sceglie la rotta. */
+    onStepClicked: (StepAction) -> Unit = {},
 ) {
     ClubBackground(modifier = modifier.testTag("season_screen"), feltFraction = 0.5f) {
         Box(modifier = Modifier.fillMaxSize().background(Color(0x99000000)))
@@ -79,7 +90,8 @@ public fun SeasonScreen(
                 modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                progress.current?.let { CurrentChapterCard(it) }
+                if (progress.chapters.isNotEmpty()) RemainingText(progress.remaining)
+                progress.current?.let { CurrentChapterCard(it, onStepClicked) }
                 if (progress.isComplete) CompleteCard()
                 if (progress.done.isNotEmpty()) {
                     Text(
@@ -93,11 +105,23 @@ public fun SeasonScreen(
                 }
             }
         }
+        if (scene != null) StoryScenePlayer(scene, playerName, onDone = { onSceneDone(scene.id) })
     }
 }
 
+/** «Ancora N tavoli all'Olimpo dei Maestri» (`story_progress_*`). */
 @Composable
-private fun CurrentChapterCard(state: ChapterState) {
+private fun RemainingText(remaining: Int) {
+    val text = when (remaining) {
+        0 -> stringResource(R.string.story_progress_done)
+        1 -> stringResource(R.string.story_progress_one)
+        else -> stringResource(R.string.story_progress_many, remaining)
+    }
+    Text(text = text, color = Cream, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("season_remaining"))
+}
+
+@Composable
+private fun CurrentChapterCard(state: ChapterState, onStepClicked: (StepAction) -> Unit) {
     val chapter = state.chapter
     NineSliceBox(
         skin = R.drawable.skin_button_green,
@@ -127,9 +151,18 @@ private fun CurrentChapterCard(state: ChapterState) {
                 color = Cream,
                 fontSize = 12.sp,
             )
-            val story = if (state.midReached) chapter.midRes ?: chapter.openRes else chapter.openRes
-            Text(text = stringResource(story), color = Cream, fontSize = 15.sp, lineHeight = 20.sp, modifier = Modifier.testTag("season_story"))
-            GoalText(chapter.goal, color = Cream)
+            state.nextStep?.let { step ->
+                Text(text = stringResource(step.textRes), color = Cream, fontSize = 15.sp, lineHeight = 20.sp, modifier = Modifier.testTag("season_story"))
+                MaestroPillButton(
+                    text = stringResource(step.buttonRes),
+                    onClick = { onStepClicked(step.action) },
+                    variant = PillButtonVariant.HERO_RED,
+                    height = 48.dp,
+                    fontSize = 16.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "season_next_button",
+                )
+            }
             val quip = if (state.midReached) chapter.midQuipRes ?: chapter.quipRes else chapter.quipRes
             if (quip != null) {
                 Text(text = stringResource(quip), color = Cream, fontSize = 13.sp, fontStyle = FontStyle.Italic)
