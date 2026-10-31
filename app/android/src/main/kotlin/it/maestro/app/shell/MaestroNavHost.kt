@@ -172,6 +172,7 @@ public fun MaestroNavHost(
                     features = featuresUi.visible,
                     introduction = featuresUi.introduction,
                     guide = featuresUi.guide,
+                    closing = featuresUi.closing,
                     returnScene = featuresUi.returnScene,
                     onReturnSceneDone = homeFeatures::onReturnSceneDone,
                     hasActiveMatch = hasActiveMatch,

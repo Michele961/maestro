@@ -73,11 +73,13 @@ public data class HomeSignals(
  *   (vede tutto) da chi la installa ora. Il default è sicuro: chi non ha scritto nulla viene valutato una volta.
  * @property revealed le funzioni mostrate nella Home; una funzione mostrata non si nasconde più.
  * @property introduced le funzioni la cui frase di presentazione è già stata detta.
+ * @property closingDay la data (`yyyy-MM-dd`) dell'ultima chiusura del giorno detta (F1G-12); vuota se mai.
  */
 public data class PresentedFeatures(
     val initialized: Boolean = false,
     val revealed: Set<HomeFeature> = emptySet(),
     val introduced: Set<HomeFeature> = emptySet(),
+    val closingDay: String = "",
 ) {
     /** La prossima frase da dire: la prima funzione mostrata, con frase, non ancora presentata. */
     public val pendingIntroduction: HomeFeature?
@@ -85,6 +87,9 @@ public data class PresentedFeatures(
 
     /** Segna come detta la frase di [feature]. */
     public fun withIntroduced(feature: HomeFeature): PresentedFeatures = copy(introduced = introduced + feature)
+
+    /** Segna come detta la chiusura del giorno [day]. */
+    public fun withClosingShown(day: String): PresentedFeatures = copy(closingDay = day)
 }
 
 /** Regole di sblocco della Home: dominio puro, senza orologio né I/O. */

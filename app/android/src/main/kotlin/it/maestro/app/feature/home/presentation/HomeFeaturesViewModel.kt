@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.maestro.app.domain.guide.GuideRepository
 import it.maestro.app.domain.guide.GuidedHandStatus
+import it.maestro.app.domain.home.DayClosing
+import it.maestro.app.domain.home.DayClosingSignals
 import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.domain.home.GuideSignals
 import it.maestro.app.domain.home.HomeFeaturesRepository
@@ -37,6 +39,9 @@ import java.time.LocalDate
  *
  * [guide] è il suggerimento «cosa premere» e [returnScene] il saluto di rientro dopo giorni di assenza (F1G-16a).
  *
+ * [closing] è `true` quando il Maestro chiude il giorno (F1G-12): sfida, partita e missioni di oggi fatte, detto una
+ * sola volta al giorno.
+ *
  * [firstLaunch] è `true` per chi è nuovo e non ha ancora fatto né saltato la mano d'esordio: la shell mostra il saluto del
  * Maestro (F1G-01). [loaded] è `false` finché i dati non sono letti.
  *
@@ -48,6 +53,7 @@ public data class HomeFeaturesUi(
     val introduction: HomeFeature?,
     val guide: HomeGuide? = null,
     val returnScene: StoryScene? = null,
+    val closing: Boolean = false,
     val firstLaunch: Boolean = false,
     val loaded: Boolean = true,
 ) {
@@ -80,6 +86,8 @@ public class HomeFeaturesViewModel(
     private val story: StoryRepository? = null,
     /** La mano d'esordio guidata (F1G-16b): decide il primo avvio; senza, il primo avvio non compare. */
     private val guide: GuideRepository? = null,
+    /** `true` quando la Partita del giorno di oggi è stata giocata (F1G-12). */
+    dailyMatchPlayedToday: Flow<Boolean> = flowOf(false),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeFeaturesUi.LOADING)
@@ -89,6 +97,9 @@ public class HomeFeaturesViewModel(
 
     private var introduction: HomeFeature? = null
 
+    /** La chiusura del giorno scelta per questa visita: resta per tutta la visita, come la presentazione. */
+    private var closing: Boolean = false
+
     /** Oltre ai segnali delle funzioni: la Scalata, la Sfida di oggi, le scene viste, l'ultimo giorno giocato. */
     private data class GuideInputs(
         val season: SeasonProgress,
@@ -96,6 +107,7 @@ public class HomeFeaturesViewModel(
         val seen: Set<String>,
         val lastPlayed: String,
         val hand: GuidedHandStatus,
+        val dayDone: DayClosingSignals,
     )
 
     init {
@@ -120,10 +132,16 @@ public class HomeFeaturesViewModel(
         val rest = combine(academyLessonsDone, wallet.observeTransactions()) { lessons, transactions ->
             lessons to transactions.any { it.isCredit && it.reason != TransactionReason.WELCOME_BONUS }
         }
-        val guideInputs = combine(
+        val dayDone = combine(puzzleSolvedToday, dailyMatchPlayedToday, retention.observeDailyMissions(today)) { puzzle, match, missions ->
+            DayClosingSignals(puzzle, match, missions.allCompleted)
+        }
+        val guideBase = combine(
             seasonProgress, puzzleSolvedToday, story?.observeSeen() ?: flowOf(emptySet()), retention.observeStreak(today),
             guide?.observe()?.map { it.hand } ?: flowOf(GuidedHandStatus.SKIPPED),
-        ) { season, solved, seen, streak, hand -> GuideInputs(season, solved, seen, streak.lastPlayedDate, hand) }
+        ) { season, solved, seen, streak, hand ->
+            GuideInputs(season, solved, seen, streak.lastPlayedDate, hand, DayClosingSignals(false, false, false))
+        }
+        val guideInputs = combine(guideBase, dayDone) { base, day -> base.copy(dayDone = day) }
         viewModelScope.launch {
             combine(signals, rest, guideInputs) { base, (lessons, reward), inputs ->
                 base.copy(academyLessonsDone = lessons, rewardReceived = reward) to inputs
@@ -143,6 +161,11 @@ public class HomeFeaturesViewModel(
             introduction = next.pendingIntroduction
             introduction?.let { next = next.withIntroduced(it) }
         }
+        // La chiusura non si somma a una presentazione: se oggi parla l'altra, resta per la prossima visita.
+        if (!closing && introduction == null && DayClosing.isDue(inputs.dayDone, next.revealed, next.closingDay, today)) {
+            closing = true
+            next = next.withClosingShown(today.toString())
+        }
         if (next != stored) repository.save(next)
         val guide = HomeGuides.choose(
             GuideSignals(
@@ -159,6 +182,6 @@ public class HomeFeaturesViewModel(
         // Chi aveva già giocato prima di questa funzione non rivede il primo avvio: la guida conta come saltata.
         val newcomer = inputs.hand == GuidedHandStatus.NOT_DONE && !signals.hasActivity
         if (inputs.hand == GuidedHandStatus.NOT_DONE && signals.hasActivity) this.guide?.setHand(GuidedHandStatus.SKIPPED)
-        _state.value = HomeFeaturesUi(next.revealed, introduction, guide, returnScene, firstLaunch = newcomer)
+        _state.value = HomeFeaturesUi(next.revealed, introduction, guide, returnScene, closing, firstLaunch = newcomer)
     }
 }

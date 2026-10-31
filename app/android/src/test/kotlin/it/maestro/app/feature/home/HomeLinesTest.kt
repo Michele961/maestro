@@ -41,6 +41,17 @@ class HomeLinesTest {
     }
 
     @Test
+    fun theClosingOfTheDayBeatsTheResumeTheGuideAndTheStreakButNotAPresentation() {
+        assertEquals(HomeLineKind.CLOSING, HomeLines.choose(true, 9, true, 3, closing = true).kind)
+        assertEquals(
+            HomeLineKind.CLOSING,
+            HomeLines.choose(false, 0, true, 3, guide = it.maestro.app.domain.home.HomeGuide.CHAPTER_READY, closing = true).kind,
+        )
+        assertEquals(HomeLineKind.UNLOCK, HomeLines.choose(false, 0, true, 3, introducing = HomeFeature.SHOP, closing = true).kind)
+        assertEquals(HomeLineKind.RESUME, HomeLines.choose(true, 9, true, 3, closing = false).kind)
+    }
+
+    @Test
     fun withoutAPresentationTheExistingVariantsAreUnchanged() {
         assertEquals(HomeLineKind.RESUME, HomeLines.choose(true, 9, true, 3, introducing = null).kind)
         assertEquals(null, HomeLines.choose(false, 0, false, 3).feature)

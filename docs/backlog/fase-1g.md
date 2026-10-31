@@ -164,16 +164,17 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-12 — Chiusura del giorno
 
-- **Stato:** da fare
+- **Stato:** fatto (2026-10-31)
 - **Obiettivo:** quando sfida, partita e missioni del giorno sono fatte, il Maestro saluta («per oggi basta») e annuncia il domani.
 - **Perimetro:** riga/schermata in Home, stato da missioni e serie esistenti; nessun invito a continuare; nessuna perdita se si salta.
 - **Criteri di accettazione:** compare una volta al giorno; screenshot; test della condizione.
 - **Per Michele:** testi.
-- **Domande aperte:** nessuna.
+- **Domande aperte:** (1) testo della chiusura: bozza in `docs/design/testi-chiusura-del-giorno.md`, da approvare (D16); (2) la Partita del giorno conta come fatta anche se persa; (3) la chiusura compare solo se Sfida, Partita e Missioni sono già in Home; (4) se nella stessa visita il Maestro presenta una funzione nuova (F1G-03), la chiusura aspetta la visita successiva.
+- **Come è fatto:** condizione pura in `domain/home/DayClosing` (`DayClosingSignals`, `isComplete`, `isDue`) da segnali esistenti (Sfida di oggi, `DailyMatchRepository`, missioni di `RetentionRepository`); l'ultima chiusura detta è `closingDay` in `PresentedFeatures` (stesso DataStore di F1G-03, default vuoto). `HomeLineKind.CLOSING` dopo le presentazioni e prima del resto; una volta al giorno.
 
 ## F1G-13 — Promemoria facoltativo
 
-- **Stato:** in corso
+- **Stato:** fatto (testi in `docs/design/testi-promemoria.md`, da approvare D16)
 - **Obiettivo:** una notifica al giorno al massimo, chiesta solo dopo la prima vittoria, solo con consenso.
 - **Perimetro:** notifica locale giornaliera (nessun server, nessun dato in uscita); richiesta del permesso `POST_NOTIFICATIONS` (Android 13+) nel momento giusto e mai prima della prima vittoria; interruttore nelle Impostazioni; testo della notifica da `strings.xml` it/en, approvato come gli altri (D16); nessun promemoria se l'utente ha già giocato oggi.
 - **Perimetro autorizzato (Michele, 2026-10-30, Q7):** il promemoria giornaliero è accettato; sono concessi il permesso `POST_NOTIFICATIONS` e, per la sola pianificazione, `RECEIVE_BOOT_COMPLETED` nel manifest. **Nessuna nuova dipendenza** è autorizzata: si usano le API della piattaforma (`AlarmManager` inesatto, `NotificationManager`). Se non bastano, il task si ferma e chiede (CLAUDE.md §5).

@@ -14,12 +14,14 @@ import it.maestro.app.domain.home.HomeFeaturesRepository
 import it.maestro.app.domain.mastery.MatchHistoryEntry
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.opponents.OpponentProgress
+import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.time.FakeClock
 import it.maestro.app.domain.wallet.TransactionReason
 import it.maestro.app.domain.wallet.WalletTransaction
 import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -30,6 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -58,16 +61,20 @@ class HomeFeaturesViewModelTest {
         puzzleDate: String = "",
         defeated: Set<Opponent> = emptySet(),
         transactions: List<WalletTransaction> = listOf(reward(TransactionReason.WELCOME_BONUS)),
+        retention: InMemoryRetentionRepository = InMemoryRetentionRepository(),
+        dailyMatchToday: Boolean = false,
     ) = HomeFeaturesViewModel(
         repository = store,
         mastery = InMemoryMasteryRepository(MasteryProfile(matchesPlayed = played.size), played),
         opponents = InMemoryOpponentRepository(OpponentProgress(defeated)),
-        retention = InMemoryRetentionRepository(),
+        retention = retention,
         dailyPuzzleSolved = InMemoryDailyPuzzleRepository(DailyPuzzleRecord(lastCompletedDate = puzzleDate))
             .observeDailyPuzzle(clock.today().toString()).map { it.lastCompletedDate.isNotEmpty() },
         academyLessonsDone = InMemoryAcademyRepository().observeProgress().map { it.values.count { l -> l.isCompleted } },
         wallet = InMemoryWalletRepository(transactions),
         clock = clock,
+        puzzleSolvedToday = flowOf(puzzleDate == clock.today().toString()),
+        dailyMatchPlayedToday = flowOf(dailyMatchToday),
     )
 
     @Test
@@ -133,5 +140,53 @@ class HomeFeaturesViewModelTest {
         assertTrue(HomeFeature.MISSIONS in state.visible)
         assertTrue(HomeFeature.ACADEMY in state.visible)
         assertTrue(HomeFeature.DAILY_PUZZLE !in state.visible)
+    }
+
+    // --- F1G-12: chiusura del giorno ---
+
+    private suspend fun completedMissions(): InMemoryRetentionRepository {
+        val retention = InMemoryRetentionRepository()
+        retention.getDailyMissions(clock.today()).missions.forEach { retention.setMissionCompleted(clock.today(), it.type) }
+        return retention
+    }
+
+    private val veteran = listOf(entry("a", win = true))
+
+    @Test
+    fun whenPuzzleMatchAndMissionsAreDoneTheMaestroClosesTheDayOnlyOncePerDay() = runTest {
+        val store = InMemoryHomeFeaturesRepository()
+        val done = clock.today().toString()
+        val first = visit(store, veteran, puzzleDate = done, retention = completedMissions(), dailyMatchToday = true).state.value
+        assertTrue(first.closing)
+
+        val second = visit(store, veteran, puzzleDate = done, retention = completedMissions(), dailyMatchToday = true).state.value
+        assertFalse(second.closing)
+        assertEquals(clock.today().toString(), store.load().closingDay)
+    }
+
+    @Test
+    fun withoutTheDailyMatchTheDayIsNotClosed() = runTest {
+        val store = InMemoryHomeFeaturesRepository()
+        val state = visit(store, veteran, puzzleDate = clock.today().toString(), retention = completedMissions()).state.value
+        assertFalse(state.closing)
+        assertEquals("", store.load().closingDay)
+    }
+
+    @Test
+    fun withoutCompletedMissionsTheDayIsNotClosed() = runTest {
+        val state = visit(InMemoryHomeFeaturesRepository(), veteran, puzzleDate = clock.today().toString(), dailyMatchToday = true).state.value
+        assertFalse(state.closing)
+    }
+
+    @Test
+    fun aPresentationGoesFirstAndTheClosingWaitsForTheNextVisit() = runTest {
+        val store = InMemoryHomeFeaturesRepository()
+        visit(store) // da nuovo
+        val done = clock.today().toString()
+        val credits = listOf(reward(TransactionReason.WELCOME_BONUS), reward(TransactionReason.MATCH_VICTORY_REWARD))
+        val twoWins = listOf(entry("a", win = true), entry("b", win = true))
+        val first = visit(store, twoWins, puzzleDate = done, transactions = credits, retention = completedMissions(), dailyMatchToday = true).state.value
+        assertEquals(HomeFeature.DAILY_PUZZLE, first.introduction)
+        assertFalse(first.closing)
     }
 }
