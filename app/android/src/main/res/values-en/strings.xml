@@ -1022,9 +1022,9 @@
     <string name="story_epilogue_alfonso">Don Alfonso, for the first time, says more than two words: \"Fine game. Sit down with us.\"</string>
     <string name="story_ch01_title">The First Evening</string>
     <string name="story_ch02_title">The First Real Game</string>
-    <string name="story_ch03_title">The Maestro Tests You</string>
-    <string name="story_ch04_title">The Problem on the Board</string>
-    <string name="story_ch05_title">Nonna Rosa and Her Front Hall</string>
+    <string name="story_ch03_title">The Maestro\'s Test</string>
+    <string name="story_ch04_title">The Puzzle on the Bulletin Board</string>
+    <string name="story_ch05_title">Nonna Rosa and Her Stair Landing</string>
     <string name="story_ch06_title">The Club Rules</string>
     <string name="story_ch07_title">The Maestro\'s Notebook</string>
     <string name="story_ch08_title">Tonino</string>
@@ -1035,13 +1035,13 @@
     <string name="story_circle_noble_lounge">Noble Lounge</string>
     <string name="story_circle_grand_casino">Grand Casino</string>
     <string name="story_circle_olympus">Olympus of Masters</string>
-    <string name="season_title">Climbing the Circles</string>
+    <string name="season_title">The Climb Through the Clubs</string>
     <string name="season_back">Back</string>
     <string name="season_chapter_of">Chapter %1$d of %2$d</string>
     <string name="season_current">Your turn</string>
-    <string name="season_goal_defeat">Beat in Classic: %1$s</string>
-    <string name="season_goal_check">Play a Sparring with the Check: %1$s</string>
-    <string name="season_goal_puzzle">Solve the Daily Challenge</string>
+    <string name="season_goal_defeat">Beat %1$s in Classic</string>
+    <string name="season_goal_check">Play a Sparring game with the Check: %1$s</string>
+    <string name="season_goal_puzzle">Solve the Daily puzzle</string>
     <string name="season_goal_academy">Complete Academy chapter %1$d</string>
     <string name="season_done_title">Chapters done</string>
     <string name="season_reward">+%1$d credits</string>
@@ -1064,7 +1064,7 @@
     <string name="story_ch01_close_scene1_text">Nicely done. I\'ll write the first line in the notebook.</string>
     <string name="story_ch01_close_scene2_text">Look: the first page is torn out. Who did it? One day I\'ll tell you.</string>
     <string name="story_ch01_close_scene3_text">Again! But no hints this time: I want to play on equal terms.</string>
-    <string name="story_ch01_next_text">Play Sparring against Gigi. If you hesitate, press «Ask the Maestro».</string>
+    <string name="story_ch01_next_text">Play Sparring against Gigi. If you hesitate, press «Ask the Master».</string>
     <string name="story_ch01_next_button">Play with Gigi</string>
     <string name="story_ch02_scene1_text">A real game this time! No hints, no back room.</string>
     <string name="story_ch02_scene2_text">I\'ll watch in silence. The game is yours.</string>
@@ -1081,7 +1081,7 @@
     <string name="story_ch03_close_scene1_text">I counted too! I found three. Or four. Or maybe seven.</string>
     <string name="story_ch03_close_scene2_text">Test done! I\'ll write this one in the notebook too. That scrap of paper? Oh, just chance.</string>
     <string name="story_ch03_close_scene3_text">At the Neighborhood Club there\'s a sheet signed «R» on the board. Shall we go look?</string>
-    <string name="story_ch03_next_text">Play a Sparring game and answer the test on the Sevens played.</string>
+    <string name="story_ch03_next_text">Play a Sparring game and answer the Sevens test: how many have come out?</string>
     <string name="story_ch03_next_button">Sevens test</string>
     <string name="story_ch04_scene1_text">The Neighborhood Club! Card problems are pinned to the board here.</string>
     <string name="story_ch04_scene2_text">There it is, the sheet signed «R»! Who could it be?</string>
@@ -1162,8 +1162,8 @@
     <string name="story_epilogue_scene5_text">The landing always has a spot for you.</string>
     <string name="story_epilogue_scene6_text">At the bar, the coffee\'s on you this time!</string>
     <string name="story_epilogue_scene7_text">Fine game. Sit down with us.</string>
-    <string name="story_progress_many">%1$d tables to go to the Olympus of Masters</string>
-    <string name="story_progress_one">1 table to go to the Olympus of Masters</string>
+    <string name="story_progress_many">%1$d more tables to the Olympus of Masters</string>
+    <string name="story_progress_one">1 more table to the Olympus of Masters</string>
     <string name="story_progress_done">You\'re at the Olympus of Masters!</string>
     <string name="guide_home_new">Let\'s begin! Press «Play» for an easy hand.</string>
     <string name="guide_home_first_win">You won! Press «Daily puzzle»: a card problem awaits you.</string>
@@ -1172,7 +1172,7 @@
     <string name="guide_home_all_done">You\'ve done everything today. Want to stay sharp? Press «Play» for a Sparring hand.</string>
     <string name="home_closing_day">That\'s enough for today: you\'ve done it all. Tomorrow you\'ll find a new puzzle, a new match and new missions. See you tomorrow.</string>
     <string name="guide_return_scene1_text">So good to see you again! The notebook waited for you, and so did I.</string>
-    <string name="guide_return_scene2_text">%1$d tables to go to the Olympus of Masters. The next one: %2$s.</string>
+    <string name="guide_return_scene2_text">%1$d more tables to the Olympus of Masters. Next up: %2$s.</string>
     <string name="guide_return_scene3_text">Whenever you like, open «The Climb» and we pick up from there.</string>
     <string name="guide_return_scene2_text_one">One table left to the Olympus of Masters: %1$s. Almost there!</string>
 
@@ -1217,7 +1217,7 @@
     <string name="guide_end_1_text">Now Gigi is waiting for a Sparring game.</string>
     <string name="guide_end_button">Go to Gigi</string>
     <string name="guide_skip_scene1_text">I see you already know your way around cards! Then you skip the first evening.</string>
-    <string name="guide_skip_scene2_text">Here\'s the point: our chair at the Olympus of Masters is empty. Like this, the club closes.</string>
+    <string name="guide_skip_scene2_text">Here\'s the point: our chair at the Olympus of Masters is empty. As it stands, the club closes.</string>
     <string name="guide_skip_scene3_text">One table at a time, I\'ll take you up there. We start with Gigi, at the Bar Table.</string>
     <string name="guide_skip_scene_button">Go to Gigi</string>
     <string name="story_welcome_next_button">I\'m in!</string>

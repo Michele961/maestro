@@ -750,3 +750,39 @@ Dipendono dall'interfaccia: `guide_pick`, `guide_single`, `guide_sum`, `guide_la
 - Tre giri di revisione indipendente il 2026-10-31 (ritmo e chiarezza: 7,5 → 8/10; coerenza con funzioni reali, trama e personaggi: 11 → 14 rilievi, tutti applicati). Corretti: istruzioni di «prossimo passo» concrete, forme neutre, grafia dei pezzi e filo del taccuino, inglese più naturale, casi limite (ospite senza nome, Sfida già fatta, niente da rivedere, prove in ordine inverso), parole dei pulsanti reali.
 - Voluti da Michele (2026-10-31): una storia più romanzata con obiettivo e posta in gioco (la sedia vuota, la sala che chiude), dialoghi che appaiono in app e un tutorial guidato e saltabile.
 - **Approvata** per delega di Michele (D16: «scrivi la bozza, falla controllare, poi auto-approvala»). «The Climb» come traduzione di «La Scalata» è una proposta.
+
+## Titoli e nomi in inglese (revisione indipendente 2026-10-31, approvata per delega, D16)
+
+Revisione critica dei titoli en dei capitoli, del nome della Scalata e delle stringhe en brevi della schermata (non dei dialoghi lunghi). Criteri: naturalezza per un lettore inglese, niente calchi, tono del Maestro (affettuoso, sobrio), coerenza con le stringhe reali dell'app e con i nomi propri. I testi it non sono toccati.
+
+| Cap. | it | en (approvato) |
+| --- | --- | --- |
+| 1 | La prima sera | The First Evening |
+| 2 | La prima partita vera | The First Real Game |
+| 3 | Il Maestro ti mette alla prova | The Maestro's Test |
+| 4 | Il problema in bacheca | The Puzzle on the Bulletin Board |
+| 5 | Nonna Rosa e il suo pianerottolo | Nonna Rosa and Her Stair Landing |
+| 6 | Le regole del circolo | The Club Rules |
+| 7 | Il taccuino del Maestro | The Maestro's Notebook |
+| 8 | Tonino | Tonino |
+| 9 | La scienza della primiera | The Science of Primiera |
+| 10 | Don Alfonso, poi il Maestro | Don Alfonso, Then the Maestro |
+
+Nome della funzione: «La Scalata» = **The Climb** (confermato); titolo schermata «La Scalata dei Circoli» = **The Climb Through the Clubs**.
+
+Cosa è cambiato e perché (prima → dopo):
+- Cap. 3 «The Maestro Tests You» → «The Maestro's Test»: titolo più sobrio, meno minaccioso.
+- Cap. 4 «The Problem on the Board» → «The Puzzle on the Bulletin Board»: «board» in un gioco di carte è il tavolo; «bacheca» è la bacheca, e l'app chiama «puzzle» la Sfida del giorno.
+- Cap. 5 «Nonna Rosa and Her Front Hall» → «Nonna Rosa and Her Stair Landing»: il pianerottolo non è l'ingresso di casa (errore di senso); coerente con «Stairwell Champion».
+- Schermata «Climbing the Circles» → «The Climb Through the Clubs»: «circles» era un calco di «circoli»; il nome della funzione ora coincide con «The Climb».
+- Obiettivi (`season_goal_*`): «Beat in Classic: %1$s» → «Beat %1$s in Classic»; «Play a Sparring with the Check» → «Play a Sparring game with the Check»; «Solve the Daily Challenge» → «Solve the Daily puzzle» (come il pulsante reale `home_daily_puzzle_button`).
+- Indicatore e rientro: «N tables to go to the Olympus of Masters» → «N more tables to the Olympus of Masters» (e «1 more table…»); «The next one:» → «Next up:».
+- Cap. 1, prossimo passo: «Ask the Maestro» → «Ask the Master», come il pulsante reale `game_hint_button`.
+- Cap. 3, prossimo passo: «answer the test on the Sevens played» (poco chiaro) → «answer the Sevens test: how many have come out?».
+- `guide_skip_scene2_text`: «Like this, the club closes» (calco di «Così») → «As it stands, the club closes».
+
+Invariati dopo la revisione: titoli dei capitoli 1, 2, 6, 7, 8, 9, 10; `story_circle_*`; «The Climb» in Home; pulsanti di fine scena.
+
+Lunghezze: i titoli dei capitoli 4 e 5 hanno 32 caratteri, come l'it del cap. 5 (31); la schermata non limita le righe, quindi a font 1.3 vanno a capo senza troncarsi. Il titolo schermata passa da 20 a 27 caratteri e a capo su telefono stretto con font grande.
+
+Dubbio residuo (fuori perimetro): `game_hint_button` en dice «Ask the Master» mentre il resto dell'app en scrive «Maestro»; da uniformare in un task sull'interfaccia, se Michele vuole.
