@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.maestro.app.designsystem.theme.MaestroTheme
 import it.maestro.app.domain.opponents.Opponent
+import it.maestro.app.domain.season.Circle
 import it.maestro.app.domain.season.SeasonFacts
 import it.maestro.app.domain.season.SeasonProgress
 import it.maestro.app.domain.story.StepAction
@@ -76,6 +77,41 @@ class StoryScenesScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("story_scene").performClick()
         composeRule.onNodeWithTag("story_scene_speaker", useUnmergedTree = true).assertTextContains("Il Maestro")
         composeRule.onRoot().captureRoboImage(screen.path("story_dialogue_maestro"))
+    }
+
+    @Test
+    fun a_scene_with_a_circle_backdrop_screenshot() {
+        val scene = requireNotNull(StoryDirector.open(5))
+        composeRule.setContent {
+            MaestroTheme { StoryScenePlayer(scene, playerName = null, onDone = {}, backdrop = Circle.NEIGHBORHOOD_CLUB.backgroundRes) }
+        }
+        composeRule.onNodeWithTag("story_scene_backdrop", useUnmergedTree = true).assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("story_scene_backdrop"))
+    }
+
+    @Test
+    fun a_dialogue_over_the_circle_backdrop_screenshot() {
+        val scene = requireNotNull(StoryDirector.open(1))
+        composeRule.setContent {
+            MaestroTheme { StoryScenePlayer(scene, playerName = null, onDone = {}, backdrop = Circle.BAR_TABLE.backgroundRes) }
+        }
+        composeRule.onNodeWithTag("story_scene").performClick()
+        composeRule.onNodeWithTag("story_scene_speaker", useUnmergedTree = true).assertTextContains("Gigi")
+        composeRule.onRoot().captureRoboImage(screen.path("story_dialogue_backdrop"))
+    }
+
+    @Test
+    fun a_scene_on_the_climb_shows_the_backdrop_of_its_circle() {
+        composeRule.setContent {
+            MaestroTheme { SeasonScreen(afterGigi, onNavigateBack = {}, scene = StoryDirector.close(2)) }
+        }
+        composeRule.onNodeWithTag("story_scene_backdrop", useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun a_scene_without_a_circle_keeps_the_dark_veil() {
+        composeRule.setContent { MaestroTheme { StoryScenePlayer(StoryDirector.GUIDE_INTRO, playerName = null, onDone = {}) } }
+        composeRule.onNodeWithTag("story_scene_backdrop", useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test

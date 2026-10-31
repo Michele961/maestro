@@ -1,5 +1,7 @@
 # Proposta grafica per la Scalata dei Circoli — vedere la storia
 
+> **Approvata da Michele il 2026-10-31: direzione B; fase 1 = F1G-21; sedia = F1G-22.** (Nel testo che segue le bozze «F1G-20» e «F1G-21» sono rinumerate F1G-21 e F1G-22; F1G-20 è «Approvazione testi per delega».)
+
 Stato: **proposta, in attesa di Michele** (task F1G-19, 2026-10-31). È solo un documento: nessun codice, nessuna immagine, nessuna voce di backlog modificata. Le immagini le genera Michele (D14); qui si decide **quali** e **come** entrano nell'app.
 
 Richiesta di Michele: «per la grafica della Scalata inerente alla storia, proponi delle grafiche e capiamo insieme quali generare e come integrarle». Feedback di partenza: «la rivedrei con una grafica che permetta di vedere in sé la storia».

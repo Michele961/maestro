@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,19 +13,24 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +44,7 @@ import it.maestro.app.designsystem.components.MaestroPillButton
 import it.maestro.app.designsystem.components.NineSliceBox
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.domain.season.ChapterState
+import it.maestro.app.domain.season.Circle
 import it.maestro.app.domain.season.SeasonChapters
 import it.maestro.app.domain.season.SeasonProgress
 import it.maestro.app.domain.story.StepAction
@@ -47,6 +54,7 @@ import it.maestro.app.domain.story.nextStep
 
 private val Ink = Color(0xFF2B1A10)
 private val Cream = Color(0xFFFFF4D6)
+private val Brass = Color(0xFFD4AF37)
 
 /**
  * La Scalata dei Circoli (task F1G-07): il Circolo e il capitolo corrente con la sua apertura, poi i capitoli
@@ -91,6 +99,9 @@ public fun SeasonScreen(
                 modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                // Il luogo del capitolo corrente (a Scalata finita, l'Olimpo): scorre con il contenuto, non toglie spazio.
+                val circle = progress.current?.chapter?.circle ?: Circle.OLYMPUS.takeIf { progress.isComplete }
+                if (circle != null) CircleBanner(circle)
                 if (progress.chapters.isNotEmpty()) RemainingText(progress.remaining)
                 progress.current?.let { CurrentChapterCard(it, onStepClicked) }
                 if (progress.isComplete) CompleteCard()
@@ -110,10 +121,31 @@ public fun SeasonScreen(
             StoryScenePlayer(
                 scene, playerName,
                 onDone = { onSceneDone(scene.id) },
+                backdrop = StoryDirector.circleOf(scene)?.backgroundRes,
                 // L'epilogo chiude la Scalata: il pulsante «Al circolo» riporta alla Home.
                 onEnd = { onSceneDone(scene.id); if (scene === StoryDirector.EPILOGUE) onNavigateBack() },
             )
         }
+    }
+}
+
+/** Lo sfondo del [circle], in una fascia alta metà della larghezza (al massimo 180 dp), in cornice d'ottone. */
+@Composable
+private fun CircleBanner(circle: Circle) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shape = RoundedCornerShape(18.dp)
+        Image(
+            painter = painterResource(circle.backgroundRes),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((maxWidth * 0.5f).coerceAtMost(180.dp))
+                .clip(shape)
+                .border(2.dp, Brass, shape)
+                .testTag("season_circle_banner"),
+        )
     }
 }
 
@@ -190,18 +222,32 @@ private fun DoneChapterRow(state: ChapterState) {
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(chapter.titleRes),
-                    color = Ink,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(text = stringResource(R.string.season_reward, chapter.rewardCredits), color = Ink, fontSize = 12.sp)
+        // Cartolina: la miniatura del Circolo a sinistra, poi titolo, crediti e chiusura.
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+            Image(
+                painter = painterResource(chapter.circle.backgroundRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.5.dp, Brass, RoundedCornerShape(10.dp))
+                    .testTag("season_done_thumb_${chapter.number}"),
+            )
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(chapter.titleRes),
+                        color = Ink,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(text = stringResource(R.string.season_reward, chapter.rewardCredits), color = Ink, fontSize = 12.sp)
+                }
+                Text(text = stringResource(chapter.closeRes), color = Ink, fontSize = 13.sp, lineHeight = 17.sp)
             }
-            Text(text = stringResource(chapter.closeRes), color = Ink, fontSize = 13.sp, lineHeight = 17.sp)
         }
     }
 }

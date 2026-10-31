@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -57,6 +58,9 @@ import it.maestro.app.feature.pregame.ui.style
  * [onDone] arriva una sola volta, a scena finita o saltata. Se la scena ha un [StoryScene.end], dopo l'ultima battuta
  * compare il suo pulsante ([onEnd], di norma come [onDone]) e un tocco non chiude più. [onSkip] e [skipLabel] cambiano il
  * «Salta» in alto (la mano guidata lo usa per «Salta la guida»).
+ *
+ * [backdrop] è lo sfondo del Circolo (F1G-21, `Circle.backgroundRes`): a tutto schermo, ritagliato, sotto un velo a
+ * sfumatura più scuro verso il basso, dove stanno fumetti e ritratti. Senza [backdrop] resta il velo nero di prima.
  */
 @Composable
 public fun StoryScenePlayer(
@@ -67,6 +71,7 @@ public fun StoryScenePlayer(
     onEnd: () -> Unit = onDone,
     onSkip: () -> Unit = onDone,
     skipLabel: Int = R.string.story_scene_skip,
+    backdrop: Int? = null,
 ) {
     var index by rememberSaveable(scene.id) { mutableIntStateOf(0) }
     val beat = scene.beats[index.coerceIn(0, scene.beats.lastIndex)]
@@ -75,12 +80,27 @@ public fun StoryScenePlayer(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xE6000000))
+            .background(if (backdrop == null) Color(0xE6000000) else Color.Black)
             .testTag("story_scene")
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
                 if (!atEnd) index += 1 else if (scene.end == null) onDone()
             },
     ) {
+        if (backdrop != null) {
+            Image(
+                painter = painterResource(backdrop),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize().testTag("story_scene_backdrop"),
+            )
+            // Velo leggero in alto (si vede il luogo), più scuro in basso: fumetti e nomi restano leggibili.
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.verticalGradient(listOf(Color(0x66000000), Color(0x80000000), Color(0xCC000000))),
+                ),
+            )
+        }
         // Il ritratto si misura sullo spazio che c'è: più piccolo sui telefoni bassi e, in un dialogo, più piccolo ancora.
         val speaker = beat.speaker
         val dialogue = scene.beats.any { it.speaker == Speaker.MAESTRO } && scene.beats.any { it.speaker != Speaker.MAESTRO }

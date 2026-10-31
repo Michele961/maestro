@@ -1,6 +1,8 @@
 package it.maestro.app.domain.story
 
 import it.maestro.app.R
+import it.maestro.app.domain.season.Circle
+import it.maestro.app.domain.season.SeasonChapters
 import it.maestro.app.domain.season.SeasonProgress
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -50,6 +52,20 @@ public object StoryDirector {
     /** Chiusura del capitolo [number]. */
     public fun close(number: Int): StoryScene? =
         StoryTexts.CLOSE[number]?.let { StoryScene(sceneId(number, "close"), it) }
+
+    /**
+     * Il Circolo in cui si svolge [scene], per lo sfondo (F1G-21): il benvenuto è al Tavolino del Bar, l'epilogo
+     * all'Olimpo, le scene dei capitoli (`chNN_*`) nel Circolo del loro capitolo. Le altre (guida, bentornato)
+     * non hanno un luogo: `null`.
+     */
+    public fun circleOf(scene: StoryScene): Circle? = when {
+        scene.id == WELCOME.id -> Circle.BAR_TABLE
+        scene.id == EPILOGUE.id -> Circle.OLYMPUS
+        else -> Regex("ch(\\d{2})_.*").matchEntire(scene.id)?.let { m ->
+            val number = m.groupValues[1].toInt()
+            SeasonChapters.ALL.firstOrNull { it.number == number }?.circle
+        }
+    }
 
     /**
      * Le scene da mostrare, in ordine, quando si apre la Scalata: il benvenuto a chi non ha ancora finito nulla, la
