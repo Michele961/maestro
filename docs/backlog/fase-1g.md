@@ -155,7 +155,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-11 — Integrazione di un mazzo regionale
 
-- **Stato:** bloccato (attende le 40 immagini pulite di un mazzo, vedi F1G-10)
+- **Stato:** rimandato (decisione di Michele, 2026-10-31: si salta per ora; si userà solo ciò che si riesce a ottenere. Prima era bloccato in attesa delle 40 immagini pulite di un mazzo, vedi F1G-10)
 - **Obiettivo:** includere nell'APK un mazzo con scheda approvata e renderlo scegliibile come il napoletano.
 - **Perimetro:** asset in `res`, nessuna regola cambiata; ripetibile per mazzo.
 - **Criteri di accettazione:** leggibilità nella matrice screenshot; peso verificato.
