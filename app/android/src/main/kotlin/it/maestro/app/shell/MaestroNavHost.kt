@@ -175,7 +175,7 @@ public fun MaestroNavHost(
                     onDailyMatchClicked = {
                         navController.navigate(
                             Route.Table(
-                                level = DifficultyLevel.INTERMEDIO.name,
+                                level = DailyMatch.LEVEL.name,
                                 targetScore = DailyMatch.TARGET_SCORE,
                                 fundamental = TrainingFundamental.NONE.name,
                                 seed = DailyMatch.seedFor(today),

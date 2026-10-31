@@ -236,6 +236,12 @@
     <string name="daily_match_share_won">vinta</string>
     <string name="daily_match_share_lost">persa</string>
     <string name="daily_match_share_button">Condividi</string>
+    <string name="daily_match_intro_title">Partita del giorno</string>
+    <string name="daily_match_intro_opponent">%1$s, %2$s</string>
+    <string name="daily_match_intro_rules">Classica, fino a %1$d punti, con le regole di base (nessuna variante).</string>
+    <string name="daily_match_intro_same_hand">Oggi la mano di partenza è la stessa per tutti: a fine partita puoi condividere il risultato, senza svelare le mosse.</string>
+    <string name="daily_match_intro_cancel">Annulla</string>
+    <string name="daily_match_intro_play">Gioca</string>
     <string name="profile_title">Profilo &amp; Maestria</string>
     <string name="profile_tab_mastery">Maestria &amp; Radar</string>
     <string name="profile_tab_history">Cronologia Partite</string>

@@ -328,6 +328,7 @@ public fun WoodRowTile(
     title: String,
     modifier: Modifier = Modifier,
     iconSize: Dp = 40.dp,
+    maxLines: Int = 1,
     onClick: (() -> Unit)? = null,
     trailingBadge: (@Composable () -> Unit)? = null,
 ) {
@@ -349,7 +350,7 @@ public fun WoodRowTile(
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaestroDisplayFont,
                 textAlign = if (trailingBadge != null) TextAlign.Start else TextAlign.Center,
-                maxLines = 1,
+                maxLines = maxLines,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(start = 6.dp),
             )
