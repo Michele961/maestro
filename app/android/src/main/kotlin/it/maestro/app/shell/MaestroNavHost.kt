@@ -67,6 +67,7 @@ import it.maestro.app.designsystem.haptics.LocalHapticsEnabled
 import it.maestro.app.feature.settings.ui.SettingsScreen
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
+import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
 import it.maestro.app.feature.home.ui.HomeScreen
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.review.ui.PostMatchScreen
@@ -150,7 +151,11 @@ public fun MaestroNavHost(
         NavHost(navController = navController, startDestination = Route.Home) {
             composable<Route.Home> {
                 LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { shell.refreshActiveMatch() }
+                val homeFeatures: HomeFeaturesViewModel = koinViewModel()
+                val featuresUi by homeFeatures.state.collectAsStateWithLifecycle()
                 HomeScreen(
+                    features = featuresUi.visible,
+                    introduction = featuresUi.introduction,
                     hasActiveMatch = hasActiveMatch,
                     onResumeGameClicked = {
                         scope.launch {

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.feature.home.presentation.HomeLine
 import it.maestro.app.feature.home.presentation.HomeLineKind
 import it.maestro.app.designsystem.components.BubbleTail
@@ -68,10 +69,12 @@ internal fun HomeHeader(
     onProfileClicked: () -> Unit,
     onShopClicked: () -> Unit,
     onNameClicked: () -> Unit = {},
+    /** Bottega e Profilo sono presentati (F1G-03): prima l'avatar non apre nulla e crediti e Maestria non si vedono. */
+    shopAndProfile: Boolean = true,
 ) {
     val avatarRes = CosmeticStyle.avatarDrawable(avatarId)
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.testTag("home_player_profile").clickable(onClick = onProfileClicked)) {
+        Box(modifier = Modifier.testTag("home_player_profile").clickable(enabled = shopAndProfile, onClick = onProfileClicked)) {
             FramedPortrait(portrait = avatarRes, size = 56.dp)
             Image(
                 painter = painterResource(R.drawable.icon_shield_fleur),
@@ -89,7 +92,7 @@ internal fun HomeHeader(
                 maxLines = 1,
                 modifier = Modifier.testTag("home_player_name").clickable(onClick = onNameClicked),
             )
-            if (mastery != null) {
+            if (mastery != null && shopAndProfile) {
                 Text(
                     text = stringResource(R.string.home_mastery_label, mastery),
                     color = BrassRivetGold.copy(alpha = 0.8f),
@@ -99,11 +102,13 @@ internal fun HomeHeader(
                     modifier = Modifier.testTag("home_mastery"),
                 )
             }
-            CurrencyPill(
-                icon = R.drawable.icon_coin,
-                value = credits.toString(),
-                modifier = Modifier.testTag("home_credits_pill").clickable(onClick = onShopClicked),
-            )
+            if (shopAndProfile) {
+                CurrencyPill(
+                    icon = R.drawable.icon_coin,
+                    value = credits.toString(),
+                    modifier = Modifier.testTag("home_credits_pill").clickable(onClick = onShopClicked),
+                )
+            }
         }
         WoodIconButton(
             icon = R.drawable.icon_gear,
@@ -153,7 +158,8 @@ internal fun MaestroWelcome(line: HomeLine, streakCount: Int, playerName: String
                         message = homeLineText(line, streakCount, playerName),
                         tail = BubbleTail.START,
                         fontSize = if (compact) 11.sp else 13.sp,
-                        maxLines = 4,
+                        // Le frasi di presentazione sono più lunghe delle battute ordinarie (F1G-03).
+                        maxLines = if (line.kind == HomeLineKind.UNLOCK) 6 else 4,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -274,6 +280,13 @@ internal fun GameTile(
 }
 
 
+private val UnlockLines = mapOf(
+    HomeFeature.DAILY_PUZZLE to R.string.home_unlock_daily_puzzle,
+    HomeFeature.DAILY_MATCH to R.string.home_unlock_daily_match,
+    HomeFeature.MISSIONS to R.string.home_unlock_missions,
+    HomeFeature.ACADEMY to R.string.home_unlock_academy,
+    HomeFeature.SHOP to R.string.home_unlock_shop,
+)
 private val ResumeLines = intArrayOf(R.string.home_line_resume_0, R.string.home_line_resume_1, R.string.home_line_resume_2)
 private val StreakLines = intArrayOf(R.string.home_line_streak_0, R.string.home_line_streak_1, R.string.home_line_streak_2)
 private val NamedLines = intArrayOf(R.string.home_line_named_0, R.string.home_line_named_1, R.string.home_line_named_2)
@@ -282,6 +295,7 @@ private val WelcomeLines = intArrayOf(R.string.home_line_welcome_0, R.string.hom
 /** Il testo della battuta del Maestro in Home (testi nelle risorse, ADR-0007). */
 @Composable
 private fun homeLineText(line: HomeLine, streakCount: Int, playerName: String?): String = when (line.kind) {
+    HomeLineKind.UNLOCK -> stringResource(UnlockLines.getValue(requireNotNull(line.feature)))
     HomeLineKind.RESUME -> stringResource(ResumeLines[line.variant])
     HomeLineKind.STREAK -> stringResource(StreakLines[line.variant], streakCount)
     HomeLineKind.WELCOME_NAMED -> stringResource(NamedLines[line.variant], playerName.orEmpty())
