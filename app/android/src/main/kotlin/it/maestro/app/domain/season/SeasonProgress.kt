@@ -44,7 +44,13 @@ public fun ChapterGoal.isMet(facts: SeasonFacts): Boolean = when (this) {
 public enum class ChapterStatus { DONE, CURRENT, UPCOMING }
 
 /** Un capitolo con il suo [status]; [midReached] vale per i capitoli a due partite dopo la prima. */
-public data class ChapterState(val chapter: SeasonChapter, val status: ChapterStatus, val midReached: Boolean = false)
+public data class ChapterState(
+    val chapter: SeasonChapter,
+    val status: ChapterStatus,
+    val midReached: Boolean = false,
+    /** Capitolo a due passi con il secondo già fatto e il primo no (la prova prima della lezione, cap. 9). */
+    val reversed: Boolean = false,
+)
 
 /**
  * La Scalata derivata dallo stato: [chapters] sono solo quelli disponibili (gli altri restano nascosti), in ordine.
@@ -57,6 +63,9 @@ public data class SeasonProgress(val chapters: List<ChapterState>, val toClaim: 
     val done: List<ChapterState> get() = chapters.filter { it.status == ChapterStatus.DONE }
 
     val isComplete: Boolean get() = chapters.isNotEmpty() && chapters.all { it.status == ChapterStatus.DONE }
+
+    /** Quanti tavoli mancano all'Olimpo: i capitoli disponibili non ancora fatti (`docs/design/stagione-scene.md`). */
+    val remaining: Int get() = chapters.size - done.size
 
     public companion object {
         /**
@@ -80,12 +89,23 @@ public data class SeasonProgress(val chapters: List<ChapterState>, val toClaim: 
                     !currentFound -> ChapterStatus.CURRENT.also { currentFound = true }
                     else -> ChapterStatus.UPCOMING
                 }
-                ChapterState(chapter, status, midReached = status == ChapterStatus.CURRENT && chapter.goal.isPartlyMet(facts))
+                val current = status == ChapterStatus.CURRENT
+                ChapterState(
+                    chapter, status,
+                    midReached = current && chapter.goal.isPartlyMet(facts),
+                    reversed = current && chapter.goal.isReversed(facts),
+                )
             }
             return SeasonProgress(states, toClaim)
         }
 
-        private fun ChapterGoal.isPartlyMet(facts: SeasonFacts): Boolean =
-            this is ChapterGoal.DefeatOpponents && opponents.size > 1 && opponents.first() in facts.defeated
+        private fun ChapterGoal.isPartlyMet(facts: SeasonFacts): Boolean = when (this) {
+            is ChapterGoal.DefeatOpponents -> opponents.size > 1 && opponents.first() in facts.defeated
+            is ChapterGoal.All -> goals.size > 1 && goals.first().isMet(facts)
+            else -> false
+        }
+
+        private fun ChapterGoal.isReversed(facts: SeasonFacts): Boolean =
+            this is ChapterGoal.All && goals.size > 1 && !goals.first().isMet(facts) && goals.drop(1).any { it.isMet(facts) }
     }
 }

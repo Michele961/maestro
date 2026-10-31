@@ -77,6 +77,7 @@ import it.maestro.app.feature.pregame.presentation.LadderViewModel
 import it.maestro.app.feature.pregame.presentation.PreGameViewModel
 import it.maestro.app.feature.pregame.ui.LadderScreen
 import it.maestro.app.feature.season.presentation.SeasonViewModel
+import it.maestro.app.feature.season.presentation.StoryViewModel
 import it.maestro.app.feature.season.ui.SeasonScreen
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.feature.profile.ui.ProfileScreen
@@ -158,6 +159,9 @@ public fun MaestroNavHost(
                 HomeScreen(
                     features = featuresUi.visible,
                     introduction = featuresUi.introduction,
+                    guide = featuresUi.guide,
+                    returnScene = featuresUi.returnScene,
+                    onReturnSceneDone = homeFeatures::onReturnSceneDone,
                     hasActiveMatch = hasActiveMatch,
                     onResumeGameClicked = {
                         scope.launch {
@@ -388,7 +392,16 @@ public fun MaestroNavHost(
             composable<Route.Season> {
                 val viewModel: SeasonViewModel = koinViewModel()
                 val progress by viewModel.state.collectAsStateWithLifecycle()
-                SeasonScreen(progress = progress, onNavigateBack = { navController.popBackStack() })
+                val storyViewModel: StoryViewModel = koinViewModel()
+                val scene by storyViewModel.scene.collectAsStateWithLifecycle()
+                SeasonScreen(
+                    progress = progress,
+                    onNavigateBack = { navController.popBackStack() },
+                    playerName = settings.playerName,
+                    scene = scene,
+                    onSceneDone = storyViewModel::onSceneDone,
+                    onStepClicked = { step -> navController.navigate(step.toRoute()) { launchSingleTop = true } },
+                )
             }
             composable<Route.Today> {
                 TodayScreen(onNavigateHome = { navController.popBackStack() })

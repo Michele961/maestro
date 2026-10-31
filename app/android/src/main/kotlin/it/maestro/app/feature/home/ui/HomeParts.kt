@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
 import it.maestro.app.domain.home.HomeFeature
+import it.maestro.app.domain.home.HomeGuide
 import it.maestro.app.feature.home.presentation.HomeLine
 import it.maestro.app.feature.home.presentation.HomeLineKind
 import it.maestro.app.designsystem.components.BubbleTail
@@ -159,7 +160,7 @@ internal fun MaestroWelcome(line: HomeLine, streakCount: Int, playerName: String
                         tail = BubbleTail.START,
                         fontSize = if (compact) 11.sp else 13.sp,
                         // Le frasi di presentazione sono più lunghe delle battute ordinarie (F1G-03).
-                        maxLines = if (line.kind == HomeLineKind.UNLOCK) 6 else 4,
+                        maxLines = if (line.kind == HomeLineKind.UNLOCK || line.kind == HomeLineKind.GUIDE) 6 else 4,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -287,6 +288,13 @@ private val UnlockLines = mapOf(
     HomeFeature.ACADEMY to R.string.home_unlock_academy,
     HomeFeature.SHOP to R.string.home_unlock_shop,
 )
+private val GuideLines = mapOf(
+    HomeGuide.NEW to R.string.guide_home_new,
+    HomeGuide.FIRST_WIN to R.string.guide_home_first_win,
+    HomeGuide.DAILY_OPEN to R.string.guide_home_daily_open,
+    HomeGuide.CHAPTER_READY to R.string.guide_home_chapter_ready,
+    HomeGuide.ALL_DONE to R.string.guide_home_all_done,
+)
 private val ResumeLines = intArrayOf(R.string.home_line_resume_0, R.string.home_line_resume_1, R.string.home_line_resume_2)
 private val StreakLines = intArrayOf(R.string.home_line_streak_0, R.string.home_line_streak_1, R.string.home_line_streak_2)
 private val NamedLines = intArrayOf(R.string.home_line_named_0, R.string.home_line_named_1, R.string.home_line_named_2)
@@ -296,6 +304,7 @@ private val WelcomeLines = intArrayOf(R.string.home_line_welcome_0, R.string.hom
 @Composable
 private fun homeLineText(line: HomeLine, streakCount: Int, playerName: String?): String = when (line.kind) {
     HomeLineKind.UNLOCK -> stringResource(UnlockLines.getValue(requireNotNull(line.feature)))
+    HomeLineKind.GUIDE -> stringResource(GuideLines.getValue(requireNotNull(line.guide)))
     HomeLineKind.RESUME -> stringResource(ResumeLines[line.variant])
     HomeLineKind.STREAK -> stringResource(StreakLines[line.variant], streakCount)
     HomeLineKind.WELCOME_NAMED -> stringResource(NamedLines[line.variant], playerName.orEmpty())

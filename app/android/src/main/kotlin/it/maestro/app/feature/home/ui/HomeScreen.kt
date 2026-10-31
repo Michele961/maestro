@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import it.maestro.app.R
 import it.maestro.app.domain.daily.DailyMatch
 import it.maestro.app.domain.home.HomeFeature
+import it.maestro.app.domain.home.HomeGuide
+import it.maestro.app.domain.story.StoryScene
+import it.maestro.app.feature.season.ui.StoryScenePlayer
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.home.presentation.HomeLines
 import it.maestro.app.designsystem.components.ClubBackground
@@ -55,6 +58,11 @@ public fun HomeScreen(
     features: Set<HomeFeature> = HomeFeature.ALL,
     /** La funzione appena comparsa che il Maestro presenta in questa visita, se c'è. */
     introduction: HomeFeature? = null,
+    /** Il suggerimento «cosa premere» del Maestro (F1G-16a), se c'è. */
+    guide: HomeGuide? = null,
+    /** Il saluto di rientro dopo giorni di assenza, se va dato; [onReturnSceneDone] arriva a scena finita o saltata. */
+    returnScene: StoryScene? = null,
+    onReturnSceneDone: (String) -> Unit = {},
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
@@ -107,8 +115,8 @@ public fun HomeScreen(
                 onNameClicked = { editingName = true },
             )
             MaestroWelcome(
-                line = remember(hasActiveMatch, streakCount, playerName, day, introduction) {
-                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day, introduction)
+                line = remember(hasActiveMatch, streakCount, playerName, day, introduction, guide) {
+                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day, introduction, guide)
                 },
                 streakCount = streakCount,
                 playerName = playerName,
@@ -157,6 +165,9 @@ public fun HomeScreen(
                     }
                 }
             }
+        }
+        if (returnScene != null) {
+            StoryScenePlayer(returnScene, playerName, onDone = { onReturnSceneDone(returnScene.id) })
         }
     }
 }
