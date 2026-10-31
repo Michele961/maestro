@@ -111,6 +111,15 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Testi:** storia e battute dei 10 capitoli, rivedute e approvate per delega, in `docs/design/stagione-storia.md`; le stringhe `story_*` entrano in `strings.xml` con F1G-07 (nessuna stringa inutilizzata prima).
 - **Domande aperte:** nessuna.
 
+## F1G-16 — Scene della Scalata e Guida del Maestro
+
+- **Stato:** da fare (dopo F1G-03 e F1G-07)
+- **Obiettivo:** la Scalata come storia interattiva: scene a battute con ritratti e fumetti che compaiono in app, «prossimo passo» con un pulsante che porta all'attività, e una guida a tutorial (mano d'esordio guidata, suggerimenti in Home, saluto di rientro, «So già giocare»).
+- **Perimetro:** testi approvati in `docs/design/stagione-scene.md` (chiavi `story_*` e `guide_*`); scena riusando il riquadro di dialogo del Maestro, avanzamento con un tocco, scene viste salvate in DataStore; indicatore «Ancora N tavoli all'Olimpo»; il tutorial è saltabile in ogni momento e «So già giocare» segna il capitolo 1 come fatto; nessuna regola nuova; tempi da `MotionSpec`; ricompense solo da `RewardEngine`. Assorbe F1G-01 (primo avvio), F1G-02 (mano d'esordio guidata) e la parte di suggerimento «prossimo passo» di F1G-03.
+- **Criteri di accettazione:** una scena compare una sola volta; il pulsante «prossimo passo» porta alla destinazione giusta per ogni capitolo; i capitoli 1 e 7 restano nascosti finché non c'è il segnale; screenshot nella matrice; test della logica di scena.
+- **Per Michele:** conferma sul telefono di ritmo e quantità delle scene.
+- **Domande aperte:** nessuna.
+
 ## F1G-09 — Regole della casa che si sbloccano con gli avversari
 
 - **Stato:** da fare
