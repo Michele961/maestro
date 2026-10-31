@@ -71,6 +71,10 @@ public sealed interface Route {
     @Serializable
     public data object Shop : Route
 
+    /** La Scalata dei Circoli (task F1G-07). */
+    @Serializable
+    public data object Season : Route
+
     @Serializable
     public data object Today : Route
 

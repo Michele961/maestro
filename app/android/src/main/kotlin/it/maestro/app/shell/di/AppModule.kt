@@ -22,6 +22,10 @@ import it.maestro.app.data.local.datastore.DataStoreRetentionRepository
 import it.maestro.app.data.local.datastore.DataStoreSettingsRepository
 import it.maestro.app.domain.mastery.MasteryRepository
 import it.maestro.app.domain.opponents.OpponentRepository
+import it.maestro.app.domain.season.SeasonRepository
+import it.maestro.app.data.local.datastore.DataStoreSeasonRepository
+import it.maestro.app.data.local.datastore.seasonFacts
+import it.maestro.app.feature.season.presentation.SeasonViewModel
 import it.maestro.app.domain.progress.AchievementRepository
 import it.maestro.app.domain.profile.PlayerTitleRepository
 import it.maestro.app.domain.progress.ExperienceRepository
@@ -68,6 +72,7 @@ private val Context.experienceDataStore by preferencesDataStore(name = "maestro_
 private val Context.playerTitleDataStore by preferencesDataStore(name = "maestro_player_title")
 private val Context.achievementsDataStore by preferencesDataStore(name = "maestro_achievements")
 private val Context.academyDataStore by preferencesDataStore(name = "maestro_academy")
+private val Context.seasonDataStore by preferencesDataStore(name = "maestro_season")
 
 /**
  * Modulo Koin principale per l'iniezione delle dipendenze dell'app Android (ADR-0012, task F1-08, F1-14).
@@ -106,7 +111,7 @@ public val appModule: Module = module {
         DataStoreDailyMatchRepository(dataStore = androidContext().dailyMatchDataStore)
     }
 
-    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get(), achievements = get()) }
+    single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get(), achievements = get(), season = get()) }
 
     single<MasteryRepository> {
         DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
@@ -118,6 +123,19 @@ public val appModule: Module = module {
 
     single<OpponentRepository> {
         DataStoreOpponentRepository(dataStore = androidContext().opponentsDataStore)
+    }
+
+    single<SeasonRepository> {
+        DataStoreSeasonRepository(
+            dataStore = androidContext().seasonDataStore,
+            facts = seasonFacts(
+                opponents = get(),
+                dailyPuzzle = get(),
+                academy = get(),
+                mastery = get(),
+                clock = get(),
+            ),
+        )
     }
 
     single<PlayerTitleRepository> {
@@ -204,6 +222,7 @@ public val appModule: Module = module {
     }
 
     viewModel { LadderViewModel(repository = get()) }
+    viewModel { SeasonViewModel(repository = get(), rewards = get()) }
     viewModel { PreGameViewModel(mastery = get()) }
 
     viewModel {
