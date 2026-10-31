@@ -172,10 +172,10 @@
     <string name="pre_game_redeal_hint">Se sul tavolo ci sono 3 o 4 Re, si rimescola</string>
     <string name="pre_game_rule_always_on">Sempre attiva in questa sfida</string>
     <string name="rule_lesson_title">Il Maestro spiega</string>
-    <string name="rule_lesson_re_bello">Da qui in poi il Re di Denari vale un punto in più a chi lo prende. Non è una carta qualsiasi.</string>
+    <string name="rule_lesson_re_bello">Da qui in poi il Re di Denari, il Re bello, vale un punto a chi lo prende. Non è una carta qualsiasi.</string>
     <string name="rule_lesson_redeal">Se all\'inizio sul tavolo ci sono tre o quattro Re, si rimescola e si ridistribuisce. Non è un errore: è la regola.</string>
-    <string name="rule_lesson_napola">Asso, due e tre di Denari valgono 3 punti, e uno in più per ogni Denaro di fila. Tienili d\'occhio.</string>
-    <string name="rule_lesson_asso">L\'Asso prende tutto il tavolo quando non ci sono altri Assi. Usalo con giudizio.</string>
+    <string name="rule_lesson_napola">Chi prende Asso, due e tre di Denari fa la napola: 3 punti, più uno per ogni Denari che segue in fila (4, 5…). Tienili d\'occhio.</string>
+    <string name="rule_lesson_asso">Se sul tavolo non ci sono Assi, il tuo Asso prende tutte le carte. Non conta come scopa.</string>
     <string name="pre_game_points">%1$d Punti</string>
     <string name="pre_game_mode_title">Modalità di gioco</string>
     <string name="pre_game_mode_classic">Classica</string>
@@ -1176,19 +1176,19 @@
     <string name="guide_home_chapter_ready">Il prossimo tavolo è pronto: apri «La Scalata» e premi il pulsante del capitolo.</string>
     <string name="guide_home_daily_open">Il problema di oggi ti aspetta: premi «Sfida del giorno».</string>
     <string name="guide_home_all_done">Per oggi hai fatto tutto. Vuoi tenerti in forma? Premi «Gioca» per una mano di Sparring.</string>
-    <string name="home_closing_day">Per oggi basta: hai fatto tutto. Domani trovi una nuova sfida, una nuova partita e nuove missioni. A domani.</string>
+    <string name="home_closing_day">Per oggi basta: hai fatto tutto quello che c\'era. Domani trovi una nuova sfida, una nuova partita e nuove missioni. A domani.</string>
     <string name="guide_return_scene1_text">Che piacere rivederti! Il taccuino ti ha aspettato, e io pure.</string>
     <string name="guide_return_scene2_text">Mancano %1$d tavoli all\'Olimpo dei Maestri. Il prossimo: %2$s.</string>
     <string name="guide_return_scene3_text">Quando vuoi, apri «La Scalata» e si riparte da lì.</string>
     <string name="guide_return_scene2_text_one">Manca un solo tavolo all\'Olimpo dei Maestri: %1$s. Ci siamo quasi!</string>
 
-    <!-- Promemoria quotidiano (F1G-13): bozza da approvare, vedi docs/design/testi-promemoria.md -->
+    <!-- Promemoria quotidiano (F1G-13): testi approvati per delega (D16, F1G-20), vedi docs/design/testi-promemoria.md -->
     <string name="reminder_channel_name">Promemoria</string>
     <string name="reminder_channel_description">Un messaggio del Maestro al giorno, al massimo.</string>
     <string name="reminder_notification_title">Il Maestro</string>
-    <string name="reminder_notification_text">Il tavolo è pronto, quando ti va di fare una mano.</string>
+    <string name="reminder_notification_text">Il tavolo è pronto, quando ti va.</string>
     <string name="reminder_prompt_title">Vuoi un promemoria?</string>
-    <string name="reminder_prompt_message">Posso ricordarti, una volta al giorno al massimo e solo se non hai ancora giocato, che il tavolo è pronto. Resta sul tuo telefono e lo spegni quando vuoi dalle Impostazioni. Android ti chiederà di confermare.</string>
+    <string name="reminder_prompt_message">Posso ricordarti che il tavolo è pronto: una notifica al giorno al massimo, e solo se non hai ancora giocato. Resta sul tuo telefono e lo spegni quando vuoi dalle Impostazioni. Se dici di no, non te lo richiedo. Se serve, Android ti chiederà di confermare.</string>
     <string name="reminder_prompt_accept">Sì, grazie</string>
     <string name="reminder_prompt_decline">No, grazie</string>
     <string name="settings_reminder">Promemoria quotidiano</string>

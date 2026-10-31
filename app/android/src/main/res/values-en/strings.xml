@@ -172,10 +172,10 @@
     <string name="pre_game_redeal_hint">If the table opens with 3 or 4 Kings, the deal is reshuffled</string>
     <string name="pre_game_rule_always_on">Always on in this challenge</string>
     <string name="rule_lesson_title">The Maestro explains</string>
-    <string name="rule_lesson_re_bello">From here on, the King of Coins is worth one extra point to whoever takes it. It is no ordinary card.</string>
-    <string name="rule_lesson_redeal">If the table opens with three or four Kings, the cards are reshuffled and dealt again. It is not a mistake: it is the rule.</string>
-    <string name="rule_lesson_napola">Ace, two and three of Coins are worth 3 points, plus one for each Coin in a row. Keep an eye on them.</string>
-    <string name="rule_lesson_asso">The Ace takes the whole table when there is no other Ace. Use it wisely.</string>
+    <string name="rule_lesson_re_bello">From here on, the King of Coins, the Re bello, is worth a point to whoever takes it. It\'s no ordinary card.</string>
+    <string name="rule_lesson_redeal">If the table opens with three or four Kings, the cards are reshuffled and dealt again. That\'s not a mistake: it\'s the rule.</string>
+    <string name="rule_lesson_napola">Whoever takes the Ace, Two and Three of Coins makes a napola: 3 points, plus one for each Coin that follows in a row (4, 5…). Keep an eye on them.</string>
+    <string name="rule_lesson_asso">If there are no Aces on the table, your Ace takes every card there. It doesn\'t count as a sweep.</string>
     <string name="pre_game_points">%1$d Points</string>
     <string name="pre_game_mode_title">Game mode</string>
     <string name="pre_game_mode_classic">Classic</string>
@@ -1176,19 +1176,19 @@
     <string name="guide_home_chapter_ready">The next table is ready: open «The Climb» and press the chapter button.</string>
     <string name="guide_home_daily_open">Today\'s problem awaits: press «Daily puzzle».</string>
     <string name="guide_home_all_done">You\'ve done everything today. Want to stay sharp? Press «Play» for a Sparring hand.</string>
-    <string name="home_closing_day">That\'s enough for today: you\'ve done it all. Tomorrow you\'ll find a new puzzle, a new match and new missions. See you tomorrow.</string>
+    <string name="home_closing_day">That\'s enough for today: you\'ve done everything there was. Tomorrow there\'s a new puzzle, a new match and new missions. See you tomorrow.</string>
     <string name="guide_return_scene1_text">So good to see you again! The notebook waited for you, and so did I.</string>
     <string name="guide_return_scene2_text">%1$d more tables to the Olympus of Masters. Next up: %2$s.</string>
     <string name="guide_return_scene3_text">Whenever you like, open «The Climb» and we pick up from there.</string>
     <string name="guide_return_scene2_text_one">One table left to the Olympus of Masters: %1$s. Almost there!</string>
 
-    <!-- Daily reminder (F1G-13): draft to be approved, see docs/design/testi-promemoria.md -->
+    <!-- Daily reminder (F1G-13): texts approved by delegation (D16, F1G-20), see docs/design/testi-promemoria.md -->
     <string name="reminder_channel_name">Reminder</string>
     <string name="reminder_channel_description">At most one message a day from the Maestro.</string>
     <string name="reminder_notification_title">The Maestro</string>
-    <string name="reminder_notification_text">The table is ready, whenever you feel like a hand.</string>
+    <string name="reminder_notification_text">The table is ready, whenever you like.</string>
     <string name="reminder_prompt_title">Would you like a reminder?</string>
-    <string name="reminder_prompt_message">I can let you know, at most once a day and only if you haven\'t played yet, that the table is ready. It stays on your phone and you can turn it off any time in Settings. Android will ask you to confirm.</string>
+    <string name="reminder_prompt_message">I can let you know the table is ready: one notification a day at most, and only if you haven\'t played yet. It stays on your phone and you can turn it off any time in Settings. If you say no, I won\'t ask again. If needed, Android will ask you to confirm.</string>
     <string name="reminder_prompt_accept">Yes, please</string>
     <string name="reminder_prompt_decline">No, thanks</string>
     <string name="settings_reminder">Daily reminder</string>
