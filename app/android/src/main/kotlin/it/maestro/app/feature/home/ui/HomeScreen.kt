@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
 import it.maestro.app.domain.daily.DailyMatch
+import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.home.presentation.HomeLines
 import it.maestro.app.designsystem.components.ClubBackground
@@ -50,6 +51,10 @@ public fun HomeScreen(
     /** Giorno corrente (`LocalDate.toEpochDay`): fa cambiare la battuta del Maestro da un giorno all'altro. */
     day: Long = 0L,
     mastery: Int? = null,
+    /** Le funzioni mostrate (F1G-03): «Gioca» c'è sempre. Il default le mostra tutte, come a chi ha già giocato. */
+    features: Set<HomeFeature> = HomeFeature.ALL,
+    /** La funzione appena comparsa che il Maestro presenta in questa visita, se c'è. */
+    introduction: HomeFeature? = null,
     onResumeGameClicked: () -> Unit = {},
     onStartGameClicked: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
@@ -95,66 +100,87 @@ public fun HomeScreen(
                 avatarId = avatarId,
                 playerName = playerName,
                 mastery = mastery,
+                shopAndProfile = HomeFeature.SHOP in features,
                 onSettingsClicked = onSettingsClicked,
                 onProfileClicked = onProfileClicked,
                 onShopClicked = onShopClicked,
                 onNameClicked = { editingName = true },
             )
             MaestroWelcome(
-                line = remember(hasActiveMatch, streakCount, playerName, day) {
-                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day)
+                line = remember(hasActiveMatch, streakCount, playerName, day, introduction) {
+                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day, introduction)
                 },
                 streakCount = streakCount,
                 playerName = playerName,
                 modifier = Modifier.weight(1f, fill = false),
             )
             PrimaryAction(hasActiveMatch, onResumeGameClicked, onStartGameClicked)
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                GameTile(
-                    title = stringResource(R.string.home_game_briscola),
-                    card = R.drawable.card_bastoni_asso,
-                    available = false,
-                    onPlay = {},
-                    testTag = "briscola_tile",
-                    modifier = Modifier.weight(1f),
-                )
-                GameTile(
-                    title = stringResource(R.string.home_game_scopa),
-                    card = R.drawable.card_denari_7,
-                    available = true,
-                    onPlay = onStartGameClicked,
-                    testTag = "scopa_tile",
-                    modifier = Modifier.weight(1f),
+            if (HomeFeature.GAME_TILES in features) GameTiles(onStartGameClicked)
+            if (HomeFeature.SEASON in features) {
+                WoodRowTile(
+                    icon = R.drawable.icon_book_closed,
+                    title = stringResource(R.string.season_home_entry),
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth().height(44.dp).testTag("home_season_tile"),
+                    onClick = onSeasonClicked,
                 )
             }
-            WoodRowTile(
-                icon = R.drawable.icon_book_closed,
-                title = stringResource(R.string.season_home_entry),
-                maxLines = 1,
-                modifier = Modifier.fillMaxWidth().height(44.dp).testTag("home_season_tile"),
-                onClick = onSeasonClicked,
-            )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                WoodRowTile(
-                    icon = R.drawable.icon_book_quill,
-                    title = stringResource(R.string.home_daily_puzzle_button),
-                    maxLines = 2,
-                    modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_puzzle_tile"),
-                    onClick = onDailyPuzzleClicked,
-                )
-                WoodRowTile(
-                    icon = R.drawable.card_denari_7,
-                    title = stringResource(R.string.home_daily_match_button),
-                    maxLines = 2,
-                    modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_match_tile"),
-                    onClick = { showingDailyMatchIntro = true },
-                )
+            if (HomeFeature.DAILY_PUZZLE in features || HomeFeature.DAILY_MATCH in features) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (HomeFeature.DAILY_PUZZLE in features) {
+                        WoodRowTile(
+                            icon = R.drawable.icon_book_quill,
+                            title = stringResource(R.string.home_daily_puzzle_button),
+                            maxLines = 2,
+                            modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_puzzle_tile"),
+                            onClick = onDailyPuzzleClicked,
+                        )
+                    }
+                    if (HomeFeature.DAILY_MATCH in features) {
+                        WoodRowTile(
+                            icon = R.drawable.card_denari_7,
+                            title = stringResource(R.string.home_daily_match_button),
+                            maxLines = 2,
+                            modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_match_tile"),
+                            onClick = { showingDailyMatchIntro = true },
+                        )
+                    }
+                }
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                MissionsTile(streakCount, onMissionsClicked, Modifier.weight(1f).height(84.dp))
-                AcademyTile(onAcademyClicked, Modifier.weight(1f).height(84.dp))
+            if (HomeFeature.MISSIONS in features || HomeFeature.ACADEMY in features) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (HomeFeature.MISSIONS in features) {
+                        MissionsTile(streakCount, onMissionsClicked, Modifier.weight(1f).height(84.dp))
+                    }
+                    if (HomeFeature.ACADEMY in features) {
+                        AcademyTile(onAcademyClicked, Modifier.weight(1f).height(84.dp))
+                    }
+                }
             }
         }
+    }
+}
+
+/** Le tessere dei giochi: Scopa si gioca, Briscola arriva più avanti. */
+@Composable
+private fun GameTiles(onStartGameClicked: () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        GameTile(
+            title = stringResource(R.string.home_game_briscola),
+            card = R.drawable.card_bastoni_asso,
+            available = false,
+            onPlay = {},
+            testTag = "briscola_tile",
+            modifier = Modifier.weight(1f),
+        )
+        GameTile(
+            title = stringResource(R.string.home_game_scopa),
+            card = R.drawable.card_denari_7,
+            available = true,
+            onPlay = onStartGameClicked,
+            testTag = "scopa_tile",
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 

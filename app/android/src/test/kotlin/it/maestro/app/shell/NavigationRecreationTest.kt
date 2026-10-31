@@ -14,7 +14,12 @@ import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.training.TrainingFundamental
 import org.junit.After
 import org.junit.Rule
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.stopKoin
+import it.maestro.app.domain.home.HomeFeature
+import it.maestro.app.domain.home.HomeFeaturesRepository
+import it.maestro.app.domain.home.PresentedFeatures
+import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -46,6 +51,11 @@ class NavigationRecreationTest {
     }
 
     private fun setUpHost(): StateRestorationTester {
+        // Questi test non verificano le presentazioni della Home (F1G-03): partono con tutte le funzioni mostrate.
+        runBlocking {
+            GlobalContext.get().get<HomeFeaturesRepository>()
+                .save(PresentedFeatures(initialized = true, revealed = HomeFeature.ALL, introduced = HomeFeature.ALL))
+        }
         val tester = StateRestorationTester(composeRule)
         tester.setContent {
             navController = rememberNavController()

@@ -1,5 +1,6 @@
 package it.maestro.app.feature.home
 
+import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.feature.home.presentation.HomeLineKind
 import it.maestro.app.feature.home.presentation.HomeLines
 import kotlin.test.Test
@@ -30,5 +31,18 @@ class HomeLinesTest {
         assertTrue(variants.all { it in 0 until HomeLines.VARIANTS })
         assertEquals(HomeLines.VARIANTS, variants.toSet().size)
         assertEquals(HomeLines.choose(false, 0, true, 5), HomeLines.choose(false, 0, true, 5))
+    }
+
+    @Test
+    fun aPresentationBeatsEveryOtherLineAndKeepsTheFeature() {
+        val line = HomeLines.choose(true, 9, true, 3, introducing = HomeFeature.SHOP)
+        assertEquals(HomeLineKind.UNLOCK, line.kind)
+        assertEquals(HomeFeature.SHOP, line.feature)
+    }
+
+    @Test
+    fun withoutAPresentationTheExistingVariantsAreUnchanged() {
+        assertEquals(HomeLineKind.RESUME, HomeLines.choose(true, 9, true, 3, introducing = null).kind)
+        assertEquals(null, HomeLines.choose(false, 0, false, 3).feature)
     }
 }

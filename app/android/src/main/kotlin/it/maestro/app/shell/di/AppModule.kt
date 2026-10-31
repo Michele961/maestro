@@ -12,6 +12,9 @@ import it.maestro.app.data.local.datastore.DailyMatchRepository
 import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyMatchRepository
+import it.maestro.app.data.local.datastore.DataStoreHomeFeaturesRepository
+import it.maestro.app.domain.home.HomeFeaturesRepository
+import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
 import it.maestro.app.data.local.datastore.DataStoreAchievementRepository
@@ -65,6 +68,7 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
 private val Context.dailyMatchDataStore by preferencesDataStore(name = "maestro_daily_match")
+private val Context.homeFeaturesDataStore by preferencesDataStore(name = "maestro_home_features")
 private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
 private val Context.opponentsDataStore by preferencesDataStore(name = "maestro_opponents")
@@ -112,6 +116,10 @@ public val appModule: Module = module {
     }
 
     single { RewardEngine(wallet = get(), retention = get(), mastery = get(), clock = get(), opponents = get(), experience = get(), achievements = get(), season = get()) }
+
+    single<HomeFeaturesRepository> {
+        DataStoreHomeFeaturesRepository(dataStore = androidContext().homeFeaturesDataStore)
+    }
 
     single<MasteryRepository> {
         DataStoreMasteryRepository(dataStore = androidContext().masteryDataStore, clock = get())
@@ -221,6 +229,20 @@ public val appModule: Module = module {
         )
     }
 
+    viewModel {
+        HomeFeaturesViewModel(
+            repository = get(),
+            mastery = get(),
+            opponents = get(),
+            retention = get(),
+            dailyPuzzleSolved = get<DailyPuzzleRepository>()
+                .observeDailyPuzzle(get<Clock>().today().toString())
+                .map { it.lastCompletedDate.isNotEmpty() },
+            academyLessonsDone = get<AcademyRepository>().observeProgress().map { lessons -> lessons.values.count { it.isCompleted } },
+            wallet = get(),
+            clock = get(),
+        )
+    }
     viewModel { LadderViewModel(repository = get()) }
     viewModel { SeasonViewModel(repository = get(), rewards = get()) }
     viewModel { PreGameViewModel(mastery = get()) }

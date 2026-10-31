@@ -57,12 +57,13 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-03 — La Home che si accende
 
-- **Stato:** da fare
+- **Stato:** fatto (2026-10-31; per l'autorizzazione di Michele senza attendere F1R). Resta: la riga «La Scalata» non esiste ancora (F1G-07): la regola di sblocco c'è (`HomeFeature.SEASON`, dopo la prima partita terminata) e F1G-07 deve solo leggerla; la frase della Sfida del giorno dice «Da domani» ma la tessera compare subito (vedi domande).
 - **Obiettivo:** mostrare le funzioni a mano a mano che servono (Sfida del giorno dopo la prima vittoria, Missioni dopo la sfida, Accademia dopo la prima prova, ecc.).
 - **Perimetro:** stato «funzioni presentate» in DataStore; la Home lo legge; nessuna voce finta; chi ha già giocato vede tutto.
 - **Criteri di accettazione:** utente nuovo vede solo Gioca; sblocchi come da tabella nel documento di ricerca §6; utente esistente invariato; screenshot.
 - **Per Michele:** niente.
-- **Domande aperte:** nessuna. Ordine degli sblocchi confermato da Michele (2026-10-30), vedi `docs/design/testi-primo-avvio-e-home.md`.
+- **Domande aperte:** nessuna sull'ordine, confermato da Michele (2026-10-30), vedi `docs/design/testi-primo-avvio-e-home.md`. Due punti da confermare: (1) la frase `home_unlock_daily_puzzle` dice «Da domani», ma per la tabella la tessera compare subito dopo la prima vittoria: va bene o la tessera compare il giorno dopo? (2) la Scalata e le tessere Scopa/Briscola compaiono dopo la prima partita terminata (scelta dell'agente, non nella tabella).
+- **Come è fatto:** stato `PresentedFeatures` (inizializzato, funzioni mostrate, frasi dette) in un DataStore nuovo `maestro_home_features`, con default sicuri; sblocchi in `domain/home/HomeUnlocks` da segnali già esistenti (Maestria e cronologia partite, avversari battuti, Sfida del giorno, Accademia, registro crediti, serie), nessun contatore nuovo. Chi ha già giocato alla prima valutazione vede tutto e non sente frasi. Una frase per visita, una sola volta per funzione.
 
 ## F1G-04 — Regole della casa già nel motore
 

@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import com.github.takahirom.roborazzi.captureRoboImage
+import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.feature.home.ui.HomeScreen
 import it.maestro.app.designsystem.theme.MaestroTheme
 import org.junit.Assert.assertEquals
@@ -61,6 +62,67 @@ class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
     fun home_screen_with_streak_screenshot() {
         composeRule.setContent { MaestroTheme { HomeScreen(streakCount = 5) } }
         composeRule.onRoot().captureRoboImage(screen.path("home_screen_with_streak"))
+    }
+
+    @Test
+    fun home_screen_new_player_screenshot() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = emptySet()) } }
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_new_player"))
+    }
+
+    @Test
+    fun home_screen_midway_with_a_presentation_screenshot() {
+        composeRule.setContent {
+            MaestroTheme {
+                HomeScreen(
+                    features = setOf(HomeFeature.DAILY_PUZZLE, HomeFeature.DAILY_MATCH, HomeFeature.GAME_TILES, HomeFeature.SEASON),
+                    introduction = HomeFeature.DAILY_MATCH,
+                )
+            }
+        }
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_midway"))
+    }
+
+    @Test
+    fun home_screen_complete_screenshot() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = HomeFeature.ALL, mastery = 1100, playerName = "Ada") } }
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_complete"))
+    }
+
+    @Test
+    fun a_new_player_sees_only_play() {
+        var profile = 0
+        composeRule.setContent { MaestroTheme { HomeScreen(features = emptySet(), mastery = 1000, onProfileClicked = { profile++ }) } }
+        composeRule.onNodeWithTag("play_now_button").assertIsDisplayed()
+        listOf(
+            "scopa_tile", "briscola_tile", "home_daily_puzzle_tile", "home_daily_match_tile", "home_missions_tile",
+            "home_academy_tile", "home_credits_pill", "home_mastery",
+        ).forEach { composeRule.onNodeWithTag(it).assertDoesNotExist() }
+        composeRule.onNodeWithTag("home_player_profile").performClick()
+        assertEquals(0, profile)
+    }
+
+    @Test
+    fun only_the_unlocked_functions_are_shown() {
+        composeRule.setContent {
+            MaestroTheme { HomeScreen(features = setOf(HomeFeature.DAILY_PUZZLE, HomeFeature.MISSIONS)) }
+        }
+        composeRule.onNodeWithTag("home_daily_puzzle_tile").assertIsDisplayed()
+        composeRule.onNodeWithTag("home_missions_tile").assertIsDisplayed()
+        composeRule.onNodeWithTag("home_daily_match_tile").assertDoesNotExist()
+        composeRule.onNodeWithTag("home_academy_tile").assertDoesNotExist()
+    }
+
+    @Test
+    fun the_maestro_presents_a_new_function_with_the_approved_phrase() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = HomeFeature.ALL, introduction = HomeFeature.ACADEMY) } }
+        composeRule.onNodeWithText("Vuoi capire perché una giocata è buona? In Accademia lo vediamo insieme.").assertExists()
+    }
+
+    @Test
+    fun without_an_introduction_the_usual_line_is_kept() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = HomeFeature.ALL, introduction = null) } }
+        composeRule.onNodeWithText("In Accademia lo vediamo insieme", substring = true).assertDoesNotExist()
     }
 
     @Test
