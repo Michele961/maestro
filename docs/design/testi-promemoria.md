@@ -1,6 +1,12 @@
 # Testi del promemoria quotidiano — F1G-13
 
-Stato: **bozza, da approvare** (D16). Scritta il 2026-10-31 dall'agente; nessuna frase è ancora approvata. Michele (o la revisione per delega) può cambiare qualunque testo indicando la chiave.
+Stato: **approvato per delega (D16), 2026-10-31, revisione indipendente**. Scritta il 2026-10-31 dall'agente e rivista in modo indipendente (F1G-20): Michele ha delegato l'approvazione dei testi. Può comunque cambiare qualunque testo indicando la chiave.
+
+Cosa ha cambiato la revisione (prima → dopo):
+
+- `reminder_prompt_message`: «Posso ricordarti, una volta al giorno al massimo […] che il tavolo è pronto. […] Android ti chiederà di confermare.» → «Posso ricordarti che il tavolo è pronto: una notifica al giorno al massimo, e solo se non hai ancora giocato. […] Se dici di no, non te lo richiedo. Se serve, Android ti chiederà di confermare.» Motivi: la frase con l'inciso era contorta; il consenso ora dice anche che non si insiste (dopo un «No» non si richiede, vero come da backlog); il permesso di sistema compare solo da Android 13 (minSdk 26), quindi «Android ti chiederà» era falso su molti telefoni. Stesse modifiche in inglese («one notification a day at most», «If you say no, I won't ask again», «If needed, Android will ask you to confirm»).
+- `reminder_notification_text`: «Il tavolo è pronto, quando ti va di fare una mano.» → «Il tavolo è pronto, quando ti va.» (en «…whenever you feel like a hand.» → «The table is ready, whenever you like.»). Motivi: più breve (una riga) e meno insistente; «a hand» era un calco poco naturale.
+- Invariati: titolo del consenso, «Sì, grazie»/«No, grazie», titolo e canale della notifica, voci delle Impostazioni (corrette, in tono, parità it/en).
 
 Voce del Maestro: calda, breve, mai sarcastica, dà del «tu». Qui in più: **nessuna pressione e nessuna colpa**. Niente «ti stiamo aspettando», niente «non perdere la serie», niente punti esclamativi, niente conteggi di giorni saltati. Il promemoria dice solo che il tavolo è pronto.
 
@@ -14,8 +20,8 @@ Riquadro su pergamena con due scelte alla pari. Spiega prima di chiedere; il per
   - it: Vuoi un promemoria?
   - en: Would you like a reminder?
 - `reminder_prompt_message`
-  - it: Posso ricordarti, una volta al giorno al massimo e solo se non hai ancora giocato, che il tavolo è pronto. Resta sul tuo telefono e lo spegni quando vuoi dalle Impostazioni. Android ti chiederà di confermare.
-  - en: I can let you know, at most once a day and only if you haven't played yet, that the table is ready. It stays on your phone and you can turn it off any time in Settings. Android will ask you to confirm.
+  - it: Posso ricordarti che il tavolo è pronto: una notifica al giorno al massimo, e solo se non hai ancora giocato. Resta sul tuo telefono e lo spegni quando vuoi dalle Impostazioni. Se dici di no, non te lo richiedo. Se serve, Android ti chiederà di confermare.
+  - en: I can let you know the table is ready: one notification a day at most, and only if you haven't played yet. It stays on your phone and you can turn it off any time in Settings. If you say no, I won't ask again. If needed, Android will ask you to confirm.
 - `reminder_prompt_accept`
   - it: Sì, grazie
   - en: Yes, please
@@ -33,8 +39,8 @@ Canale a bassa importanza: niente suono, niente vibrazione.
   - it: Il Maestro
   - en: The Maestro
 - `reminder_notification_text`
-  - it: Il tavolo è pronto, quando ti va di fare una mano.
-  - en: The table is ready, whenever you feel like a hand.
+  - it: Il tavolo è pronto, quando ti va.
+  - en: The table is ready, whenever you like.
 - `reminder_channel_name` (nome del canale nelle impostazioni di Android)
   - it: Promemoria
   - en: Reminder

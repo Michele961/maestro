@@ -34,6 +34,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 | F1G-13 | Promemoria facoltativo | M5 | F1G-03 |
 | F1G-14 | Misure minime del ritorno | M5 | — |
 | F1G-15 | Partita del giorno offline | M5 | F1R-02, F1R-14 |
+| F1G-20 | Approvazione testi per delega | M5 | F1G-09, F1G-12, F1G-13 |
 
 ---
 
@@ -136,7 +137,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Come è fatto:** `domain/match/StoryHouseRules` (pura): `inForce(opponent)` = regole degli avversari precedenti sulla scala (Gigi nessuna; Rosa Re bello; Tonino + tre Re; Alfonso + napola; il Maestro + asso che taglia), `enteringWith(opponent)` = quella che entra proprio con lui, `forOpponent` = `HouseRules` e `resolve(opponent, sparring, chosen)`. `PreGameScreen` in Classica non mostra interruttori: le regole in vigore sono righe fisse con l'etichetta «Sempre attiva in questa sfida» (`fixed_rule_*`), quelle non ancora in vigore non compaiono; `onStartGame` consegna sempre le regole già risolte da `resolve`, quindi la scelta passa alla rotta `Route.Table` e al tavolo già vincolata (nessun interruttore da cui partire). Mini-lezione (1-2 frasi) nel pre-partita la prima volta che una regola entra in vigore: `GuideProgress.seenRuleLessons` nel DataStore `maestro_season` già esistente (chiave nuova `guide_rule_lessons`, default vuoto, nessuna migrazione), registrata quando la partita in Classica parte. Testi in `strings.xml` it/en e bozze in `docs/design/testi-regole-della-casa.md`. Test: tabella completa dell'abbinamento, regole fisse nella `ScopaConfig`, Classica non disattivabile, Sparring libero, schermata (Gigi/Rosa/Alfonso), store delle lezioni. Screenshot `pre_game_fixed_{rosa,tonino,alfonso}` nella matrice.
 - **Decisioni da confermare:** (1) interpretazione: contro ogni personaggio valgono le regole sbloccate dagli avversari PRECEDENTI (Rosa: Re bello; Tonino: + tre Re; Alfonso: + napola; il Maestro: + asso che taglia); contro Gigi nessuna regola extra. (2) **Sparring resta libero** (tutti e quattro gli interruttori come prima, anche contro i personaggi): è allenamento e non fa avanzare la scala; le regole fisse valgono in Classica, che è la modalità dei match della Scalata. (3) La Partita del giorno non ha regole in più (come oggi) e la Rivincita riusa la configurazione della partita appena giocata. (4) La ridistribuzione con 3 Re è già accesa di default nella specifica (§3.3, §8): contro Gigi e Rosa resta accesa (default della specifica) e dal Tonino in poi è mostrata come regola fissa; se Michele la vuole spenta prima di Tonino basta cambiare `forOpponent`. (5) Per «dove la scala continua» l'asso che taglia entra contro il Maestro, l'ultimo avversario. (6) Il «già visto» della mini-lezione scatta all'avvio della partita in Classica, non all'apertura della schermata.
 - **Fuori dal perimetro:** mini-lezioni in Accademia; sblocchi o ricompense in `RewardEngine`; regole nella Partita del giorno.
-- **Domande aperte:** (1) i testi delle quattro mini-lezioni, dell'etichetta «Sempre attiva in questa sfida» e del titolo «Il Maestro spiega» sono **bozza da approvare** (D16), in `docs/design/testi-regole-della-casa.md`; (2) le decisioni da confermare qui sopra, in particolare (2) Sparring libero e (4) tre Re.
+- **Domande aperte:** (1) testi approvati per delega (D16) il 2026-10-31 (F1G-20): mini-lezioni, etichetta «Sempre attiva in questa sfida» e titolo «Il Maestro spiega» in `docs/design/testi-regole-della-casa.md`; (2) le decisioni da confermare qui sopra, in particolare (2) Sparring libero e (4) tre Re.
 
 ## F1G-10 — Schede fonte e licenza dei mazzi regionali
 
@@ -174,17 +175,17 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** riga/schermata in Home, stato da missioni e serie esistenti; nessun invito a continuare; nessuna perdita se si salta.
 - **Criteri di accettazione:** compare una volta al giorno; screenshot; test della condizione.
 - **Per Michele:** testi.
-- **Domande aperte:** (1) testo della chiusura: bozza in `docs/design/testi-chiusura-del-giorno.md`, da approvare (D16); (2) la Partita del giorno conta come fatta anche se persa; (3) la chiusura compare solo se Sfida, Partita e Missioni sono già in Home; (4) se nella stessa visita il Maestro presenta una funzione nuova (F1G-03), la chiusura aspetta la visita successiva.
+- **Domande aperte:** (1) testo della chiusura in `docs/design/testi-chiusura-del-giorno.md`: testi approvati per delega (D16) il 2026-10-31 (F1G-20); (2) la Partita del giorno conta come fatta anche se persa; (3) la chiusura compare solo se Sfida, Partita e Missioni sono già in Home; (4) se nella stessa visita il Maestro presenta una funzione nuova (F1G-03), la chiusura aspetta la visita successiva.
 - **Come è fatto:** condizione pura in `domain/home/DayClosing` (`DayClosingSignals`, `isComplete`, `isDue`) da segnali esistenti (Sfida di oggi, `DailyMatchRepository`, missioni di `RetentionRepository`); l'ultima chiusura detta è `closingDay` in `PresentedFeatures` (stesso DataStore di F1G-03, default vuoto). `HomeLineKind.CLOSING` dopo le presentazioni e prima del resto; una volta al giorno.
 
 ## F1G-13 — Promemoria facoltativo
 
-- **Stato:** fatto (testi in `docs/design/testi-promemoria.md`, da approvare D16)
+- **Stato:** fatto (testi in `docs/design/testi-promemoria.md`, approvati per delega D16 il 2026-10-31)
 - **Obiettivo:** una notifica al giorno al massimo, chiesta solo dopo la prima vittoria, solo con consenso.
 - **Perimetro:** notifica locale giornaliera (nessun server, nessun dato in uscita); richiesta del permesso `POST_NOTIFICATIONS` (Android 13+) nel momento giusto e mai prima della prima vittoria; interruttore nelle Impostazioni; testo della notifica da `strings.xml` it/en, approvato come gli altri (D16); nessun promemoria se l'utente ha già giocato oggi.
 - **Perimetro autorizzato (Michele, 2026-10-30, Q7):** il promemoria giornaliero è accettato; sono concessi il permesso `POST_NOTIFICATIONS` e, per la sola pianificazione, `RECEIVE_BOOT_COMPLETED` nel manifest. **Nessuna nuova dipendenza** è autorizzata: si usano le API della piattaforma (`AlarmManager` inesatto, `NotificationManager`). Se non bastano, il task si ferma e chiede (CLAUDE.md §5).
 - **Criteri di accettazione:** il permesso si chiede una sola volta, dopo la prima vittoria, con spiegazione; rifiutato → nessuna notifica e nessuna insistenza; l'interruttore spegne e riaccende la pianificazione; al riavvio del telefono la pianificazione riparte; test sulla logica (quando notificare, mai due volte nello stesso giorno, mai se ha già giocato).
-- **Domande aperte:** (1) testi del consenso, della notifica e delle Impostazioni: bozza in `docs/design/testi-promemoria.md`, da approvare (D16); (2) orario 19:00 con tolleranza di 3 ore, senza schermata per cambiarlo: va bene? (3) chi ha detto «No, grazie» può riaccendere il promemoria dalle Impostazioni, e lì Android mostra il suo permesso: va bene? (4) la «prima vittoria» si legge dalla cronologia recente (ultime 20 partite), come in F1G-03.
+- **Domande aperte:** (1) testi del consenso, della notifica e delle Impostazioni in `docs/design/testi-promemoria.md`: testi approvati per delega (D16) il 2026-10-31 (F1G-20); (2) orario 19:00 con tolleranza di 3 ore, senza schermata per cambiarlo: va bene? (3) chi ha detto «No, grazie» può riaccendere il promemoria dalle Impostazioni, e lì Android mostra il suo permesso: va bene? (4) la «prima vittoria» si legge dalla cronologia recente (ultime 20 partite), come in F1G-03.
 
 ## F1G-14 — Misure minime del ritorno
 
@@ -208,4 +209,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Obiettivo:** tre ritocchi emersi dal test sul telefono.
 - **Perimetro:** (1) interruttori delle regole della casa (PreGame) e delle Impostazioni con colori del design system (`MaestroSwitch`: acceso verde con pallino crema, spento beige con pallino di legno), stessi `testTag` e stesso comportamento; (2) nelle scene della storia i ritratti degli avversari, che hanno già la cornice circolare in ottone, si disegnano senza un secondo cerchio (solo il Maestro, senza cornice nell'immagine, usa `FramedPortrait`); (3) stile dialogo in `StoryScenePlayer`: l'altro interlocutore in alto a destra, il Maestro in basso a sinistra, ognuno col suo fumetto sotto il ritratto; chi non parla resta visibile, piccolo e attenuato, finché la scena non cambia; nessuno scorrimento, misure dallo spazio disponibile; le scene con un solo interlocutore restano come prima.
 - **Criteri di accettazione:** screenshot nella matrice (small, medium, pixel10pro, small-font130) per una scena con Maestro e Gigi; i test esistenti passano senza asserzioni cambiate.
+- **Domande aperte:** nessuna.
+
+## F1G-20 — Approvazione testi per delega
+
+- **Stato:** fatto (2026-10-31)
+- **Obiettivo:** chiudere l'approvazione dei testi delle bozze di F1G-09, F1G-12 e F1G-13: Michele ha delegato la revisione («fai un passaggio con un agente e mi fido», D16).
+- **Perimetro:** revisione indipendente di `docs/design/testi-promemoria.md`, `testi-chiusura-del-giorno.md` e `testi-regole-della-casa.md` contro `docs/rules/scopa.md`, `docs/rules/glossary.md` e la voce del Maestro (correttezza delle regole citate, tono, italiano e inglese, lunghezza, parità dei segnaposto, rispetto del consenso); correzioni solo ai testi (`strings.xml` it/en, nessuna chiave nuova o rinominata) e alle tre bozze, che passano a «approvato per delega (D16), 2026-10-31, revisione indipendente» con l'elenco prima → dopo. Nessun codice cambiato; nei test, nessuna asserzione toccata (le sottostringhe cercate «Per oggi basta» e «Non è una carta qualsiasi» sono rimaste nei testi).
+- **Criteri di accettazione:** le tre bozze marcate approvate con l'elenco delle modifiche; F1G-09, F1G-12 e F1G-13 con la riga «testi approvati per delega (D16) il 2026-10-31»; `./gradlew check` verde.
 - **Domande aperte:** nessuna.
