@@ -27,6 +27,7 @@ class StoryDirectorTest {
         dailyPuzzleSolvedToday = true,
         completedAcademyChapters = AcademyChapterId.entries.toSet(),
         sparringChecksPlayed = TrainingFundamental.entries.toSet(),
+        reviewed = true,
     )
 
     @Test
@@ -64,6 +65,7 @@ class StoryDirectorTest {
             sparringChecksPlayed = TrainingFundamental.entries.toSet(),
             dailyPuzzleSolvedToday = true,
             completedAcademyChapters = AcademyChapterId.entries.toSet(),
+            reviewed = true,
         )
         assertEquals(listOf("ch09_close", "ch10_mid"), ids(progress(atAlfonso)))
     }
@@ -137,7 +139,7 @@ class StoryDirectorTest {
         val scene = requireNotNull(StoryDirector.returnGreeting(progress(), today.minusDays(9), today, emptySet()))
         val middle = scene.beats[1]
         assertEquals(R.string.guide_return_scene2_text, middle.textRes)
-        assertEquals(listOf(BeatArg.Number(8), BeatArg.Text(R.string.story_ch02_title)), middle.args)
+        assertEquals(listOf(BeatArg.Number(9), BeatArg.Text(R.string.story_ch02_title)), middle.args)
     }
 
     @Test

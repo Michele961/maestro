@@ -93,6 +93,8 @@ public class GameViewModel(
 
     /** Il giocatore chiude il riepilogo di smazzata: la partita prosegue e la regia riprende (nuova distribuzione). */
     public fun continueAfterSummary() {
+        // La mano guidata finisce qui: la partita non prosegue, resta il saluto del Maestro (F1G-02).
+        if (internalState.guide != null) return onIntent(GameIntent.FinishGuide)
         onIntent(GameIntent.DismissDealSummary)
         director.value?.resume()
     }
@@ -103,7 +105,7 @@ public class GameViewModel(
         when (intent) {
             is GameIntent.StartMatch -> {
                 voice = MaestroVoice(intent.seed, state.humanSeat)
-                if (state.isSparring) voice.greeting(currentChattiness, hintUsedBefore)?.let { internalState = state.copy(maestroLine = it) }
+                if (state.isSparring && state.guide == null) voice.greeting(currentChattiness, hintUsedBefore)?.let { internalState = state.copy(maestroLine = it) }
             }
             is GameIntent.RestoreMatch -> voice = MaestroVoice(intent.session.log.seed + intent.session.log.moves.size, state.humanSeat)
             is GameIntent.RequestHint -> if (!hintUsedBefore) {
@@ -112,7 +114,7 @@ public class GameViewModel(
             }
             else -> {
                 val beat = state.lastBeat?.takeIf { it !== previousBeat } ?: return
-                if (state.isSparring) {
+                if (state.isSparring && state.guide == null) {
                     voice.onBeat(beat, state.session, currentChattiness, hintUsedBefore)?.let { internalState = state.copy(maestroLine = it) }
                 }
             }
@@ -200,8 +202,8 @@ public class GameViewModel(
         updateMaestroVoice(intent, previousBeat)
         _uiState.value = internalState.toUiState()
 
-        // Persistenza automatica della partita (ADR-0003, task F1-08)
-        if (matchRepository != null) {
+        // Persistenza automatica della partita (ADR-0003, task F1-08). La mano guidata non si salva: non è una partita.
+        if (matchRepository != null && internalState.guide == null) {
             scope.launch {
                 try {
                     val session = internalState.session

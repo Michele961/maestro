@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.maestro.ai.bot.DifficultyLevel
 import it.maestro.app.R
+import it.maestro.app.domain.guide.GuidedHandStatus
 import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.audio.Backdrops
@@ -81,6 +82,9 @@ public fun TableScreen(
     trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
     seed: Long = 42L,
     resume: Boolean = false,
+    /** Mano d'esordio guidata (F1G-02): il Maestro guida passo per passo; [onGuideDone] riceve come è andata. */
+    guided: Boolean = false,
+    onGuideDone: (GuidedHandStatus) -> Unit = {},
     tableThemeId: String = "felt_classic_green",
     cardBackThemeId: String = "back_classic_trevigiano",
     showPointsRace: Boolean = false,
@@ -109,7 +113,8 @@ public fun TableScreen(
                     level = level,
                     seed = seed,
                     trainingFundamental = trainingFundamental,
-                    sparring = trainingFundamental != TrainingFundamental.NONE,
+                    sparring = guided || trainingFundamental != TrainingFundamental.NONE,
+                    guided = guided,
                 ),
             )
         }
@@ -140,6 +145,7 @@ public fun TableScreen(
             val training = if (results.isEmpty()) null else results.count { it.isCorrect } to results.size
             onViewAnalysis(viewModel.currentMatchLog, training)
         },
+        onGuideDone = onGuideDone,
         onSkip = viewModel::skipScene,
         onSummaryContinue = viewModel::continueAfterSummary,
         onRematch = {
@@ -178,9 +184,11 @@ public fun TableContent(
     onRematch: () -> Unit = { onIntent(GameIntent.StartMatch()) },
     onSkip: () -> Unit = {},
     onSummaryContinue: () -> Unit = { onIntent(GameIntent.DismissDealSummary) },
+    onGuideDone: (GuidedHandStatus) -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var showPause by remember { mutableStateOf(false) }
+    var skippingGuide by rememberSaveable { mutableStateOf(false) }
     val step = scene.step
 
     // Suoni dai passi della regia, non dai composable (`table-director.md` §4.7).
@@ -307,6 +315,7 @@ public fun TableContent(
                     onChattinessChange = onChattinessChange,
                     audio = audio,
                     onVolumeChange = onVolumeChange,
+                    onSkipGuide = if (uiState.guide != null) ({ showPause = false; skippingGuide = true }) else null,
                 )
             }
 
@@ -326,7 +335,8 @@ public fun TableContent(
                 is SceneStep.AwaitDealSummary -> step.score to Int.MAX_VALUE
                 else -> null
             }
-            if (summary != null) {
+            // Finita la mano guidata, resta solo il saluto del Maestro: il riepilogo non si ripresenta.
+            if (summary != null && uiState.guide?.finished != true) {
                 DealSummaryDialog(
                     score = summary.first,
                     uiState = uiState,
@@ -342,6 +352,16 @@ public fun TableContent(
                     event = UiGameEvent.Sweep(step.actor, scene.after?.sweeps?.get(step.actor) ?: 1),
                     isHuman = step.actor == step.humanSeat,
                     onDismiss = onSkip,
+                )
+            }
+
+            uiState.guide?.let { guide ->
+                GuideOverlay(
+                    guide = guide,
+                    skipping = skippingGuide,
+                    onSkipRequested = { skippingGuide = true },
+                    onIntroDone = { onIntent(GameIntent.DismissGuideIntro) },
+                    onFinished = onGuideDone,
                 )
             }
         }

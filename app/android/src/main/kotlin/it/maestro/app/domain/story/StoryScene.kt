@@ -21,5 +21,14 @@ public data class Beat(
     val args: List<BeatArg> = emptyList(),
 )
 
-/** Una scena: una sequenza di [beats] con un [id] stabile, che è la chiave con cui si ricorda che è stata vista. */
-public data class StoryScene(val id: String, val beats: List<Beat>)
+/**
+ * La chiusura di una scena con un pulsante (F1G-16b): dopo l'ultima battuta compare [textRes] (se c'è) e il pulsante
+ * [buttonRes]; la scena si chiude solo da lì (o da «Salta»), non più con un tocco.
+ */
+public data class SceneEnd(val buttonRes: Int, val textRes: Int? = null)
+
+/**
+ * Una scena: una sequenza di [beats] con un [id] stabile, che è la chiave con cui si ricorda che è stata vista.
+ * [end] è il pulsante finale, se la scena ne ha uno.
+ */
+public data class StoryScene(val id: String, val beats: List<Beat>, val end: SceneEnd? = null)

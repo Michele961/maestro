@@ -41,6 +41,7 @@ import it.maestro.app.domain.season.ChapterState
 import it.maestro.app.domain.season.SeasonChapters
 import it.maestro.app.domain.season.SeasonProgress
 import it.maestro.app.domain.story.StepAction
+import it.maestro.app.domain.story.StoryDirector
 import it.maestro.app.domain.story.StoryScene
 import it.maestro.app.domain.story.nextStep
 
@@ -105,7 +106,14 @@ public fun SeasonScreen(
                 }
             }
         }
-        if (scene != null) StoryScenePlayer(scene, playerName, onDone = { onSceneDone(scene.id) })
+        if (scene != null) {
+            StoryScenePlayer(
+                scene, playerName,
+                onDone = { onSceneDone(scene.id) },
+                // L'epilogo chiude la Scalata: il pulsante «Al circolo» riporta alla Home.
+                onEnd = { onSceneDone(scene.id); if (scene === StoryDirector.EPILOGUE) onNavigateBack() },
+            )
+        }
     }
 }
 

@@ -4,6 +4,9 @@ import android.app.Activity
 import it.maestro.app.domain.audio.AudioChannel
 import it.maestro.app.data.local.datastore.DailyMatchRepository
 import it.maestro.app.domain.daily.DailyMatch
+import it.maestro.app.domain.guide.GuideRepository
+import it.maestro.app.domain.guide.GuidedHand
+import it.maestro.app.domain.guide.GuidedHandStatus
 import it.maestro.app.domain.daily.DailyMatchResult
 import it.maestro.app.domain.match.HouseRules
 import it.maestro.app.domain.audio.AudioLevels
@@ -69,6 +72,7 @@ import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
 import it.maestro.app.feature.home.ui.HomeScreen
+import it.maestro.app.feature.firstlaunch.ui.FirstLaunchHost
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
 import it.maestro.app.feature.review.ui.PostMatchScreen
 import org.koin.core.parameter.parametersOf
@@ -112,6 +116,7 @@ public fun MaestroNavHost(
     val crashReporter: CrashReporter = koinInject()
     val clock: Clock = koinInject()
     val dailyMatchRepository: DailyMatchRepository = koinInject()
+    val guideRepository: GuideRepository = koinInject()
     val soundManager: SoundManager = koinInject()
     val scope = rememberCoroutineScope()
 
@@ -204,10 +209,35 @@ public fun MaestroNavHost(
                     playerName = settings.playerName,
                     day = today.toEpochDay(),
                     playerNameMaxLength = MAX_PLAYER_NAME,
-                    askPlayerName = settingsLoaded && settings.playerName == null && !settings.playerNameAsked,
+                    askPlayerName = settingsLoaded && featuresUi.loaded && !featuresUi.firstLaunch &&
+                        settings.playerName == null && !settings.playerNameAsked,
                     onPlayerNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
                     onPlayerNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },
                     mastery = mastery,
+                )
+                // Il primo avvio (F1G-01) copre la Home e chiede il nome da sé: la Home non lo chiede finché dura.
+                FirstLaunchHost(
+                    firstLaunch = featuresUi.firstLaunch && settingsLoaded,
+                    playerName = settings.playerName,
+                    nameAsked = settings.playerNameAsked,
+                    playerNameMaxLength = MAX_PLAYER_NAME,
+                    onNameConfirmed = { name -> scope.launch { settingsRepository.updatePlayerName(name) } },
+                    onNameSkipped = { scope.launch { settingsRepository.markPlayerNameAsked() } },
+                    onStartHand = {
+                        navController.navigate(
+                            Route.Table(
+                                level = Opponent.GIGI.level.name,
+                                targetScore = GuidedHand.TARGET_SCORE,
+                                fundamental = TrainingFundamental.NONE.name,
+                                seed = GuidedHand.SEED,
+                                guided = true,
+                            ),
+                        ) { popUpTo(Route.Home) }
+                    },
+                    onGoToGigi = {
+                        scope.launch { guideRepository.setHand(GuidedHandStatus.SKIPPED) }
+                        navController.navigate(Route.PreGame(Opponent.GIGI.name)) { launchSingleTop = true }
+                    },
                 )
             }
             composable<Route.Ladder> { entry ->
@@ -256,6 +286,11 @@ public fun MaestroNavHost(
                     trainingFundamental = TrainingFundamental.valueOf(route.fundamental),
                     seed = route.seed,
                     resume = route.resume,
+                    guided = route.guided,
+                    onGuideDone = { status ->
+                        scope.launch { guideRepository.setHand(status) }
+                        navController.navigate(Route.PreGame(Opponent.GIGI.name)) { popUpTo(Route.Home) }
+                    },
                     tableThemeId = settings.selectedTableTheme,
                     cardBackThemeId = settings.selectedCardBackTheme,
                     showPointsRace = settings.showPointsRace,
@@ -291,6 +326,8 @@ public fun MaestroNavHost(
                 val matchLog = remember(route.matchLog) { MatchLog.parse(route.matchLog) }
                 val training = if (route.trainingTotal >= 0) route.trainingCorrect to route.trainingTotal else null
                 val fundamental = TrainingFundamental.valueOf(route.fundamental)
+                // «Rivedi analisi» nel Profilo apre una partita già giocata: è il segnale del capitolo 7 (F1G-16b).
+                LaunchedEffect(route) { if (route.fromHistory) guideRepository.markReviewed() }
                 LaunchedEffect(route) {
                     shell.startPostMatch(
                         matchLog, Seat.P1, training, fundamental, route.fromHistory,
@@ -352,6 +389,8 @@ public fun MaestroNavHost(
                     if (value == null) value = withContext(Dispatchers.Default) { MatchAnalyzer().analyze(matchLog) }
                 }
                 val ready = analysis
+                // Aprire la revisione di una partita è il segnale del capitolo 7 (F1G-16b).
+                LaunchedEffect(route.matchLog) { guideRepository.markReviewed() }
                 if (ready != null) {
                     GameReviewScreen(
                         matchLog = matchLog,

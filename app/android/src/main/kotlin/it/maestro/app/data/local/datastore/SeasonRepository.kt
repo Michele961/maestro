@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import it.maestro.app.data.local.academy.AcademyContent
+import it.maestro.app.domain.guide.GuideRepository
 import it.maestro.app.domain.mastery.MasteryRepository
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.season.SeasonFacts
 import it.maestro.app.domain.season.SeasonProgress
@@ -53,12 +55,14 @@ public fun seasonFacts(
     academy: AcademyRepository,
     mastery: MasteryRepository,
     clock: Clock,
+    guide: GuideRepository,
 ): Flow<SeasonFacts> = combine(
     opponents.observeProgress(),
     dailyPuzzle.observeDailyPuzzle(clock.today().toString()),
     academy.observeProgress(),
     mastery.observeMatchHistory(),
-) { ladder, puzzle, lessons, history ->
+    guide.observe(),
+) { ladder, puzzle, lessons, history, guideState ->
     SeasonFacts(
         defeated = ladder.defeated,
         dailyPuzzleSolvedToday = puzzle.isSolvedToday,
@@ -69,6 +73,12 @@ public fun seasonFacts(
         sparringChecksPlayed = history
             .mapNotNull { entry -> TrainingFundamental.entries.firstOrNull { it.name == entry.sparringObjective } }
             .toSet(),
+        guidedHand = guideState.hand,
+        sparringPlayed = history.any { it.sparringObjective != null },
+        reviewed = guideState.reviewed,
+        hasPlayedMatch = history.isNotEmpty(),
+        // Lo storico è dal più recente: conta solo l'ultima partita, e solo se persa.
+        lostTo = history.firstOrNull()?.takeIf { !it.isWin }?.opponent?.let { name -> Opponent.entries.firstOrNull { it.name == name } },
     )
 }
 

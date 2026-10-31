@@ -28,6 +28,8 @@ import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.season.SeasonRepository
 import it.maestro.app.domain.story.StoryRepository
 import it.maestro.app.data.local.datastore.DataStoreStoryRepository
+import it.maestro.app.data.local.datastore.DataStoreGuideRepository
+import it.maestro.app.domain.guide.GuideRepository
 import it.maestro.app.feature.season.presentation.StoryViewModel
 import it.maestro.app.data.local.datastore.DataStoreSeasonRepository
 import it.maestro.app.data.local.datastore.seasonFacts
@@ -138,6 +140,8 @@ public val appModule: Module = module {
 
     single<StoryRepository> { DataStoreStoryRepository(dataStore = androidContext().seasonDataStore) }
 
+    single<GuideRepository> { DataStoreGuideRepository(dataStore = androidContext().seasonDataStore) }
+
     single<SeasonRepository> {
         DataStoreSeasonRepository(
             dataStore = androidContext().seasonDataStore,
@@ -147,6 +151,7 @@ public val appModule: Module = module {
                 academy = get(),
                 mastery = get(),
                 clock = get(),
+                guide = get(),
             ),
         )
     }

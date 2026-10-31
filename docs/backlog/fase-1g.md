@@ -39,7 +39,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-01 — Primo avvio e saluto del Maestro
 
-- **Stato:** da fare
+- **Stato:** fatto (assorbito da F1G-16b, 2026-10-31)
 - **Obiettivo:** un utente nuovo non trova la Home piena: trova il Maestro che saluta, dà il nome ed entra nella prima mano.
 - **Perimetro:** schermata di primo avvio (riusa il dialogo del nome); flag «primo avvio completato» in DataStore con valore di default (nessuna migrazione distruttiva); chi aggiorna l'app con dati esistenti non vede il primo avvio.
 - **Criteri di accettazione:** utente nuovo → saluto → nome → ingresso nella prima mano; utente esistente → Home com'è; il flag sopravvive a chiusura del processo e rotazione; test sul flag e screenshot nella matrice.
@@ -48,7 +48,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-02 — Mano d'esordio guidata
 
-- **Stato:** da fare
+- **Stato:** fatto (assorbito da F1G-16b, 2026-10-31)
 - **Obiettivo:** insegnare presa singola e somma in una mano con seme fisso, saltabile («So già giocare»).
 - **Perimetro:** partita guidata sul tavolo esistente con i suggerimenti a due livelli di Sparring; testi dal capitolo 1 dell'Accademia; **nessuna regola nuova**; il seme fisso passa dal generatore del progetto (ADR-0009).
 - **Criteri di accettazione:** la mano è identica a ogni avvio; si può saltare; fine mano porta a Gigi; test di determinismo e di salto.
@@ -114,14 +114,16 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-16 — Scene della Scalata e Guida del Maestro
 
-- **Stato:** in corso (fatto 16a; resta 16b: primo avvio, mano d'esordio guidata, «So già giocare»)
+- **Stato:** fatto (16a e 16b, 2026-10-31)
 - **Obiettivo:** la Scalata come storia interattiva: scene a battute con ritratti e fumetti che compaiono in app, «prossimo passo» con un pulsante che porta all'attività, e una guida a tutorial (mano d'esordio guidata, suggerimenti in Home, saluto di rientro, «So già giocare»).
 - **Perimetro:** testi approvati in `docs/design/stagione-scene.md` (chiavi `story_*` e `guide_*`); scena riusando il riquadro di dialogo del Maestro, avanzamento con un tocco, scene viste salvate in DataStore; indicatore «Ancora N tavoli all'Olimpo»; il tutorial è saltabile in ogni momento e «So già giocare» segna il capitolo 1 come fatto; nessuna regola nuova; tempi da `MotionSpec`; ricompense solo da `RewardEngine`. Assorbe F1G-01 (primo avvio), F1G-02 (mano d'esordio guidata) e la parte di suggerimento «prossimo passo» di F1G-03.
 - **Criteri di accettazione:** una scena compare una sola volta; il pulsante «prossimo passo» porta alla destinazione giusta per ogni capitolo; i capitoli 1 e 7 restano nascosti finché non c'è il segnale; screenshot nella matrice; test della logica di scena.
 - **Per Michele:** conferma sul telefono di ritmo e quantità delle scene.
 - **Domande aperte:** nessuna.
 - **Fatto 16a (2026-10-31, per l'autorizzazione di Michele con dipendenze F1R aperte):** modello di scena in `domain/story/` (battute con parlante, varianti `_named`, scene di benvenuto, apertura, metà, chiusura, epilogo e rientro) lette dai capitoli; scene viste in DataStore (chiave `story_seen_scenes`, default vuoto); `StoryScenePlayer` (ritratto + riquadro del Maestro, un tocco avanza, «Salta», nessuna animazione); «prossimo passo» con pulsante verso le rotte esistenti (PreGame con avversario o Check, Sfida del giorno, Accademia); indicatore «Ancora N tavoli»; suggerimento `guide_home_*` e saluto di rientro in Home. Scelte dell'agente da confermare: soglia di rientro 3 giorni (`StoryDirector.RETURN_AFTER_DAYS`); N conta i capitoli disponibili (oggi 8, perché 1 e 7 sono nascosti); chi ha già capitoli finiti non rivede benvenuto né chiusure vecchie; per la partita in Classica la PreGame si apre sull'avversario ma la modalità si sceglie lì; Sparring con Check contro Gigi; due stringhe UI aggiunte (`story_scene_skip`, `story_scene_tap_hint`); non usate: casi limite `story_edge_*`, `story_ch04_*_done/unavailable`, pulsanti `story_welcome_next_button`/`story_epilogue_next_*`.
-- **Resta 16b:** primo avvio (F1G-01), mano d'esordio guidata (F1G-02, chiavi `guide_intro/pick/single/…/end/skip`), «So già giocare» e «Salta la guida» (cap. 1 fatto, `guide_skip_scene`), segnale di revisione per il cap. 7, casi limite.
+- **Fatto 16b (2026-10-31, assorbe F1G-01 e F1G-02):** primo avvio sopra la Home (`feature/firstlaunch`: saluto, nome con il dialogo della Home, «Prima mano» / «So già giocare»); flag nel nuovo `GuideRepository` (DataStore `maestro_season`, chiavi `guide_hand` e `guide_reviewed`, default «non fatta»): chi ha già giocato alla prima valutazione conta come «saltata» e non rivede il primo avvio. Mano d'esordio guidata al tavolo (`Route.Table(guided = true)`, seme fisso `GuidedHand.SEED = 88` dal generatore del progetto, avversario Gigi): la regia è sempre il `TableDirector`, il Maestro parla nel fumetto della zona esistente, il passo da insegnare si sceglie dalla sola vista (`domain/guide/GuidedHand`), la partita non si salva né si registra (niente Maestria, ricompense, «Riprendi partita»); a fine smazzata il riepilogo porta al saluto «Vai da Gigi». «Salta la guida» è nell'introduzione e nella pausa; «So già giocare» e «Salta la guida» passano dalla scena `guide_skip_scene*` e segnano il capitolo 1 fatto. Cap. 1: nascosto finché la mano non è giocata o saltata; dopo la mano giocata si chiude con una partita di Sparring. Cap. 7: ora sempre disponibile, si chiude quando si apre una revisione (Rivedi analisi dal Profilo o Rivedi partita). Casi limite collegati: `story_welcome_next_button`, `story_epilogue_next_*` (pulsanti di fine scena), `story_edge_review_empty_*` (cap. 7 senza partite), `story_edge_lost_*` (ultima partita persa contro l'avversario del capitolo).
+- **Da confermare (16b):** (1) il seme 88 insegna tutti i passi nell'ordine della guida a chi ubbidisce al Maestro; l'ordine di insegnamento a turni (Settebello e scopa prima, poi singola, somma, posa) è scelta dell'agente; (2) la mano guidata è la smazzata intera (18 mosse) e non si riprende se si esce: al rientro compare di nuovo il primo avvio; (3) la scena di «So già giocare» porta a Gigi (documento v3) e non alla Home come dice `testi-primo-avvio-e-home.md` §1; (4) il cap. 1 dopo la mano giocata richiede una partita di Sparring; (5) con il cap. 7 sempre visibile «Ancora N tavoli» passa da 8 a 9; chi era già oltre il cap. 6 rivede il cap. 7 come corrente; (6) `%1$s` di `guide_single_instr` è nel formato «7 Denari» (formattatore della carta esistente).
+- **Non collegate (nessuna stringa aggiunta in `strings.xml`, il modello non le raggiunge):** `story_ch04_scene3_text_done`, `story_ch04_next_*_done` e `story_edge_done_elsewhere_*` (un capitolo con obiettivo già soddisfatto si chiude da solo, non passa da «corrente»); `story_ch04_unavailable_*` (la Sfida del giorno è generata offline, non manca mai).
 
 ## F1G-09 — Regole della casa che si sbloccano con gli avversari
 

@@ -9,10 +9,15 @@ import it.maestro.game.scopa.MatchLog
 import it.maestro.app.domain.coach.HintComposer
 import it.maestro.app.domain.coach.HintLine
 import it.maestro.app.domain.coach.VoiceLine
+import it.maestro.app.domain.guide.GuideLine
+import it.maestro.app.domain.guide.GuideStep
+import it.maestro.app.domain.guide.GuideTone
+import it.maestro.app.domain.guide.GuidedHand
 import it.maestro.app.domain.match.Beat
 import it.maestro.app.domain.match.MatchSession
 import it.maestro.game.scopa.ScopaConfig
 import it.maestro.game.scopa.ScopaMove
+import it.maestro.game.scopa.ScopaView
 import it.maestro.game.training.TrainingFundamental
 import it.maestro.game.training.TrainingQuestion
 
@@ -125,6 +130,25 @@ public data class GameUiState(
     val dealAnimationId: Long = 0L,
     /** True se l'animazione di distribuzione include shuffle e 4 carte a terra (smazzata iniziale). */
     val isInitialDeal: Boolean = false,
+    /** La mano d'esordio guidata (F1G-02); `null` in ogni altra partita. */
+    val guide: GuideUi? = null,
+)
+
+/**
+ * Ciò che la mano d'esordio guidata mostra: la battuta [line] del Maestro (`null` se tace), se l'introduzione
+ * deve ancora comparire ([intro]) e se la mano è finita e resta solo il saluto ([finished]).
+ */
+public data class GuideUi(val line: GuideLine?, val intro: Boolean, val finished: Boolean)
+
+/**
+ * Stato interno della mano guidata: i passi già insegnati, le mosse fatte dal giocatore e la reazione all'ultima.
+ */
+public data class GuideSession(
+    val taught: Set<GuideStep> = emptySet(),
+    val moves: Int = 0,
+    val feedback: GuideLine? = null,
+    val introSeen: Boolean = false,
+    val finished: Boolean = false,
 )
 
 /**
@@ -139,6 +163,8 @@ public sealed interface GameIntent {
         val trainingFundamental: TrainingFundamental = TrainingFundamental.NONE,
         /** Sparring (con Maestro, consigli e Check) o Classica (nessun aiuto, solo pose); da `docs/app/features/maestro-voice.md` §6. */
         val sparring: Boolean = true,
+        /** Mano d'esordio guidata (F1G-02): il Maestro guida passo per passo e la partita non si registra. */
+        val guided: Boolean = false,
     ) : GameIntent
 
     public data class RestoreMatch(
@@ -165,6 +191,12 @@ public sealed interface GameIntent {
     public data object DismissEvent : GameIntent
     public data class ShowMaestroLine(val line: VoiceLine) : GameIntent
     public data object DismissMaestroLine : GameIntent
+
+    /** L'introduzione della mano guidata è stata vista. */
+    public data object DismissGuideIntro : GameIntent
+
+    /** Il giocatore ha chiuso il riepilogo della mano guidata: la guida è finita. */
+    public data object FinishGuide : GameIntent
 }
 
 /**
@@ -200,6 +232,7 @@ public data class GameInternalState(
     val opponentLastMove: OpponentMoveSummary? = null,
     val dealAnimationId: Long = 0L,
     val isInitialDeal: Boolean = false,
+    val guide: GuideSession? = null,
 ) {
     /** Log della partita: seed + configurazione + mosse (ADR-0003). */
     val matchLog: MatchLog get() = session.log
@@ -246,7 +279,21 @@ public data class GameInternalState(
             opponentLastMove = opponentLastMove,
             dealAnimationId = dealAnimationId,
             isInitialDeal = isInitialDeal,
+            guide = guide?.let { guideUi(it, view) },
         )
+    }
+
+    // La battuta tocca al Maestro solo a mano in corso: nel proprio turno insegna, dopo la mossa reagisce, a fine mano chiude.
+    private fun guideUi(progress: GuideSession, view: ScopaView): GuideUi {
+        val line = when {
+            progress.finished -> null
+            view.phase != DealPhase.PLAYING || pendingDealScore != null ->
+                GuideLine(GuideStep.END, GuideTone.INSTRUCTION)
+            view.toMove == humanSeat ->
+                GuidedHand.step(progress.taught, progress.moves, session.legalMovesFor(humanSeat), view.table)
+            else -> progress.feedback
+        }
+        return GuideUi(line, intro = !progress.introSeen, finished = progress.finished)
     }
 }
 
