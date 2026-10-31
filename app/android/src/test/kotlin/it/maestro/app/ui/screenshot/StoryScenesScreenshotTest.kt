@@ -89,7 +89,10 @@ class StoryScenesScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithText(welcome2).assertExists()
         repeat(StoryDirector.WELCOME.beats.size - 2) { composeRule.onNodeWithTag("story_scene").performClick() }
         assertEquals(0, done)
+        // La scena di benvenuto finisce con il pulsante «Ci sto!», non più con un tocco (F1G-16b).
         composeRule.onNodeWithTag("story_scene").performClick()
+        assertEquals(0, done)
+        composeRule.onNodeWithTag("story_scene_end_button").performClick()
         assertEquals(1, done)
     }
 
@@ -133,8 +136,36 @@ class StoryScenesScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun the_epilogue_ends_with_a_button_that_goes_back_to_the_club_screenshot() {
+        var back = 0
+        var seen: String? = null
+        composeRule.setContent {
+            MaestroTheme {
+                SeasonScreen(
+                    atStart, onNavigateBack = { back++ }, scene = StoryDirector.EPILOGUE,
+                    onSceneDone = { seen = it },
+                )
+            }
+        }
+        repeat(StoryDirector.EPILOGUE.beats.size - 1) { composeRule.onNodeWithTag("story_scene").performClick() }
+        composeRule.onNodeWithText("Continua a giocare", substring = true).assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("story_epilogue_end"))
+        composeRule.onNodeWithTag("story_scene_end_button").performClick()
+        assertEquals("epilogue", seen)
+        assertEquals(1, back)
+    }
+
+    @Test
+    fun the_welcome_button_is_i_am_in() {
+        composeRule.setContent { MaestroTheme { StoryScenePlayer(StoryDirector.WELCOME, playerName = null, onDone = {}) } }
+        repeat(StoryDirector.WELCOME.beats.size - 1) { composeRule.onNodeWithTag("story_scene").performClick() }
+        composeRule.onNodeWithText("Ci sto!").assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("story_welcome_end"))
+    }
+
+    @Test
     fun the_remaining_tables_are_shown_from_the_chapters_available() {
         composeRule.setContent { MaestroTheme { SeasonScreen(afterGigi, onNavigateBack = {}) } }
-        composeRule.onNodeWithTag("season_remaining").assertTextContains("Ancora 7 tavoli all'Olimpo dei Maestri")
+        composeRule.onNodeWithTag("season_remaining").assertTextContains("Ancora 8 tavoli all'Olimpo dei Maestri")
     }
 }

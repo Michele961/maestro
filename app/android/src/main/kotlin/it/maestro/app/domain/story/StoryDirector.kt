@@ -13,8 +13,31 @@ public object StoryDirector {
     /** Giorni senza giocare dopo i quali il Maestro dà il bentornato. */
     public const val RETURN_AFTER_DAYS: Int = 3
 
-    public val WELCOME: StoryScene = StoryScene("welcome", StoryTexts.WELCOME_BEATS)
-    public val EPILOGUE: StoryScene = StoryScene("epilogue", StoryTexts.EPILOGUE_BEATS)
+    public val WELCOME: StoryScene = StoryScene("welcome", StoryTexts.WELCOME_BEATS, SceneEnd(R.string.story_welcome_next_button))
+    public val EPILOGUE: StoryScene = StoryScene(
+        "epilogue", StoryTexts.EPILOGUE_BEATS, SceneEnd(R.string.story_epilogue_next_button, R.string.story_epilogue_next_text),
+    )
+
+    /** Introduzione della mano d'esordio guidata (`guide_intro_1`). Non si ricorda: la mano si gioca una volta. */
+    public val GUIDE_INTRO: StoryScene = StoryScene("guide_intro", listOf(Beat(Speaker.MAESTRO, R.string.guide_intro_1_text)))
+
+    /** Saluto a fine mano guidata: dopo i punti, il Maestro manda da Gigi. */
+    public val GUIDE_END: StoryScene = StoryScene(
+        "guide_end",
+        listOf(Beat(Speaker.MAESTRO, R.string.guide_end_ok), Beat(Speaker.MAESTRO, R.string.guide_end_1_text)),
+        SceneEnd(R.string.guide_end_button),
+    )
+
+    /** Scena di «So già giocare» e «Salta la guida» (`guide_skip_scene*`). */
+    public val GUIDE_SKIP: StoryScene = StoryScene(
+        "guide_skip",
+        listOf(
+            Beat(Speaker.MAESTRO, R.string.guide_skip_scene1_text),
+            Beat(Speaker.MAESTRO, R.string.guide_skip_scene2_text),
+            Beat(Speaker.MAESTRO, R.string.guide_skip_scene3_text),
+        ),
+        SceneEnd(R.string.guide_skip_scene_button),
+    )
 
     private fun sceneId(number: Int, kind: String) = "ch${number.toString().padStart(2, '0')}_$kind"
 

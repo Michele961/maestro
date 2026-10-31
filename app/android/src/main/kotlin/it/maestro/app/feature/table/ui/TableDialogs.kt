@@ -110,6 +110,7 @@ internal fun PauseDialog(
     onChattinessChange: (Chattiness) -> Unit = {},
     audio: AudioLevels = AudioLevels(),
     onVolumeChange: (AudioChannel, Int) -> Unit = { _, _ -> },
+    onSkipGuide: (() -> Unit)? = null,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onResume) {
         ParchmentPanel(modifier = Modifier.width(300.dp).verticalScroll(rememberScrollState()).testTag("pause_dialog")) {
@@ -159,6 +160,16 @@ internal fun PauseDialog(
                         testTag = "pause_chat_${level.name.lowercase()}",
                     )
                 }
+            }
+            // Nella mano d'esordio la guida si può saltare in ogni momento (F1G-02).
+            if (onSkipGuide != null) {
+                MaestroPillButton(
+                    text = stringResource(id = R.string.guide_skip_button),
+                    onClick = onSkipGuide,
+                    variant = PillButtonVariant.CREAM,
+                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                    testTag = "pause_skip_guide_button",
+                )
             }
             MaestroPillButton(
                 text = stringResource(id = R.string.game_menu_home),

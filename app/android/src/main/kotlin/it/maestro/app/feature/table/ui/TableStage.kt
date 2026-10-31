@@ -37,6 +37,7 @@ import it.maestro.app.designsystem.components.MaestroSpeechBubble
 import it.maestro.app.designsystem.components.PillButtonVariant
 import it.maestro.app.designsystem.components.PlaceholderCardView
 import it.maestro.app.domain.coach.HintComposer
+import it.maestro.app.domain.guide.GuideTexts
 import it.maestro.app.feature.table.presentation.GameUiState
 import it.maestro.game.model.Card
 import it.maestro.game.model.Rank
@@ -283,6 +284,9 @@ private fun RaceOrBubble(
     val nudge = uiState.hintNudge
     val showBubble = uiState.isSparring && (((hint != null || nudge != null) && !dismissed) || uiState.isHintLoading)
     val line = uiState.maestroLine?.takeIf { uiState.isSparring && !showBubble }
+    // Mano d'esordio guidata (F1G-02): il Maestro insegna a scena ferma; un consiglio chiesto ha la precedenza.
+    val guideLine = uiState.guide?.takeIf { !it.intro && checkActive && !showBubble }?.line
+    val guideRes = guideLine?.let(GuideTexts::res)
     // Il fumetto si appoggia al lato del Maestro: la coda tocca il ritratto, senza vuoto in mezzo.
     Zone(zone, Alignment.CenterEnd) {
         if (check != null) {
@@ -295,6 +299,15 @@ private fun RaceOrBubble(
                 onContinue = onContinueCheck,
                 // Con font grandi le risposte vanno a capo: il fumetto può sforare la zona invece di tagliarle.
                 modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically, unbounded = true),
+            )
+        } else if (guideLine != null && guideRes != null) {
+            val cardName = rememberCardFormatter()
+            MaestroSpeechBubble(
+                message = guideLine.card?.let { stringResource(guideRes, cardName(it)) } ?: stringResource(guideRes),
+                tail = BubbleTail.END,
+                fontSize = 12.sp,
+                maxLines = 5,
+                modifier = Modifier.testTag("guide_bubble"),
             )
         } else if (line != null) {
             // Battuta spontanea del Maestro: sparisce quando giochi o al tocco, senza timer.
