@@ -77,6 +77,8 @@ class SeasonScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.setContent { MaestroTheme { SeasonScreen(progress(midway), onNavigateBack = { back++ }) } }
         composeRule.onNodeWithTag("season_current_card").assertExists()
         composeRule.onNodeWithTag("season_done_2").assertExists()
+        composeRule.onNodeWithTag("season_circle_banner").assertExists()
+        composeRule.onNodeWithTag("season_done_thumb_2").assertExists()
         composeRule.onNodeWithTag("season_back_button").performClick()
         assertEquals(1, back)
     }

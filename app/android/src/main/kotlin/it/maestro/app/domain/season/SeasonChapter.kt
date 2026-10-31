@@ -5,13 +5,16 @@ import it.maestro.app.domain.academy.AcademyChapterId
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.game.training.TrainingFundamental
 
-/** I Circoli della Scalata (`docs/design/stagione-storia.md`, mappa dei Circoli); i nomi stanno nelle risorse. */
-public enum class Circle(public val nameRes: Int) {
-    BAR_TABLE(R.string.story_circle_bar_table),
-    NEIGHBORHOOD_CLUB(R.string.story_circle_neighborhood_club),
-    NOBLE_LOUNGE(R.string.story_circle_noble_lounge),
-    GRAND_CASINO(R.string.story_circle_grand_casino),
-    OLYMPUS(R.string.story_circle_olympus),
+/**
+ * I Circoli della Scalata (`docs/design/stagione-storia.md`, mappa dei Circoli); i nomi stanno nelle risorse.
+ * [backgroundRes] è lo sfondo illustrato del luogo, senza persone né testo (F1G-21, `story_bg_*`).
+ */
+public enum class Circle(public val nameRes: Int, public val backgroundRes: Int) {
+    BAR_TABLE(R.string.story_circle_bar_table, R.drawable.story_bg_bar_table),
+    NEIGHBORHOOD_CLUB(R.string.story_circle_neighborhood_club, R.drawable.story_bg_neighborhood_club),
+    NOBLE_LOUNGE(R.string.story_circle_noble_lounge, R.drawable.story_bg_noble_lounge),
+    GRAND_CASINO(R.string.story_circle_grand_casino, R.drawable.story_bg_grand_casino),
+    OLYMPUS(R.string.story_circle_olympus, R.drawable.story_bg_olympus),
 }
 
 /**

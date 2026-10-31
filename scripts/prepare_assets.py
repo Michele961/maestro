@@ -14,6 +14,7 @@ Esempi:
       icon_trophy icon_book_quill icon_pouch icon_coin ...
   scripts/prepare_assets.py sheet ornaments.jpg out/ ornament_top ornament_bottom ornament_corner --merge 60
   scripts/prepare_assets.py texture wood.jpg out/ texture_wood --size 1024
+  scripts/prepare_assets.py texture bg.jpg out/ story_bg_bar_table --size 2000 --quality 80
 
 Un nome "-" scarta l'oggetto in quella posizione.
 Richiede Pillow e numpy.
@@ -110,12 +111,12 @@ def texture(args):
         sys.exit("texture: serve un solo nome")
     img = Image.open(args.input).convert("RGB")
     img.thumbnail((args.size, args.size), Image.LANCZOS)
-    save(img, args.out, args.names[0])
+    save(img, args.out, args.names[0], args.quality)
 
 
-def save(img, out, name):
+def save(img, out, name, quality=90):
     path = Path(out) / f"{name}.webp"
-    img.save(path, "WEBP", quality=90, method=6)
+    img.save(path, "WEBP", quality=quality, method=6)
     print(f"{path} {img.size[0]}x{img.size[1]}")
 
 
@@ -126,6 +127,7 @@ def main():
     p.add_argument("out")
     p.add_argument("names", nargs="+", help="nomi dei file in ordine di lettura (- per scartare)")
     p.add_argument("--size", type=int, default=512, help="lato massimo in px (default 512)")
+    p.add_argument("--quality", type=int, default=90, help="qualità WebP in modalità texture (default 90)")
     p.add_argument("--merge", type=int, default=2, help="unisce pezzi distanti meno di N px (default 2)")
     p.add_argument("--key", choices=["green", "magenta"], default="green", help="colore del fondo da togliere")
     p.add_argument("--min-area", type=int, default=5000, help="ignora frammenti più piccoli (px)")

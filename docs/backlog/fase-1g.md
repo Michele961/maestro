@@ -209,3 +209,23 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** (1) interruttori delle regole della casa (PreGame) e delle Impostazioni con colori del design system (`MaestroSwitch`: acceso verde con pallino crema, spento beige con pallino di legno), stessi `testTag` e stesso comportamento; (2) nelle scene della storia i ritratti degli avversari, che hanno già la cornice circolare in ottone, si disegnano senza un secondo cerchio (solo il Maestro, senza cornice nell'immagine, usa `FramedPortrait`); (3) stile dialogo in `StoryScenePlayer`: l'altro interlocutore in alto a destra, il Maestro in basso a sinistra, ognuno col suo fumetto sotto il ritratto; chi non parla resta visibile, piccolo e attenuato, finché la scena non cambia; nessuno scorrimento, misure dallo spazio disponibile; le scene con un solo interlocutore restano come prima.
 - **Criteri di accettazione:** screenshot nella matrice (small, medium, pixel10pro, small-font130) per una scena con Maestro e Gigi; i test esistenti passano senza asserzioni cambiate.
 - **Domande aperte:** nessuna.
+
+## F1G-21 — Sfondi dei Circoli
+
+- **Stato:** fatto (2026-10-31)
+- **Dipende da:** F1G-19 approvato da Michele (direzione B, 2026-10-31); i cinque sfondi generati e consegnati da Michele
+- **Obiettivo:** la Scalata e le scene mostrano il luogo del Circolo (Tavolino del Bar, Circolo di quartiere, Salotto nobile, Gran Casinò, Olimpo dei Maestri) invece di un velo nero e di una carta verde.
+- **Perimetro:** `Circle.backgroundRes`; sfondo dietro `StoryScenePlayer` (velo a sfumatura, parametro opzionale, fallback al velo di oggi); immagine del Circolo corrente in cima a `SeasonScreen` e cartoline per i capitoli fatti; nessuna nuova logica di avanzamento, nessuna dipendenza; stringhe nuove solo se indispensabili, con chiavi it/en, segnalate come da approvare.
+- **Criteri di accettazione:** ogni capitolo mostra il suo Circolo; benvenuto = Bar, epilogo = Olimpo; senza immagine resta il comportamento attuale; testo leggibile su ogni sfondo; screenshot nella matrice (small, medium, pixel10pro, small-font130) per una scena e per la Scalata; i test esistenti passano senza asserzioni cambiate.
+- **Per Michele:** (fatto) i 5 sfondi generati con i prompt di `docs/design/proposta-grafica-scalata.md` §4.
+- **Domande aperte:** nessuna.
+
+## F1G-22 — Sedia dell'Olimpo (facoltativa)
+
+- **Stato:** da fare
+- **Dipende da:** F1G-21 fatto e visto sul telefono; `story_chair_empty` e `story_chair_taken` generate da Michele
+- **Obiettivo:** dare un volto alla posta in gioco: la sedia vuota in cima alla Scalata, occupata nell'epilogo.
+- **Perimetro:** due immagini in `SeasonScreen` (stato letto da `SeasonProgress.isComplete`); nessuna logica nuova.
+- **Criteri di accettazione:** sedia vuota fino al capitolo 10, occupata a Scalata completa; screenshot nella matrice.
+- **Per Michele:** generare le 2 immagini (`docs/design/proposta-grafica-scalata.md` §4, fase 2).
+- **Domande aperte:** nessuna.

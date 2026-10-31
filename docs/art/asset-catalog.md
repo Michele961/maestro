@@ -139,3 +139,19 @@ Sorgenti in `docs/art/generated/game-feel/`.
 | `maestro_despair.webp` | Ritratto Maestro mano sulla fronte (scopa subita) |
 | `maestro_encouraging.webp` | Ritratto Maestro pollice in su incoraggiante |
 
+
+---
+
+## 6. Sfondi dei Circoli (task F1G-21)
+
+Fondali verticali **senza persone e senza testo**, generati da Michele (D14) con i prompt di `docs/design/proposta-grafica-scalata.md` §4; dietro le scene della storia e in cima alla Scalata, ritagliati con `ContentScale.Crop`. Originali JPEG 989 × 2000, convertiti con `scripts/prepare_assets.py texture <originale>.jpg res/drawable-nodpi story_bg_<circolo> --size 2000 --quality 80` (WebP senza trasparenza; il lato massimo 2000 evita di ingrandire). Il nome corrisponde all'enum `Circle`, che li collega con `backgroundRes`.
+
+| File | Circolo | Peso |
+|---|---|---|
+| `story_bg_bar_table.webp` | Tavolino del Bar (capitoli 1–3, benvenuto) | 116 KB |
+| `story_bg_neighborhood_club.webp` | Circolo di quartiere (capitoli 4–6) | 118 KB |
+| `story_bg_noble_lounge.webp` | Salotto nobile (capitoli 7–8) | 103 KB |
+| `story_bg_grand_casino.webp` | Gran Casinò (capitolo 9) | 186 KB |
+| `story_bg_olympus.webp` | Olimpo dei Maestri (capitolo 10, epilogo) | 96 KB |
+
+Totale 619 KB (989 × 2000 px ciascuno; la proposta indicava 1080 × 2160: la risoluzione generata da Michele basta per un fondale ritagliato).
