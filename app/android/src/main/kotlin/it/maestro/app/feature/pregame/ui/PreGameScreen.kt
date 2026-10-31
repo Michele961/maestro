@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
+import it.maestro.app.designsystem.components.MaestroSwitch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -243,7 +243,7 @@ private fun HouseRuleRow(label: String, hint: String, checked: Boolean, onChecke
             Text(text = label, style = MaterialTheme.typography.titleMedium, color = ink)
             Text(text = hint, style = MaterialTheme.typography.bodySmall, color = ink)
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(tag))
+        MaestroSwitch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(tag))
     }
 }
 

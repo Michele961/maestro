@@ -23,7 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
+import it.maestro.app.designsystem.components.MaestroSwitch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -340,7 +340,7 @@ private fun SwitchRow(
             Spacer(modifier = Modifier.height(2.dp))
             Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = SubtitleColor)
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(switchTag))
+        MaestroSwitch(checked = checked, onCheckedChange = onCheckedChange, modifier = Modifier.testTag(switchTag))
     }
 }
 

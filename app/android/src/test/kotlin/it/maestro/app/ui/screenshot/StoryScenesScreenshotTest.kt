@@ -64,6 +64,21 @@ class StoryScenesScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun a_dialogue_puts_gigi_on_top_and_the_maestro_below_screenshot() {
+        val scene = requireNotNull(StoryDirector.open(1))
+        composeRule.setContent { MaestroTheme { StoryScenePlayer(scene, playerName = null, onDone = {}) } }
+        composeRule.onNodeWithTag("story_scene_speaker", useUnmergedTree = true).assertTextContains("Il Maestro")
+        composeRule.onNodeWithTag("story_scene").performClick()
+        composeRule.onNodeWithTag("story_scene_speaker", useUnmergedTree = true).assertTextContains("Gigi")
+        composeRule.onNodeWithTag("story_scene_box", useUnmergedTree = true).assertExists()
+        composeRule.onRoot().captureRoboImage(screen.path("story_dialogue_gigi"))
+        // Alla battuta successiva Gigi resta visibile, attenuato, e parla il Maestro: un solo fumetto alla volta.
+        composeRule.onNodeWithTag("story_scene").performClick()
+        composeRule.onNodeWithTag("story_scene_speaker", useUnmergedTree = true).assertTextContains("Il Maestro")
+        composeRule.onRoot().captureRoboImage(screen.path("story_dialogue_maestro"))
+    }
+
+    @Test
     fun season_with_next_step_screenshot() {
         composeRule.setContent { MaestroTheme { SeasonScreen(atStart, onNavigateBack = {}) } }
         composeRule.onNodeWithTag("season_next_button").assertExists()
