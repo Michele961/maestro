@@ -58,6 +58,7 @@ public fun HomeScreen(
     onProfileClicked: () -> Unit = {},
     onMissionsClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
+    onSeasonClicked: () -> Unit = {},
     onShopClicked: () -> Unit = {},
     onPlayerNameConfirmed: (String) -> Unit = {},
     onPlayerNameSkipped: () -> Unit = {},
@@ -126,6 +127,13 @@ public fun HomeScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
+            WoodRowTile(
+                icon = R.drawable.icon_book_closed,
+                title = stringResource(R.string.season_home_entry),
+                maxLines = 1,
+                modifier = Modifier.fillMaxWidth().height(44.dp).testTag("home_season_tile"),
+                onClick = onSeasonClicked,
+            )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 WoodRowTile(
                     icon = R.drawable.icon_book_quill,
