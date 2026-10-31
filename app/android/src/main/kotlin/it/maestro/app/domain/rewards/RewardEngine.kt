@@ -8,6 +8,8 @@ import it.maestro.app.domain.opponents.LadderVictory
 import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.domain.opponents.OpponentRepository
 import it.maestro.app.domain.retention.RetentionRepository
+import it.maestro.app.domain.season.SeasonChapter
+import it.maestro.app.domain.season.SeasonRepository
 import it.maestro.app.domain.retention.DailyMission
 import it.maestro.app.domain.retention.DailyMissionType
 import it.maestro.app.domain.progress.AchievementCounter
@@ -90,6 +92,7 @@ public class RewardEngine(
     private val opponents: OpponentRepository? = null,
     private val experience: ExperienceRepository? = null,
     private val achievements: AchievementRepository? = null,
+    private val season: SeasonRepository? = null,
 ) {
 
     /**
@@ -249,6 +252,22 @@ public class RewardEngine(
             ),
             experienceGained = addExperience(
                 Experience.MISSION_CLAIMED + if (allClaimed) Experience.ALL_MISSIONS_CLAIMED else 0,
+            ),
+        )
+    }
+
+    /**
+     * Capitolo della Scalata dei Circoli finito: [SeasonChapter.rewardCredits] crediti, una sola volta per capitolo
+     * (lo garantiscono sia il segno di «riscosso» della Stagione sia il registro del wallet).
+     */
+    public suspend fun onSeasonChapterCompleted(chapter: SeasonChapter): RewardSummary {
+        if (season?.markClaimed(chapter.number) != true) return RewardSummary()
+        return RewardSummary(
+            creditsEarned = credit(
+                chapter.rewardCredits,
+                TransactionReason.SEASON_CHAPTER_REWARD,
+                "season-ch${chapter.number}",
+                "Capitolo della Scalata completato: ${chapter.number}",
             ),
         )
     }
