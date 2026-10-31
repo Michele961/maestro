@@ -1,5 +1,6 @@
 package it.maestro.app.domain.daily
 
+import it.maestro.ai.bot.DifficultyLevel
 import java.time.LocalDate
 
 /**
@@ -11,6 +12,9 @@ import java.time.LocalDate
 public object DailyMatch {
     /** Punteggio da raggiungere: fisso, perché la partita sia la stessa per tutti. */
     public const val TARGET_SCORE: Int = 21
+
+    /** Livello del bot della partita del giorno: fisso, perché la partita sia la stessa per tutti. */
+    public val LEVEL: DifficultyLevel = DifficultyLevel.INTERMEDIO
 
     private const val SEED_MULTIPLIER: Long = 6364136223846793005L
     private const val SEED_INCREMENT: Long = 1442695040888963407L

@@ -236,6 +236,12 @@
     <string name="daily_match_share_won">won</string>
     <string name="daily_match_share_lost">lost</string>
     <string name="daily_match_share_button">Share</string>
+    <string name="daily_match_intro_title">Daily match</string>
+    <string name="daily_match_intro_opponent">%1$s, %2$s</string>
+    <string name="daily_match_intro_rules">Classic, first to %1$d points, standard rules (no variants).</string>
+    <string name="daily_match_intro_same_hand">Today the starting hand is the same for everyone: when the match ends you can share the result, without giving away your moves.</string>
+    <string name="daily_match_intro_cancel">Cancel</string>
+    <string name="daily_match_intro_play">Play</string>
     <string name="profile_title">Profile &amp; Mastery</string>
     <string name="profile_tab_mastery">Mastery &amp; Radar</string>
     <string name="profile_tab_history">Match History</string>

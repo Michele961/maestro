@@ -24,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.maestro.app.R
+import it.maestro.app.domain.daily.DailyMatch
+import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.home.presentation.HomeLines
 import it.maestro.app.designsystem.components.ClubBackground
 import it.maestro.app.designsystem.components.MaestroPillButton
@@ -62,6 +64,14 @@ public fun HomeScreen(
 ) {
     // Si apre da solo la prima volta; poi tocchi il nome per cambiarlo.
     var editingName by remember { mutableStateOf(false) }
+    var showingDailyMatchIntro by remember { mutableStateOf(false) }
+    if (showingDailyMatchIntro) {
+        DailyMatchIntroDialog(
+            opponent = Opponent.forLevel(DailyMatch.LEVEL),
+            onPlay = { showingDailyMatchIntro = false; onDailyMatchClicked() },
+            onDismiss = { showingDailyMatchIntro = false },
+        )
+    }
     if (askPlayerName || editingName) {
         PlayerNameDialog(
             currentName = playerName,
@@ -120,14 +130,16 @@ public fun HomeScreen(
                 WoodRowTile(
                     icon = R.drawable.icon_book_quill,
                     title = stringResource(R.string.home_daily_puzzle_button),
+                    maxLines = 2,
                     modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_puzzle_tile"),
                     onClick = onDailyPuzzleClicked,
                 )
                 WoodRowTile(
                     icon = R.drawable.card_denari_7,
                     title = stringResource(R.string.home_daily_match_button),
+                    maxLines = 2,
                     modifier = Modifier.weight(1f).height(50.dp).testTag("home_daily_match_tile"),
-                    onClick = onDailyMatchClicked,
+                    onClick = { showingDailyMatchIntro = true },
                 )
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
