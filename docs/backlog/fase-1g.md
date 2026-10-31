@@ -231,10 +231,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-22 — Sedia dell'Olimpo (facoltativa)
 
-- **Stato:** da fare
+- **Stato:** fatto
 - **Dipende da:** F1G-21 fatto e visto sul telefono; `story_chair_empty` e `story_chair_taken` generate da Michele
 - **Obiettivo:** dare un volto alla posta in gioco: la sedia vuota in cima alla Scalata, occupata nell'epilogo.
 - **Perimetro:** due immagini in `SeasonScreen` (stato letto da `SeasonProgress.isComplete`); nessuna logica nuova.
 - **Criteri di accettazione:** sedia vuota fino al capitolo 10, occupata a Scalata completa; screenshot nella matrice.
 - **Per Michele:** generare le 2 immagini (`docs/design/proposta-grafica-scalata.md` §4, fase 2).
+- **Come è fatto:** `scripts/prepare_chairs.py` (offline, Pillow + numpy, nessuna dipendenza del progetto) ricava dai due sorgenti su verde `story_chair_empty.webp` e `story_chair_taken.webp` (441 × 800, 39 + 42 KB, trasparenza) con matte sul verde luminoso, despill dei bordi, ritaglio e stessa tela/scala; comando in `docs/art/asset-catalog.md` §7. In `SeasonScreen` la sedia è un'immagine dentro la testata del Circolo (a destra, alta quanto la testata meno il respiro: non aggiunge altezza, quindi nessun effetto su small-font130). Stato da `olympusChair(progress)` (interno): `TAKEN` se `SeasonProgress.isComplete`, `EMPTY` se il Circolo del capitolo corrente è l'Olimpo, altrimenti nessuna sedia; nessuna nuova fonte di stato, nessun testo nuovo, nessuna animazione (la proposta non la prevede). Test: `OlympusChairTest` (3 stati) e screenshot `season_chair_empty` + `season_complete` (ora con la sedia occupata) nella matrice small, medium, pixel10pro, small-font130.
+- **Decisioni da confermare:** (1) la sedia compare solo dal capitolo 10 (vuota) e a Scalata completa (occupata), non nei capitoli 1-9: tiene la testata pulita e il capitolo 10 è «il tavolo della sedia». Se la vuoi in cima a tutta la Scalata basta cambiare la condizione in `olympusChair`. (2) Niente animazione vuota→occupata: la proposta non la prevede; il passaggio avviene a schermata nuova, dopo l'epilogo. (3) La sedia sta nella testata, non nell'epilogo (`StoryScenePlayer`), che resta come in F1G-21; la targa col nome del giocatore (citata nella proposta) non è stata aggiunta perché richiederebbe un testo disegnato sulla targa. (4) Le immagini hanno il taccuino e le carte napoletane sul sedile come da prompt; la targa sullo schienale è vuota (nessuna lettera).
 - **Domande aperte:** nessuna.

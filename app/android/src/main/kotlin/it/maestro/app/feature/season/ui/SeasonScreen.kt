@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -101,7 +102,7 @@ public fun SeasonScreen(
             ) {
                 // Il luogo del capitolo corrente (a Scalata finita, l'Olimpo): scorre con il contenuto, non toglie spazio.
                 val circle = progress.current?.chapter?.circle ?: Circle.OLYMPUS.takeIf { progress.isComplete }
-                if (circle != null) CircleBanner(circle)
+                if (circle != null) CircleBanner(circle, olympusChair(progress))
                 if (progress.chapters.isNotEmpty()) RemainingText(progress.remaining)
                 progress.current?.let { CurrentChapterCard(it, onStepClicked) }
                 if (progress.isComplete) CompleteCard()
@@ -129,23 +130,57 @@ public fun SeasonScreen(
     }
 }
 
-/** Lo sfondo del [circle], in una fascia alta metà della larghezza (al massimo 180 dp), in cornice d'ottone. */
+/** La sedia dell'Olimpo (F1G-22): vuota finché il capitolo 10 è in corso, occupata a Scalata completa. */
+internal enum class OlympusChair(val drawableRes: Int, val tag: String) {
+    EMPTY(R.drawable.story_chair_empty, "season_chair_empty"),
+    TAKEN(R.drawable.story_chair_taken, "season_chair_taken"),
+}
+
+/** Lo stato della sedia, letto solo da [SeasonProgress]: `null` finché il capitolo corrente non è quello dell'Olimpo. */
+internal fun olympusChair(progress: SeasonProgress): OlympusChair? = when {
+    progress.isComplete -> OlympusChair.TAKEN
+    progress.current?.chapter?.circle == Circle.OLYMPUS -> OlympusChair.EMPTY
+    else -> null
+}
+
+/**
+ * Lo sfondo del [circle], in una fascia alta metà della larghezza (al massimo 180 dp), in cornice d'ottone.
+ * Con [chair] la sedia sta a destra dentro la fascia, alta quanto la fascia meno il respiro: non aggiunge altezza.
+ */
 @Composable
-private fun CircleBanner(circle: Circle) {
+private fun CircleBanner(circle: Circle, chair: OlympusChair?) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val shape = RoundedCornerShape(18.dp)
-        Image(
-            painter = painterResource(circle.backgroundRes),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.Center,
+        val bannerHeight = (maxWidth * 0.5f).coerceAtMost(180.dp)
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((maxWidth * 0.5f).coerceAtMost(180.dp))
+                .height(bannerHeight)
                 .clip(shape)
                 .border(2.dp, Brass, shape)
                 .testTag("season_circle_banner"),
-        )
+        ) {
+            Image(
+                painter = painterResource(circle.backgroundRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize(),
+            )
+            if (chair != null) {
+                Image(
+                    painter = painterResource(chair.drawableRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    alignment = Alignment.CenterEnd,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 12.dp, top = 8.dp, bottom = 8.dp)
+                        .fillMaxHeight()
+                        .testTag(chair.tag),
+                )
+            }
+        }
     }
 }
 
