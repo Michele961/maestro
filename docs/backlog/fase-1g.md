@@ -164,12 +164,13 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-12 — Chiusura del giorno
 
-- **Stato:** da fare
+- **Stato:** fatto (2026-10-31)
 - **Obiettivo:** quando sfida, partita e missioni del giorno sono fatte, il Maestro saluta («per oggi basta») e annuncia il domani.
 - **Perimetro:** riga/schermata in Home, stato da missioni e serie esistenti; nessun invito a continuare; nessuna perdita se si salta.
 - **Criteri di accettazione:** compare una volta al giorno; screenshot; test della condizione.
 - **Per Michele:** testi.
-- **Domande aperte:** nessuna.
+- **Domande aperte:** (1) testo della chiusura: bozza in `docs/design/testi-chiusura-del-giorno.md`, da approvare (D16); (2) la Partita del giorno conta come fatta anche se persa; (3) la chiusura compare solo se Sfida, Partita e Missioni sono già in Home; (4) se nella stessa visita il Maestro presenta una funzione nuova (F1G-03), la chiusura aspetta la visita successiva.
+- **Come è fatto:** condizione pura in `domain/home/DayClosing` (`DayClosingSignals`, `isComplete`, `isDue`) da segnali esistenti (Sfida di oggi, `DailyMatchRepository`, missioni di `RetentionRepository`); l'ultima chiusura detta è `closingDay` in `PresentedFeatures` (stesso DataStore di F1G-03, default vuoto). `HomeLineKind.CLOSING` dopo le presentazioni e prima del resto; una volta al giorno.
 
 ## F1G-13 — Promemoria facoltativo
 

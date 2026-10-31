@@ -38,6 +38,7 @@ class HomeFeaturesRepositoryTest {
             initialized = true,
             revealed = setOf(HomeFeature.DAILY_PUZZLE, HomeFeature.GAME_TILES),
             introduced = setOf(HomeFeature.DAILY_PUZZLE),
+            closingDay = "2026-10-31",
         )
         DataStoreHomeFeaturesRepository(open(firstRun)).save(saved)
         firstRun.cancel()

@@ -90,6 +90,19 @@ class HomeScreenScreenshotTest(private val screen: ScreenConfig) {
     }
 
     @Test
+    fun home_screen_day_closing_screenshot() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = HomeFeature.ALL, mastery = 1100, playerName = "Ada", closing = true) } }
+        composeRule.onRoot().captureRoboImage(screen.path("home_screen_day_closing"))
+    }
+
+    @Test
+    fun the_maestro_closes_the_day_without_inviting_to_continue() {
+        composeRule.setContent { MaestroTheme { HomeScreen(features = HomeFeature.ALL, closing = true) } }
+        composeRule.onNodeWithText("Per oggi basta", substring = true).assertExists()
+        composeRule.onNodeWithText("Premi «Gioca»", substring = true).assertDoesNotExist()
+    }
+
+    @Test
     fun a_new_player_sees_only_play() {
         var profile = 0
         composeRule.setContent { MaestroTheme { HomeScreen(features = emptySet(), mastery = 1000, onProfileClicked = { profile++ }) } }

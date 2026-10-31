@@ -1170,6 +1170,7 @@
     <string name="guide_home_chapter_ready">The next table is ready: open «The Climb» and press the chapter button.</string>
     <string name="guide_home_daily_open">Today\'s problem awaits: press «Daily puzzle».</string>
     <string name="guide_home_all_done">You\'ve done everything today. Want to stay sharp? Press «Play» for a Sparring hand.</string>
+    <string name="home_closing_day">That\'s enough for today: you\'ve done it all. Tomorrow you\'ll find a new puzzle, a new match and new missions. See you tomorrow.</string>
     <string name="guide_return_scene1_text">So good to see you again! The notebook waited for you, and so did I.</string>
     <string name="guide_return_scene2_text">%1$d tables to go to the Olympus of Masters. The next one: %2$s.</string>
     <string name="guide_return_scene3_text">Whenever you like, open «The Climb» and we pick up from there.</string>

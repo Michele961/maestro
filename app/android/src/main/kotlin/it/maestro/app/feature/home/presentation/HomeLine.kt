@@ -4,7 +4,7 @@ import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.domain.home.HomeGuide
 
 /** Di cosa parla il Maestro dalla Home (`docs/app/features/home.md` §3.5). */
-public enum class HomeLineKind { UNLOCK, RESUME, GUIDE, STREAK, WELCOME_NAMED, WELCOME }
+public enum class HomeLineKind { UNLOCK, CLOSING, RESUME, GUIDE, STREAK, WELCOME_NAMED, WELCOME }
 
 /**
  * La battuta scelta: [kind] e quale delle [HomeLines.VARIANTS] varianti. Per [HomeLineKind.UNLOCK] c'è la frase di
@@ -37,8 +37,11 @@ public object HomeLines {
         introducing: HomeFeature? = null,
         /** Il suggerimento «cosa premere» (F1G-16a): dopo la partita da riprendere, prima di serie e saluti. */
         guide: HomeGuide? = null,
+        /** La chiusura del giorno (F1G-12): sfida, partita e missioni fatte; dopo una presentazione, prima del resto. */
+        closing: Boolean = false,
     ): HomeLine {
         if (introducing != null) return HomeLine(HomeLineKind.UNLOCK, variant = 0, feature = introducing)
+        if (closing) return HomeLine(HomeLineKind.CLOSING, variant = 0)
         if (guide != null && !hasActiveMatch) return HomeLine(HomeLineKind.GUIDE, variant = 0, guide = guide)
         val kind = when {
             hasActiveMatch -> HomeLineKind.RESUME

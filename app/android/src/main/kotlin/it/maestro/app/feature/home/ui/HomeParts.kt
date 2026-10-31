@@ -160,7 +160,7 @@ internal fun MaestroWelcome(line: HomeLine, streakCount: Int, playerName: String
                         tail = BubbleTail.START,
                         fontSize = if (compact) 11.sp else 13.sp,
                         // Le frasi di presentazione sono più lunghe delle battute ordinarie (F1G-03).
-                        maxLines = if (line.kind == HomeLineKind.UNLOCK || line.kind == HomeLineKind.GUIDE) 6 else 4,
+                        maxLines = if (line.kind == HomeLineKind.UNLOCK || line.kind == HomeLineKind.GUIDE || line.kind == HomeLineKind.CLOSING) 6 else 4,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -305,6 +305,7 @@ private val WelcomeLines = intArrayOf(R.string.home_line_welcome_0, R.string.hom
 private fun homeLineText(line: HomeLine, streakCount: Int, playerName: String?): String = when (line.kind) {
     HomeLineKind.UNLOCK -> stringResource(UnlockLines.getValue(requireNotNull(line.feature)))
     HomeLineKind.GUIDE -> stringResource(GuideLines.getValue(requireNotNull(line.guide)))
+    HomeLineKind.CLOSING -> stringResource(R.string.home_closing_day)
     HomeLineKind.RESUME -> stringResource(ResumeLines[line.variant])
     HomeLineKind.STREAK -> stringResource(StreakLines[line.variant], streakCount)
     HomeLineKind.WELCOME_NAMED -> stringResource(NamedLines[line.variant], playerName.orEmpty())

@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import it.maestro.app.domain.home.HomeFeature
 import it.maestro.app.domain.home.HomeFeaturesRepository
@@ -18,6 +19,7 @@ public class DataStoreHomeFeaturesRepository(private val dataStore: DataStore<Pr
     private val initializedKey = booleanPreferencesKey("home_features_initialized")
     private val revealedKey = stringSetPreferencesKey("home_features_revealed")
     private val introducedKey = stringSetPreferencesKey("home_features_introduced")
+    private val closingDayKey = stringPreferencesKey("home_features_closing_day")
 
     override suspend fun load(): PresentedFeatures {
         val prefs = dataStore.data.first()
@@ -25,6 +27,7 @@ public class DataStoreHomeFeaturesRepository(private val dataStore: DataStore<Pr
             initialized = prefs[initializedKey] ?: false,
             revealed = decode(prefs[revealedKey]),
             introduced = decode(prefs[introducedKey]),
+            closingDay = prefs[closingDayKey].orEmpty(),
         )
     }
 
@@ -33,6 +36,7 @@ public class DataStoreHomeFeaturesRepository(private val dataStore: DataStore<Pr
             prefs[initializedKey] = state.initialized
             prefs[revealedKey] = state.revealed.map { it.name }.toSet()
             prefs[introducedKey] = state.introduced.map { it.name }.toSet()
+            prefs[closingDayKey] = state.closingDay
         }
     }
 

@@ -60,6 +60,8 @@ public fun HomeScreen(
     introduction: HomeFeature? = null,
     /** Il suggerimento «cosa premere» del Maestro (F1G-16a), se c'è. */
     guide: HomeGuide? = null,
+    /** Il Maestro chiude il giorno (F1G-12): sfida, partita e missioni fatte; saluta e annuncia il domani. */
+    closing: Boolean = false,
     /** Il saluto di rientro dopo giorni di assenza, se va dato; [onReturnSceneDone] arriva a scena finita o saltata. */
     returnScene: StoryScene? = null,
     onReturnSceneDone: (String) -> Unit = {},
@@ -122,8 +124,8 @@ public fun HomeScreen(
                 onNameClicked = { editingName = true },
             )
             MaestroWelcome(
-                line = remember(hasActiveMatch, streakCount, playerName, day, introduction, guide) {
-                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day, introduction, guide)
+                line = remember(hasActiveMatch, streakCount, playerName, day, introduction, guide, closing) {
+                    HomeLines.choose(hasActiveMatch, streakCount, !playerName.isNullOrBlank(), day, introduction, guide, closing)
                 },
                 streakCount = streakCount,
                 playerName = playerName,

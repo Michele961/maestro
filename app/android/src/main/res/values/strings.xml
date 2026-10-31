@@ -1170,6 +1170,7 @@
     <string name="guide_home_chapter_ready">Il prossimo tavolo è pronto: apri «La Scalata» e premi il pulsante del capitolo.</string>
     <string name="guide_home_daily_open">Il problema di oggi ti aspetta: premi «Sfida del giorno».</string>
     <string name="guide_home_all_done">Per oggi hai fatto tutto. Vuoi tenerti in forma? Premi «Gioca» per una mano di Sparring.</string>
+    <string name="home_closing_day">Per oggi basta: hai fatto tutto. Domani trovi una nuova sfida, una nuova partita e nuove missioni. A domani.</string>
     <string name="guide_return_scene1_text">Che piacere rivederti! Il taccuino ti ha aspettato, e io pure.</string>
     <string name="guide_return_scene2_text">Mancano %1$d tavoli all\'Olimpo dei Maestri. Il prossimo: %2$s.</string>
     <string name="guide_return_scene3_text">Quando vuoi, apri «La Scalata» e si riparte da lì.</string>

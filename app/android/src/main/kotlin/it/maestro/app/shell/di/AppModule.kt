@@ -278,6 +278,8 @@ public val appModule: Module = module {
                 .observeDailyPuzzle(get<Clock>().today().toString())
                 .map { it.isSolvedToday },
             story = get(),
+            dailyMatchPlayedToday = get<DailyMatchRepository>().history
+                .map { results -> results.any { it.date == get<Clock>().today() } },
         )
     }
     viewModel { LadderViewModel(repository = get()) }
