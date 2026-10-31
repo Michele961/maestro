@@ -1,5 +1,6 @@
 package it.maestro.app.domain.guide
 
+import it.maestro.app.domain.match.HouseRule
 import kotlinx.coroutines.flow.Flow
 
 /** Come è andata la mano d'esordio guidata (F1G-02). */
@@ -19,10 +20,12 @@ public enum class GuidedHandStatus {
  *
  * @property hand la mano d'esordio guidata; è anche il flag «primo avvio completato» (F1G-01).
  * @property reviewed il giocatore ha aperto la revisione di una partita: è il segnale del capitolo 7.
+ * @property seenRuleLessons le regole della casa di cui il Maestro ha già fatto la mini-lezione (F1G-09).
  */
 public data class GuideProgress(
     val hand: GuidedHandStatus = GuidedHandStatus.NOT_DONE,
     val reviewed: Boolean = false,
+    val seenRuleLessons: Set<HouseRule> = emptySet(),
 )
 
 /** Persistenza dello stato della guida. Senza dati vale il valore di default: nulla di esistente viene toccato. */
@@ -34,4 +37,7 @@ public interface GuideRepository {
 
     /** Registra che una revisione è stata aperta; ripeterla non cambia nulla. */
     public suspend fun markReviewed()
+
+    /** Registra che la mini-lezione di [rule] è stata mostrata; ripeterla non cambia nulla. */
+    public suspend fun markRuleLessonSeen(rule: HouseRule)
 }

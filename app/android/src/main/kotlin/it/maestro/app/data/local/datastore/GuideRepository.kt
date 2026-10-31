@@ -5,9 +5,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import it.maestro.app.domain.guide.GuideProgress
 import it.maestro.app.domain.guide.GuideRepository
 import it.maestro.app.domain.guide.GuidedHandStatus
+import it.maestro.app.domain.match.HouseRule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -19,11 +21,15 @@ import kotlinx.coroutines.flow.map
 public class DataStoreGuideRepository(private val dataStore: DataStore<Preferences>) : GuideRepository {
     private val handKey = stringPreferencesKey("guide_hand")
     private val reviewedKey = booleanPreferencesKey("guide_reviewed")
+    private val lessonsKey = stringSetPreferencesKey("guide_rule_lessons")
 
     override fun observe(): Flow<GuideProgress> = dataStore.data.map { preferences ->
         GuideProgress(
             hand = GuidedHandStatus.entries.firstOrNull { it.name == preferences[handKey] } ?: GuidedHandStatus.NOT_DONE,
             reviewed = preferences[reviewedKey] == true,
+            seenRuleLessons = preferences[lessonsKey].orEmpty()
+                .mapNotNull { name -> HouseRule.entries.firstOrNull { it.name == name } }
+                .toSet(),
         )
     }
 
@@ -33,6 +39,10 @@ public class DataStoreGuideRepository(private val dataStore: DataStore<Preferenc
 
     override suspend fun markReviewed() {
         dataStore.edit { it[reviewedKey] = true }
+    }
+
+    override suspend fun markRuleLessonSeen(rule: HouseRule) {
+        dataStore.edit { it[lessonsKey] = it[lessonsKey].orEmpty() + rule.name }
     }
 }
 
@@ -48,5 +58,9 @@ public class InMemoryGuideRepository(initial: GuideProgress = GuideProgress()) :
 
     override suspend fun markReviewed() {
         state.value = state.value.copy(reviewed = true)
+    }
+
+    override suspend fun markRuleLessonSeen(rule: HouseRule) {
+        state.value = state.value.copy(seenRuleLessons = state.value.seenRuleLessons + rule)
     }
 }
