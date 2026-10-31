@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -174,7 +175,7 @@ class PreGameScreenScreenshotTest(private val screen: ScreenConfig) {
     @Test
     fun the_lesson_shows_the_text_of_the_rule_entering_force() {
         classic(Opponent.NONNA_ROSA, lesson = HouseRule.RE_BELLO)
-        composeRule.onNodeWithTag("rule_lesson").performScrollTo().assertTextContains("Re di Denari", substring = true)
+        composeRule.onNodeWithText("Non è una carta qualsiasi", substring = true).performScrollTo().assertExists()
     }
 
     @Test
