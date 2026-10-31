@@ -92,7 +92,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-07 — Modello e schermata della Stagione
 
-- **Stato:** fatto (con le due voci in «Resta» e le dipendenze F1R-18/27/28/29 ancora da confermare da Michele sul telefono)
+- **Stato:** in corso (schermata e modello consegnati; restano le voci in «Resta» e la conferma di Michele sul telefono delle dipendenze F1R-18/27/28/29)
 - **Obiettivo:** la «Scalata dei Circoli» come dati: capitoli che richiamano avversario, modalità, Check, livello di sfida, lezione; schermata del capitolo corrente.
 - **Perimetro:** modello nel dominio, progresso in DataStore, ricompense solo da `RewardEngine`; capitoli come dati, non codice; nessun blocco a tempo.
 - **Criteri di accettazione:** progresso salvato e sopravvive a chiusura; capitolo completato assegna ricompensa una sola volta; screenshot; test del modello.
