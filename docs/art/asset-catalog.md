@@ -155,3 +155,21 @@ Fondali verticali **senza persone e senza testo**, generati da Michele (D14) con
 | `story_bg_olympus.webp` | Olimpo dei Maestri (capitolo 10, epilogo) | 96 KB |
 
 Totale 619 KB (989 × 2000 px ciascuno; la proposta indicava 1080 × 2160: la risoluzione generata da Michele basta per un fondale ritagliato).
+
+---
+
+## 7. Sedia dell'Olimpo (task F1G-22)
+
+Due oggetti con trasparenza, generati da Michele su fondo verde chroma-key con un alone verde luminoso (sorgenti: `story_chair_empty_src.webp` 1024 × 765 e `story_chair_taken_src.jpg` 2000 × 1493). In cima alla Scalata quando il capitolo 10 è in corso (vuota) e a Scalata completa (occupata). Stessa tela (441 × 800 px, sedia alta 760 px con 20 px di margine) e stessa scala: si sovrappongono a parte taccuino e carte sul sedile.
+
+```
+python3 scripts/prepare_chairs.py story_chair_empty_src.webp story_chair_taken_src.jpg \
+    app/android/src/main/res/drawable-nodpi
+```
+
+Lo script (Pillow + numpy, solo offline) toglie il verde luminoso (matte sul canale verde, il panno verde scuro della sedia resta opaco), sopprime l'alone sui bordi (despill nella fascia vicina alla trasparenza), ritaglia alla sedia e normalizza altezza e centro. Verificata a vista su bianco, nero e verde panno `#1E4D2B`: nessun contorno verdastro.
+
+| File | Stato | Peso |
+|---|---|---|
+| `story_chair_empty.webp` | Capitolo 10 in corso | 39 KB |
+| `story_chair_taken.webp` | Scalata completa (taccuino aperto e carte napoletane) | 42 KB |

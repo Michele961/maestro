@@ -66,9 +66,27 @@ class SeasonScreenScreenshotTest(private val screen: ScreenConfig) {
             dailyPuzzleSolvedToday = true,
             completedAcademyChapters = AcademyChapterId.entries.toSet(),
             sparringChecksPlayed = TrainingFundamental.entries.toSet(),
+            reviewed = true,
         )
         composeRule.setContent { MaestroTheme { SeasonScreen(progress(all), onNavigateBack = {}) } }
+        composeRule.onNodeWithTag("season_chair_taken").assertExists()
+        composeRule.onNodeWithTag("season_chair_empty").assertDoesNotExist()
         composeRule.onRoot().captureRoboImage(screen.path("season_complete"))
+    }
+
+    @Test
+    fun season_at_the_olympus_with_the_empty_chair_screenshot() {
+        val beforeTheEnd = SeasonFacts(
+            defeated = Opponent.entries.toSet() - setOf(Opponent.DON_ALFONSO, Opponent.MAESTRO),
+            dailyPuzzleSolvedToday = true,
+            completedAcademyChapters = AcademyChapterId.entries.toSet(),
+            sparringChecksPlayed = TrainingFundamental.entries.toSet(),
+            reviewed = true,
+        )
+        composeRule.setContent { MaestroTheme { SeasonScreen(progress(beforeTheEnd), onNavigateBack = {}) } }
+        composeRule.onNodeWithTag("season_chair_empty").assertExists()
+        composeRule.onNodeWithTag("season_chair_taken").assertDoesNotExist()
+        composeRule.onRoot().captureRoboImage(screen.path("season_chair_empty"))
     }
 
     @Test
@@ -78,6 +96,7 @@ class SeasonScreenScreenshotTest(private val screen: ScreenConfig) {
         composeRule.onNodeWithTag("season_current_card").assertExists()
         composeRule.onNodeWithTag("season_done_2").assertExists()
         composeRule.onNodeWithTag("season_circle_banner").assertExists()
+        composeRule.onNodeWithTag("season_chair_empty").assertDoesNotExist()
         composeRule.onNodeWithTag("season_done_thumb_2").assertExists()
         composeRule.onNodeWithTag("season_back_button").performClick()
         assertEquals(1, back)
