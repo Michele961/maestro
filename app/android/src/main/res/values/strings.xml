@@ -1174,6 +1174,18 @@
     <string name="guide_return_scene2_text">Mancano %1$d tavoli all\'Olimpo dei Maestri. Il prossimo: %2$s.</string>
     <string name="guide_return_scene3_text">Quando vuoi, apri «La Scalata» e si riparte da lì.</string>
     <string name="guide_return_scene2_text_one">Manca un solo tavolo all\'Olimpo dei Maestri: %1$s. Ci siamo quasi!</string>
+
+    <!-- Promemoria quotidiano (F1G-13): bozza da approvare, vedi docs/design/testi-promemoria.md -->
+    <string name="reminder_channel_name">Promemoria</string>
+    <string name="reminder_channel_description">Un messaggio del Maestro al giorno, al massimo.</string>
+    <string name="reminder_notification_title">Il Maestro</string>
+    <string name="reminder_notification_text">Il tavolo è pronto, quando ti va di fare una mano.</string>
+    <string name="reminder_prompt_title">Vuoi un promemoria?</string>
+    <string name="reminder_prompt_message">Posso ricordarti, una volta al giorno al massimo e solo se non hai ancora giocato, che il tavolo è pronto. Resta sul tuo telefono e lo spegni quando vuoi dalle Impostazioni. Android ti chiederà di confermare.</string>
+    <string name="reminder_prompt_accept">Sì, grazie</string>
+    <string name="reminder_prompt_decline">No, grazie</string>
+    <string name="settings_reminder">Promemoria quotidiano</string>
+    <string name="settings_reminder_subtitle">Una notifica al giorno al massimo, mai se hai già giocato.</string>
     <!-- Primo avvio, mano d'esordio guidata e casi limite della Scalata (F1G-16b): testi da docs/design/stagione-scene.md -->
     <string name="first_launch_greeting">Benvenuto al circolo. Io sono il Maestro: ti insegno la Scopa una mano alla volta.</string>
     <string name="first_launch_ask_name">Come ti chiami? Così so come chiamarti al tavolo.</string>

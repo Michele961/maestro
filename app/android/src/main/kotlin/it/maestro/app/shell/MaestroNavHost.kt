@@ -71,6 +71,7 @@ import it.maestro.app.feature.settings.ui.SettingsScreen
 import it.maestro.app.feature.puzzle.ui.DailyPuzzleScreen
 import it.maestro.app.feature.review.ui.GameReviewScreen
 import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
+import it.maestro.app.feature.reminder.presentation.ReminderViewModel
 import it.maestro.app.feature.home.ui.HomeScreen
 import it.maestro.app.feature.firstlaunch.ui.FirstLaunchHost
 import it.maestro.app.feature.review.presentation.PostMatchViewModel
@@ -161,7 +162,13 @@ public fun MaestroNavHost(
                 LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { shell.refreshActiveMatch() }
                 val homeFeatures: HomeFeaturesViewModel = koinViewModel()
                 val featuresUi by homeFeatures.state.collectAsStateWithLifecycle()
+                val reminderViewModel: ReminderViewModel = koinViewModel()
+                val reminderUi by reminderViewModel.uiState.collectAsStateWithLifecycle()
+                val requestNotifications = rememberNotificationPermissionRequest(reminderViewModel::onPermissionResult)
                 HomeScreen(
+                    askReminder = reminderUi.askConsent,
+                    onReminderAccepted = { reminderViewModel.onConsentAccepted(); requestNotifications() },
+                    onReminderDeclined = reminderViewModel::onConsentDeclined,
                     features = featuresUi.visible,
                     introduction = featuresUi.introduction,
                     guide = featuresUi.guide,

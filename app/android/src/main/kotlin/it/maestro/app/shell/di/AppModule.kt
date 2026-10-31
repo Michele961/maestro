@@ -13,7 +13,13 @@ import it.maestro.app.data.local.datastore.DailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreAcademyRepository
 import it.maestro.app.data.local.datastore.DataStoreDailyMatchRepository
 import it.maestro.app.data.local.datastore.DataStoreHomeFeaturesRepository
+import it.maestro.app.data.reminder.AlarmReminderScheduler
+import it.maestro.app.data.reminder.AndroidReminderNotifier
+import it.maestro.app.data.reminder.DataStoreReminderRepository
 import it.maestro.app.domain.home.HomeFeaturesRepository
+import it.maestro.app.domain.reminder.ReminderCoordinator
+import it.maestro.app.domain.reminder.ReminderRepository
+import it.maestro.app.feature.reminder.presentation.ReminderViewModel
 import it.maestro.app.feature.home.presentation.HomeFeaturesViewModel
 import it.maestro.app.data.local.datastore.DataStoreDailyPuzzleRepository
 import it.maestro.app.data.local.datastore.DataStoreMasteryRepository
@@ -69,11 +75,13 @@ import it.maestro.app.domain.time.Clock
 import it.maestro.app.domain.time.SystemClock
 import it.maestro.app.shell.ShellViewModel
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
 private val Context.dataStore by preferencesDataStore(name = "maestro_settings")
 private val Context.dailyPuzzleDataStore by preferencesDataStore(name = "maestro_daily_puzzle")
 private val Context.dailyMatchDataStore by preferencesDataStore(name = "maestro_daily_match")
 private val Context.homeFeaturesDataStore by preferencesDataStore(name = "maestro_home_features")
+private val Context.reminderDataStore by preferencesDataStore(name = "maestro_reminder")
 private val Context.masteryDataStore by preferencesDataStore(name = "maestro_mastery")
 private val Context.retentionDataStore by preferencesDataStore(name = "maestro_retention")
 private val Context.opponentsDataStore by preferencesDataStore(name = "maestro_opponents")
@@ -124,6 +132,20 @@ public val appModule: Module = module {
 
     single<HomeFeaturesRepository> {
         DataStoreHomeFeaturesRepository(dataStore = androidContext().homeFeaturesDataStore)
+    }
+
+    single<ReminderRepository> { DataStoreReminderRepository(dataStore = androidContext().reminderDataStore) }
+    single {
+        ReminderCoordinator(
+            repository = get(),
+            scheduler = AlarmReminderScheduler(androidContext()),
+            notifier = AndroidReminderNotifier(androidContext()),
+            clock = get(),
+            lastPlayed = {
+                val clock = get<Clock>()
+                runCatching { LocalDate.parse(get<RetentionRepository>().getStreak(clock.today()).lastPlayedDate) }.getOrNull()
+            },
+        )
     }
 
     single<MasteryRepository> {
@@ -283,6 +305,7 @@ public val appModule: Module = module {
         )
     }
 
+    viewModel { ReminderViewModel(repository = get(), mastery = get(), coordinator = get()) }
     viewModel {
         SettingsViewModel(settingsRepository = get(), soundManager = get())
     }

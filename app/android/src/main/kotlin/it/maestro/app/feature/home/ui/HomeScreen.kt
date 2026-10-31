@@ -75,6 +75,10 @@ public fun HomeScreen(
     onShopClicked: () -> Unit = {},
     onPlayerNameConfirmed: (String) -> Unit = {},
     onPlayerNameSkipped: () -> Unit = {},
+    /** Mostra la spiegazione del promemoria (F1G-13): una volta sola, dopo la prima vittoria. */
+    askReminder: Boolean = false,
+    onReminderAccepted: () -> Unit = {},
+    onReminderDeclined: () -> Unit = {},
 ) {
     // Si apre da solo la prima volta; poi tocchi il nome per cambiarlo.
     var editingName by remember { mutableStateOf(false) }
@@ -93,6 +97,9 @@ public fun HomeScreen(
             onConfirm = { editingName = false; onPlayerNameConfirmed(it) },
             onDismiss = { editingName = false; onPlayerNameSkipped() },
         )
+    }
+    if (askReminder && !askPlayerName && !editingName) {
+        ReminderConsentDialog(onAccept = onReminderAccepted, onDecline = onReminderDeclined)
     }
     ClubBackground(modifier = modifier, feltFraction = 0.5f) {
         Column(

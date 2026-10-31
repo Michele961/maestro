@@ -2,7 +2,12 @@ package it.maestro.app.shell
 
 import android.app.Application
 import android.util.Log
+import it.maestro.app.domain.reminder.ReminderCoordinator
 import it.maestro.app.shell.di.appModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.context.GlobalContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -33,6 +38,11 @@ public class MaestroApp : Application() {
                 androidContext(this@MaestroApp)
                 modules(appModule)
             }
+        }
+
+        // Il promemoria riparte a ogni avvio dell'app (F1G-13); al riavvio del telefono ci pensa il ricevitore.
+        CoroutineScope(Dispatchers.Default).launch {
+            runCatching { GlobalContext.get().get<ReminderCoordinator>().reschedule() }
         }
     }
 }
