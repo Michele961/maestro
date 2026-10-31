@@ -63,6 +63,7 @@ public fun HomeScreen(
     onProfileClicked: () -> Unit = {},
     onMissionsClicked: () -> Unit = {},
     onAcademyClicked: () -> Unit = {},
+    onSeasonClicked: () -> Unit = {},
     onShopClicked: () -> Unit = {},
     onPlayerNameConfirmed: (String) -> Unit = {},
     onPlayerNameSkipped: () -> Unit = {},
@@ -115,6 +116,15 @@ public fun HomeScreen(
             )
             PrimaryAction(hasActiveMatch, onResumeGameClicked, onStartGameClicked)
             if (HomeFeature.GAME_TILES in features) GameTiles(onStartGameClicked)
+            if (HomeFeature.SEASON in features) {
+                WoodRowTile(
+                    icon = R.drawable.icon_book_closed,
+                    title = stringResource(R.string.season_home_entry),
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth().height(44.dp).testTag("home_season_tile"),
+                    onClick = onSeasonClicked,
+                )
+            }
             if (HomeFeature.DAILY_PUZZLE in features || HomeFeature.DAILY_MATCH in features) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (HomeFeature.DAILY_PUZZLE in features) {

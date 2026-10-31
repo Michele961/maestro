@@ -34,6 +34,7 @@ internal fun TransactionReason.labelRes(): Int = when (this) {
     TransactionReason.DAILY_PUZZLE_REWARD -> R.string.movement_daily_puzzle_reward
     TransactionReason.DAILY_MISSION_REWARD -> R.string.movement_daily_mission_reward
     TransactionReason.ACADEMY_LESSON_REWARD -> R.string.movement_academy_lesson_reward
+    TransactionReason.SEASON_CHAPTER_REWARD -> R.string.movement_season_chapter_reward
     TransactionReason.MATCH_VICTORY_REWARD -> R.string.movement_match_victory_reward
     TransactionReason.HINT_PURCHASE -> R.string.movement_hint_purchase
     TransactionReason.GAME_REVIEW_PURCHASE -> R.string.movement_game_review_purchase

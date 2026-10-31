@@ -22,6 +22,9 @@ public enum class TransactionReason {
     /** Ricompensa per aver superato una lezione dell'Accademia. */
     ACADEMY_LESSON_REWARD,
 
+    /** Ricompensa per un capitolo della Scalata dei Circoli (una volta per capitolo). */
+    SEASON_CHAPTER_REWARD,
+
     /** Ricompensa per la vittoria di una partita contro il bot. */
     MATCH_VICTORY_REWARD,
 

@@ -93,13 +93,15 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-07 — Modello e schermata della Stagione
 
-- **Stato:** da fare
+- **Stato:** in corso (schermata e modello consegnati; restano le voci in «Resta» e la conferma di Michele sul telefono delle dipendenze F1R-18/27/28/29)
 - **Obiettivo:** la «Scalata dei Circoli» come dati: capitoli che richiamano avversario, modalità, Check, livello di sfida, lezione; schermata del capitolo corrente.
 - **Perimetro:** modello nel dominio, progresso in DataStore, ricompense solo da `RewardEngine`; capitoli come dati, non codice; nessun blocco a tempo.
 - **Criteri di accettazione:** progresso salvato e sopravvive a chiusura; capitolo completato assegna ricompensa una sola volta; screenshot; test del modello.
 - **Decisioni di Michele (2026-10-30):** Q2 forma «Scalata dei Circoli» con tono da apprendista confermata; Q10 abbinamento Gigi–Tavolino del Bar, Nonna Rosa–Circolo Rionale, Tonino–Salotto Nobile, Don Alfonso–Gran Casinò, il Maestro–Olimpo confermato; se un personaggio non calza, Michele ne genera altri.
 - **Per Michele:** niente.
 - **Domande aperte:** nessuna. Dipendenze tecniche ancora aperte: F1R-18, F1R-27, F1R-28, F1R-29.
+- **Esito (2026-10-31, procede per autorizzazione di Michele con le dipendenze ancora aperte):** modello in `domain/season/` (10 capitoli come dati, capitolo corrente derivato da avversari battuti, Sfida del giorno, Accademia e storico Sparring; in DataStore solo i capitoli con ricompensa riscossa); ricompensa solo da `RewardEngine.onSeasonChapterCompleted` (20 crediti a capitolo, 50 al decimo, una volta sola); schermata `feature/season`, raggiungibile da «La Scalata» in Home; stringhe `story_*` copiate dalla storia approvata.
+- **Resta:** cap. 1 (mano d'esordio guidata, F1G-02) e cap. 7 (revisione: nessun segnale registrato) restano nascosti e non completabili finché la funzione non c'è; il cap. 4 si completa solo se la Sfida del giorno è risolta nel giorno in cui si apre la schermata (la Sfida non conserva lo storico). I titoli dei capitoli in inglese (`story_chNN_title`) sono bozza dell'agente: da rivedere (D16).
 
 ## F1G-08 — Testi e voce della Stagione
 
@@ -108,6 +110,15 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Perimetro:** `strings.xml` it/en; bozze dell'agente, approvazione di Michele (D16).
 - **Criteri di accettazione:** parità it/en; Michele ha approvato.
 - **Testi:** storia e battute dei 10 capitoli, rivedute e approvate per delega, in `docs/design/stagione-storia.md`; le stringhe `story_*` entrano in `strings.xml` con F1G-07 (nessuna stringa inutilizzata prima).
+- **Domande aperte:** nessuna.
+
+## F1G-16 — Scene della Scalata e Guida del Maestro
+
+- **Stato:** da fare (dopo F1G-03 e F1G-07)
+- **Obiettivo:** la Scalata come storia interattiva: scene a battute con ritratti e fumetti che compaiono in app, «prossimo passo» con un pulsante che porta all'attività, e una guida a tutorial (mano d'esordio guidata, suggerimenti in Home, saluto di rientro, «So già giocare»).
+- **Perimetro:** testi approvati in `docs/design/stagione-scene.md` (chiavi `story_*` e `guide_*`); scena riusando il riquadro di dialogo del Maestro, avanzamento con un tocco, scene viste salvate in DataStore; indicatore «Ancora N tavoli all'Olimpo»; il tutorial è saltabile in ogni momento e «So già giocare» segna il capitolo 1 come fatto; nessuna regola nuova; tempi da `MotionSpec`; ricompense solo da `RewardEngine`. Assorbe F1G-01 (primo avvio), F1G-02 (mano d'esordio guidata) e la parte di suggerimento «prossimo passo» di F1G-03.
+- **Criteri di accettazione:** una scena compare una sola volta; il pulsante «prossimo passo» porta alla destinazione giusta per ogni capitolo; i capitoli 1 e 7 restano nascosti finché non c'è il segnale; screenshot nella matrice; test della logica di scena.
+- **Per Michele:** conferma sul telefono di ritmo e quantità delle scene.
 - **Domande aperte:** nessuna.
 
 ## F1G-09 — Regole della casa che si sbloccano con gli avversari

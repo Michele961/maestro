@@ -76,6 +76,8 @@ import it.maestro.app.domain.opponents.Opponent
 import it.maestro.app.feature.pregame.presentation.LadderViewModel
 import it.maestro.app.feature.pregame.presentation.PreGameViewModel
 import it.maestro.app.feature.pregame.ui.LadderScreen
+import it.maestro.app.feature.season.presentation.SeasonViewModel
+import it.maestro.app.feature.season.ui.SeasonScreen
 import it.maestro.app.feature.pregame.ui.PreGameScreen
 import it.maestro.app.feature.profile.ui.ProfileScreen
 import it.maestro.app.feature.shop.ui.ShopScreen
@@ -190,6 +192,7 @@ public fun MaestroNavHost(
                     onProfileClicked = { navController.navigate(Route.Profile) { launchSingleTop = true } },
                     onMissionsClicked = { navController.navigate(Route.Today) { launchSingleTop = true } },
                     onAcademyClicked = { navController.navigate(Route.Academy) { launchSingleTop = true } },
+                    onSeasonClicked = { navController.navigate(Route.Season) { launchSingleTop = true } },
                     onShopClicked = { navController.navigate(Route.Shop) { launchSingleTop = true } },
                     streakCount = streak.currentStreak,
                     credits = credits,
@@ -381,6 +384,11 @@ public fun MaestroNavHost(
             }
             composable<Route.Academy> {
                 AcademyScreen(onNavigateHome = { navController.popBackStack() })
+            }
+            composable<Route.Season> {
+                val viewModel: SeasonViewModel = koinViewModel()
+                val progress by viewModel.state.collectAsStateWithLifecycle()
+                SeasonScreen(progress = progress, onNavigateBack = { navController.popBackStack() })
             }
             composable<Route.Today> {
                 TodayScreen(onNavigateHome = { navController.popBackStack() })
