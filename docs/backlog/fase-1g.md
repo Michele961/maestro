@@ -111,6 +111,7 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 - **Criteri di accettazione:** parità it/en; Michele ha approvato.
 - **Testi:** storia e battute dei 10 capitoli, rivedute e approvate per delega, in `docs/design/stagione-storia.md`; le stringhe `story_*` entrano in `strings.xml` con F1G-07 (nessuna stringa inutilizzata prima).
 - **Domande aperte:** nessuna.
+- **Titoli en (2026-10-31):** fatto. Titoli dei capitoli, nome «The Climb» e stringhe en brevi della schermata rivisti da un agente indipendente e approvati per delega (D16); esito in `docs/design/stagione-scene.md`, sezione «Titoli e nomi in inglese». Resta: l'approvazione di Michele sulle battute delle scene (D16, già date per delega) e `game_hint_button` en «Ask the Master» da uniformare a «Maestro» (fuori perimetro).
 
 ## F1G-16 — Scene della Scalata e Guida del Maestro
 
