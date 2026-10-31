@@ -54,9 +54,11 @@ import it.maestro.app.designsystem.theme.WoodSurfaceDark
 import it.maestro.app.domain.coach.Chattiness
 import it.maestro.app.domain.settings.AppLanguage
 import it.maestro.app.domain.settings.GameSpeed
+import it.maestro.app.feature.reminder.presentation.ReminderViewModel
 import it.maestro.app.feature.settings.presentation.SettingsUiState
 import it.maestro.app.feature.settings.presentation.SettingsViewModel
 import it.maestro.app.shell.DeveloperTools
+import it.maestro.app.shell.rememberNotificationPermissionRequest
 import org.koin.androidx.compose.koinViewModel
 
 /** Colore dei sottotitoli su pergamena. */
@@ -76,10 +78,16 @@ public fun SettingsScreen(
     onNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel(),
+    reminderViewModel: ReminderViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val reminder by reminderViewModel.uiState.collectAsStateWithLifecycle()
+    val requestNotifications = rememberNotificationPermissionRequest(reminderViewModel::onPermissionResult)
     SettingsScreenContent(
         state = state,
+        reminderAvailable = reminder.switchAvailable,
+        reminderEnabled = reminder.enabled,
+        onReminderToggled = { on -> if (on) requestNotifications() else reminderViewModel.setEnabled(false) },
         onSoundToggled = viewModel::setSoundEnabled,
         onGameSpeedChanged = viewModel::setGameSpeed,
         onMaestroChattinessChanged = viewModel::setMaestroChattiness,
@@ -122,6 +130,10 @@ public fun SettingsScreenContent(
     onHapticsToggled: (Boolean) -> Unit = {},
     onLanguageChanged: (AppLanguage) -> Unit = {},
     onMusicChoiceSelected: (MusicChoice) -> Unit = {},
+    /** Promemoria quotidiano (F1G-13): l'interruttore compare solo dopo la prima vittoria. */
+    reminderAvailable: Boolean = false,
+    reminderEnabled: Boolean = false,
+    onReminderToggled: (Boolean) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -231,6 +243,16 @@ public fun SettingsScreenContent(
                         rowTag = "points_race_row",
                         switchTag = "points_race_switch",
                     )
+                    if (reminderAvailable) {
+                        SwitchRow(
+                            title = stringResource(R.string.settings_reminder),
+                            subtitle = stringResource(R.string.settings_reminder_subtitle),
+                            checked = reminderEnabled,
+                            onCheckedChange = onReminderToggled,
+                            rowTag = "reminder_row",
+                            switchTag = "reminder_switch",
+                        )
+                    }
                     ChoiceRow(
                         title = stringResource(R.string.settings_maestro_chat),
                         subtitle = stringResource(R.string.settings_maestro_chat_subtitle),

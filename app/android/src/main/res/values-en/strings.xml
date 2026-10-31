@@ -1174,4 +1174,16 @@
     <string name="guide_return_scene2_text">%1$d tables to go to the Olympus of Masters. The next one: %2$s.</string>
     <string name="guide_return_scene3_text">Whenever you like, open «The Climb» and we pick up from there.</string>
     <string name="guide_return_scene2_text_one">One table left to the Olympus of Masters: %1$s. Almost there!</string>
+
+    <!-- Daily reminder (F1G-13): draft to be approved, see docs/design/testi-promemoria.md -->
+    <string name="reminder_channel_name">Reminder</string>
+    <string name="reminder_channel_description">At most one message a day from the Maestro.</string>
+    <string name="reminder_notification_title">The Maestro</string>
+    <string name="reminder_notification_text">The table is ready, whenever you feel like a hand.</string>
+    <string name="reminder_prompt_title">Would you like a reminder?</string>
+    <string name="reminder_prompt_message">I can let you know, at most once a day and only if you haven\'t played yet, that the table is ready. It stays on your phone and you can turn it off any time in Settings. Android will ask you to confirm.</string>
+    <string name="reminder_prompt_accept">Yes, please</string>
+    <string name="reminder_prompt_decline">No, thanks</string>
+    <string name="settings_reminder">Daily reminder</string>
+    <string name="settings_reminder_subtitle">At most one notification a day, never if you\'ve already played.</string>
 </resources>

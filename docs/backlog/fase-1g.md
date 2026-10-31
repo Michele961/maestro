@@ -171,12 +171,12 @@ Lo stato di ogni task è **solo** nella sua riga **Stato** (`docs/workflow.md`).
 
 ## F1G-13 — Promemoria facoltativo
 
-- **Stato:** da fare (dopo F1G-03)
+- **Stato:** in corso
 - **Obiettivo:** una notifica al giorno al massimo, chiesta solo dopo la prima vittoria, solo con consenso.
 - **Perimetro:** notifica locale giornaliera (nessun server, nessun dato in uscita); richiesta del permesso `POST_NOTIFICATIONS` (Android 13+) nel momento giusto e mai prima della prima vittoria; interruttore nelle Impostazioni; testo della notifica da `strings.xml` it/en, approvato come gli altri (D16); nessun promemoria se l'utente ha già giocato oggi.
 - **Perimetro autorizzato (Michele, 2026-10-30, Q7):** il promemoria giornaliero è accettato; sono concessi il permesso `POST_NOTIFICATIONS` e, per la sola pianificazione, `RECEIVE_BOOT_COMPLETED` nel manifest. **Nessuna nuova dipendenza** è autorizzata: si usano le API della piattaforma (`AlarmManager` inesatto, `NotificationManager`). Se non bastano, il task si ferma e chiede (CLAUDE.md §5).
 - **Criteri di accettazione:** il permesso si chiede una sola volta, dopo la prima vittoria, con spiegazione; rifiutato → nessuna notifica e nessuna insistenza; l'interruttore spegne e riaccende la pianificazione; al riavvio del telefono la pianificazione riparte; test sulla logica (quando notificare, mai due volte nello stesso giorno, mai se ha già giocato).
-- **Domande aperte:** nessuna.
+- **Domande aperte:** (1) testi del consenso, della notifica e delle Impostazioni: bozza in `docs/design/testi-promemoria.md`, da approvare (D16); (2) orario 19:00 con tolleranza di 3 ore, senza schermata per cambiarlo: va bene? (3) chi ha detto «No, grazie» può riaccendere il promemoria dalle Impostazioni, e lì Android mostra il suo permesso: va bene? (4) la «prima vittoria» si legge dalla cronologia recente (ultime 20 partite), come in F1G-03.
 
 ## F1G-14 — Misure minime del ritorno
 
